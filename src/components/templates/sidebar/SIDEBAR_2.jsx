@@ -11,9 +11,9 @@ import {
   ChevronDown,
 } from "lucide-react";
 
-const SIDEBAR_1 = () => {
+const SIDEBAR_2 = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(true);
   const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 768);
   const [openDropdowns, setOpenDropdowns] = useState({});
   const dropdownRefs = useRef({});
@@ -238,22 +238,27 @@ const SIDEBAR_1 = () => {
         </div>
       </div>
       {/* Main Content */}
-      <div className="flex-1 flex flex-col">
-        <div className="md:hidden p-4">
+      <div className="flex-1 transition-all duration-300 ease-in-out">
+        <div className="sticky top-0 flex w-full bg-black border-gray-200 z-99999 dark:border-gray-800 dark:bg-gray-900 lg:border-b h-[80px]">
+          <div style={{ color: "red" }}>asdads</div>
+        </div>
+        <div className="h-[5000px] border">asd</div>
+
+        {/* <div className="md:hidden p-4">
           <button onClick={toggleSidebar}>
             <Menu size={28} />
           </button>
-        </div>
+        </div> */}
         {/* <div className="m-4 p-4 md:ml-10 border">
           <h1 className="text-2xl font-bold">Welcome</h1>
           <p>This is the main content area.</p>
         </div> */}
-        <div className="m-4 p-4 md:ml-10 border mb-10">
+        {/* <div className="m-4 p-4 md:ml-10 border mb-10">
           <div className="h-[5000px]">Content Here</div>
-        </div>
+        </div> */}
       </div>
     </div>
   );
 };
 
-export default SIDEBAR_1;
+export default SIDEBAR_2;

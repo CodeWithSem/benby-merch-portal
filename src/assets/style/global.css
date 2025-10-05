@@ -1,4 +1,9 @@
 :root {
   height: 100%;
-  --primary-color: #333333;
+  --primary-color: #000000;
+}
+
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }
