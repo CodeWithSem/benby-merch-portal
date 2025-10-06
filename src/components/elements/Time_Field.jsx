@@ -13,7 +13,9 @@ const Time_Field = ({
   step,
   placeholder,
 }) => {
-  const wrapper_class = `mt-1 block w-full rounded-md shadow-sm border text-sm
+  const wrapper_class = `${
+    label ? "mt-1" : ""
+  } block w-full rounded-md shadow-sm border text-sm
     ${error_message ? "border-pink-500" : "border-slate-300"}
     ${disabled ? "bg-slate-50 text-slate-500" : "bg-white text-slate-700"}
     focus-within:ring-1 ${

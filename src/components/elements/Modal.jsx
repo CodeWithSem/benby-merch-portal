@@ -1,5 +1,6 @@
 import React from "react";
 import { X } from "lucide-react";
+import Button from "./Button";
 
 const Modal = () => {
   return (
@@ -18,7 +19,7 @@ const Modal = () => {
           </button>
 
           {/* Modal Body */}
-          <div className="text-xl font-bold mb-4">Park In</div>
+          <div className="text-xl font-bold mb-4">Modal</div>
 
           <div className="flex flex-col md:flex-row gap-4">
             <div className="w-full">
@@ -77,18 +78,22 @@ const Modal = () => {
             </label>
           </div>
           <div className="flex justify-end gap-2 mt-4">
-            <button
-              // onClick={() => setIsOpen(false)}
-              className="px-4 py-2 bg-sky-500 text-sm text-white rounded hover:bg-sky-600"
+            <Button
+              // on_click={() => set_loading(!loading)}
+              width="w-[100px]"
+              variant="primary"
+              // loading={loading}
             >
               Proceed
-            </button>
-            <button
-              // onClick={() => setIsOpen(false)}
-              className="px-4 py-2 border text-sm text-gray-700 rounded hover:bg-gray-50"
+            </Button>
+            <Button
+              // on_click={() => set_loading(!loading)}
+              width="w-[100px]"
+              variant="white"
+              // loading={loading}
             >
-              Close
-            </button>
+              Cancel
+            </Button>
           </div>
         </div>
       </div>

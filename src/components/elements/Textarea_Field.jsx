@@ -10,8 +10,11 @@ const Textarea_Field = ({
   required = false,
   rows = 4,
   textarea_error,
+  height, // new prop
 }) => {
-  const textarea_class = `block w-full mt-1 px-3 py-2 bg-white border rounded-md text-sm shadow-sm placeholder-slate-400
+  const textarea_class = `block w-full ${
+    label ? "mt-1" : ""
+  } px-3 py-2 bg-white border rounded-md text-sm shadow-sm placeholder-slate-400
     focus:outline-none focus:ring-1 resize-none
     ${
       disabled
@@ -43,6 +46,7 @@ const Textarea_Field = ({
         disabled={disabled}
         className={textarea_class}
         spellCheck={false}
+        style={height ? { height } : undefined}
       />
 
       {textarea_error && (

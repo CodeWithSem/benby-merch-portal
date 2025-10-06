@@ -1,43 +1,53 @@
 import React, { useState, useEffect, useRef } from "react";
 import {
-  Menu,
-  X,
   Home,
-  User,
   Settings,
   LogOut,
-  ChevronLeft,
-  ChevronRight,
   ChevronDown,
   FileText,
+  FormInput,
+  Table,
+  Table2Icon,
+  BoxIcon,
 } from "lucide-react";
 
-const Sidebar = ({ isDesktop, isCollapsed, isOpen }) => {
-  const [openDropdowns, setOpenDropdowns] = useState({});
-  const [activeItem, setActiveItem] = useState("Dashboard");
-  const dropdownRefs = useRef({});
+const Sidebar = ({
+  active_item,
+  set_active_item,
+  is_desktop,
+  is_collapsed,
+  is_open,
+}) => {
+  const [open_dropdowns, set_open_dropdowns] = useState({});
+  const dropdown_refs = useRef({});
 
-  const sidebarItems = [
+  const sidebar_items = [
     {
       key: "Dashboard",
       type: "link",
       name: "Dashboard",
       icon: <Home size={18} />,
-      path: "#",
     },
     {
-      key: "Profile",
+      key: "Forms",
       type: "dropdown",
-      name: "Profile",
-      icon: <User size={18} />,
-      subItems: ["Admin", "Guard", "Cashier", "Others"],
+      name: "Forms",
+      icon: <FormInput size={18} />,
+      subItems: ["Form Elements"],
     },
     {
-      key: "Reports",
+      key: "Tables",
       type: "dropdown",
-      name: "Reports",
-      icon: <FileText size={18} />,
-      subItems: ["Receipt", "Audit Log", "E-Journal"],
+      name: "Tables",
+      icon: <Table2Icon size={18} />,
+      subItems: ["Data Tables"],
+    },
+    {
+      key: "UI Elements",
+      type: "dropdown",
+      name: "UI Elements",
+      icon: <BoxIcon size={18} />,
+      subItems: ["Alerts", "Modals"],
     },
     {
       key: "Maintenance",
@@ -62,51 +72,51 @@ const Sidebar = ({ isDesktop, isCollapsed, isOpen }) => {
     },
   ];
 
-  const handleItemClick = (key) => {
-    setActiveItem(key);
+  const handle_item_click = (key) => {
+    set_active_item(key);
   };
 
-  const handleSubItemClick = (parentKey, subItem) => {
-    setActiveItem(`${parentKey}-${subItem}`);
+  const handle_subitem_click = (parentKey, subItem) => {
+    set_active_item(`${parentKey}-${subItem}`);
   };
 
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      Object.keys(dropdownRefs.current).forEach((key) => {
+    const handle_click_outside = (event) => {
+      Object.keys(dropdown_refs.current).forEach((key) => {
         if (
-          dropdownRefs.current[key] &&
-          !dropdownRefs.current[key].contains(event.target)
+          dropdown_refs.current[key] &&
+          !dropdown_refs.current[key].contains(event.target)
         ) {
-          setOpenDropdowns((prev) => ({ ...prev, [key]: false }));
+          set_open_dropdowns((prev) => ({ ...prev, [key]: false }));
         }
       });
     };
 
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    document.addEventListener("mousedown", handle_click_outside);
+    return () =>
+      document.removeEventListener("mousedown", handle_click_outside);
   }, []);
 
-  const toggleDropdown = (key) => {
-    setOpenDropdowns((prev) => ({
+  const toggle_dropdown = (key) => {
+    set_open_dropdowns((prev) => ({
       ...prev,
       [key]: !prev[key],
     }));
   };
 
-  const renderDropdown = (key, items) => {
+  const render_dropdown = (key, items) => {
     // Collapsed sidebar (desktop)
-    if (isCollapsed && isDesktop) {
+    if (is_collapsed && is_desktop) {
       return (
-        openDropdowns[key] && (
+        open_dropdowns[key] && (
           <div className="absolute left-full top-0 ml-2 bg-white rounded border py-2 z-50 w-40 shadow-lg">
             {items.map((item, idx) => {
               const subKey = `${key}-${item}`;
-              const isActive = activeItem === subKey;
+              const isActive = active_item === subKey;
               return (
                 <a
                   key={idx}
-                  href="#"
-                  onClick={() => handleSubItemClick(key, item)}
+                  onClick={() => handle_subitem_click(key, item)}
                   className={`block px-4 py-2 text-sm ${
                     isActive
                       ? "bg-sky-100 text-sky-600"
@@ -126,17 +136,18 @@ const Sidebar = ({ isDesktop, isCollapsed, isOpen }) => {
     return (
       <div
         className={`ml-9 mt-1 flex flex-col overflow-hidden transition-[max-height,opacity] duration-300 ${
-          openDropdowns[key] ? "max-h-[200px] opacity-100" : "max-h-0 opacity-0"
+          open_dropdowns[key]
+            ? "max-h-[200px] opacity-100"
+            : "max-h-0 opacity-0"
         }`}
       >
         {items.map((item, idx) => {
           const subKey = `${key}-${item}`;
-          const isActive = activeItem === subKey;
+          const isActive = active_item === subKey;
           return (
             <a
               key={idx}
-              href="#"
-              onClick={() => handleSubItemClick(key, item)}
+              onClick={() => handle_subitem_click(key, item)}
               className={`text-sm py-1 px-2 rounded transition-all duration-200 ${
                 isActive
                   ? "bg-sky-100 text-sky-600"
@@ -157,17 +168,17 @@ const Sidebar = ({ isDesktop, isCollapsed, isOpen }) => {
       {/* Sidebar */}
       <div
         className={`fixed bg-white text-gray-900 border-r border-gray-200 flex flex-col ${
-          !isDesktop && "pt-[100px]"
+          !is_desktop && "pt-[100px]"
         } ${
-          isDesktop ? (isCollapsed ? "w-20" : "w-64") : "w-64"
+          is_desktop ? (is_collapsed ? "w-20" : "w-64") : "w-64"
         } p-4 transition-all duration-300 z-40 h-full inset-y-0 left-0 ${
-          isOpen ? "translate-x-0" : "-translate-x-full"
+          is_open ? "translate-x-0" : "-translate-x-full"
         } md:translate-x-0`}
         style={{ userSelect: "none" }}
       >
         {/* Title */}
-        {isDesktop ? (
-          isCollapsed ? (
+        {is_desktop ? (
+          is_collapsed ? (
             <div className="w-[50px] h-[50px] text-[10px] border flex justify-center items-center ">
               Icon
             </div>
@@ -185,16 +196,16 @@ const Sidebar = ({ isDesktop, isCollapsed, isOpen }) => {
 
         {/* + Navigation */}
         <nav className="flex flex-col space-y-2 flex-1 mt-5 font-medium">
-          {sidebarItems.map((item) => {
+          {sidebar_items.map((item) => {
             if (item.type === "link") {
-              const isActive = activeItem === item.key;
+              const isActive = active_item === item.key;
               return (
                 <a
                   key={item.key}
                   href={item.path}
-                  onClick={() => handleItemClick(item.key)}
+                  onClick={() => handle_item_click(item.key)}
                   className={`relative flex items-center rounded transition-all duration-300 ${
-                    isDesktop && isCollapsed ? "justify-center p-3" : "p-3"
+                    is_desktop && is_collapsed ? "justify-center p-3" : "p-3"
                   } ${
                     isActive
                       ? "bg-sky-100 text-sky-600"
@@ -204,7 +215,7 @@ const Sidebar = ({ isDesktop, isCollapsed, isOpen }) => {
                   {item.icon}
                   <span
                     className={`ml-3 absolute left-[30px] text-sm transition-opacity duration-300 ${
-                      isDesktop && isCollapsed ? "opacity-0" : "opacity-100"
+                      is_desktop && is_collapsed ? "opacity-0" : "opacity-100"
                     }`}
                   >
                     {item.name}
@@ -215,18 +226,18 @@ const Sidebar = ({ isDesktop, isCollapsed, isOpen }) => {
 
             if (item.type === "dropdown") {
               const isParentActive = item.subItems?.some(
-                (sub) => activeItem === `${item.key}-${sub}`
+                (sub) => active_item === `${item.key}-${sub}`
               );
               return (
                 <div
                   key={item.key}
                   className="relative"
-                  ref={(el) => (dropdownRefs.current[item.key] = el)}
+                  ref={(el) => (dropdown_refs.current[item.key] = el)}
                 >
                   <button
-                    onClick={() => toggleDropdown(item.key)}
+                    onClick={() => toggle_dropdown(item.key)}
                     className={`relative flex items-center rounded w-full transition-all duration-300 ${
-                      isDesktop && isCollapsed ? "justify-center p-3" : "p-3"
+                      is_desktop && is_collapsed ? "justify-center p-3" : "p-3"
                     } ${
                       isParentActive
                         ? "bg-sky-100 text-sky-600"
@@ -236,21 +247,21 @@ const Sidebar = ({ isDesktop, isCollapsed, isOpen }) => {
                     {item.icon}
                     <span
                       className={`ml-3 absolute left-[30px] text-sm transition-opacity duration-300 ${
-                        isDesktop && isCollapsed ? "opacity-0" : "opacity-100"
+                        is_desktop && is_collapsed ? "opacity-0" : "opacity-100"
                       }`}
                     >
                       {item.name}
                     </span>
                     <span
                       className={`ml-3 absolute right-[24px] text-sm transition-opacity duration-300 ${
-                        isDesktop && isCollapsed ? "opacity-0" : "opacity-100"
+                        is_desktop && is_collapsed ? "opacity-0" : "opacity-100"
                       }`}
                     >
                       <ChevronDown size={14} />
                     </span>
                   </button>
 
-                  {renderDropdown(item.key, item.subItems)}
+                  {render_dropdown(item.key, item.subItems)}
                 </div>
               );
             }
@@ -263,15 +274,14 @@ const Sidebar = ({ isDesktop, isCollapsed, isOpen }) => {
         {/* Logout */}
         <div className="pt-2 mt-auto">
           <a
-            href="#"
-            className={`relative flex items-center rounded hover:bg-gray-100 text-gray-600 font-medium transition-all duration-300 ${
-              isDesktop && isCollapsed ? "justify-center p-3" : "p-3"
+            className={`relative flex items-center rounded hover:bg-gray-100 text-gray-600 font-medium transition-all duration-300 cursor-pointer ${
+              is_desktop && is_collapsed ? "justify-center p-3" : "p-3"
             }`}
           >
             <LogOut size={18} />
             <span
               className={`ml-3 absolute left-[30px] text-sm transition-opacity duration-1 ${
-                isDesktop && isCollapsed ? "opacity-0" : "opacity-100"
+                is_desktop && is_collapsed ? "opacity-0" : "opacity-100"
               }`}
             >
               Logout

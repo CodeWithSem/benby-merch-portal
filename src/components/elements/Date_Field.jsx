@@ -12,7 +12,9 @@ const Date_Field = ({
   min,
   max,
 }) => {
-  const input_class = `block w-full mt-1 px-3 py-2 bg-white border rounded-md text-sm shadow-sm placeholder-slate-400 focus:ring-1
+  const input_class = `block w-full ${
+    label ? "mt-1" : ""
+  } px-3 py-2 bg-white border rounded-md text-sm shadow-sm placeholder-slate-400 focus:ring-1
     ${
       disabled
         ? "disabled:bg-slate-50 disabled:text-slate-500 disabled:border-slate-200 disabled:shadow-none"
@@ -27,32 +29,32 @@ const Date_Field = ({
     focus:outline-none`;
 
   return (
-    <React.Fragment>
+    <label className="block">
       {label && (
-        <label className="block">
-          <span className="block text-sm font-medium text-slate-700">
-            {label}
-          </span>
-          <input
-            type="date"
-            name={name}
-            value={value}
-            onChange={on_change}
-            disabled={disabled}
-            required={required}
-            min={min}
-            max={max}
-            placeholder={placeholder}
-            className={input_class}
-          />
-          {error_message && (
-            <span className="block text-xs font-medium text-red-500 mt-1">
-              {error_message}
-            </span>
-          )}
-        </label>
+        <span className="block text-sm font-medium text-slate-700">
+          {label}
+        </span>
       )}
-    </React.Fragment>
+
+      <input
+        type="date"
+        name={name}
+        value={value}
+        onChange={on_change}
+        disabled={disabled}
+        required={required}
+        min={min}
+        max={max}
+        placeholder={placeholder}
+        className={input_class}
+      />
+
+      {error_message && (
+        <span className="block text-xs font-medium text-red-500 mt-1">
+          {error_message}
+        </span>
+      )}
+    </label>
   );
 };
 

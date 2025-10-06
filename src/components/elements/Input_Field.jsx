@@ -14,7 +14,9 @@ const Input_Field = ({
   min,
   max,
 }) => {
-  const input_class = `block w-full mt-1 px-3 py-2 bg-white border rounded-md text-sm shadow-sm placeholder-slate-400 focus:ring-1 
+  const input_class = `block w-full ${
+    label ? "mt-1" : ""
+  } px-3 py-2 bg-white border rounded-md text-sm shadow-sm placeholder-slate-400 focus:ring-1 
     ${
       disabled
         ? "disabled:bg-slate-50 disabled:text-slate-500 disabled:border-slate-200 disabled:shadow-none"
@@ -35,35 +37,35 @@ const Input_Field = ({
   };
 
   return (
-    <React.Fragment>
+    <label className="block">
       {label && (
-        <label className="block">
-          <span className="block text-sm font-medium text-slate-700">
-            {label}
-          </span>
-          <input
-            type={type}
-            placeholder={placeholder}
-            pattern={pattern}
-            value={value}
-            onChange={on_change}
-            name={name}
-            disabled={disabled}
-            required={required}
-            min={min}
-            max={max}
-            spellCheck={false}
-            onWheel={handle_wheel}
-            className={input_class}
-          />
-          {error_message && (
-            <span className="block text-xs font-medium text-red-500 mt-1">
-              {error_message}
-            </span>
-          )}
-        </label>
+        <span className="block text-sm font-medium text-slate-700">
+          {label}
+        </span>
       )}
-    </React.Fragment>
+
+      <input
+        type={type}
+        placeholder={placeholder}
+        pattern={pattern}
+        value={value}
+        onChange={on_change}
+        name={name}
+        disabled={disabled}
+        required={required}
+        min={min}
+        max={max}
+        spellCheck={false}
+        onWheel={handle_wheel}
+        className={input_class}
+      />
+
+      {error_message && (
+        <span className="block text-xs font-medium text-red-500 mt-1">
+          {error_message}
+        </span>
+      )}
+    </label>
   );
 };
 

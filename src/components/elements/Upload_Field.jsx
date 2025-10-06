@@ -25,7 +25,9 @@ const Upload_Field = ({
     if (on_change) on_change(e);
   };
 
-  const wrapper_class = `mt-1 flex rounded-md shadow-sm border text-sm overflow-hidden
+  const wrapper_class = `${
+    label ? "mt-1" : ""
+  } flex rounded-md shadow-sm border text-sm overflow-hidden
     ${file_error ? "border-pink-500" : "border-slate-300"}
     ${
       disabled
@@ -38,7 +40,9 @@ const Upload_Field = ({
         : "focus-within:ring-sky-500 focus-within:border-sky-500"
     }`;
 
-  const left_section_class = `inline-flex items-center px-3 border-r border-slate-300 bg-slate-100 text-slate-600 text-sm`;
+  const left_section_class = `inline-flex items-center px-3 border-r border-slate-300 bg-slate-100 text-slate-600 text-sm ${
+    disabled ? "cursor-not-allowed" : "cursor-pointer"
+  }`;
 
   const input_display_class = `flex-1 bg-transparent border-0 focus:ring-0 px-3 py-2 placeholder-slate-400 text-sm truncate
     ${disabled ? "cursor-not-allowed" : "cursor-pointer"}`;

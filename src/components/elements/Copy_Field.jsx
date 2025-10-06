@@ -38,46 +38,79 @@ const Copy_Field = ({
   // Button is never disabled, so always interactive.
   const button_class = `inline-flex items-center px-3 border-l border-slate-300 text-slate-500 hover:text-slate-700 cursor-pointer`;
 
-  return (
-    <React.Fragment>
-      {label && (
-        <label className="block">
-          <span className="block text-sm font-medium text-slate-700">
-            {label}
+  // If label is provided, wrap everything in a label element.
+  // If no label, just render input, button, and error message without wrapping label.
+  if (label) {
+    return (
+      <label className="block">
+        <span className="block text-sm font-medium text-slate-700">
+          {label}
+        </span>
+
+        <div className={wrapper_class}>
+          <input
+            type="text"
+            name={name}
+            value={value}
+            onChange={on_change}
+            disabled={disabled}
+            className={input_class}
+          />
+
+          <button
+            type="button"
+            onClick={handle_copy}
+            title="Copy to clipboard"
+            className={button_class}
+          >
+            {copied ? <ClipboardCheck size={18} /> : <Clipboard size={18} />}
+            {copy_button_label && (
+              <span className="ml-1">{copy_button_label}</span>
+            )}
+          </button>
+        </div>
+
+        {error_message && (
+          <span className="block text-xs font-medium text-red-500 mt-1">
+            {error_message}
           </span>
+        )}
+      </label>
+    );
+  }
 
-          <div className={wrapper_class}>
-            <input
-              type="text"
-              name={name}
-              value={value}
-              onChange={on_change}
-              disabled={disabled}
-              className={input_class}
-            />
+  // No label case
+  return (
+    <div>
+      <div className={wrapper_class}>
+        <input
+          type="text"
+          name={name}
+          value={value}
+          onChange={on_change}
+          disabled={disabled}
+          className={input_class}
+        />
 
-            <button
-              type="button"
-              onClick={handle_copy}
-              // button NOT disabled
-              title="Copy to clipboard"
-              className={button_class}
-            >
-              {copied ? <ClipboardCheck size={18} /> : <Clipboard size={18} />}
-              {copy_button_label && (
-                <span className="ml-1">{copy_button_label}</span>
-              )}
-            </button>
-          </div>
-
-          {error_message && (
-            <span className="block text-xs font-medium text-red-500 mt-1">
-              {error_message}
-            </span>
+        <button
+          type="button"
+          onClick={handle_copy}
+          title="Copy to clipboard"
+          className={button_class}
+        >
+          {copied ? <ClipboardCheck size={18} /> : <Clipboard size={18} />}
+          {copy_button_label && (
+            <span className="ml-1">{copy_button_label}</span>
           )}
-        </label>
+        </button>
+      </div>
+
+      {error_message && (
+        <span className="block text-xs font-medium text-red-500 mt-1">
+          {error_message}
+        </span>
       )}
-    </React.Fragment>
+    </div>
   );
 };
 
