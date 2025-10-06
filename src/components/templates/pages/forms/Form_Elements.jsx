@@ -185,8 +185,11 @@ const Form_Elements = () => {
   // RETURN ORIGIN
   return (
     <React.Fragment>
+      <div className="w-full">
+        <h1 className="w-full text-xl py-5">Form Elements</h1>
+      </div>
       <div className="w-full bg-white rounded-lg border">
-        <h1 className="w-full text-lg border-b p-5">Form Elements</h1>
+        <h1 className="w-full text-lg border-b p-5">Default Inputs</h1>
         <div className="flex flex-col md:flex-row gap-5 p-6">
           <div className="w-full">
             <div className="w-full">

@@ -4,6 +4,8 @@ import Header from "./Header";
 import Modal from "../../elements/Modal";
 import Form_Elements from "../pages/forms/Form_Elements";
 import Data_Tables from "../pages/tables/Data_Tables";
+import Alerts from "../pages/alerts/Alerts";
+import Modals from "../pages/modals/Modals";
 
 const Layout = () => {
   const [active_item, set_active_item] = useState(() => {
@@ -48,6 +50,10 @@ const Layout = () => {
         return <Form_Elements />;
       case "Tables-Data Tables":
         return <Data_Tables />;
+      case "UI Elements-Alerts":
+        return <Alerts />;
+      case "UI Elements-Modals":
+        return <Modals />;
     }
   };
 

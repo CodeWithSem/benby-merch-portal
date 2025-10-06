@@ -52,6 +52,10 @@ const Button = ({
       "bg-sky-600 text-white hover:bg-sky-700 focus:ring-sky-500 disabled:bg-sky-300 disabled:cursor-not-allowed",
     secondary:
       "bg-gray-100 text-gray-700 hover:bg-gray-200 focus:ring-gray-300 disabled:bg-gray-50 disabled:text-gray-400 disabled:cursor-not-allowed",
+    success:
+      "bg-green-600 text-white hover:bg-green-700 focus:ring-green-500 disabled:bg-green-300 disabled:cursor-not-allowed",
+    warning:
+      "bg-orange-600 text-white hover:bg-orange-700 focus:ring-orange-500 disabled:bg-orange-300 disabled:cursor-not-allowed",
     danger:
       "bg-pink-600 text-white hover:bg-pink-700 focus:ring-pink-500 disabled:bg-pink-300 disabled:cursor-not-allowed",
     white:

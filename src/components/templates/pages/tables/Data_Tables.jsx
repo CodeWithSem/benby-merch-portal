@@ -149,6 +149,9 @@ const Data_Tables = () => {
 
   return (
     <React.Fragment>
+      <div className="w-full">
+        <h1 className="w-full text-xl py-5">Data Tables</h1>
+      </div>
       {/* + Data Table 1 */}
       <div className="w-full bg-white rounded-lg border">
         <h1 className="w-full text-lg border-b p-5">Data Table 1</h1>
