@@ -3,7 +3,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 
 const Pagination = ({ current_page, total_pages, on_page_change }) => {
   const arrow_btn_classes = `
-    flex items-center justify-center w-9 h-9 
+    flex items-center justify-center w-8 h-7 mx-1
     border border-gray-300 rounded-md 
     hover:bg-gray-100 
     disabled:text-gray-300 disabled:border-gray-200 disabled:bg-transparent
@@ -62,7 +62,7 @@ const Pagination = ({ current_page, total_pages, on_page_change }) => {
         page === "..." ? (
           <span
             key={idx}
-            className="w-9 h-9 flex items-center justify-center text-gray-500 text-sm select-none"
+            className="w-8 h-7 flex items-center justify-center text-gray-500 text-sm select-none"
           >
             ...
           </span>
@@ -70,7 +70,7 @@ const Pagination = ({ current_page, total_pages, on_page_change }) => {
           <button
             key={idx}
             onClick={() => on_page_change(page)}
-            className={`w-9 h-9 rounded-md text-sm 
+            className={`min-w-8 h-7 rounded-md text-sm px-2
               ${
                 current_page === page
                   ? "bg-sky-600 text-white"

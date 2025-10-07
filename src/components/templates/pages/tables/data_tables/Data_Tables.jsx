@@ -8,12 +8,15 @@ import {
   View,
   Filter,
   Download,
+  CheckCircle2,
+  Info,
 } from "lucide-react";
-import Icon_Field from "../../../elements/Icon_Field";
-import Select_Field from "../../../elements/Select_Field";
-import Pagination from "../../../elements/Pagination";
-import Button from "../../../elements/Button";
-import Toggle_Switch from "../../../elements/Toggle_Switch";
+import Icon_Field from "../../../../elements/Icon_Field";
+import Select_Field from "../../../../elements/Select_Field";
+import Pagination from "../../../../elements/Pagination";
+import Button from "../../../../elements/Button";
+import Toggle_Switch from "../../../../elements/Toggle_Switch";
+import { useToast } from "../../../layout/Toast_Provider";
 
 const Data_Tables = () => {
   const [showFilter, setShowFilter] = useState(false);
@@ -147,6 +150,29 @@ const Data_Tables = () => {
     current_page * per_page
   );
 
+  const { show_toast } = useToast();
+
+  const handle_show_toast = (type, title, message) => {
+    const icon =
+      type === "success" ? (
+        <CheckCircle2 size={21} className="text-green-500" />
+      ) : type === "warning" ? (
+        <Info size={21} className="text-yellow-500" />
+      ) : (
+        <Info size={21} className="text-red-500" />
+      );
+
+    show_toast({
+      type,
+      title,
+      message,
+      icon,
+      width: "270px",
+      position: "top-right",
+    });
+  };
+
+  // RETURN ORIGIN
   return (
     <React.Fragment>
       <div className="w-full">
@@ -235,8 +261,13 @@ const Data_Tables = () => {
                       width="w-[120px]"
                       icon={Download}
                       icon_position="right"
-                      // loading
-                      // on_click={() => setShowFilter((prev) => !prev)}
+                      on_click={() =>
+                        handle_show_toast(
+                          "success",
+                          "Success",
+                          "You have downloaded the data successfully."
+                        )
+                      }
                     >
                       Download
                     </Button>
@@ -404,7 +435,7 @@ const Data_Tables = () => {
                       icon_position="left"
                     />
                   </div>
-                  <div className="relative" ref={filterRef}>
+                  <div className="relative">
                     <Button
                       variant="white"
                       width="w-[100px]"
@@ -415,42 +446,6 @@ const Data_Tables = () => {
                     >
                       Filter
                     </Button>
-
-                    {/* Filter Popover */}
-                    {showFilter && (
-                      <div className="absolute right-full mr-2 top-[-10px] z-50 bg-white border rounded-lg shadow-md p-4 w-[240px]">
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Date From
-                        </label>
-                        <input
-                          type="date"
-                          className="block w-full mb-2 px-3 py-2 border rounded-md text-sm"
-                        />
-                        <label className="block text-sm font-medium text-gray-700 mb-1 mt-4">
-                          Date To
-                        </label>
-                        <input
-                          type="date"
-                          className="block w-full mb-2 px-3 py-2 border rounded-md text-sm"
-                        />
-                        <div className="flex justify-end gap-2 mt-4">
-                          <Button
-                            size="sm"
-                            variant="primary"
-                            on_click={() => setShowFilter(false)}
-                          >
-                            Apply
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="secondary"
-                            on_click={() => setShowFilter(false)}
-                          >
-                            Cancel
-                          </Button>
-                        </div>
-                      </div>
-                    )}
                   </div>
                   <div className="">
                     <Button

@@ -1,10 +1,13 @@
 import React from "react";
 import Layout from "./components/templates/layout/Layout";
+import { Toast_Provider } from "./components/templates/layout/Toast_Provider";
 
 function App() {
   return (
     <React.Fragment>
-      <Layout />
+      <Toast_Provider>
+        <Layout />
+      </Toast_Provider>
     </React.Fragment>
   );
 }

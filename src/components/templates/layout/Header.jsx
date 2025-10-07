@@ -1,12 +1,10 @@
 import React from "react";
 import { Menu } from "lucide-react";
 
-const Header = ({ is_desktop, toggle_sidebar }) => {
+const Header = ({ toggle_sidebar }) => {
   return (
     <div
-      className={`sticky top-0 flex items-center w-full bg-white border-gray-200 dark:border-gray-800 dark:bg-gray-900 border-b h-[80px] px-4 ${
-        !is_desktop && "z-[99]"
-      }`}
+      className={`sticky top-0 flex items-center w-full bg-white border-gray-200 dark:border-gray-800 dark:bg-gray-900 border-b h-[80px] px-4 z-[2]`}
     >
       {/* Sidebar Toggle Button */}
       <button

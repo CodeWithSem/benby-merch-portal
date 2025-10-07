@@ -1,14 +1,12 @@
 import React, { useState, useEffect, useRef } from "react";
 import {
   Home,
-  Settings,
   LogOut,
   ChevronDown,
-  FileText,
   FormInput,
-  Table,
   Table2Icon,
   BoxIcon,
+  ChartPie,
 } from "lucide-react";
 
 const Sidebar = ({
@@ -43,33 +41,48 @@ const Sidebar = ({
       subItems: ["Data Tables"],
     },
     {
+      key: "Charts",
+      type: "dropdown",
+      name: "Charts",
+      icon: <ChartPie size={18} />,
+      subItems: ["Bar Chart", "Pie Chart"],
+    },
+    {
       key: "UI Elements",
       type: "dropdown",
       name: "UI Elements",
       icon: <BoxIcon size={18} />,
-      subItems: ["Alerts", "Modals"],
-    },
-    {
-      key: "Maintenance",
-      type: "dropdown",
-      name: "Maintenance",
-      icon: <Settings size={18} />,
       subItems: [
-        "Maint 1",
-        "Maint 2",
-        "Maint 3",
-        "Maint 4",
-        "Maint 5",
-        "Maint 6",
-        "Maint 7",
-        "Maint 8",
-        "Maint 9",
-        "Maint 10",
-        "Maint 11",
-        "Maint 12",
-        "Maint 13",
+        "Alerts",
+        "Badges",
+        "Breadcrumb",
+        "Buttons",
+        "Dropdowns",
+        "Modals",
+        "Tabs",
       ],
     },
+    // {
+    //   key: "Maintenance",
+    //   type: "dropdown",
+    //   name: "Maintenance",
+    //   icon: <Settings size={18} />,
+    //   subItems: [
+    //     "Maint 1",
+    //     "Maint 2",
+    //     "Maint 3",
+    //     "Maint 4",
+    //     "Maint 5",
+    //     "Maint 6",
+    //     "Maint 7",
+    //     "Maint 8",
+    //     "Maint 9",
+    //     "Maint 10",
+    //     "Maint 11",
+    //     "Maint 12",
+    //     "Maint 13",
+    //   ],
+    // },
   ];
 
   const handle_item_click = (key) => {
@@ -171,7 +184,7 @@ const Sidebar = ({
           !is_desktop && "pt-[100px]"
         } ${
           is_desktop ? (is_collapsed ? "w-20" : "w-64") : "w-64"
-        } p-4 transition-all duration-300 z-40 h-full inset-y-0 left-0 ${
+        } p-4 transition-all duration-300 z-[1] h-full inset-y-0 left-0 ${
           is_open ? "translate-x-0" : "-translate-x-full"
         } md:translate-x-0`}
         style={{ userSelect: "none" }}

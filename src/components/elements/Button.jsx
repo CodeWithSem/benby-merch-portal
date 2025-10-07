@@ -53,11 +53,11 @@ const Button = ({
     secondary:
       "bg-gray-100 text-gray-700 hover:bg-gray-200 focus:ring-gray-300 disabled:bg-gray-50 disabled:text-gray-400 disabled:cursor-not-allowed",
     success:
-      "bg-green-600 text-white hover:bg-green-700 focus:ring-green-500 disabled:bg-green-300 disabled:cursor-not-allowed",
+      "bg-green-500 text-white hover:bg-green-600 focus:ring-green-500 disabled:bg-green-300 disabled:cursor-not-allowed",
     warning:
-      "bg-orange-600 text-white hover:bg-orange-700 focus:ring-orange-500 disabled:bg-orange-300 disabled:cursor-not-allowed",
+      "bg-yellow-300 text-gray-800 hover:bg-yellow-400 focus:ring-yellow-300 disabled:bg-yellow-200 disabled:cursor-not-allowed",
     danger:
-      "bg-pink-600 text-white hover:bg-pink-700 focus:ring-pink-500 disabled:bg-pink-300 disabled:cursor-not-allowed",
+      "bg-red-600 text-white hover:bg-red-700 focus:ring-red-500 disabled:bg-red-300 disabled:cursor-not-allowed",
     white:
       "bg-white text-slate-700 border border-slate-300 hover:bg-slate-50 focus:ring-slate-200 disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed",
   };
