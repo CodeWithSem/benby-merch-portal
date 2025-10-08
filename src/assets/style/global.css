@@ -8,24 +8,31 @@ input[type="number"]::-webkit-inner-spin-button {
   margin: 0;
 }
 
-/* Scrollbar styling for Tailwind project */
+/* + Scrollbar */
 .scrollbar-custom::-webkit-scrollbar {
   width: 8px;
+  height: 5px;
 }
 
 .scrollbar-custom::-webkit-scrollbar-track {
-  background: #f3f4f6; /* Tailwind gray-100 */
+  background: #f3f4f6;
 }
 
 .scrollbar-custom::-webkit-scrollbar-thumb {
-  background-color: #9ca3af; /* Tailwind gray-400 */
-  /* border-radius: 8px; */
+  background-color: #9ca3af;
   border: 2px solid #f3f4f6;
+  /* border-radius: 8px */
+}
+
+.scrollbar-custom.basic-table::-webkit-scrollbar-thumb {
+  background-color: #9ca3af;
+  border: 0;
 }
 
 .scrollbar-custom:hover::-webkit-scrollbar-thumb {
-  background-color: #6b7280; /* Tailwind gray-500 */
+  background-color: #6b7280;
 }
+/* - Scrollbar */
 
 a {
   cursor: pointer;

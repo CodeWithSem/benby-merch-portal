@@ -394,12 +394,12 @@ const Data_Tables = () => {
                 </tbody>
               </table>
             </div>
-
             <div className="w-full">
               <Pagination
                 current_page={current_page}
-                total_pages={total_pages}
+                total_pages={100}
                 on_page_change={set_current_page}
+                variant="spread"
               />
             </div>
           </div>
@@ -564,7 +564,6 @@ const Data_Tables = () => {
                 </tbody>
               </table>
             </div>
-
             <div className="w-full">
               <Pagination
                 current_page={current_page}

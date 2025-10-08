@@ -29,7 +29,7 @@ const Modals = () => {
           <div className="p-6">
             <Button
               width="w-[150px]"
-              variant="primary"
+              variant="white"
               size="lg"
               on_click={() => set_open_default_modal(true)}
             >
@@ -46,7 +46,7 @@ const Modals = () => {
           <div className="p-6">
             <Button
               width="w-[150px]"
-              variant="primary"
+              variant="white"
               size="lg"
               on_click={() => set_open_vertical_modal(true)}
             >
@@ -63,7 +63,7 @@ const Modals = () => {
           <div className="p-6">
             <Button
               width="w-[150px]"
-              variant="primary"
+              variant="white"
               size="lg"
               on_click={() => set_open_form_modal(true)}
             >
@@ -78,7 +78,7 @@ const Modals = () => {
           <div className="p-6">
             <Button
               width="w-[150px]"
-              variant="primary"
+              variant="white"
               size="lg"
               on_click={() => set_open_full_screen_modal(true)}
             >

@@ -1,17 +1,19 @@
 import React, { useState, useEffect } from "react";
 import Sidebar from "./Sidebar";
 import Header from "./Header";
-import Modal from "../../elements/Modal";
 import Form_Elements from "../pages/forms/form_elements/Form_Elements";
 import Data_Tables from "../pages/tables/data_tables/Data_Tables";
 import Alerts from "../pages/ui_elements/alerts/Alerts";
 import Modals from "../pages/ui_elements/modals/Modals";
-import { ToastProvider } from "./Toast_Provider";
 import Badges from "../pages/ui_elements/badges/Badges";
 import Breadcrumb from "../pages/ui_elements/breadcrumb/Breadcrumb";
 import Buttons from "../pages/ui_elements/buttons/Buttons";
 import Dropdowns from "../pages/ui_elements/dropdowns/Dropdowns";
 import Tabs from "../pages/ui_elements/tabs/Tabs";
+import Basic_Tables from "../pages/tables/basic_tables/Basic_Tables";
+import Popovers from "../pages/ui_elements/popovers/Popovers";
+import Bar_Chart from "../pages/charts/bar_chart/Bar_Chart";
+import Line_Chart from "../pages/charts/line_chart/Line_Chart";
 
 const Layout = () => {
   const [active_item, set_active_item] = useState(() => {
@@ -54,8 +56,14 @@ const Layout = () => {
         return "";
       case "Forms-Form Elements":
         return <Form_Elements />;
+      case "Tables-Basic Tables":
+        return <Basic_Tables />;
       case "Tables-Data Tables":
         return <Data_Tables />;
+      case "Charts-Bar Chart":
+        return <Bar_Chart />;
+      case "Charts-Line Chart":
+        return <Line_Chart />;
       case "UI Elements-Alerts":
         return <Alerts />;
       case "UI Elements-Badges":
@@ -68,6 +76,8 @@ const Layout = () => {
         return <Dropdowns />;
       case "UI Elements-Modals":
         return <Modals />;
+      case "UI Elements-Popovers":
+        return <Popovers />;
       case "UI Elements-Tabs":
         return <Tabs />;
     }

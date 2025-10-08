@@ -227,12 +227,12 @@ const Form_Elements = () => {
             </div>
             <div className="w-full mt-5">
               <Select_Field
-                label="Select Option"
+                label="Option"
                 name="option"
                 value={select_option}
                 on_change={handle_select_option_change}
                 options={select_options}
-                placeholder=""
+                placeholder="Select Option"
                 error_message={select_option_error}
                 required
               />

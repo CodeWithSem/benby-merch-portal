@@ -13,7 +13,7 @@ const Buttons = () => {
       <div className="w-full bg-white rounded-lg border">
         <h1 className="w-full text-lg border-b p-5">Default Buttons</h1>
         <div className="p-8">
-          <div className="flex items-center gap-5">
+          <div className="flex flex-wrap items-center gap-5">
             <Button
               //   on_click={() => set_loading(!loading)}
               //   width="w-[120px]"
@@ -34,7 +34,7 @@ const Buttons = () => {
       <div className="w-full bg-white rounded-lg border mt-5">
         <h1 className="w-full text-lg border-b p-5">Buttons with Icon</h1>
         <div className="p-8">
-          <div className="flex items-center gap-5">
+          <div className="flex flex-wrap items-center gap-5">
             <Button variant="primary" icon={BoxIcon} icon_position="left">
               Primary
             </Button>
@@ -58,7 +58,7 @@ const Buttons = () => {
       <div className="w-full bg-white rounded-lg border mt-5">
         <h1 className="w-full text-lg border-b p-5">Loading Buttons</h1>
         <div className="p-8">
-          <div className="flex items-center gap-5">
+          <div className="flex flex-wrap items-center gap-5">
             <Button width="w-[100px]" variant="primary" loading={true}>
               Primary
             </Button>
