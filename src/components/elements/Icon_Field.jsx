@@ -13,7 +13,7 @@ const Icon_Field = ({
   icon_position = "right",
   icon_size = 18,
 }) => {
-  // Base input styles same as Input_Field
+  // Base input styles same as Text_Field
   const input_class = `block w-full ${
     label ? "mt-1" : ""
   } px-3 py-2 bg-white border rounded-md text-sm shadow-sm placeholder-slate-400 focus:ring-1 

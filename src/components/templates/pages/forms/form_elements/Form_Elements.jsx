@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { Search } from "lucide-react";
-import Input_Field from "../../../../elements/Input_Field";
+import Text_Field from "../../../../elements/Text_Field";
 import Select_Field from "../../../../elements/Select_Field";
 import Date_Field from "../../../../elements/Date_Field";
 import Time_Field from "../../../../elements/Time_Field";
@@ -14,6 +14,7 @@ import Payment_Field from "../../../../elements/Payment_Field";
 import Password_Field from "../../../../elements/Password_Field";
 import Icon_Field from "../../../../elements/Icon_Field";
 import Button from "../../../../elements/Button";
+import Date_Range_Field from "../../../../elements/Date_Range_Field";
 
 const Form_Elements = () => {
   // + For Input Field (Text)
@@ -63,20 +64,79 @@ const Form_Elements = () => {
   ];
   // - For Select Field
   // + For Date Field
-  const [date, set_date] = useState("");
-  const [date_error, set_date_error] = useState("");
+  // const [date, set_date] = useState("");
+  // const [date_error, set_date_error] = useState("");
 
-  const handle_date_change = (e) => {
-    const value = e.target.value;
-    set_date(value);
+  // const handle_date_change = (e) => {
+  //   const value = e.target.value;
+  //   set_date(value);
 
-    if (!value) {
-      set_date_error("Date is required.");
-    } else {
-      set_date_error("");
-    }
+  //   if (!value) {
+  //     set_date_error("Date is required.");
+  //   } else {
+  //     set_date_error("");
+  //   }
+  // };
+  const [form, setForm] = useState({
+    start_date: null,
+    date_range: [], // 👈 For range mode, store as array [start, end]
+  });
+
+  // Generic handler that works for both single and range
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setForm((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const [form1, setForm1] = useState({
+    start_date: null,
+    date_range: [], // 👈 For range mode, store as array [start, end]
+  });
+
+  // Generic handler that works for both single and range
+  const handleInputChange1 = (e) => {
+    const { name, value } = e.target;
+    setForm1((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
   // - For Date Field
+  // + For Date Range Field
+  const dateRangeRef = useRef(null);
+
+  const [date_range_data, set_date_range_data] = useState({
+    start_date: "",
+    end_date: "",
+  });
+  const handleGetDate = () => {
+    if (dateRangeRef.current) {
+      const selectedDates = dateRangeRef.current.flatpickr.selectedDates;
+
+      set_date_range_data({
+        start_date: selectedDates[0] || "",
+        end_date: selectedDates[1] || "",
+      });
+
+      console.log("Stored in state:", {
+        start_date: selectedDates[0] || "",
+        end_date: selectedDates[1] || "",
+      });
+    }
+  };
+
+  const formatDate = (date) => {
+    if (!date) return "";
+    const mm = String(date.getMonth() + 1).padStart(2, "0"); // months are 0-indexed
+    const dd = String(date.getDate()).padStart(2, "0");
+    const yyyy = date.getFullYear();
+    return `${mm}/${dd}/${yyyy}`;
+  };
+
+  // - For Date Range Field
   // + For Time Field
   const [time, set_time] = useState("");
   const [time_error, set_time_error] = useState("");
@@ -193,7 +253,7 @@ const Form_Elements = () => {
         <div className="flex flex-col md:flex-row gap-5 p-6">
           <div className="w-full">
             <div className="w-full">
-              <Input_Field
+              <Text_Field
                 label="Text"
                 type={"text"}
                 placeholder="Enter text"
@@ -204,10 +264,10 @@ const Form_Elements = () => {
               />
             </div>
             <div className="w-full mt-5">
-              <Input_Field
-                label="Number"
+              <Text_Field
+                label="Weight (kg)"
                 type={"number"}
-                placeholder="Enter number"
+                placeholder="Enter weight"
                 value={number}
                 on_change={handle_number_change}
                 pattern="[A-Za-z]{1,}"
@@ -239,16 +299,20 @@ const Form_Elements = () => {
             </div>
             <div className="w-full mt-5">
               <Date_Field
-                // label="Select Date"
-                name="date"
-                value={date}
-                on_change={handle_date_change}
-                placeholder="Select your birth date"
-                required
-                min="1900-01-01"
-                max="2025-12-31"
-                error_message={date_error}
+                label="Select Date"
+                name="date_range"
+                value={form1.date_range}
+                on_change={handleInputChange1}
+                placeholder="Select Date"
+                // mode="range"
+                // required
+                // min="1900-01-01"
+                // max="2025-12-31"
+                // error_message={date_error}
               />
+            </div>
+            <div className="w-full mt-5">
+              <Date_Range_Field label="Select Date" ref={dateRangeRef} />
             </div>
             <div className="w-full mt-5">
               <Time_Field
@@ -356,7 +420,7 @@ const Form_Elements = () => {
                 />
               </div>
             </div>
-            <div className="w-full mt-[20px] md:mt-[50px]">
+            <div className="w-full mt-[20px] md:mt-[46px]">
               <div className="flex gap-4">
                 <Button on_click={() => alert("Clicked!")}>Submit</Button>
                 <Button
@@ -375,6 +439,22 @@ const Form_Elements = () => {
                 >
                   Cancel
                 </Button>
+                <Button
+                  on_click={handleGetDate}
+                  width="w-[120px]"
+                  variant="white"
+                  // loading={loading}
+                >
+                  Get Date
+                </Button>
+              </div>
+            </div>
+            <div className="w-full mt-5">
+              <div className="text-sm">
+                <p>
+                  Start Date: {formatDate(date_range_data.start_date) || "N/A"}
+                </p>
+                <p>End Date: {formatDate(date_range_data.end_date) || "N/A"}</p>
               </div>
             </div>
           </div>

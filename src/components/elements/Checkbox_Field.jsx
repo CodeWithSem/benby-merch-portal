@@ -41,7 +41,7 @@ const Checkbox_Field = ({
         {checked && <Check size={icon_size} color="white" />}
       </div>
       {label && (
-        <div className="flex flex-col">
+        <div className="flex flex-col" style={{ userSelect: "none" }}>
           <label
             htmlFor={name}
             className={`text-sm font-medium text-slate-700 ${

@@ -4,7 +4,7 @@ import { Menu } from "lucide-react";
 const Header = ({ toggle_sidebar }) => {
   return (
     <div
-      className={`sticky top-0 flex items-center w-full bg-white border-gray-200 dark:border-gray-800 dark:bg-gray-900 border-b h-[80px] px-4 z-[2]`}
+      className={`sticky top-0 flex items-center w-full bg-white border-gray-200 dark:border-gray-800 dark:bg-gray-900 border-b h-[80px] px-4 z-[11]`}
     >
       {/* Sidebar Toggle Button */}
       <button

@@ -192,7 +192,7 @@ const Sidebar = ({
           !is_desktop && "pt-[100px]"
         } ${
           is_desktop ? (is_collapsed ? "w-20" : "w-64") : "w-64"
-        } p-4 transition-all duration-300 z-[1] h-full inset-y-0 left-0 ${
+        } p-4 transition-all duration-300 z-[10] h-full inset-y-0 left-0 ${
           is_open ? "translate-x-0" : "-translate-x-full"
         } md:translate-x-0`}
         style={{ userSelect: "none" }}

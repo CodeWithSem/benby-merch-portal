@@ -68,6 +68,7 @@ const Radio_Button = ({
           onClick={() =>
             !disabled && on_change({ target: { checked: true, name } })
           }
+          style={{ userSelect: "none" }}
         >
           {label}
         </label>

@@ -39,17 +39,68 @@ a {
 }
 
 .fc .fc-daygrid-day-frame {
-  padding: 14px; /* Adjust as needed */
+  padding: 14px;
 }
 
 .fc .fc-highlight {
-  background-color: rgba(0, 204, 255, 0.11); /* custom color */
-  border-radius: 6px; /* soft rounded highlight */
-  margin: 10px; /* creates visual padding inside the cell */
+  background-color: rgba(0, 204, 255, 0.11);
+  border-radius: 6px;
+  margin: 10px;
 }
 
-/* .fc .fc-daygrid-day-top {
-  justify-content: flex-start !important;
-  align-items: flex-start !important;
-  padding: 6px;
+.fc,
+.fc-scrollgrid {
+  border: none !important;
+}
+
+.fc-scrollgrid th:last-child {
+  border-right: none !important;
+}
+
+.fc-col-header-cell > .fc-scrollgrid-sync-inner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: 600;
+  color: #6b7280;
+  height: 50px;
+}
+
+.fc-col-header-cell {
+  background: #f9fafb;
+}
+
+.fc-scrollgrid tr > td:last-child {
+  border-bottom: none !important;
+  border-right: none !important;
+}
+
+.fc-day-today {
+  background: #e9e9e9 !important;
+}
+
+/* .flatpickr-month {
+  height: 50px !important;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 1px solid black;
+} */
+/* 
+.rangeMode .flatpickr-day {
+  margin-top: 20px !important;
+} */
+/* .flatpickr-calendar {
+  padding: 20px !important;
+} */
+
+/* Style previous month button */
+/* .flatpickr-prev-month {
+  top: 20px !important;
+} */
+
+/* Style next month button */
+/* .flatpickr-next-month {
+  top: 20px !important;
+  right: 15px !important;
 } */

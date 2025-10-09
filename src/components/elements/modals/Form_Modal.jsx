@@ -1,7 +1,7 @@
 import React from "react";
 import { X } from "lucide-react";
 import Button from "../Button";
-import Input_Field from "../Input_Field";
+import Text_Field from "../Text_Field";
 import Textarea_Field from "../Textarea_Field";
 
 const Form_Modal = ({ is_open, on_close, width = "max-w-[700px]" }) => {
@@ -25,10 +25,10 @@ const Form_Modal = ({ is_open, on_close, width = "max-w-[700px]" }) => {
           <div className="text-lg md:text-xl font-bold mb-5">Form Modal</div>
           {/* - Modal Label */}
           {/* + Modal Body */}
-          <div className="w-full pl-0 p-4 overflow-y-auto h-[400px] scrollbar-custom">
+          <div className="w-full pl-1 p-4 overflow-y-auto h-[400px] scrollbar-custom">
             <div className="flex flex-col md:flex-row gap-5">
               <div className="w-full">
-                <Input_Field
+                <Text_Field
                   label="Text Field 1"
                   type={"text"}
                   placeholder="Enter text"
@@ -36,7 +36,7 @@ const Form_Modal = ({ is_open, on_close, width = "max-w-[700px]" }) => {
                 />
               </div>
               <div className="w-full">
-                <Input_Field
+                <Text_Field
                   label="Text Field 2"
                   type={"text"}
                   placeholder="Enter text"
@@ -45,7 +45,7 @@ const Form_Modal = ({ is_open, on_close, width = "max-w-[700px]" }) => {
               </div>
             </div>
             <div className="w-full mt-5">
-              <Input_Field
+              <Text_Field
                 label="Text Field 3"
                 type={"text"}
                 placeholder="Enter text"
@@ -53,7 +53,7 @@ const Form_Modal = ({ is_open, on_close, width = "max-w-[700px]" }) => {
               />
             </div>
             <div className="w-full mt-5">
-              <Input_Field
+              <Text_Field
                 label="Text Field 4"
                 type={"text"}
                 placeholder="Enter text"
@@ -62,7 +62,7 @@ const Form_Modal = ({ is_open, on_close, width = "max-w-[700px]" }) => {
             </div>
             <div className="flex flex-col md:flex-row gap-5 mt-5">
               <div className="w-full">
-                <Input_Field
+                <Text_Field
                   label="Text Field 5"
                   type={"text"}
                   placeholder="Enter text"
@@ -70,7 +70,7 @@ const Form_Modal = ({ is_open, on_close, width = "max-w-[700px]" }) => {
                 />
               </div>
               <div className="w-full">
-                <Input_Field
+                <Text_Field
                   label="Text Field 6"
                   type={"text"}
                   placeholder="Enter text"
@@ -78,7 +78,7 @@ const Form_Modal = ({ is_open, on_close, width = "max-w-[700px]" }) => {
                 />
               </div>
               <div className="w-full">
-                <Input_Field
+                <Text_Field
                   label="Text Field 7"
                   type={"text"}
                   placeholder="Enter text"
