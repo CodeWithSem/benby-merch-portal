@@ -72,15 +72,14 @@ const Bar_Chart = () => {
 
   const [bar_chart_data_2, set_bar_chart_data_2] = useState({
     series: [
-      { name: "Direct", data: generateRandomData(12) },
-      { name: "Referral", data: generateRandomData(12) },
-      { name: "Organic Search", data: generateRandomData(12) },
-      { name: "Social", data: generateRandomData(12) },
+      { name: "Data 1", data: generateRandomData(12) },
+      { name: "Data 2", data: generateRandomData(12) },
+      { name: "Data 3", data: generateRandomData(12) },
+      { name: "Data 4", data: generateRandomData(12) },
     ],
     colors: ["#238be0"],
     options: {
       chart: {
-        type: "bar", // <-- Change to bar
         height: 350,
         toolbar: { show: false },
       },
@@ -88,7 +87,8 @@ const Bar_Chart = () => {
         bar: {
           horizontal: false,
           columnWidth: "40%",
-          borderRadiusApplication: "end", // only top corners for vertical bars
+          // borderRadius: 2,
+          // borderRadiusApplication: "end",
         },
       },
       dataLabels: {
@@ -110,9 +110,6 @@ const Bar_Chart = () => {
           "Dec",
         ],
       },
-      //   yaxis: {
-      //     title: { text: "Sales / Revenue" },
-      //   },
       grid: {
         borderColor: "#e7e7e7",
       },
@@ -125,9 +122,9 @@ const Bar_Chart = () => {
         horizontalAlign: "left",
         floating: false,
         markers: {
-          width: 12,
-          height: 12,
-          radius: 12,
+          size: 7,
+          // shape: "circle",
+          strokeWidth: 1,
         },
       },
     },
@@ -158,7 +155,7 @@ const Bar_Chart = () => {
           <Chart
             options={bar_chart_data_2.options}
             series={bar_chart_data_2.series}
-            type="bar" // <-- also here
+            type="bar"
             height={240}
           />
         </div>

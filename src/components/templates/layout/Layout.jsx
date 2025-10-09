@@ -14,6 +14,8 @@ import Basic_Tables from "../pages/tables/basic_tables/Basic_Tables";
 import Popovers from "../pages/ui_elements/popovers/Popovers";
 import Bar_Chart from "../pages/charts/bar_chart/Bar_Chart";
 import Line_Chart from "../pages/charts/line_chart/Line_Chart";
+import Pie_Chart from "../pages/charts/pie_chart/Pie_Chart";
+import Calendar from "../pages/calendar/Calendar";
 
 const Layout = () => {
   const [active_item, set_active_item] = useState(() => {
@@ -54,6 +56,8 @@ const Layout = () => {
     switch (active_item) {
       case "Dashboard":
         return "";
+      case "Calendar":
+        return <Calendar />;
       case "Forms-Form Elements":
         return <Form_Elements />;
       case "Tables-Basic Tables":
@@ -64,6 +68,8 @@ const Layout = () => {
         return <Bar_Chart />;
       case "Charts-Line Chart":
         return <Line_Chart />;
+      case "Charts-Pie Chart":
+        return <Pie_Chart />;
       case "UI Elements-Alerts":
         return <Alerts />;
       case "UI Elements-Badges":

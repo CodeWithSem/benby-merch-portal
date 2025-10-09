@@ -37,3 +37,19 @@ input[type="number"]::-webkit-inner-spin-button {
 a {
   cursor: pointer;
 }
+
+.fc .fc-daygrid-day-frame {
+  padding: 14px; /* Adjust as needed */
+}
+
+.fc .fc-highlight {
+  background-color: rgba(0, 204, 255, 0.11); /* custom color */
+  border-radius: 6px; /* soft rounded highlight */
+  margin: 10px; /* creates visual padding inside the cell */
+}
+
+/* .fc .fc-daygrid-day-top {
+  justify-content: flex-start !important;
+  align-items: flex-start !important;
+  padding: 6px;
+} */

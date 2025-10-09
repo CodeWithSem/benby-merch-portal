@@ -239,7 +239,7 @@ const Form_Elements = () => {
             </div>
             <div className="w-full mt-5">
               <Date_Field
-                label="Select Date"
+                // label="Select Date"
                 name="date"
                 value={date}
                 on_change={handle_date_change}

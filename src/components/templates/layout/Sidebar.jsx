@@ -7,6 +7,7 @@ import {
   Table2Icon,
   BoxIcon,
   ChartPie,
+  Calendar,
 } from "lucide-react";
 
 const Sidebar = ({
@@ -25,6 +26,12 @@ const Sidebar = ({
       type: "link",
       name: "Dashboard",
       icon: <Home size={18} />,
+    },
+    {
+      key: "Calendar",
+      type: "link",
+      name: "Calendar",
+      icon: <Calendar size={18} />,
     },
     {
       key: "Forms",
