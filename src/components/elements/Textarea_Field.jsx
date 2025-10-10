@@ -9,7 +9,7 @@ const Textarea_Field = ({
   disabled = false,
   required = false,
   rows = 4,
-  textarea_error,
+  error_message,
   height, // new prop
 }) => {
   const textarea_class = `block w-full ${
@@ -22,7 +22,7 @@ const Textarea_Field = ({
         : ""
     }
     ${
-      textarea_error
+      error_message
         ? "border-pink-500 text-pink-600 focus:ring-pink-500 focus:border-pink-500"
         : "border-slate-300 focus:ring-sky-500 focus:border-sky-500"
     }
@@ -49,9 +49,9 @@ const Textarea_Field = ({
         style={height ? { height } : undefined}
       />
 
-      {textarea_error && (
+      {error_message && (
         <span className="block text-xs font-medium text-red-500 mt-1">
-          {textarea_error}
+          {error_message}
         </span>
       )}
     </div>

@@ -115,24 +115,6 @@ const Calendar = () => {
             <Button on_click={handleNext} variant="white" width="w-[40px]">
               <ChevronRight size={20} />
             </Button>
-
-            {/* View Toggle Buttons */}
-            {/* <div className="ml-4 flex gap-1">
-              {[
-                { label: "Month", view: "dayGridMonth" },
-                { label: "Week", view: "timeGridWeek" },
-                { label: "Day", view: "timeGridDay" },
-              ].map(({ label, view }) => (
-                <Button
-                  key={view}
-                  on_click={() => handleViewChange(view)}
-                  variant={calendarView === view ? "primary" : "white"}
-                  width="w-[70px]"
-                >
-                  {label}
-                </Button>
-              ))}
-            </div> */}
             <nav className="ml-5 flex overflow-x-auto rounded-lg bg-gray-100 p-1 border dark:bg-gray-900 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-200 dark:[&::-webkit-scrollbar-thumb]:bg-gray-600 [&::-webkit-scrollbar-track]:bg-white dark:[&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar]:h-1.5">
               {[
                 { label: "Month", view: "dayGridMonth" },

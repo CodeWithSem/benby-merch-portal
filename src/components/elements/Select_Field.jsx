@@ -10,7 +10,7 @@ const Select_Field = ({
   disabled = false,
   required = false,
   error_message,
-  placeholder = "Select an option", // ✅ new parameter
+  placeholder = "Select an option",
 }) => {
   const select_class = `block w-full ${
     label ? "mt-1" : ""

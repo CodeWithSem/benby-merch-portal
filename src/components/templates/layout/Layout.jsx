@@ -16,6 +16,8 @@ import Bar_Chart from "../pages/charts/bar_chart/Bar_Chart";
 import Line_Chart from "../pages/charts/line_chart/Line_Chart";
 import Pie_Chart from "../pages/charts/pie_chart/Pie_Chart";
 import Calendar from "../pages/calendar/Calendar";
+import Form_Generator from "../pages/forms/form_generator/Form_Generator";
+import Form_Receiver from "../pages/forms/form_receiver/Form_Receiver";
 
 const Layout = () => {
   const [active_item, set_active_item] = useState(() => {
@@ -60,6 +62,10 @@ const Layout = () => {
         return <Calendar />;
       case "Forms-Form Elements":
         return <Form_Elements />;
+      case "Forms-Form Generator":
+        return <Form_Generator />;
+      case "Forms-Form Receiver":
+        return <Form_Receiver />;
       case "Tables-Basic Tables":
         return <Basic_Tables />;
       case "Tables-Data Tables":

@@ -38,7 +38,7 @@ const Sidebar = ({
       type: "dropdown",
       name: "Forms",
       icon: <FormInput size={18} />,
-      subItems: ["Form Elements"],
+      subItems: ["Form Elements", "Form Generator", "Form Receiver"],
     },
     {
       key: "Tables",
