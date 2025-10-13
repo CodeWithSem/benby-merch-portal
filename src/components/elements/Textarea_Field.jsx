@@ -45,8 +45,9 @@ const Textarea_Field = ({
         required={required}
         disabled={disabled}
         className={textarea_class}
-        spellCheck={false}
         style={height ? { height } : undefined}
+        autoComplete="off"
+        spellCheck={false}
       />
 
       {error_message && (

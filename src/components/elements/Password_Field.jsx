@@ -55,8 +55,9 @@ const Password_Field = ({
           placeholder={placeholder}
           disabled={disabled}
           required={required}
-          spellCheck={false}
           className={input_class}
+          autoComplete="off"
+          spellCheck={false}
         />
 
         <div

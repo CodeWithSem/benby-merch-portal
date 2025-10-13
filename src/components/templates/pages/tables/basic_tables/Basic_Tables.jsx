@@ -15,6 +15,7 @@ import {
   Search,
   Settings,
   SquarePen,
+  Trash,
   Trash2,
   UserCircle,
 } from "lucide-react";
@@ -66,7 +67,28 @@ const Basic_Tables = () => {
   return (
     <React.Fragment>
       <div className="w-full">
-        <h1 className="w-full text-xl py-5">Basic Tables</h1>
+        <div className="flex flex-wrap items-center justify-between gap-3 py-5">
+          <h1 className="text-xl">Basic Tables</h1>
+          <nav>
+            <ol className="flex flex-wrap items-center gap-1.5">
+              <li>
+                <a className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-sky-500 cursor-pointer">
+                  Home
+                </a>
+              </li>
+              <li className="flex items-center gap-1.5 text-sm text-gray-500">
+                <span>/</span>
+                <a className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-sky-500 cursor-pointer">
+                  Tables
+                </a>
+              </li>
+              <li className="flex items-center gap-1.5 text-sm text-gray-500">
+                <span>/</span>
+                <span className="text-gray-800">Basic Tables</span>
+              </li>
+            </ol>
+          </nav>
+        </div>
       </div>
       {/* + Basic Table 1 */}
       <div className="w-full bg-white rounded-lg border">
@@ -785,6 +807,121 @@ const Basic_Tables = () => {
         </div>
       </div>
       {/* - Basic Table 3 */}
+      {/* + Basic Table 4 */}
+      <div className="w-full bg-white rounded-lg border mt-5">
+        <h1 className="w-full text-lg border-b p-5">Basic Table 4</h1>
+        <div className="p-5 sm:p-6">
+          <div className="overflow-hidden rounded-lg border border-gray-200 bg-white pt-4 dark:border-gray-800 dark:bg-white/[0.03]">
+            <div className="flex flex-col gap-5 px-6 mb-4 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <h3 className="font-semibold text-gray-700 dark:text-white/90 whitespace-nowrap">
+                  List of Products
+                </h3>
+              </div>
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center md:w-[500px]">
+                <div className="w-full">
+                  <Icon_Field
+                    name="search"
+                    placeholder="Search..."
+                    icon={Search}
+                    icon_position="left"
+                  />
+                </div>
+              </div>
+            </div>
+            <div className="max-w-full overflow-x-auto custom-scrollbar">
+              <table className="min-w-full text-left text-sm text-gray-700 dark:border-gray-800">
+                <thead className="bg-gray-50 dark:bg-gray-900">
+                  <tr className="border-b border-t border-gray-100 whitespace-nowrap dark:border-gray-800 text-sm">
+                    <th className="px-5 py-4 font-medium whitespace-nowrap text-gray-700 dark:text-gray-400">
+                      SI No.
+                    </th>
+                    <th className="px-5 py-4 font-medium whitespace-nowrap text-gray-700 dark:text-gray-400">
+                      Product
+                    </th>
+                    <th className="px-5 py-4 font-medium whitespace-nowrap text-gray-700 dark:text-gray-400">
+                      Quantity
+                    </th>
+                    <th className="px-5 py-4 font-medium whitespace-nowrap text-gray-700 dark:text-gray-400">
+                      Unit Cose
+                    </th>
+                    <th className="px-5 py-4 font-medium whitespace-nowrap text-gray-700 dark:text-gray-400">
+                      Discount
+                    </th>
+                    <th className="px-5 py-4 font-medium whitespace-nowrap text-gray-700 dark:text-gray-400">
+                      Total
+                    </th>
+                    <th className="relative px-5 py-4 text-sm font-medium whitespace-nowrap text-gray-700 dark:text-gray-400"></th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100 bg-white dark:divide-gray-800 dark:bg-white/[0.03]">
+                  <tr>
+                    <td className="px-5 py-4 text-sm whitespace-nowrap text-gray-500 dark:text-gray-400">
+                      1
+                    </td>
+                    <td className="px-5 py-4 text-sm font-medium whitespace-nowrap text-gray-800 dark:text-white/90">
+                      Macbook pro 13"
+                    </td>
+                    <td className="px-5 py-4 text-sm whitespace-nowrap text-gray-500 dark:text-gray-400">
+                      5
+                    </td>
+                    <td className="px-5 py-4 text-sm whitespace-nowrap text-gray-500 dark:text-gray-400">
+                      P 100,000.00
+                    </td>
+                    <td className="px-5 py-4 text-sm whitespace-nowrap text-gray-500 dark:text-gray-400">
+                      0%
+                    </td>
+                    <td className="px-5 py-4 text-sm whitespace-nowrap text-gray-500 dark:text-gray-400">
+                      P 500,000.00
+                    </td>
+                    <td className="px-5 py-4 text-sm whitespace-nowrap text-gray-500 dark:text-gray-400">
+                      <div className="flex items-center justify-center gap-2">
+                        <div className="flex items-center justify-center hover:text-sky-500 cursor-pointer">
+                          <SquarePen size={20} />
+                        </div>
+                        <div className="flex items-center justify-center hover:text-red-500 cursor-pointer pb-[1px]">
+                          <Trash2 size={20} />
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td className="px-5 py-4 text-sm whitespace-nowrap text-gray-500 dark:text-gray-400">
+                      2
+                    </td>
+                    <td className="px-5 py-4 text-sm font-medium whitespace-nowrap text-gray-800 dark:text-white/90">
+                      iPhone 15 Pro max
+                    </td>
+                    <td className="px-5 py-4 text-sm whitespace-nowrap text-gray-500 dark:text-gray-400">
+                      1
+                    </td>
+                    <td className="px-5 py-4 text-sm whitespace-nowrap text-gray-500 dark:text-gray-400">
+                      P 60,000.00
+                    </td>
+                    <td className="px-5 py-4 text-sm whitespace-nowrap text-gray-500 dark:text-gray-400">
+                      0%
+                    </td>
+                    <td className="px-5 py-4 text-sm whitespace-nowrap text-gray-500 dark:text-gray-400">
+                      P 60,000.00
+                    </td>
+                    <td className="px-5 py-4 text-sm whitespace-nowrap text-gray-500 dark:text-gray-400">
+                      <div className="flex items-center justify-center gap-2">
+                        <div className="flex items-center justify-center hover:text-sky-500 cursor-pointer">
+                          <SquarePen size={20} />
+                        </div>
+                        <div className="flex items-center justify-center hover:text-red-500 cursor-pointer pb-[1px]">
+                          <Trash2 size={20} />
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+      {/* - Basic Table 4 */}
     </React.Fragment>
   );
 };

@@ -18,6 +18,8 @@ import Pie_Chart from "../pages/charts/pie_chart/Pie_Chart";
 import Calendar from "../pages/calendar/Calendar";
 import Form_Generator from "../pages/forms/form_generator/Form_Generator";
 import Form_Receiver from "../pages/forms/form_receiver/Form_Receiver";
+import Create_Invoice from "../pages/templates/create_invoice/Create_Invoice";
+import Database_Table from "../pages/templates/database_table/Database_Table";
 
 const Layout = () => {
   const [active_item, set_active_item] = useState(() => {
@@ -92,6 +94,10 @@ const Layout = () => {
         return <Popovers />;
       case "UI Elements-Tabs":
         return <Tabs />;
+      case "Templates-Create Invoice":
+        return <Create_Invoice />;
+      case "Templates-Database Table":
+        return <Database_Table />;
     }
   };
 
@@ -114,7 +120,7 @@ const Layout = () => {
           }`}
         >
           <Header toggle_sidebar={toggle_sidebar} />
-          <div className="p-4 mx-auto max-w-screen-2xl md:p-6">
+          <div className="p-4 mx-auto max-w-screen-2xl md:px-6 pt-2 pb-6">
             {page_renderer(active_item)}
           </div>
         </div>

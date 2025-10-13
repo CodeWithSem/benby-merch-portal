@@ -172,7 +172,28 @@ const Form_Generator = () => {
   return (
     <React.Fragment>
       <div className="w-full">
-        <h1 className="w-full text-xl py-5">Form Generator</h1>
+        <div className="flex flex-wrap items-center justify-between gap-3 py-5">
+          <h1 className="text-xl">Form Generator</h1>
+          <nav>
+            <ol className="flex flex-wrap items-center gap-1.5">
+              <li>
+                <a className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-sky-500 cursor-pointer">
+                  Home
+                </a>
+              </li>
+              <li className="flex items-center gap-1.5 text-sm text-gray-500">
+                <span>/</span>
+                <a className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-sky-500 cursor-pointer">
+                  Forms
+                </a>
+              </li>
+              <li className="flex items-center gap-1.5 text-sm text-gray-500">
+                <span>/</span>
+                <span className="text-gray-800">Form Generator</span>
+              </li>
+            </ol>
+          </nav>
+        </div>
       </div>
 
       <div className="w-full flex flex-col gap-10">

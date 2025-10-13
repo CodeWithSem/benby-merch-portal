@@ -15,6 +15,9 @@ import Password_Field from "../../../../elements/Password_Field";
 import Icon_Field from "../../../../elements/Icon_Field";
 import Button from "../../../../elements/Button";
 import Date_Range_Field from "../../../../elements/Date_Range_Field";
+import Find_Field from "../../../../elements/Find_Field";
+import Verify_Field from "../../../../elements/Verify_Field";
+import Quantity_Field from "../../../../elements/Quantity_Field";
 
 const Form_Elements = () => {
   // + For Input Field (Text)
@@ -159,6 +162,32 @@ const Form_Elements = () => {
     set_copy(e.target.value);
   };
   // - For Copy Field
+  // + For Find Field
+  const [search_value, set_search_value] = useState("");
+
+  const handle_change = (e) => {
+    set_search_value(e.target.value);
+  };
+
+  const handle_find = () => {
+    // You can trigger an API call, filter logic, etc.
+    alert("open");
+  };
+  // - For Find Field
+  // + For Verify Field
+  const [text_verify, set_text_verify] = useState("");
+  const [verifyStatus, setVerifyStatus] = useState("");
+
+  const handleFind = () => {
+    alert("Searching for: " + text_verify);
+  };
+
+  const handleVerify = () => {
+    // simulate verification
+    if (text_verify === "12345") setVerifyStatus("check");
+    else setVerifyStatus("error");
+  };
+  // - For Verify Field
   // + For Upload Field
   const [file, set_file] = useState(null);
   const [file_error, set_file_error] = useState("");
@@ -240,13 +269,37 @@ const Form_Elements = () => {
   // + For Icon Field
   const [search_term, set_search_term] = useState("");
   // - For Icon Field
+  // + For Quantity Field
+  const [quantity, set_quantity] = useState(1);
+  // - For Quantity Field
 
   const [loading, set_loading] = useState(false);
   // RETURN ORIGIN
   return (
     <React.Fragment>
       <div className="w-full">
-        <h1 className="w-full text-xl py-5">Form Elements</h1>
+        <div className="flex flex-wrap items-center justify-between gap-3 py-5">
+          <h1 className="text-xl">Form Elements</h1>
+          <nav>
+            <ol className="flex flex-wrap items-center gap-1.5">
+              <li>
+                <a className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-sky-500 cursor-pointer">
+                  Home
+                </a>
+              </li>
+              <li className="flex items-center gap-1.5 text-sm text-gray-500">
+                <span>/</span>
+                <a className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-sky-500 cursor-pointer">
+                  Forms
+                </a>
+              </li>
+              <li className="flex items-center gap-1.5 text-sm text-gray-500">
+                <span>/</span>
+                <span className="text-gray-800">Form Elements</span>
+              </li>
+            </ol>
+          </nav>
+        </div>
       </div>
       <div className="w-full bg-white rounded-lg border">
         <h1 className="w-full text-lg border-b p-5">Default Inputs</h1>
@@ -254,7 +307,7 @@ const Form_Elements = () => {
           <div className="w-full">
             <div className="w-full">
               <Text_Field
-                label="Text"
+                label="Text Field"
                 type={"text"}
                 placeholder="Enter text"
                 value={text}
@@ -265,7 +318,7 @@ const Form_Elements = () => {
             </div>
             <div className="w-full mt-5">
               <Text_Field
-                label="Weight (kg)"
+                label="Text Field (Number)"
                 type={"number"}
                 placeholder="Enter weight"
                 value={number}
@@ -370,6 +423,30 @@ const Form_Elements = () => {
               />
             </div>
             <div className="w-full mt-5">
+              <Find_Field
+                label="Search Item"
+                name="search_input"
+                value={search_value}
+                on_change={handle_change}
+                on_find={handle_find}
+              />
+            </div>
+            <div className="w-full mt-5">
+              <Verify_Field
+                label="Purchase Order Number"
+                name="verify_code"
+                placeholder="Enter PO"
+                value={text_verify}
+                on_change={(e) => {
+                  set_text_verify(e.target.value);
+                  setVerifyStatus("");
+                }}
+                on_find={handleFind}
+                on_verify={handleVerify}
+                verify_status={verifyStatus}
+              />
+            </div>
+            <div className="w-full mt-5">
               <Textarea_Field
                 label="Description"
                 name="description"
@@ -381,7 +458,17 @@ const Form_Elements = () => {
                 textarea_error={description_error}
               />
             </div>
-            <div className="w-full flex md:mt-[52px] mt-[20px] gap-4">
+            <div className="w-full mt-5">
+              <Quantity_Field
+                label="Quantity"
+                value={quantity}
+                // min={1}
+                // max={10}
+                on_change={set_quantity}
+                // error_message={quantity < 1 ? "Must be at least 1" : ""}
+              />
+            </div>
+            {/* <div className="w-full flex md:mt-[52px] mt-[20px] gap-4">
               <div>
                 <Checkbox_Field
                   label="Checkbox"
@@ -448,7 +535,7 @@ const Form_Elements = () => {
                   Get Date
                 </Button>
               </div>
-            </div>
+            </div> */}
             <div className="w-full mt-5">
               <div className="text-sm">
                 <p>

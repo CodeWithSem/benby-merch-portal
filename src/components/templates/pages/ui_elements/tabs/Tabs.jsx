@@ -15,7 +15,28 @@ const Tabs = () => {
   return (
     <React.Fragment>
       <div className="w-full">
-        <h1 className="w-full text-xl py-5">Tabs</h1>
+        <div className="flex flex-wrap items-center justify-between gap-3 py-5">
+          <h1 className="text-xl">Tabs</h1>
+          <nav>
+            <ol className="flex flex-wrap items-center gap-1.5">
+              <li>
+                <a className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-sky-500 cursor-pointer">
+                  Home
+                </a>
+              </li>
+              <li className="flex items-center gap-1.5 text-sm text-gray-500">
+                <span>/</span>
+                <a className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-sky-500 cursor-pointer">
+                  UI Elements
+                </a>
+              </li>
+              <li className="flex items-center gap-1.5 text-sm text-gray-500">
+                <span>/</span>
+                <span className="text-gray-800">Tabs</span>
+              </li>
+            </ol>
+          </nav>
+        </div>
       </div>
       {/* + Default Tabs */}
       <div className="w-full bg-white rounded-lg border">

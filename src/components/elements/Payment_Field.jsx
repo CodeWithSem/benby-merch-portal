@@ -67,6 +67,7 @@ const Payment_Field = ({
           disabled={disabled}
           required={required}
           className={input_class}
+          autoComplete="off"
           spellCheck={false}
         />
       </div>

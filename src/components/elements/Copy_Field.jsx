@@ -33,56 +33,19 @@ const Copy_Field = ({
         : "focus-within:ring-sky-500 focus-within:border-sky-500"
     }`;
 
-  const input_class = `flex-1 bg-transparent border border-transparent focus:border-transparent focus:ring-0 px-3 py-2 placeholder-slate-400 disabled:cursor-not-allowed disabled:bg-transparent focus:outline-none`;
+  const input_class = `flex-1 min-w-0 bg-transparent border border-transparent focus:border-transparent focus:ring-0 px-3 py-2 placeholder-slate-400 disabled:cursor-not-allowed disabled:bg-transparent focus:outline-none`;
 
-  // Button is never disabled, so always interactive.
-  const button_class = `inline-flex items-center px-3 border-l border-slate-300 text-slate-500 hover:text-slate-700 cursor-pointer`;
+  const button_class = `inline-flex flex-shrink-0 items-center px-3 border-l border-slate-300 text-slate-500 hover:text-slate-700 cursor-pointer`;
 
-  // If label is provided, wrap everything in a label element.
-  // If no label, just render input, button, and error message without wrapping label.
-  if (label) {
-    return (
-      <label className="block">
+  return (
+    <div className="block">
+      {label && (
         <span className="block text-sm font-medium text-slate-700">
           {label}
         </span>
+      )}
 
-        <div className={wrapper_class}>
-          <input
-            type="text"
-            name={name}
-            value={value}
-            onChange={on_change}
-            disabled={disabled}
-            className={input_class}
-          />
-
-          <button
-            type="button"
-            onClick={handle_copy}
-            title="Copy to clipboard"
-            className={button_class}
-          >
-            {copied ? <ClipboardCheck size={18} /> : <Clipboard size={18} />}
-            {copy_button_label && (
-              <span className="ml-1">{copy_button_label}</span>
-            )}
-          </button>
-        </div>
-
-        {error_message && (
-          <span className="block text-xs font-medium text-red-500 mt-1">
-            {error_message}
-          </span>
-        )}
-      </label>
-    );
-  }
-
-  // No label case
-  return (
-    <div>
-      <div className={wrapper_class}>
+      <div className={`${wrapper_class} flex`}>
         <input
           type="text"
           name={name}
@@ -90,6 +53,8 @@ const Copy_Field = ({
           onChange={on_change}
           disabled={disabled}
           className={input_class}
+          autoComplete="off"
+          spellCheck={false}
         />
 
         <button

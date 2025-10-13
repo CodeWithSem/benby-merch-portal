@@ -55,9 +55,10 @@ const Text_Field = ({
         required={required}
         min={min}
         max={max}
-        spellCheck={false}
         onWheel={handle_wheel}
         className={input_class}
+        autoComplete="off"
+        spellCheck={false}
       />
 
       {error_message && (

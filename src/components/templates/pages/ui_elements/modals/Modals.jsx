@@ -19,7 +19,28 @@ const Modals = () => {
   return (
     <React.Fragment>
       <div className="w-full">
-        <h1 className="w-full text-xl py-5">Modals</h1>
+        <div className="flex flex-wrap items-center justify-between gap-3 py-5">
+          <h1 className="text-xl">Modals</h1>
+          <nav>
+            <ol className="flex flex-wrap items-center gap-1.5">
+              <li>
+                <a className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-sky-500 cursor-pointer">
+                  Home
+                </a>
+              </li>
+              <li className="flex items-center gap-1.5 text-sm text-gray-500">
+                <span>/</span>
+                <a className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-sky-500 cursor-pointer">
+                  UI Elements
+                </a>
+              </li>
+              <li className="flex items-center gap-1.5 text-sm text-gray-500">
+                <span>/</span>
+                <span className="text-gray-800">Modals</span>
+              </li>
+            </ol>
+          </nav>
+        </div>
       </div>
 
       <div className="w-full flex flex-col md:flex-row gap-5">
@@ -140,7 +161,7 @@ const Modals = () => {
         on_close={() => set_open_alert_success_modal(false)}
         width="max-w-[620px]"
         variant="success" // success | warning | error
-        title="Park In Success"
+        title="Parked In"
         message="The customer has successfully parked in. Please remind them that parking fees need to be collected at the lobby, and ensure the payment is processed before they leave."
       />
       <Alert_Modal

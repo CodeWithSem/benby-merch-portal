@@ -8,6 +8,7 @@ import {
   BoxIcon,
   ChartPie,
   Calendar,
+  NotepadTextDashed,
 } from "lucide-react";
 
 const Sidebar = ({
@@ -69,6 +70,13 @@ const Sidebar = ({
         "Popovers",
         "Tabs",
       ],
+    },
+    {
+      key: "Templates",
+      type: "dropdown",
+      name: "Templates",
+      icon: <NotepadTextDashed size={18} />,
+      subItems: ["Create Invoice", "Database Table"],
     },
     // {
     //   key: "Maintenance",
@@ -158,7 +166,7 @@ const Sidebar = ({
       <div
         className={`ml-9 mt-1 flex flex-col overflow-hidden transition-[max-height,opacity] duration-300 ${
           open_dropdowns[key]
-            ? "max-h-[200px] opacity-100"
+            ? "max-h-[300px] opacity-100"
             : "max-h-0 opacity-0"
         }`}
       >
@@ -225,7 +233,7 @@ const Sidebar = ({
                   key={item.key}
                   href={item.path}
                   onClick={() => handle_item_click(item.key)}
-                  className={`relative flex items-center rounded transition-all duration-300 ${
+                  className={`relative flex items-center rounded transition-all duration-300 outline-none ${
                     is_desktop && is_collapsed ? "justify-center p-3" : "p-3"
                   } ${
                     isActive
@@ -257,7 +265,7 @@ const Sidebar = ({
                 >
                   <button
                     onClick={() => toggle_dropdown(item.key)}
-                    className={`relative flex items-center rounded w-full transition-all duration-300 ${
+                    className={`relative flex items-center rounded w-full transition-all duration-300 outline-none ${
                       is_desktop && is_collapsed ? "justify-center p-3" : "p-3"
                     } ${
                       isParentActive

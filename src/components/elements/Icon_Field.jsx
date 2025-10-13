@@ -56,8 +56,9 @@ const Icon_Field = ({
           placeholder={placeholder}
           disabled={disabled}
           required={required}
-          spellCheck={false}
           className={`${input_class} ${padding_class}`}
+          autoComplete="off"
+          spellCheck={false}
         />
 
         {Icon && (
