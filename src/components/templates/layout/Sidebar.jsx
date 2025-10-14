@@ -10,6 +10,8 @@ import {
   Calendar,
   NotepadTextDashed,
 } from "lucide-react";
+import { logoutUser } from "../../../api/firebase_auth_api";
+import { useToast } from "../layout/Toast_Provider";
 
 const Sidebar = ({
   active_item,
@@ -18,6 +20,7 @@ const Sidebar = ({
   is_collapsed,
   is_open,
 }) => {
+  const { show_toast } = useToast();
   const [open_dropdowns, set_open_dropdowns] = useState({});
   const dropdown_refs = useRef({});
 
@@ -76,7 +79,7 @@ const Sidebar = ({
       type: "dropdown",
       name: "Templates",
       icon: <NotepadTextDashed size={18} />,
-      subItems: ["Create Invoice", "Database Table"],
+      subItems: ["Create Invoice", "Firestore DB", "Real-time DB"],
     },
     // {
     //   key: "Maintenance",
@@ -189,6 +192,25 @@ const Sidebar = ({
         })}
       </div>
     );
+  };
+
+  // Sign out
+  const handleSignOut = async () => {
+    try {
+      await logoutUser();
+      show_toast({
+        type: "success",
+        title: "Signed Out",
+        message: "You have been logged out successfully",
+      });
+      // App will automatically redirect to login if you follow previous setup
+    } catch (err) {
+      show_toast({
+        type: "danger",
+        title: "Sign Out Failed",
+        message: err.message,
+      });
+    }
   };
 
   // RETURN ORIGIN
@@ -306,6 +328,7 @@ const Sidebar = ({
             className={`relative flex items-center rounded hover:bg-gray-100 text-gray-600 font-medium transition-all duration-300 cursor-pointer ${
               is_desktop && is_collapsed ? "justify-center p-3" : "p-3"
             }`}
+            onClick={handleSignOut}
           >
             <LogOut size={18} />
             <span

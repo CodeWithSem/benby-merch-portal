@@ -9,9 +9,14 @@ import {
   doc,
   deleteDoc,
 } from "firebase/firestore";
-import { db } from "../assets/scripts/firebase";
+import { firestore_db } from "../assets/scripts/firebase";
 
-const users_ref = collection(db, "DB1_QS_SYSTEM_DEMO", "TBL_USERS", "DATA");
+const users_ref = collection(
+  firestore_db,
+  "DB1_QS_SYSTEM_DEMO",
+  "TBL_USERS",
+  "DATA"
+);
 
 // Fetch all users (client-side filtering)
 export const fetch_all_users = async () => {
@@ -28,7 +33,7 @@ export const fetch_all_users = async () => {
 export const fetch_user = async (user_id) => {
   try {
     const user_doc_ref = doc(
-      db,
+      firestore_db,
       "DB1_QS_SYSTEM_DEMO",
       "TBL_USERS",
       "DATA",
@@ -73,8 +78,16 @@ export const add_user = async (user_data) => {
       ...user_data,
       timestamp: serverTimestamp(),
     });
+
+    // ✅ Return full object with generated ID
+    const new_user = {
+      id: doc_ref.id,
+      ...user_data,
+      timestamp: new Date().toISOString(),
+    };
+
     console.log("✅ User added with ID:", doc_ref.id);
-    return doc_ref.id;
+    return new_user; // 👈 return full data instead of just ID
   } catch (error) {
     console.error("Error adding user:", error);
     throw error;
@@ -83,7 +96,7 @@ export const add_user = async (user_data) => {
 
 export const delete_user = async (user_id) => {
   const user_doc_ref = doc(
-    db,
+    firestore_db,
     "DB1_QS_SYSTEM_DEMO",
     "TBL_USERS",
     "DATA",
@@ -93,7 +106,12 @@ export const delete_user = async (user_id) => {
   console.log("Deleted user with ID:", user_id);
 };
 
-const invoice_ref = collection(db, "DB1_QS_SYSTEM_DEMO", "TBL_INVOICE", "DATA");
+const invoice_ref = collection(
+  firestore_db,
+  "DB1_QS_SYSTEM_DEMO",
+  "TBL_INVOICE",
+  "DATA"
+);
 
 export const add_invoice = async () => {
   try {

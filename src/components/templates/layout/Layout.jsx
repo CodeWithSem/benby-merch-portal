@@ -19,7 +19,8 @@ import Calendar from "../pages/calendar/Calendar";
 import Form_Generator from "../pages/forms/form_generator/Form_Generator";
 import Form_Receiver from "../pages/forms/form_receiver/Form_Receiver";
 import Create_Invoice from "../pages/templates/create_invoice/Create_Invoice";
-import Database_Table from "../pages/templates/database_table/Database_Table";
+import Firestore_DB from "../pages/templates/firestore_db/Firestore_DB";
+import Real_Time_DB from "../pages/templates/real_time_db/Real_Time_DB";
 
 const Layout = () => {
   const [active_item, set_active_item] = useState(() => {
@@ -96,8 +97,10 @@ const Layout = () => {
         return <Tabs />;
       case "Templates-Create Invoice":
         return <Create_Invoice />;
-      case "Templates-Database Table":
-        return <Database_Table />;
+      case "Templates-Firestore DB":
+        return <Firestore_DB />;
+      case "Templates-Real-time DB":
+        return <Real_Time_DB />;
     }
   };
 

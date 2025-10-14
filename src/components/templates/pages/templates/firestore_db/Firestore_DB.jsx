@@ -1,4 +1,4 @@
-// src/components/Database_Table.js
+// src/components/Firestore_DB.js
 import React, { useEffect, useRef, useState } from "react";
 import {
   Search,
@@ -7,7 +7,6 @@ import {
   Edit,
   Trash,
   View,
-  Download,
   CheckCircle2,
   Info,
   PlusCircle,
@@ -28,7 +27,7 @@ import {
 } from "../../../../../api/firebase_api";
 import Verify_Field from "../../../../elements/Verify_Field";
 
-const Database_Table = () => {
+const Firestore_DB = () => {
   const filter_ref = useRef(null);
   const { show_toast } = useToast();
 
@@ -159,7 +158,7 @@ const Database_Table = () => {
 
   const handle_add_user = async () => {
     try {
-      await add_user({
+      const new_user = await add_user({
         name: "Sample User " + Math.floor(Math.random() * 1000),
         email: "sample" + Math.floor(Math.random() * 1000) + "@example.com",
         phone: "+63 912 345 6789",
@@ -171,16 +170,17 @@ const Database_Table = () => {
         plan: "Free",
       });
 
+      // ✅ Add new user locally without re-fetch
+      set_all_data((prev) => [new_user, ...prev]);
+
       show_toast({
         type: "success",
         title: "Added!",
-        message: "User added to Firestore.",
+        message: "User added successfully.",
         icon: <CheckCircle2 size={21} className="text-green-500" />,
         width: "270px",
         position: "top-right",
       });
-
-      load_users();
     } catch (err) {
       show_toast({
         type: "danger",
@@ -485,4 +485,4 @@ const Database_Table = () => {
   );
 };
 
-export default Database_Table;
+export default Firestore_DB;

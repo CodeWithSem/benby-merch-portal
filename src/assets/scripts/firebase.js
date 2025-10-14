@@ -1,13 +1,14 @@
-// Import the functions you need from the SDKs you need
+// firebase_config.js
 import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
+import { getDatabase } from "firebase/database";
+import { getAuth } from "firebase/auth"; // <-- Add this
 
-// Your web app's Firebase configuration
 const firebaseConfig = {
   apiKey: "AIzaSyAF96p13wi5B3ofmom9c_p21ht4l7SNgl0",
   authDomain: "qs-system-demo.firebaseapp.com",
+  databaseURL:
+    "https://qs-system-demo-default-rtdb.asia-southeast1.firebasedatabase.app",
   projectId: "qs-system-demo",
   storageBucket: "qs-system-demo.firebasestorage.app",
   messagingSenderId: "641710365797",
@@ -16,4 +17,10 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-export const db = getFirestore(app);
+
+// Export databases
+export const realtime_db = getDatabase(app);
+export const firestore_db = getFirestore(app);
+
+// Export auth
+export const auth = getAuth(app); // <-- Initialize Auth
