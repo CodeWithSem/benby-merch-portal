@@ -6,15 +6,30 @@ import Sign_Up from "./components/templates/layout/Sign_Up";
 import { onAuthStateChangedListener } from "./api/firebase_auth_api";
 
 function App() {
-  const [page, set_page] = useState(null); // null = checking auth
+  // const [page, set_page] = useState(null);
+
+  const [page, set_page] = useState(() => {
+    return localStorage.getItem("page") || "login";
+  });
+
+  useEffect(() => {
+    if (!localStorage.getItem("page")) {
+      localStorage.setItem("page", "login");
+    }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem("page", page);
+  }, [page]);
+
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChangedListener((user) => {
       if (user) {
-        set_page("dashboard"); // logged in
+        set_page("dashboard");
       } else {
-        set_page("login"); // not logged in
+        set_page("login");
       }
       setLoading(false);
     });

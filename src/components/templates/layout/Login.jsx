@@ -18,15 +18,15 @@ const Login = ({ set_page }) => {
   const { show_toast } = useToast();
 
   // Listen for existing auth state (auto-login)
-  useEffect(() => {
-    const unsubscribe = onAuthStateChangedListener((user) => {
-      if (user) {
-        console.log("Logged In.");
-        // Redirect to dashboard or main page
-      }
-    });
-    return () => unsubscribe();
-  }, []);
+  // useEffect(() => {
+  //   const unsubscribe = onAuthStateChangedListener((user) => {
+  //     if (user) {
+  //       console.log("Logged In.");
+  //       // Redirect to dashboard or main page
+  //     }
+  //   });
+  //   return () => unsubscribe();
+  // }, []);
 
   const handleLogin = async (e) => {
     e.preventDefault();

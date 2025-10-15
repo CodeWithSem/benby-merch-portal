@@ -21,8 +21,11 @@ import Form_Receiver from "../pages/forms/form_receiver/Form_Receiver";
 import Create_Invoice from "../pages/templates/create_invoice/Create_Invoice";
 import Firestore_DB from "../pages/templates/firestore_db/Firestore_DB";
 import Real_Time_DB from "../pages/templates/real_time_db/Real_Time_DB";
+import Edit_Profile from "../pages/authentication/Edit_Profile";
+import Dashboard from "../pages/dashboard/Dashboard";
+import { onAuthStateChangedListener } from "../../../api/firebase_auth_api";
 
-const Layout = () => {
+const Layout = ({ set_page }) => {
   const [active_item, set_active_item] = useState(() => {
     return localStorage.getItem("active_item") || "Dashboard";
   });
@@ -59,8 +62,10 @@ const Layout = () => {
 
   const page_renderer = (active_item) => {
     switch (active_item) {
+      case "Auth-Edit Profile":
+        return <Edit_Profile />;
       case "Dashboard":
-        return "";
+        return <Dashboard />;
       case "Calendar":
         return <Calendar />;
       case "Forms-Form Elements":
@@ -122,7 +127,11 @@ const Layout = () => {
             is_desktop ? (is_collapsed ? "md:ml-20" : "md:ml-64") : "ml-0"
           }`}
         >
-          <Header toggle_sidebar={toggle_sidebar} />
+          <Header
+            toggle_sidebar={toggle_sidebar}
+            set_active_item={set_active_item}
+            set_page={set_page}
+          />
           <div className="p-4 mx-auto max-w-screen-2xl md:px-6 pt-2 pb-6">
             {page_renderer(active_item)}
           </div>

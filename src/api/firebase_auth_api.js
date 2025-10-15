@@ -40,7 +40,7 @@ export const registerUser = async (email, password, displayName) => {
 /**
  * Sign In with option to persist
  */
-export const loginUser = async (email, password, keepLoggedIn = false) => {
+export const loginUser = async (email, password, keepLoggedIn) => {
   try {
     await setPersistence(
       auth,

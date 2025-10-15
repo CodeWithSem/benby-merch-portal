@@ -8,47 +8,53 @@ import {
   Menu,
   Settings,
   UserCircle,
+  X,
 } from "lucide-react";
-import profile_placeholder from "../../../assets/images/profile-1.png"; // fallback avatar
+import profile_placeholder from "../../../assets/images/profile-1.png";
+import profile_2 from "../../../assets/images/profile-2.png";
 import {
   logoutUser,
   onAuthStateChangedListener,
 } from "../../../api/firebase_auth_api";
 import { useToast } from "../layout/Toast_Provider";
 
-const Header = ({ toggle_sidebar }) => {
+const Header = ({ toggle_sidebar, set_active_item }) => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
-  const [user, setUser] = useState(null); // state for authenticated user
+  const [notifOpen, setNotifOpen] = useState(false); // 🟩 NEW STATE
+  const [user, setUser] = useState(null);
   const profileRef = useRef(null);
+  const notifRef = useRef(null); // 🟩 NEW REF
   const { show_toast } = useToast();
 
-  // Listen for auth state changes
   useEffect(() => {
     const unsubscribe = onAuthStateChangedListener((currentUser) => {
-      setUser(currentUser); // update user state when auth changes
+      setUser(currentUser);
     });
     return () => unsubscribe();
   }, []);
 
-  // Toggle sidebar on mobile
   const toggleMobile = () => setMobileOpen(!mobileOpen);
-
-  // Toggle profile dropdown
   const toggleProfileDropdown = () => setProfileOpen((prev) => !prev);
 
-  // Close dropdown when clicking outside
+  // 🟩 New function for Notification Dropdown
+  const toggleNotificationDropdown = () => setNotifOpen((prev) => !prev);
+
+  // 🟩 Close dropdowns when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (profileRef.current && !profileRef.current.contains(event.target)) {
         setProfileOpen(false);
+      }
+
+      if (notifRef.current && !notifRef.current.contains(event.target)) {
+        setNotifOpen(false);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Sign out
   const handleSignOut = async () => {
     try {
       await logoutUser();
@@ -58,7 +64,6 @@ const Header = ({ toggle_sidebar }) => {
         message: "You have been logged out successfully",
         icon: <LogOut size={21} className="text-green-500" />,
       });
-      // App will automatically redirect to login if you follow previous setup
     } catch (err) {
       show_toast({
         type: "danger",
@@ -68,9 +73,16 @@ const Header = ({ toggle_sidebar }) => {
     }
   };
 
-  // Use user's displayName or fallback
   const displayName = user?.displayName || user?.email?.split("@")[0] || "User";
   const email = user?.email || "";
+
+  const notifications = [
+    { id: 1, name: "User 1" },
+    { id: 2, name: "User 2" },
+    { id: 3, name: "User 3" },
+    { id: 4, name: "User 4" },
+    { id: 5, name: "User 5" },
+  ];
 
   return (
     <header className="sticky top-0 z-[11] flex w-full border-gray-200 bg-white xl:border-b">
@@ -106,14 +118,66 @@ const Header = ({ toggle_sidebar }) => {
             mobileOpen ? "flex" : "hidden"
           } xl:flex`}
         >
-          <div className="2xsm:gap-3 flex items-center gap-2">
-            <div className="relative">
-              <button className="relative flex h-11 w-11 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700">
+          <div className="flex items-center gap-2">
+            {/* 🟩 Notification Button + Dropdown */}
+            <div className="relative" ref={notifRef}>
+              <button
+                onClick={toggleNotificationDropdown}
+                className="relative flex h-11 w-11 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700"
+              >
                 <span className="absolute top-0.5 right-0 z-1 h-2 w-2 rounded-full bg-orange-400 flex">
                   <span className="absolute -z-1 inline-flex h-full w-full animate-ping rounded-full bg-orange-400 opacity-75"></span>
                 </span>
                 <Bell size={20} />
               </button>
+
+              {notifOpen && ( // 🟩 Conditional render
+                <div className="shadow-lg absolute -right-[320px] mt-[17px] flex h-[480px] w-[350px] flex-col rounded-2xl border border-gray-200 bg-white p-3 sm:w-[361px] lg:right-0">
+                  <div className="mb-3 flex items-center justify-between border-b border-gray-100 pb-3 px-1">
+                    <h5 className="text-lg font-semibold text-gray-800">
+                      Notification
+                    </h5>
+                    <button
+                      onClick={() => setNotifOpen(false)}
+                      className="text-gray-500 hover:text-gray-700"
+                    >
+                      <X size={20} />
+                    </button>
+                  </div>
+                  <ul className="scrollbar-custom flex h-auto flex-col overflow-y-auto">
+                    {notifications.map((data) => (
+                      <li key={data.id}>
+                        <a className="flex gap-3 rounded-lg border-b border-gray-100 p-3 hover:bg-gray-100">
+                          <span className="relative block h-10 w-10 rounded-full">
+                            <img
+                              src={profile_2}
+                              alt="Avatar"
+                              className="rounded-full"
+                            />
+                            <span className="bg-green-500 absolute right-0 bottom-0 z-10 h-2.5 w-2.5 rounded-full border-[1.5px] border-white"></span>
+                          </span>
+                          <span className="block">
+                            <span className="text-sm mb-1.5 block text-gray-500">
+                              <span className="font-medium text-gray-800">
+                                {data.name}
+                              </span>{" "}
+                              requests permission to change{" "}
+                              <span className="font-medium text-gray-800">
+                                Project - ERP System
+                              </span>
+                            </span>
+                            <span className="text-xs flex items-center gap-2 text-gray-500">
+                              <span>Project</span>
+                              <span className="h-1 w-1 rounded-full bg-gray-400"></span>
+                              <span>5 min ago</span>
+                            </span>
+                          </span>
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
             </div>
           </div>
 
@@ -149,7 +213,13 @@ const Header = ({ toggle_sidebar }) => {
                 </div>
                 <ul className="flex flex-col gap-1 border-b border-gray-200 pt-4 pb-3">
                   <li>
-                    <a className="group text-sm flex items-center gap-3 rounded-lg px-3 py-2 font-medium text-gray-700 hover:bg-gray-100">
+                    <a
+                      className="group text-sm flex items-center gap-3 rounded-lg px-3 py-2 font-medium text-gray-700 hover:bg-gray-100"
+                      onClick={() => {
+                        set_active_item("Auth-Edit Profile");
+                        setProfileOpen(false);
+                      }}
+                    >
                       <UserCircle size={20} />
                       Edit profile
                     </a>
