@@ -11,6 +11,7 @@ import {
   Info,
   PlusCircle,
   RefreshCw,
+  ScanEye,
 } from "lucide-react";
 import Icon_Field from "../../../../elements/Icon_Field";
 import Select_Field from "../../../../elements/Select_Field";
@@ -25,23 +26,25 @@ import {
   delete_user,
   add_invoice,
 } from "../../../../../api/firebase_api";
+
+import {
+  fetch_all_data,
+  add_new_data,
+  delete_data,
+} from "../../../../../api/firestore_crud_api";
 import Verify_Field from "../../../../elements/Verify_Field";
+import { format_date } from "../../../../../assets/scripts/format";
 
 const Firestore_DB = () => {
   const filter_ref = useRef(null);
   const { show_toast } = useToast();
 
   const columns = [
-    { key: "name", label: "Name" },
-    { key: "email", label: "Email" },
-    { key: "phone", label: "Phone" },
-    { key: "company", label: "Company" },
-    { key: "country", label: "Country" },
-    { key: "status", label: "Status" },
-    { key: "date_joined", label: "Date Joined" },
-    { key: "role", label: "Role" },
-    { key: "plan", label: "Plan" },
-    { key: "actions", label: "Actions" },
+    { key: "user_code", label: "User Code", sortable: true },
+    { key: "name", label: "Name", sortable: true },
+    { key: "creation_date", label: "Creation Date", sortable: true },
+    { key: "store_code_tag", label: "Store Tagging Count", sortable: false },
+    { key: "actions", label: "Actions", sortable: false },
   ];
 
   // --- State ---
@@ -77,22 +80,22 @@ const Firestore_DB = () => {
   }, []);
 
   // --- Load all users once ---
-  const load_users = async () => {
+  const load_data = async () => {
     set_loading(true);
-    const users = await fetch_all_users();
-    set_all_data(users);
+    const data = await fetch_all_data();
+    set_all_data(data);
     set_loading(false);
   };
 
   useEffect(() => {
-    load_users();
+    load_data();
   }, []);
 
-  // --- Client-side filtering, sorting, pagination ---
+  // + Client-side Filtering
   useEffect(() => {
     let temp = [...all_data];
 
-    // Filter across all columns
+    // + Column Filter
     if (debounced_query.trim() !== "") {
       const q = debounced_query.toLowerCase();
       temp = temp.filter((u) =>
@@ -103,8 +106,9 @@ const Firestore_DB = () => {
         })
       );
     }
+    // - Column Filter
 
-    // Sort
+    // + Sort Function
     temp.sort((a, b) => {
       const val_a = a[sort_by];
       const val_b = b[sort_by];
@@ -116,10 +120,12 @@ const Firestore_DB = () => {
       if (val_a > val_b) return sort_order === "asc" ? 1 : -1;
       return 0;
     });
+    // - Sort Function
 
-    // Pagination
+    // + Pagination Function
     const start_idx = (current_page - 1) * select_option;
     const end_idx = start_idx + select_option;
+    // - Pagination Function
     set_filtered_data(temp.slice(start_idx, end_idx));
   }, [
     all_data,
@@ -129,7 +135,9 @@ const Firestore_DB = () => {
     current_page,
     select_option,
   ]);
+  // - Client-side Filtering
 
+  // + Total page of Pagination
   const total_pages = Math.ceil(
     (debounced_query
       ? all_data.filter((u) =>
@@ -144,8 +152,9 @@ const Firestore_DB = () => {
         ).length
       : all_data.length) / select_option
   );
+  // - Total page of Pagination
 
-  // --- Handlers ---
+  // + Sort Filtering
   const handle_sort = (column) => {
     if (sort_by === column)
       set_sort_order(sort_order === "asc" ? "desc" : "asc");
@@ -155,19 +164,36 @@ const Firestore_DB = () => {
     }
     set_current_page(1);
   };
+  // - Sort Filtering
 
-  const handle_add_user = async () => {
+  const handle_add_new_data = async () => {
     try {
-      const new_user = await add_user({
-        name: "Sample User " + Math.floor(Math.random() * 1000),
-        email: "sample" + Math.floor(Math.random() * 1000) + "@example.com",
-        phone: "+63 912 345 6789",
-        company: "Demo Company",
-        country: "Philippines",
-        status: "Active",
-        date_joined: new Date().toISOString().slice(0, 10),
-        role: "Viewer",
-        plan: "Free",
+      const new_user = await add_new_data({
+        user_code: "TDS-002",
+        name: "User 2",
+        creation_date: format_date(new Date(), "military"),
+        store_code_tag: [
+          "500001",
+          "500002",
+          "500003",
+          "500004",
+          "500005",
+          "500006",
+          "500007",
+          "500008",
+          "500009",
+          "500010",
+          "500011",
+          "500012",
+          "500013",
+          "500014",
+          "500015",
+          "500016",
+          "500017",
+          "500018",
+          "500019",
+          "500020",
+        ],
       });
 
       // ✅ Add new user locally without re-fetch
@@ -216,9 +242,9 @@ const Firestore_DB = () => {
       });
     }
   };
-  const handle_delete_user = async (user_id) => {
+  const handle_delete_data = async (user_id) => {
     try {
-      await delete_user(user_id);
+      await delete_data(user_id);
       show_toast({
         type: "success",
         title: "Deleted!",
@@ -227,7 +253,7 @@ const Firestore_DB = () => {
         width: "270px",
         position: "top-right",
       });
-      load_users();
+      load_data();
     } catch (err) {
       show_toast({
         type: "danger",
@@ -276,157 +302,156 @@ const Firestore_DB = () => {
     }
   };
   // - For Verify Field
-
-  // RETURN ORIGIN
   return (
-    <div className="w-full">
-      <div className="flex flex-wrap items-center justify-between gap-3 py-5">
-        <h1 className="text-xl">Firestore Table</h1>
-      </div>
-
-      <div className="w-full bg-white rounded-lg border">
-        <div className="flex flex-wrap items-center justify-between gap-3 p-5">
-          <h1 className="text-lg">Data Table</h1>
-          <Button
-            variant="primary"
-            icon={PlusCircle}
-            icon_position="left"
-            on_click={handle_add_user}
-          >
-            Add User
-          </Button>
+    <React.Fragment>
+      <div className="w-full">
+        <div className="flex flex-wrap items-center justify-between gap-3 py-5">
+          <h1 className="text-xl">Firestore Table</h1>
         </div>
 
-        <div className="p-5 sm:p-6 border-t">
-          <div className="w-full border rounded-lg">
-            <div className="w-full md:flex md:justify-between p-4 gap-4">
-              <div className="flex items-center text-sm gap-2">
-                <div>Show</div>
-                <div className="w-[90px]">
-                  <Select_Field
-                    name="option"
-                    value={select_option}
-                    on_change={(e) => {
-                      set_select_option(Number(e.target.value));
-                      set_current_page(1);
-                    }}
-                    options={[
-                      { label: "5", value: 5 },
-                      { label: "10", value: 10 },
-                      { label: "50", value: 50 },
-                    ]}
-                  />
-                </div>
-                <div>entries</div>
-              </div>
+        <div className="w-full bg-white rounded-lg border">
+          <div className="flex flex-wrap items-center justify-between gap-3 p-5">
+            <h1 className="text-lg">Data Table</h1>
+            <Button
+              variant="primary"
+              icon={PlusCircle}
+              icon_position="left"
+              on_click={handle_add_new_data}
+            >
+              Add User
+            </Button>
+          </div>
 
-              <div className="w-full mt-4 md:mt-0 md:w-[600px]">
-                <div className="w-full flex items-center gap-2">
-                  <div className="w-full">
-                    <Icon_Field
-                      name="search"
-                      placeholder="Search..."
-                      icon={Search}
-                      icon_position="left"
-                      value={search_query}
-                      on_change={(e) => set_search_query(e.target.value)}
+          <div className="p-5 sm:p-6 border-t">
+            <div className="w-full border rounded-lg">
+              <div className="w-full md:flex md:justify-between p-4 gap-4">
+                <div className="flex items-center text-sm gap-2">
+                  <div>Show</div>
+                  <div className="w-[90px]">
+                    <Select_Field
+                      name="option"
+                      value={select_option}
+                      on_change={(e) => {
+                        set_select_option(Number(e.target.value));
+                        set_current_page(1);
+                      }}
+                      options={[
+                        { label: "5", value: 5 },
+                        { label: "10", value: 10 },
+                        { label: "50", value: 50 },
+                      ]}
                     />
                   </div>
-                  <Button
-                    variant="white"
-                    width="w-[120px]"
-                    icon={RefreshCw}
-                    icon_position="left"
-                    on_click={() => load_users()}
-                  >
-                    Refresh
-                  </Button>
+                  <div>entries</div>
+                </div>
+
+                <div className="w-full mt-4 md:mt-0 md:w-[600px]">
+                  <div className="w-full flex items-center gap-2">
+                    <div className="w-full">
+                      <Icon_Field
+                        name="search"
+                        placeholder="Search..."
+                        icon={Search}
+                        icon_position="left"
+                        value={search_query}
+                        on_change={(e) => set_search_query(e.target.value)}
+                      />
+                    </div>
+                    <Button
+                      variant="white"
+                      width="w-[120px]"
+                      icon={RefreshCw}
+                      icon_position="left"
+                      on_click={() => load_data()}
+                    >
+                      Refresh
+                    </Button>
+                  </div>
                 </div>
               </div>
-            </div>
 
-            {/* Table */}
-            <div className="overflow-x-auto">
-              {loading ? (
-                <div className="p-6 text-center text-gray-500 text-sm">
-                  Loading...
-                </div>
-              ) : filtered_data.length === 0 ? (
-                <div className="p-6 text-center text-gray-500 text-sm">
-                  No data found
-                </div>
-              ) : (
-                <table className="min-w-full">
-                  <thead className="bg-gray-100">
-                    <tr className="whitespace-nowrap">
-                      {columns.map((col, i) => {
-                        const is_sorted = sort_by === col.key;
-                        return (
-                          <th
-                            key={col.key}
-                            onClick={() =>
-                              col.key !== "actions" && handle_sort(col.key)
-                            }
-                            className={`border px-4 py-3 text-left text-[12px] font-medium text-gray-700 cursor-pointer select-none ${
-                              i === 0 ? "border-l-0" : ""
-                            } ${i === columns.length - 1 ? "border-r-0" : ""}`}
-                          >
-                            <div className="flex items-center justify-between w-full">
-                              <span>{col.label}</span>
-                              {col.key !== "actions" &&
-                                is_sorted &&
-                                (sort_order === "asc" ? (
-                                  <ChevronUp
-                                    size={14}
-                                    className="text-gray-500"
-                                  />
-                                ) : (
-                                  <ChevronDown
-                                    size={14}
-                                    className="text-gray-500"
-                                  />
-                                ))}
-                            </div>
-                          </th>
-                        );
-                      })}
-                    </tr>
-                  </thead>
+              {/* Table */}
+              <div className="overflow-x-auto">
+                {loading ? (
+                  <div className="p-6 text-center text-gray-500 text-sm">
+                    Loading...
+                  </div>
+                ) : filtered_data.length === 0 ? (
+                  <div className="p-6 text-center text-gray-500 text-sm">
+                    No data found
+                  </div>
+                ) : (
+                  <table className="min-w-full">
+                    <thead className="bg-gray-100">
+                      <tr className="whitespace-nowrap">
+                        {columns.map((col, i) => {
+                          const renderHeaderCell = (col) => {
+                            const isSorted = sort_by === col.key;
 
-                  <tbody className="bg-white">
-                    {filtered_data.map((row, idx) => (
-                      <tr
-                        key={idx}
-                        className="hover:bg-gray-50 whitespace-nowrap"
-                      >
-                        {columns.map((col, i) => (
-                          <td
-                            key={i}
-                            className={`border px-4 py-4 text-[12px] text-gray-600 ${
-                              i === 0 ? "border-l-0" : ""
-                            } ${
-                              i === columns.length - 1
-                                ? "border-r-0 text-left"
-                                : ""
-                            }`}
-                          >
-                            {col.key !== "actions" &&
-                              col.key !== "plan" &&
-                              row[col.key]}
-                            {col.key === "plan" && (
-                              <div className="flex">
-                                <span
-                                  className={`inline-flex items-center justify-center gap-1 rounded-full px-3 py-0.5 text-xs font-medium ${
-                                    row.plan === "Free"
-                                      ? "bg-yellow-100 text-yellow-500"
-                                      : "bg-green-100 text-green-500"
-                                  }`}
-                                >
-                                  {row.plan}
-                                </span>
+                            return (
+                              <div className="flex items-center justify-between w-full">
+                                <span>{col.label}</span>
+                                {col.sortable &&
+                                  isSorted &&
+                                  (sort_order === "asc" ? (
+                                    <ChevronUp
+                                      size={14}
+                                      className="text-gray-500"
+                                    />
+                                  ) : (
+                                    <ChevronDown
+                                      size={14}
+                                      className="text-gray-500"
+                                    />
+                                  ))}
                               </div>
-                            )}
-                            {col.key === "actions" && (
+                            );
+                          };
+
+                          // const isSortable = !nonSortableKeys.includes(col.key);
+                          return (
+                            <th
+                              key={col.key}
+                              onClick={() =>
+                                col.sortable && handle_sort(col.key)
+                              }
+                              className={`border px-4 py-3 text-left text-[12px] font-medium text-gray-700 ${
+                                col.sortable ? "cursor-pointer select-none" : ""
+                              } ${i === 0 ? "border-l-0" : ""} ${
+                                i === columns.length - 1 ? "border-r-0" : ""
+                              }`}
+                            >
+                              {renderHeaderCell(col)}
+                            </th>
+                          );
+                        })}
+                      </tr>
+                    </thead>
+                    <tbody className="bg-white">
+                      {filtered_data.map((row, idx) => {
+                        const render_cell = (col, row) => {
+                          const value = row[col.key];
+                          if (
+                            col.key === "store_code_tag" &&
+                            Array.isArray(value)
+                          ) {
+                            return (
+                              <div className="flex flex-wrap gap-1">
+                                {/* {value.map((store_code, idx) => (
+                                  <span
+                                    key={idx}
+                                    className="bg-sky-100 text-sky-800 px-2 py-1 rounded text-xs"
+                                  >
+                                    {store_code}
+                                  </span>
+                                ))} */}
+                                {value.length}
+                              </div>
+                            );
+                          }
+
+                          if (col.key === "actions") {
+                            return (
                               <div className="flex gap-2">
                                 <button
                                   className="text-green-500 hover:text-green-600 text-[12px] outline-none"
@@ -439,49 +464,59 @@ const Firestore_DB = () => {
                                 </button>
                                 <button
                                   className="text-red-500 hover:text-red-600 text-[12px] mb-[1px] outline-none"
-                                  onClick={() => handle_delete_user(row.id)}
+                                  onClick={() => console.log(row)}
+                                  // onClick={() => handle_delete_data(row.id)}
                                 >
                                   <Trash size={18} />
                                 </button>
                               </div>
-                            )}
-                          </td>
-                        ))}
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+                            );
+                          }
+
+                          // Default render for all other fields
+                          return value;
+                        };
+
+                        return (
+                          <tr
+                            key={idx}
+                            className="hover:bg-gray-50 whitespace-nowrap"
+                          >
+                            {columns.map((col, i) => (
+                              <td
+                                key={i}
+                                className={`border px-4 py-4 text-[12px] text-gray-600 ${
+                                  i === 0 ? "border-l-0" : ""
+                                } ${
+                                  i === columns.length - 1
+                                    ? "border-r-0 text-left"
+                                    : ""
+                                }`}
+                              >
+                                {render_cell(col, row)}
+                              </td>
+                            ))}
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                )}
+              </div>
+
+              {total_pages > 0 && (
+                <Pagination
+                  current_page={current_page}
+                  total_pages={total_pages}
+                  on_page_change={handle_page_change}
+                  variant="compact"
+                />
               )}
             </div>
-
-            {total_pages > 0 && (
-              <Pagination
-                current_page={current_page}
-                total_pages={total_pages}
-                on_page_change={handle_page_change}
-                variant="compact"
-              />
-            )}
-          </div>
-          <div className="mt-5 grid grid-cols-1 gap-5 md:grid-cols-3">
-            <Verify_Field
-              label="Name"
-              name="verify_name"
-              placeholder="Enter name"
-              show_find_button={false}
-              value={text_verify}
-              on_change={(e) => {
-                set_text_verify(e.target.value);
-                set_verify_status("");
-              }}
-              on_find={handle_find}
-              on_verify={() => handle_verify(text_verify)}
-              verify_status={verify_status}
-            />
           </div>
         </div>
       </div>
-    </div>
+    </React.Fragment>
   );
 };
 

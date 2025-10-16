@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import Checkbox_Field from "../../elements/Checkbox_Field";
 import delphys_logo from "../../../assets/images/delphys-sidebar-logo.png";
+import auth_img from "../../../assets/images/auth-image.png";
 import {
   loginUser,
   onAuthStateChangedListener,
@@ -163,6 +164,11 @@ const Login = ({ set_page }) => {
                   </h1>
                 </div>
               </a>
+              <div className="mb-4 block">
+                <div className="flex items-center gap-3 h-[500px] w-[500px]">
+                  <img src={auth_img} alt="Logo" />
+                </div>
+              </div>
               <p className="text-center text-sm text-gray-300 dark:text-white/60">
                 Empowering businesses to run smarter, faster, and together — all
                 your operations, one platform.

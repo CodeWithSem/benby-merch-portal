@@ -101,7 +101,7 @@ const Header = ({ toggle_sidebar, set_active_item }) => {
           </button>
           <a className="md:hidden">
             <div className="text-gray-700 font-bold text-[18px] whitespace-nowrap">
-              App Name
+              Delphys Software
             </div>
           </a>
           <button

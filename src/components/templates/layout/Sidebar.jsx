@@ -10,6 +10,7 @@ import {
   Calendar,
   NotepadTextDashed,
 } from "lucide-react";
+import delphys_logo from "../../../assets/images/delphys-sidebar-logo.png";
 import { logoutUser } from "../../../api/firebase_auth_api";
 import { useToast } from "../layout/Toast_Provider";
 
@@ -230,16 +231,16 @@ const Sidebar = ({
         {/* Title */}
         {is_desktop ? (
           is_collapsed ? (
-            <div className="w-[50px] h-[50px] text-[10px] border flex justify-center items-center ">
-              Icon
+            <div className="w-[50px] h-[50px] text-[10px] border flex justify-center items-center rounded-lg bg-gray-100">
+              <img src={delphys_logo} alt="Logo" />
             </div>
           ) : (
             <div className="w-full h-[50px] flex justify-center items-center">
-              <div className="w-[50px] h-[50px] text-[10px] border flex justify-center items-center">
-                Icon
+              <div className="w-[50px] h-[50px] text-[10px] border flex justify-center items-center rounded-lg bg-gray-100">
+                <img src={delphys_logo} alt="Logo" />
               </div>
-              <div className="ml-3 flex-1 text-gray-700 font-bold text-[18px] whitespace-nowrap">
-                App Name
+              <div className="ml-3 flex-1 text-gray-700 font-bold text-[16px] whitespace-nowrap">
+                Delphys Software
               </div>
             </div>
           )

@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Eye, EyeOff, CheckCircle2, Info } from "lucide-react";
 import Checkbox_Field from "../../elements/Checkbox_Field";
 import delphys_logo from "../../../assets/images/delphys-sidebar-logo.png";
+import auth_img from "../../../assets/images/auth-image.png";
 import { useToast } from "../layout/Toast_Provider";
 import { registerUser } from "../../../api/firebase_auth_api"; // We'll define this in firebase_auth_api.js
 
@@ -184,6 +185,11 @@ const Sign_Up = ({ set_page }) => {
                   </h1>
                 </div>
               </a>
+              <div className="mb-4 block">
+                <div className="flex items-center gap-3 h-[500px] w-[500px]">
+                  <img src={auth_img} alt="Logo" />
+                </div>
+              </div>
               <p className="text-center text-sm text-gray-300 dark:text-white/60">
                 Empowering businesses to run smarter, faster, and together — all
                 your operations, one platform.

@@ -26,7 +26,7 @@ import Checkbox_Field from "../../../elements/Checkbox_Field";
 import Pagination from "../../../elements/Pagination";
 import Date_Field from "../../../elements/Date_Field";
 
-const Dashboard_Table_1 = () => {
+const Dashboard_Table_3 = () => {
   const today = new Date();
 
   const [osa_history_date, set_osa_history_date] = useState(today);
@@ -43,11 +43,7 @@ const Dashboard_Table_1 = () => {
       date: "10/16/2025 05:14:23 PM",
       store_code: "5000001",
       store_name: "Fishermall Malabon",
-      av: "240",
-      cr: "0",
-      ovs: "12",
-      os: "13",
-      nc: "0",
+      status: "Deployed",
     },
     {
       id: 2,
@@ -57,11 +53,7 @@ const Dashboard_Table_1 = () => {
       date: "10/16/2025 07:01:45 PM",
       store_code: "5000002",
       store_name: "SM Grand Central",
-      av: "212",
-      cr: "3",
-      ovs: "10",
-      os: "10",
-      nc: "0",
+      status: "Deployed",
     },
     {
       id: 3,
@@ -71,39 +63,7 @@ const Dashboard_Table_1 = () => {
       date: "10/16/2025 07:30:32 PM",
       store_code: "5000002",
       store_name: "SM Grand Central",
-      av: "215",
-      cr: "0",
-      ovs: "0",
-      os: "0",
-      nc: "0",
-    },
-    {
-      id: 4,
-      image: profile_4,
-      name: "Jude Wright",
-      username: "TDS-004",
-      date: "10/16/2025 09:10:12 PM",
-      store_code: "5000002",
-      store_name: "SM Grand Central",
-      av: "215",
-      cr: "0",
-      ovs: "0",
-      os: "0",
-      nc: "0",
-    },
-    {
-      id: 5,
-      image: profile_5,
-      name: "Erick Salvador",
-      username: "TDS-005",
-      date: "10/16/2025 10:03:15 PM",
-      store_code: "5000002",
-      store_name: "SM Grand Central",
-      av: "197",
-      cr: "20",
-      ovs: "1",
-      os: "2",
-      nc: "0",
+      status: "Deployed",
     },
   ];
   return (
@@ -111,8 +71,8 @@ const Dashboard_Table_1 = () => {
       <div className="overflow-hidden rounded-lg border border-gray-200 bg-white pt-4 dark:border-gray-800 dark:bg-white/[0.03]">
         <div className="flex flex-col gap-5 px-6 mb-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h3 className="text-md md:text-lg font-semibold text-gray-600 dark:text-white/90">
-              OSA History
+            <h3 className="text-md md:text-lg font-semibold text-gray-600 dark:text-white/90 whitespace-nowrap">
+              EP History
             </h3>
           </div>
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center md:w-[500px]">
@@ -145,45 +105,14 @@ const Dashboard_Table_1 = () => {
                 </th>
                 <th className="px-6 py-3 whitespace-nowrap">
                   <div className="flex items-center">
-                    <p className="text-gray-500">Creation Date</p>
+                    <p className="text-gray-500">Store</p>
                   </div>
                 </th>
                 <th className="px-6 py-3 whitespace-nowrap">
-                  <div className="flex items-center">
-                    <p className="text-gray-500">Store </p>
+                  <div className="flex items-center justify-center">
+                    <p className="text-gray-500">Status</p>
                   </div>
                 </th>
-                <th className="px-6 py-3 whitespace-nowrap">
-                  <div className="flex justify-center items-center">
-                    <p className="text-gray-500 text-center">Available</p>
-                  </div>
-                </th>
-                <th className="px-6 py-3 whitespace-nowrap">
-                  <div className="flex justify-center items-center">
-                    <p className="text-gray-500">Critical</p>
-                  </div>
-                </th>
-                <th className="px-6 py-3 whitespace-nowrap">
-                  <div className="flex justify-center items-center">
-                    <p className="text-gray-500">Overstock</p>
-                  </div>
-                </th>
-                <th className="px-6 py-3 whitespace-nowrap">
-                  <div className="flex justify-center items-center">
-                    <p className="text-gray-500">Out of Stock</p>
-                  </div>
-                </th>
-                <th className="px-6 py-3 whitespace-nowrap">
-                  <div className="flex justify-center items-center">
-                    <p className="text-gray-500">Not Carried</p>
-                  </div>
-                </th>
-                <th className="px-6 py-3 whitespace-nowrap">
-                  <div className="flex justify-center items-center">
-                    <p className="text-gray-500">SKU</p>
-                  </div>
-                </th>
-                <th className="px-6 py-3 whitespace-nowrap"></th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
@@ -192,29 +121,19 @@ const Dashboard_Table_1 = () => {
                   {/* Name */}
                   <td className="px-5 py-4 sm:px-6" colSpan={1}>
                     <div className="flex items-center gap-3 whitespace-nowrap">
-                      <div className="w-10 h-10 overflow-hidden rounded-full">
+                      {/* <div className="w-10 h-10 overflow-hidden rounded-full">
                         <img src={row.image} alt={row.name} />
-                      </div>
+                      </div> */}
                       <div className="block dark:text-white/90">
                         <span className="block font-medium text-gray-600 text-sm dark:text-white/90">
                           {row.name}
-                        </span>
-                        <span className="block text-gray-500 text-xs">
-                          {row.username}
+                          <span className="block text-gray-500 text-xs">
+                            {row.username}
+                          </span>
                         </span>
                       </div>
                     </div>
                   </td>
-
-                  {/* Date */}
-                  <td className="px-6 py-3 whitespace-nowrap text-xs text-gray-700 dark:text-gray-400">
-                    {row.date}
-                  </td>
-
-                  {/* Product */}
-                  {/* <td className="px-6 py-3 whitespace-nowrap text-sm text-gray-700 dark:text-gray-400">
-                    {row.store_code}
-                  </td> */}
                   <td className="px-5 py-4 sm:px-6" colSpan={1}>
                     <div className="flex items-center gap-3">
                       <div className="block dark:text-white/90">
@@ -227,53 +146,21 @@ const Dashboard_Table_1 = () => {
                       </div>
                     </div>
                   </td>
-
-                  {/* Deal Value */}
-                  <td className="px-6 py-3 whitespace-nowrap text-sm text-gray-700 dark:text-gray-400">
-                    <div className="flex justify-center items-center">
+                  <td className="px-6 py-3 whitespace-nowrap text-xs text-gray-700 dark:text-gray-400">
+                    <div className="flex flex-col gap-2">
                       <span className="inline-flex items-center justify-center gap-1 rounded-md bg-green-100 px-3 py-0.5 text-xs font-medium text-green-500">
-                        {row.av}
+                        Implemented
                       </span>
-                    </div>
-                  </td>
-                  <td className="px-6 py-3 whitespace-nowrap text-sm text-gray-700 dark:text-gray-400">
-                    <div className="flex justify-center items-center">
-                      <span className="inline-flex items-center justify-center gap-1 rounded-md bg-yellow-100 px-3 py-0.5 text-xs font-medium text-yellow-600">
-                        {row.cr}
-                      </span>
-                    </div>
-                  </td>
-                  <td className="px-6 py-3 whitespace-nowrap text-sm text-gray-700 dark:text-gray-400">
-                    <div className="flex justify-center items-center">
-                      <span className="inline-flex items-center justify-center gap-1 rounded-md bg-orange-100 px-3 py-0.5 text-xs font-medium text-orange-600">
-                        {row.ovs}
-                      </span>
-                    </div>
-                  </td>
-                  <td className="px-6 py-3 whitespace-nowrap text-sm text-gray-700 dark:text-gray-400">
-                    <div className="flex justify-center items-center">
-                      <span className="inline-flex items-center justify-center gap-1 rounded-md bg-red-100 px-3 py-0.5 text-xs font-medium text-red-500">
-                        {row.os}
-                      </span>
-                    </div>
-                  </td>
-                  <td className="px-6 py-3 whitespace-nowrap text-sm text-gray-700 dark:text-gray-400">
-                    <div className="flex justify-center items-center">
                       <span className="inline-flex items-center justify-center gap-1 rounded-md bg-gray-100 px-3 py-0.5 text-xs font-medium text-gray-500">
-                        {row.nc}
+                        Correct Location
+                      </span>
+                      <span className="inline-flex items-center justify-center gap-1 rounded-md bg-gray-100 px-3 py-0.5 text-xs font-medium text-gray-500">
+                        Correct Planogram
+                      </span>
+                      <span className="inline-flex items-center justify-center gap-1 rounded-md bg-gray-100 px-3 py-0.5 text-xs font-medium text-gray-500">
+                        With Picture
                       </span>
                     </div>
-                  </td>
-                  <td className="px-6 py-3 whitespace-nowrap text-sm text-gray-700 dark:text-gray-400">
-                    <div className="flex justify-center items-center text-xs">
-                      240 / 500
-                    </div>
-                  </td>
-
-                  <td className="px-6 py-3 whitespace-nowrap">
-                    <button className="flex items-center justify-start text-gray-500 hover:text-green-500">
-                      <ScanEye size={20} />
-                    </button>
                   </td>
                 </tr>
               ))}
@@ -293,4 +180,4 @@ const Dashboard_Table_1 = () => {
   );
 };
 
-export default Dashboard_Table_1;
+export default Dashboard_Table_3;

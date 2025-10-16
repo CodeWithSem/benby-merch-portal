@@ -4,6 +4,8 @@ import { EllipsisVertical, ShoppingCart, Users } from "lucide-react";
 import Date_Field from "../../../elements/Date_Field";
 import { options } from "@fullcalendar/core/preact.js";
 import Dashboard_Table_1 from "./Dashboard_Table_1";
+import Dashboard_Table_2 from "./Dashboard_Table_2";
+import Dashboard_Table_3 from "./Dashboard_Table_3";
 
 const Dashboard = () => {
   const [bar_chart_data_1, set_bar_chart_data_1] = useState({
@@ -15,7 +17,7 @@ const Dashboard = () => {
     ],
     options: {
       chart: {
-        type: "bar", // <-- Change to bar
+        type: "bar",
         height: 350,
         toolbar: { show: false },
       },
@@ -24,16 +26,19 @@ const Dashboard = () => {
           horizontal: false,
           columnWidth: "40%",
           borderRadius: 7,
-          borderRadiusApplication: "end", // only top corners for vertical bars
+          borderRadiusApplication: "end",
         },
       },
-      colors: ["#0284c7"],
+      // colors: ["#0284c7"],
+      colors: [
+        function ({ dataPointIndex }) {
+          const colors = ["#10b981", "#f5d20b", "#f5970b", "#ef4444"];
+          return colors[dataPointIndex];
+        },
+      ],
       xaxis: {
         categories: ["Available", "Critical", "Over Stock", "Out of Stock"],
       },
-      //   yaxis: {
-      //     title: { text: "Sales / Revenue" },
-      //   },
       grid: {
         borderColor: "#e7e7e7",
       },
@@ -116,7 +121,7 @@ const Dashboard = () => {
                     <span className="text-sm text-gray-500 dark:text-gray-400">
                       Merch Deployment
                     </span>
-                    <h4 className="mt-2 text-2xl font-bold text-gray-800 dark:text-white/90">
+                    <h4 className="mt-2 text-2xl font-bold text-gray-600 dark:text-white/90">
                       876
                     </h4>
                   </div>
@@ -136,7 +141,7 @@ const Dashboard = () => {
                     <span className="text-sm text-gray-500 dark:text-gray-400">
                       Execution Planner
                     </span>
-                    <h4 className="mt-2 text-2xl font-bold text-gray-800 dark:text-white/90">
+                    <h4 className="mt-2 text-2xl font-bold text-gray-600 dark:text-white/90">
                       201
                     </h4>
                   </div>
@@ -151,7 +156,7 @@ const Dashboard = () => {
             {/* + Metric Group 2 */}
             <div className="overflow-hidden rounded-lg border border-gray-200 bg-white px-5 pt-5 sm:px-6 sm:pt-6 dark:border-gray-800 dark:bg-white/[0.03]">
               <div className="flex items-center justify-between">
-                <h3 className="text-md md:text-lg font-semibold text-gray-800 dark:text-white/90">
+                <h3 className="text-md md:text-lg font-semibold text-gray-600 dark:text-white/90">
                   On-Shelf Availability
                 </h3>
                 <div className="relative h-fit">
@@ -181,7 +186,7 @@ const Dashboard = () => {
               <div className="shadow-default rounded-lg bg-white px-5 pb-11 pt-5 dark:bg-gray-900 sm:px-6 sm:pt-6">
                 <div className="flex justify-between">
                   <div>
-                    <h3 className="text-lg font-semibold text-gray-800 dark:text-white/90">
+                    <h3 className="text-lg font-semibold text-gray-600 dark:text-white/90">
                       Merch Control Plan
                     </h3>
                     <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
@@ -189,7 +194,7 @@ const Dashboard = () => {
                     </p>
                   </div>
                   <div className="relative h-fit">
-                    <button className="text-gray-400 hover:text-gray-700 dark:hover:text-white">
+                    <button className="text-gray-400 hover:text-gray-600 dark:hover:text-white">
                       <EllipsisVertical size={20} />
                     </button>
                   </div>
@@ -217,7 +222,7 @@ const Dashboard = () => {
                   <p className="mb-1 text-center text-xs text-gray-500 dark:text-gray-400">
                     COMPLETE
                   </p>
-                  <p className="flex items-center justify-center gap-1 text-base font-semibold text-gray-800 dark:text-white/90 sm:text-lg">
+                  <p className="flex items-center justify-center gap-1 text-base font-semibold text-gray-600 dark:text-white/90 sm:text-lg">
                     200
                   </p>
                 </div>
@@ -226,7 +231,7 @@ const Dashboard = () => {
                   <p className="mb-1 text-center text-xs text-gray-500 dark:text-gray-400">
                     ON GOING
                   </p>
-                  <p className="flex items-center justify-center gap-1 font-semibold text-gray-800 dark:text-white/90 sm:text-lg">
+                  <p className="flex items-center justify-center gap-1 font-semibold text-gray-600 dark:text-white/90 sm:text-lg">
                     98
                   </p>
                 </div>
@@ -235,7 +240,7 @@ const Dashboard = () => {
                   <p className="mb-1 text-center text-xs text-gray-500 dark:text-gray-400">
                     PENDING
                   </p>
-                  <p className="flex items-center justify-center gap-1 font-semibold text-gray-800 dark:text-white/90 sm:text-lg">
+                  <p className="flex items-center justify-center gap-1 font-semibold text-gray-600 dark:text-white/90 sm:text-lg">
                     302
                   </p>
                 </div>
@@ -243,11 +248,21 @@ const Dashboard = () => {
             </div>
           </div>
           {/* - Right Section */}
-          {/* + Table */}
+          {/* + Table 1 */}
           <div className="col-span-12">
             <Dashboard_Table_1 />
           </div>
-          {/* - Table */}
+          {/* - Table 1 */}
+          {/* + Table 2 */}
+          <div className="col-span-12 xl:col-span-6">
+            <Dashboard_Table_2 />
+          </div>
+          {/* - Table 2 */}
+          {/* + Table 3 */}
+          <div className="col-span-12 xl:col-span-6">
+            <Dashboard_Table_3 />
+          </div>
+          {/* - Table 3 */}
         </div>
       </div>
     </React.Fragment>
