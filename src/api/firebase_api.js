@@ -35,7 +35,7 @@ export const fetch_user = async (user_id) => {
     const user_doc_ref = doc(
       firestore_db,
       "DB1_QS_SYSTEM_DEMO",
-      "TBL_USERS",
+      "TBL_SAMPLE",
       "DATA",
       user_id
     );

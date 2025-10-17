@@ -5,6 +5,7 @@ import delphys_logo from "../../../assets/images/delphys-sidebar-logo.png";
 import auth_img from "../../../assets/images/auth-image.png";
 import { useToast } from "../layout/Toast_Provider";
 import { registerUser } from "../../../api/firebase_auth_api"; // We'll define this in firebase_auth_api.js
+import { format_date } from "../../../assets/scripts/format";
 
 const Sign_Up = ({ set_page }) => {
   const [firstName, setFirstName] = useState("");
@@ -18,11 +19,16 @@ const Sign_Up = ({ set_page }) => {
   const handleSignUp = async (e) => {
     e.preventDefault();
     try {
-      // Combine first and last name
       const fullName = `${firstName} ${lastName}`;
-
-      // Register user with email, password, and set displayName
-      const user = await registerUser(email, password, fullName);
+      const user = await registerUser(
+        email,
+        password,
+        fullName,
+        firstName,
+        lastName,
+        "TDS-001",
+        "TDS"
+      );
 
       show_toast({
         type: "success",
@@ -30,19 +36,6 @@ const Sign_Up = ({ set_page }) => {
         message: `Welcome ${user.displayName || user.email}`,
         icon: <CheckCircle2 size={21} className="text-green-500" />,
       });
-
-      // Optionally, store extra info in Firestore
-      /*
-    await setDoc(doc(firestore_db, "users", user.uid), {
-      firstName,
-      lastName,
-      email,
-      role: "Viewer",
-      dateJoined: new Date().toISOString(),
-    });
-    */
-
-      // Redirect to dashboard or login page
     } catch (err) {
       show_toast({
         type: "danger",

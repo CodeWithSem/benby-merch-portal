@@ -26,6 +26,7 @@ import {
   delete_user,
   add_invoice,
 } from "../../../../../api/firebase_api";
+import { deleteUserByAdmin } from "../../../../../api/firebase_auth_api";
 
 import {
   fetch_all_data,
@@ -34,6 +35,8 @@ import {
 } from "../../../../../api/firestore_crud_api";
 import Verify_Field from "../../../../elements/Verify_Field";
 import { format_date } from "../../../../../assets/scripts/format";
+import Form_Modal from "../../../../elements/modals/Form_Modal";
+import Add_Data from "./modals/Add_Data";
 
 const Firestore_DB = () => {
   const filter_ref = useRef(null);
@@ -41,9 +44,10 @@ const Firestore_DB = () => {
 
   const columns = [
     { key: "user_code", label: "User Code", sortable: true },
-    { key: "name", label: "Name", sortable: true },
+    { key: "displayName", label: "Name", sortable: true },
     { key: "creation_date", label: "Creation Date", sortable: true },
-    { key: "store_code_tag", label: "Store Tagging Count", sortable: false },
+    { key: "category", label: "Category", sortable: true },
+    // { key: "store_code_tag", label: "Store Tagging Count", sortable: false },
     { key: "actions", label: "Actions", sortable: false },
   ];
 
@@ -244,21 +248,26 @@ const Firestore_DB = () => {
   };
   const handle_delete_data = async (user_id) => {
     try {
-      await delete_data(user_id);
+      // Delete from Firestore and Auth
+      await deleteUserByAdmin(user_id);
+
       show_toast({
         type: "success",
-        title: "Deleted!",
-        message: "User deleted successfully.",
+        title: "Account Deleted",
+        message: "User has been successfully removed from the system.",
         icon: <CheckCircle2 size={21} className="text-green-500" />,
         width: "270px",
         position: "top-right",
       });
+
+      // Refresh data table
       load_data();
     } catch (err) {
+      console.error(err);
       show_toast({
         type: "danger",
         title: "Error",
-        message: "Failed to delete user.",
+        message: "Failed to delete account.",
         icon: <Info size={21} className="text-red-500" />,
         width: "270px",
         position: "top-right",
@@ -302,6 +311,10 @@ const Firestore_DB = () => {
     }
   };
   // - For Verify Field
+
+  const [display_modal, set_display_modal] = useState("");
+
+  // RETURN ORIGIN
   return (
     <React.Fragment>
       <div className="w-full">
@@ -316,7 +329,7 @@ const Firestore_DB = () => {
               variant="primary"
               icon={PlusCircle}
               icon_position="left"
-              on_click={handle_add_new_data}
+              on_click={() => set_display_modal("add_data")}
             >
               Add User
             </Button>
@@ -464,8 +477,7 @@ const Firestore_DB = () => {
                                 </button>
                                 <button
                                   className="text-red-500 hover:text-red-600 text-[12px] mb-[1px] outline-none"
-                                  onClick={() => console.log(row)}
-                                  // onClick={() => handle_delete_data(row.id)}
+                                  onClick={() => handle_delete_data(row.id)}
                                 >
                                   <Trash size={18} />
                                 </button>
@@ -516,6 +528,11 @@ const Firestore_DB = () => {
           </div>
         </div>
       </div>
+      <Add_Data
+        is_open={display_modal === "add_data"}
+        on_close={() => set_display_modal("")}
+        width="max-w-[820px]"
+      />
     </React.Fragment>
   );
 };

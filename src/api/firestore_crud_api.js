@@ -14,7 +14,7 @@ import { firestore_db } from "../assets/scripts/firebase";
 const table_ref = collection(
   firestore_db,
   "DB1_QS_SYSTEM_DEMO",
-  "TBL_SAMPLE",
+  "TBL_ADMIN",
   "DATA"
 );
 

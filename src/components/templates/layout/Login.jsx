@@ -9,12 +9,14 @@ import {
 } from "../../../api/firebase_auth_api";
 import { CheckCircle2, Info } from "lucide-react";
 import { useToast } from "../layout/Toast_Provider";
+import Button from "../../elements/Button";
 
 const Login = ({ set_page }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [keepLoggedIn, setKeepLoggedIn] = useState(false);
+  const [is_loading, set_is_loading] = useState(false);
 
   const { show_toast } = useToast();
 
@@ -32,19 +34,26 @@ const Login = ({ set_page }) => {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const user = await loginUser(email, password, keepLoggedIn);
+      set_is_loading(true);
+      const loggedInUser = await loginUser(email, password, keepLoggedIn);
+      set_is_loading(false);
+      console.log("User Info:", loggedInUser.firestore_data);
+      // Example: loggedInUser.displayName, loggedInUser.category, loggedInUser.user_code, etc.
+
       show_toast({
         type: "success",
-        title: "Logged In",
-        message: `Welcome ${user.displayName || user.email}`,
+        title: "Login Successful",
+        message: `Welcome back ${
+          loggedInUser.displayName || loggedInUser.user_code
+        }`,
         icon: <CheckCircle2 size={21} className="text-green-500" />,
       });
-      // Redirect to dashboard
     } catch (err) {
+      set_is_loading(false);
       show_toast({
         type: "danger",
         title: "Login Failed",
-        message: "Error: invalid credential",
+        message: err.message,
         icon: <Info size={21} className="text-red-500" />,
       });
     }
@@ -125,12 +134,21 @@ const Login = ({ set_page }) => {
 
                 {/* Submit button */}
                 <div>
-                  <button
+                  <Button
+                    type="submit"
+                    variant="primary"
+                    width="w-full"
+                    class_name="py-3"
+                    loading={is_loading}
+                  >
+                    Sign In
+                  </Button>
+                  {/* <button
                     type="submit"
                     className="bg-sky-600 shadow-xs hover:bg-sky-700 flex w-full items-center justify-center rounded-lg px-4 py-3 text-sm font-medium text-white transition outline-none"
                   >
                     Sign In
-                  </button>
+                  </button> */}
                 </div>
               </div>
             </form>
