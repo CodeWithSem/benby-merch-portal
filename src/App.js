@@ -1,27 +1,13 @@
-import React, { useState, useEffect } from "react";
+// src/App.js
+import React from "react";
 import Layout from "./components/ADMINISTRATIVE/layout/Layout";
 import { Toast_Provider } from "./components/ADMINISTRATIVE/layout/Toast_Provider";
 import Login from "./components/AUTHENTICATION/Login";
 import Sign_Up from "./components/AUTHENTICATION/Sign_Up";
+import { App_Provider, Use_App } from "./context/app_context";
 
-function App() {
-  const [page, set_page] = useState(() => {
-    // ✅ If a user is stored, go straight to dashboard
-    const stored_user = localStorage.getItem("user_data");
-    if (stored_user) return "dashboard";
-    return localStorage.getItem("page") || "login";
-  });
-
-  useEffect(() => {
-    // ensure default page is set
-    if (!localStorage.getItem("page")) {
-      localStorage.setItem("page", "login");
-    }
-  }, []);
-
-  useEffect(() => {
-    localStorage.setItem("page", page);
-  }, [page]);
+const App_Content = () => {
+  const { page, set_page } = Use_App();
 
   return (
     <Toast_Provider>
@@ -29,6 +15,14 @@ function App() {
       {page === "sign_up" && <Sign_Up set_page={set_page} />}
       {page === "dashboard" && <Layout set_page={set_page} />}
     </Toast_Provider>
+  );
+};
+
+function App() {
+  return (
+    <App_Provider>
+      <App_Content />
+    </App_Provider>
   );
 }
 

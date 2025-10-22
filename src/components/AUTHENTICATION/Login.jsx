@@ -5,8 +5,10 @@ import auth_img from "../../assets/images/auth-image.png";
 import Button from "../elements/Button";
 import { useToast } from "../ADMINISTRATIVE/layout/Toast_Provider";
 import { login_user } from "../../api/firestore_auth_api"; // ✅ Firestore-only login function
+import { Use_App } from "../../context/app_context";
 
-const Login = ({ set_page }) => {
+const Login = () => {
+  const { set_active_user, set_page } = Use_App();
   const [username, set_username] = useState("");
   const [password, set_password] = useState("");
   const [show_password, set_show_password] = useState(false);
@@ -22,7 +24,7 @@ const Login = ({ set_page }) => {
       set_is_loading(false);
 
       // Store user data in localStorage
-      localStorage.setItem("active_user", JSON.stringify(user));
+      set_active_user(user);
 
       // Redirect to Dashboard by updating parent state
       set_page("dashboard");

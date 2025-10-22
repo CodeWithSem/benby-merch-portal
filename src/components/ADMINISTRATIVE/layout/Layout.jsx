@@ -2,8 +2,9 @@ import React, { useState, useEffect } from "react";
 import Sidebar from "./Sidebar";
 import Header from "./Header";
 import Dashboard from "../pages/dashboard/Dashboard";
+import Admin from "../pages/user_management/admin/Admin";
 
-const Layout = ({ set_page }) => {
+const Layout = () => {
   const [active_item, set_active_item] = useState(() => {
     return localStorage.getItem("active_item") || "Dashboard";
   });
@@ -44,6 +45,8 @@ const Layout = ({ set_page }) => {
       //   return <Edit_Profile />;
       case "Dashboard":
         return <Dashboard />;
+      case "User Management-Admin":
+        return <Admin />;
     }
   };
 
@@ -58,7 +61,6 @@ const Layout = ({ set_page }) => {
             is_desktop={is_desktop}
             is_collapsed={is_collapsed}
             is_open={is_open}
-            set_page={set_page}
           />
         </div>
         <div
@@ -69,7 +71,6 @@ const Layout = ({ set_page }) => {
           <Header
             toggle_sidebar={toggle_sidebar}
             set_active_item={set_active_item}
-            set_page={set_page}
           />
           <div className="p-4 mx-auto max-w-screen-2xl md:px-6 pt-2 pb-6">
             {page_renderer(active_item)}

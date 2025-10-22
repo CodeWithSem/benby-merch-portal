@@ -13,29 +13,18 @@ import {
 import profile_placeholder from "../../../assets/images/profile-1.png";
 import profile_2 from "../../../assets/images/profile-2.png";
 import { useToast } from "../layout/Toast_Provider";
+import { Use_App } from "../../../context/app_context";
 
-const Header = ({ toggle_sidebar, set_active_item, set_page }) => {
+const Header = ({ toggle_sidebar, set_active_item }) => {
+  const { active_user, set_active_user, set_page } = Use_App();
   const [mobile_open, set_mobile_open] = useState(false);
   const [profile_open, set_profile_open] = useState(false);
   const [notif_open, set_notif_open] = useState(false);
   const [user, set_user] = useState(null);
-  const [active_user, set_active_user] = useState(null);
 
   const profile_ref = useRef(null);
   const notif_ref = useRef(null);
   const { show_toast } = useToast();
-
-  // Load stored Firestore user data
-  useEffect(() => {
-    const saved_user = localStorage.getItem("active_user");
-    if (saved_user) {
-      try {
-        set_active_user(JSON.parse(saved_user));
-      } catch (e) {
-        console.error("Failed to parse active_user:", e);
-      }
-    }
-  }, []);
 
   const toggle_mobile = () => set_mobile_open(!mobile_open);
   const toggle_profile_dropdown = () => set_profile_open((prev) => !prev);

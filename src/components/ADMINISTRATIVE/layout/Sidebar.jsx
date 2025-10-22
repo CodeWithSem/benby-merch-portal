@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import delphys_logo from "../../../assets/images/delphys-sidebar-logo.png";
 import { useToast } from "./Toast_Provider";
+import { Use_App } from "../../../context/app_context";
 
 const Sidebar = ({
   active_item,
@@ -19,8 +20,8 @@ const Sidebar = ({
   is_desktop,
   is_collapsed,
   is_open,
-  set_page,
 }) => {
+  const { set_active_user, set_page } = Use_App();
   const { show_toast } = useToast();
   const [open_dropdowns, set_open_dropdowns] = useState({});
   const dropdown_refs = useRef({});
