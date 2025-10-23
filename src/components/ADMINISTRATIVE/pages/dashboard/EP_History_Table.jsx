@@ -20,11 +20,11 @@ import {
   Trash2,
   UserCircle,
 } from "lucide-react";
-import Icon_Field from "../../../elements/Icon_Field";
-import Button from "../../../elements/Button";
-import Checkbox_Field from "../../../elements/Checkbox_Field";
-import Pagination from "../../../elements/Pagination";
-import Date_Field from "../../../elements/Date_Field";
+import Icon_Field from "assets/elements/Icon_Field";
+import Button from "assets/elements/Button";
+import Checkbox_Field from "assets/elements/Checkbox_Field";
+import Pagination from "assets/elements/Pagination";
+import Date_Field from "assets/elements/Date_Field";
 
 const EP_History_Table = () => {
   const today = new Date();

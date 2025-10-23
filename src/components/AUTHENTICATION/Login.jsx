@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Eye, EyeOff, CheckCircle2, Info } from "lucide-react";
 import delphys_logo from "../../assets/images/delphys-sidebar-logo.png";
 import auth_img from "../../assets/images/auth-image.png";
-import Button from "../elements/Button";
+import Button from "assets/elements/Button";
 import { useToast } from "../ADMINISTRATIVE/layout/Toast_Provider";
 import { login_user } from "../../api/firestore_auth_api"; // ✅ Firestore-only login function
 import { Use_App } from "../../context/app_context";
@@ -158,7 +158,7 @@ const Login = () => {
                       <img src={delphys_logo} alt="Logo" />
                     </div>
                     <h1 className="text-white text-4xl whitespace-nowrap">
-                      Delphys Software
+                      Delphys 7
                     </h1>
                   </div>
                 </a>

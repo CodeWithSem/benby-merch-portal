@@ -11,10 +11,10 @@ import {
   PlusCircle,
   RefreshCw,
 } from "lucide-react";
-import Icon_Field from "../../../../elements/Icon_Field";
-import Select_Field from "../../../../elements/Select_Field";
-import Pagination from "../../../../elements/Pagination";
-import Button from "../../../../elements/Button";
+import Icon_Field from "assets/elements/Icon_Field";
+import Select_Field from "assets/elements/Select_Field";
+import Pagination from "assets/elements/Pagination";
+import Button from "assets/elements/Button";
 import { useToast } from "../../../layout/Toast_Provider";
 import {
   fetch_all_users,
@@ -31,11 +31,11 @@ import {
   add_new_data,
   delete_data,
 } from "../../../../../api/firestore_crud_api";
-import Verify_Field from "../../../../elements/Verify_Field";
-import { format_date } from "../../../../../assets/scripts/format";
-import Form_Modal from "../../../../elements/modals/Form_Modal";
-import profile_1 from "../../../../../assets/images/profile-1.png";
-import { fetch_admin } from "../../../../../assets/scripts/api/firestore/tbl_admin_api";
+import Verify_Field from "assets/elements/Verify_Field";
+import { format_date } from "assets/scripts/format";
+import Form_Modal from "assets/elements/modals/Form_Modal";
+import profile_1 from "assets/images/profile-1.png";
+import { fetch_admin } from "assets/scripts/api/firestore/tbl_admin_api";
 import Add_Admin from "./modals/Add_Admin";
 import Edit_Admin from "./modals/Edit_Admin";
 import Delete_Admin from "./modals/Delete_Admin";

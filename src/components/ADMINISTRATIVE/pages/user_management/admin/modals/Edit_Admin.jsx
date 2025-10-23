@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { registerUserByAdmin } from "../../../../../../api/firebase_auth_api";
 import { X } from "lucide-react";
-import Button from "../../../../../elements/Button";
-import Text_Field from "../../../../../elements/Text_Field";
-import Textarea_Field from "../../../../../elements/Textarea_Field";
-import Select_Field from "../../../../../elements/Select_Field";
+import Button from "assets/elements/Button";
+import Text_Field from "assets/elements/Text_Field";
+import Textarea_Field from "assets/elements/Textarea_Field";
+import Select_Field from "assets/elements/Select_Field";
 import { useToast } from "../../../../layout/Toast_Provider";
 
 const Edit_Admin = ({
