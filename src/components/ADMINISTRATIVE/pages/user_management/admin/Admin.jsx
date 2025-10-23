@@ -36,6 +36,9 @@ import { format_date } from "../../../../../assets/scripts/format";
 import Form_Modal from "../../../../elements/modals/Form_Modal";
 import profile_1 from "../../../../../assets/images/profile-1.png";
 import { fetch_admin } from "../../../../../assets/scripts/api/firestore/tbl_admin_api";
+import Add_Admin from "./modals/Add_Admin";
+import Edit_Admin from "./modals/Edit_Admin";
+import Delete_Admin from "./modals/Delete_Admin";
 // import Add_Data from "./modals/Add_Data";
 
 const Admin = () => {
@@ -313,6 +316,20 @@ const Admin = () => {
 
   const [display_modal, set_display_modal] = useState("");
 
+  const [edit_data, set_edit_data] = useState({});
+
+  const handle_edit_admin = (edit_data) => {
+    set_edit_data(edit_data);
+    set_display_modal("edit_admin");
+  };
+
+  const [delete_data, set_delete_data] = useState({});
+
+  const handle_delete_admin = (delete_data) => {
+    set_delete_data(delete_data);
+    set_display_modal("delete_admin");
+  };
+
   // RETURN ORIGIN
   return (
     <React.Fragment>
@@ -347,7 +364,7 @@ const Admin = () => {
               variant="primary"
               icon={PlusCircle}
               icon_position="left"
-              on_click={() => set_display_modal("add_data")}
+              on_click={() => set_display_modal("add_admin")}
             >
               Add Admin
             </Button>
@@ -489,12 +506,15 @@ const Admin = () => {
                                 >
                                   <View size={19} />
                                 </button>
-                                <button className="text-sky-500 hover:text-sky-600 text-[12px] outline-none">
+                                <button
+                                  className="text-sky-500 hover:text-sky-600 text-[12px] outline-none"
+                                  onClick={() => handle_edit_admin(row)}
+                                >
                                   <Edit size={19} />
                                 </button>
                                 <button
                                   className="text-red-500 hover:text-red-600 text-[12px] mb-[1px] outline-none"
-                                  onClick={() => handle_delete_data(row.id)}
+                                  onClick={() => handle_delete_admin(row)}
                                 >
                                   <Trash size={18} />
                                 </button>
@@ -545,11 +565,23 @@ const Admin = () => {
           </div>
         </div>
       </div>
-      {/* <Add_Data
-        is_open={display_modal === "add_data"}
+      <Add_Admin
+        is_open={display_modal === "add_admin"}
         on_close={() => set_display_modal("")}
         width="max-w-[820px]"
-      /> */}
+      />
+      <Edit_Admin
+        is_open={display_modal === "edit_admin"}
+        on_close={() => set_display_modal("")}
+        width="max-w-[820px]"
+        edit_data={edit_data}
+      />
+      <Delete_Admin
+        is_open={display_modal === "delete_admin"}
+        on_close={() => set_display_modal("")}
+        width="max-w-[820px]"
+        delete_data={delete_data}
+      />
     </React.Fragment>
   );
 };

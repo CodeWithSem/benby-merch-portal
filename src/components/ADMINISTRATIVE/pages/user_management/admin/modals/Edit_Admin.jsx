@@ -1,24 +1,25 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { registerUserByAdmin } from "../../../../../../api/firebase_auth_api";
 import { X } from "lucide-react";
 import Button from "../../../../../elements/Button";
 import Text_Field from "../../../../../elements/Text_Field";
 import Textarea_Field from "../../../../../elements/Textarea_Field";
-import Password_Field from "../../../../../elements/Password_Field";
 import Select_Field from "../../../../../elements/Select_Field";
 import { useToast } from "../../../../layout/Toast_Provider";
 
-const Add_Admin = ({ is_open, on_close, width = "max-w-[700px]" }) => {
+const Edit_Admin = ({
+  is_open,
+  on_close,
+  width = "max-w-[700px]",
+  edit_data,
+}) => {
   const { show_toast } = useToast();
   const [loading, set_loading] = useState(false);
-  const [form_data, set_form_data] = useState({
-    first_name: "",
-    last_name: "",
-    user_code: "",
-    email: "",
-    password: "",
-    category: "",
-  });
+  const [form_data, set_form_data] = useState({});
+
+  useEffect(() => {
+    set_form_data(edit_data);
+  }, [is_open]);
 
   // Generic change handler
   const handle_change = (e) => {
@@ -34,49 +35,6 @@ const Add_Admin = ({ is_open, on_close, width = "max-w-[700px]" }) => {
     { label: "Diser", value: "DISER" },
     { label: "Supervisor", value: "SUPV" },
   ];
-
-  const handle_proceed = async () => {
-    try {
-      set_loading(true);
-
-      // Call the admin registration API
-      const new_user = await registerUserByAdmin(
-        form_data.email,
-        form_data.password,
-        `${form_data.first_name} ${form_data.last_name}`, // display_name
-        form_data.first_name,
-        form_data.last_name,
-        form_data.user_code,
-        form_data.category
-      );
-
-      show_toast({
-        type: "success",
-        title: "User Created",
-        message: `${new_user.email} has been successfully added.`,
-      });
-
-      // Reset form or close modal
-      set_form_data({
-        first_name: "",
-        last_name: "",
-        user_code: "",
-        email: "",
-        password: "",
-        category: "",
-      });
-      on_close();
-    } catch (err) {
-      console.error(err);
-      show_toast({
-        type: "danger",
-        title: "Registration Failed",
-        message: err.message || "Something went wrong",
-      });
-    } finally {
-      set_loading(false);
-    }
-  };
 
   // RETURN ORIGIN
   return is_open ? (
@@ -96,11 +54,20 @@ const Add_Admin = ({ is_open, on_close, width = "max-w-[700px]" }) => {
             <X size={20} />
           </button>
           {/* + Modal Label */}
-          <div className="text-lg md:text-xl font-bold mb-5">Add New Admin</div>
+          <div className="text-lg md:text-xl font-bold mb-5">Edit Admin</div>
           {/* - Modal Label */}
           {/* + Modal Body */}
           <div className="w-full pl-1 p-4 overflow-y-auto max-h-[500px] scrollbar-custom">
             <div className="space-y-5">
+              <div className="col-span-full">
+                <Text_Field
+                  label="Username"
+                  name={"username"}
+                  type={"text"}
+                  value={form_data.username}
+                  disabled
+                />
+              </div>
               <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
                 <div>
                   <Text_Field
@@ -122,26 +89,7 @@ const Add_Admin = ({ is_open, on_close, width = "max-w-[700px]" }) => {
                     on_change={handle_change}
                   />
                 </div>
-                <div className="col-span-full">
-                  <Text_Field
-                    label="Username"
-                    name={"username"}
-                    type={"text"}
-                    placeholder="Enter username"
-                    value={form_data.username}
-                    on_change={handle_change}
-                  />
-                </div>
-                <div className="col-span-full">
-                  <Password_Field
-                    label="Password"
-                    name={"password"}
-                    type={"password"}
-                    placeholder="Enter your password"
-                    value={form_data.password}
-                    on_change={handle_change}
-                  />
-                </div>
+
                 <div className="col-span-full">
                   <Text_Field
                     label="Email"
@@ -152,16 +100,18 @@ const Add_Admin = ({ is_open, on_close, width = "max-w-[700px]" }) => {
                     on_change={handle_change}
                   />
                 </div>
-                <div className="col-span-full">
-                  <Select_Field
-                    label="Category"
-                    name="category"
-                    value={form_data.category}
-                    on_change={handle_change}
-                    options={category_list}
-                    placeholder="Select Category"
-                  />
-                </div>
+                {form_data.category !== "DEV" && (
+                  <div className="col-span-full">
+                    <Select_Field
+                      label="Category"
+                      name="category"
+                      value={form_data.category}
+                      on_change={handle_change}
+                      options={category_list}
+                      placeholder="Select Category"
+                    />
+                  </div>
+                )}
               </div>
             </div>
 
@@ -176,18 +126,30 @@ const Add_Admin = ({ is_open, on_close, width = "max-w-[700px]" }) => {
           </div>
           {/* - Modal Body */}
           {/* + Modal Footer */}
-          <div className="flex justify-end gap-2 mt-5">
-            <Button
-              width="w-[100px]"
-              variant="primary"
-              on_click={handle_proceed}
-            >
-              Proceed
-            </Button>
-            <Button width="w-[100px]" variant="white" on_click={on_close}>
-              Cancel
-            </Button>
+          <div className="flex justify-between mt-5">
+            <div className="flex">
+              <Button
+                variant="danger"
+                //   on_click={handle_proceed}
+              >
+                Reset Password
+              </Button>
+            </div>
+            <div className="flex justify-end gap-2">
+              <Button
+                width="w-[100px]"
+                variant="primary"
+                //   on_click={handle_proceed}
+              >
+                Update
+              </Button>
+
+              <Button width="w-[100px]" variant="white" on_click={on_close}>
+                Cancel
+              </Button>
+            </div>
           </div>
+
           {/* - Modal Footer */}
         </div>
 
@@ -197,4 +159,4 @@ const Add_Admin = ({ is_open, on_close, width = "max-w-[700px]" }) => {
   ) : null;
 };
 
-export default Add_Admin;
+export default Edit_Admin;
