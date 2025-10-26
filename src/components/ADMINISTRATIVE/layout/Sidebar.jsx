@@ -9,6 +9,9 @@ import {
   ShoppingCart,
   Box,
   ClipboardCheck,
+  PackagePlus,
+  PackageMinus,
+  Warehouse,
 } from "lucide-react";
 import delphys_logo from "../../../assets/images/delphys-sidebar-logo.png";
 import { useToast } from "./Toast_Provider";
@@ -34,45 +37,47 @@ const Sidebar = ({
       icon: <Home size={18} />,
     },
     {
-      key: "User Management",
+      key: "Inbound",
       type: "dropdown",
-      name: "User Management",
-      icon: <UserCircle size={18} />,
-      sub_items: ["Admin", "TDS"],
+      name: "Inbound",
+      icon: <PackagePlus size={18} />,
+      sub_items: [
+        "Purchase Order",
+        "Goods Receive",
+        "Batch",
+        "Inbound History",
+      ],
     },
     {
-      key: "Merch Control Plan",
-      type: "link",
-      name: "Merch Control Plan",
-      icon: <ClipboardCheck size={18} />,
+      key: "Outbound",
+      type: "dropdown",
+      name: "Outbound",
+      icon: <PackageMinus size={18} />,
+      sub_items: [
+        // "Purchase Order",
+        // "Goods Receive",
+        // "Batch",
+        // "Inbound History",
+      ],
     },
     {
-      key: "On-Shelf Availability",
+      key: "Warehouse",
       type: "dropdown",
-      name: "On-Shelf Availability",
-      icon: <Box size={18} />,
-      sub_items: ["SKU Tagging", "OSA History"],
-    },
-    {
-      key: "Merch Deployment",
-      type: "dropdown",
-      name: "Merch Deployment",
-      icon: <Users size={18} />,
-      sub_items: ["Diser Record", "MD History"],
-    },
-    {
-      key: "Execution Planner",
-      type: "dropdown",
-      name: "Execution Planner",
-      icon: <ShoppingCart size={18} />,
-      sub_items: ["Planner Record", "EP History"],
+      name: "Warehouse",
+      icon: <Warehouse size={18} />,
+      sub_items: [
+        "Stock Transfer",
+        "Inventory Master",
+        "Item Master",
+        "Inventory History",
+      ],
     },
     {
       key: "Maintenance",
       type: "dropdown",
       name: "Maintenance",
       icon: <Settings size={18} />,
-      sub_items: ["SKU Master Data"],
+      sub_items: ["General Structure", "Financial", "Vendor", "Purchase Order"],
     },
   ];
 
@@ -189,8 +194,8 @@ const Sidebar = ({
             <div className="w-[50px] h-[50px] text-[10px] border flex justify-center items-center rounded-lg bg-gray-100">
               <img src={delphys_logo} alt="Logo" />
             </div>
-            <div className="ml-3 flex-1 text-gray-700 font-bold text-[18px] whitespace-nowrap">
-              Merch App
+            <div className="ml-3 flex-1 text-gray-700 font-bold text-[20px] whitespace-nowrap">
+              Delphys 7
             </div>
           </div>
         ))}

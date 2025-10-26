@@ -100,8 +100,8 @@ const Header = ({ toggle_sidebar, set_active_item }) => {
             <Menu size={22} className="text-gray-500" />
           </button>
           <a className="md:hidden">
-            <div className="text-gray-700 font-bold text-[18px] whitespace-nowrap">
-              Merch App
+            <div className="text-gray-700 font-bold text-[20px] whitespace-nowrap">
+              Delphys 7
             </div>
           </a>
           <button
