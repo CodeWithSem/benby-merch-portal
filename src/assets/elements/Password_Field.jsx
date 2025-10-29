@@ -30,7 +30,7 @@ const Password_Field = ({
         : "focus-within:ring-sky-500 focus-within:border-sky-500"
     }`;
 
-  const input_class = `block w-full pr-10 px-3 py-2 bg-transparent border border-transparent focus:outline-none focus:ring-0 focus:border-transparent placeholder-gray-400 disabled:cursor-not-allowed disabled:bg-transparent`;
+  const input_class = `block w-full pr-10 px-3 py-2 bg-transparent focus:outline-none focus:ring-0 placeholder-gray-400 disabled:cursor-not-allowed disabled:bg-transparent`;
 
   const icon_class = `absolute right-[14px] top-1/2 transform -translate-y-1/2 cursor-pointer text-gray-500 hover:text-gray-700`;
 

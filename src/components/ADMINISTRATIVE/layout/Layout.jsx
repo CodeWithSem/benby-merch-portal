@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from "react";
 import Sidebar from "./Sidebar";
 import Header from "./Header";
-import Dashboard from "../pages/dashboard/Dashboard";
-import Admin from "../pages/user_management/admin/Admin";
+import Dashboard from "../modules/dashboard/Dashboard";
+import Admin from "../modules/user_management/admin/Admin";
+import Form_Elements from "assets/templates/pages/forms/form_elements/Form_Elements";
+import Purchase_Order from "../modules/inbound/purchase_order/Purchase_Order";
 
 const Layout = () => {
   const [active_item, set_active_item] = useState(() => {
@@ -45,8 +47,10 @@ const Layout = () => {
       //   return <Edit_Profile />;
       case "Dashboard":
         return <Dashboard />;
-      case "User Management-Admin":
-        return <Admin />;
+      case "Inbound-Purchase Order":
+        return <Purchase_Order />;
+      case "Templates-Form Elements":
+        return <Form_Elements />;
     }
   };
 

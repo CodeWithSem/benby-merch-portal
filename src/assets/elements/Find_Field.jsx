@@ -12,28 +12,32 @@ const Find_Field = ({
   placeholder = "",
 }) => {
   const wrapper_class = `mt-1 flex rounded-md shadow-sm border text-sm
-    ${error_message ? "border-pink-500" : "border-slate-300"}
-    ${disabled ? "bg-slate-50 text-slate-500" : "bg-white text-slate-700"}
-    focus-within:ring-1 ${
-      error_message
-        ? "focus-within:ring-pink-500 focus-within:border-pink-500"
-        : "focus-within:ring-sky-500 focus-within:border-sky-500"
-    }`;
+    ${error_message ? "border-pink-500" : ""}
+    ${
+      disabled
+        ? "bg-slate-50 text-slate-500 disabled:border-slate-200 focus-within:ring-0 focus-within:border-slate-200"
+        : "bg-white text-slate-700 border-slate-300 focus-within:ring-1"
+    }
+     ${
+       error_message
+         ? "focus-within:ring-pink-500 focus-within:border-pink-500"
+         : "focus-within:ring-sky-500 focus-within:border-sky-500"
+     }`;
 
-  const input_class = `flex-1 min-w-0 text-sm bg-transparent border border-transparent focus:border-transparent focus:ring-0 px-3 py-2 placeholder-slate-400 disabled:bg-transparent focus:outline-none`;
+  const input_class = `flex-1 min-w-0 text-sm bg-transparent focus:ring-0 px-3 py-2 placeholder-slate-400 disabled:bg-transparent focus:outline-none`;
 
-  const button_wrapper_class = `flex-shrink-0 p-1`; // Prevent shrinking, preserve spacing
-  const button_class = `inline-flex items-center justify-center px-2 h-full bg-sky-600 text-white hover:bg-sky-700 transition-colors rounded-[5px]`;
+  const button_wrapper_class = `flex-shrink-0 p-1`;
+  const button_class = `inline-flex items-center justify-center px-2 h-full bg-sky-600 text-white hover:bg-sky-700 transition-colors rounded-[5px] outline-none`;
 
   return (
-    <div className="block">
+    <label className="block">
       {label && (
         <span className="block text-sm font-medium text-slate-700">
           {label}
         </span>
       )}
 
-      <div className={`${wrapper_class} flex`}>
+      <div className={`${wrapper_class} flex items-stretch`}>
         <input
           type="text"
           placeholder={placeholder}
@@ -63,7 +67,7 @@ const Find_Field = ({
           {error_message}
         </span>
       )}
-    </div>
+    </label>
   );
 };
 

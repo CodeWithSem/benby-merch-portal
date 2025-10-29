@@ -459,7 +459,7 @@ const Form_Elements = () => {
                 verify_status={verifyStatus}
               />
             </div>
-            {/* <div className="w-full mt-5">
+            <div className="w-full mt-5">
               <Textarea_Field
                 label="Description"
                 name="description"
@@ -470,7 +470,7 @@ const Form_Elements = () => {
                 required={true}
                 textarea_error={description_error}
               />
-            </div> */}
+            </div>
             <div className="w-full mt-5">
               <Quantity_Field
                 label="Quantity"

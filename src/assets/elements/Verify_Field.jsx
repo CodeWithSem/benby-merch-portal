@@ -23,7 +23,7 @@ const Verify_Field = ({
         : "focus-within:ring-sky-500 focus-within:border-sky-500"
     }`;
 
-  const input_class = `flex-1 min-w-0 bg-transparent border border-transparent focus:border-transparent focus:ring-0 px-3 py-2 placeholder-slate-400 disabled:bg-transparent focus:outline-none`;
+  const input_class = `flex-1 min-w-0 bg-transparent focus:ring-0 px-3 py-2 placeholder-slate-400 disabled:bg-transparent focus:outline-none`;
 
   const button_find_class = `h-full inline-flex items-center justify-center px-2 bg-sky-600 text-white hover:bg-sky-700 transition-colors rounded-[5px]`;
 
@@ -53,7 +53,7 @@ const Verify_Field = ({
         </span>
       )}
 
-      <div className={`${wrapper_class} flex`}>
+      <div className={`${wrapper_class} flex item-stretch`}>
         {/* Input Field */}
         <input
           type="text"

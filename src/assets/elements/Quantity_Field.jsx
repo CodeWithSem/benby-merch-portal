@@ -41,7 +41,7 @@ const Quantity_Field = ({
         : "focus-within:ring-sky-500 focus-within:border-sky-500"
     }`;
 
-  const input_class = `flex-1 min-w-0 text-center bg-transparent border border-transparent focus:border-transparent focus:ring-0 px-3 py-[7px] placeholder-slate-400 disabled:bg-transparent focus:outline-none`;
+  const input_class = `flex-1 min-w-0 text-center focus:ring-0 px-3 py-2 placeholder-slate-400 disabled:bg-transparent focus:outline-none`;
 
   const button_class = `inline-flex items-center w-10 justify-center border-l border-slate-300 text-slate-500 outline-none ${
     disabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer"
@@ -59,7 +59,7 @@ const Quantity_Field = ({
         </span>
       )}
 
-      <div className={`${wrapper_class} flex`}>
+      <div className={`${wrapper_class} flex items-stretch`}>
         {/* Minus Button */}
         <button
           type="button"
