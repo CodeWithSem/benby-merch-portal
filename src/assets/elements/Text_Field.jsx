@@ -11,17 +11,14 @@ const Text_Field = ({
   error_message,
   name,
   required = false,
+  bg_color = "white",
   min,
   max,
 }) => {
   const input_class = `block w-full ${
     label ? "mt-1" : ""
-  } px-3 py-2 bg-white border rounded-md text-sm shadow-sm placeholder-slate-400 focus:ring-1 
-    ${
-      disabled
-        ? "disabled:bg-slate-50 disabled:text-slate-500 disabled:border-slate-200 disabled:shadow-none"
-        : ""
-    }
+  } px-3 py-2 bg-${bg_color} border rounded-md text-sm shadow-sm placeholder-slate-400 focus:ring-1 
+    ${disabled ? "disabled:bg-slate-50 disabled:text-slate-500" : ""}
     ${error_message ? "border-pink-500 text-pink-600" : "border-slate-300"}
     ${
       error_message

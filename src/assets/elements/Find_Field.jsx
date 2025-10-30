@@ -12,10 +12,10 @@ const Find_Field = ({
   placeholder = "",
 }) => {
   const wrapper_class = `mt-1 flex rounded-md shadow-sm border text-sm
-    ${error_message ? "border-pink-500" : ""}
+    ${error_message ? "border-pink-500" : "border-slate-300"}
     ${
       disabled
-        ? "bg-slate-50 text-slate-500 disabled:border-slate-200 focus-within:ring-0 focus-within:border-slate-200"
+        ? "bg-slate-50 text-slate-500 focus-within:ring-0 focus-within:border-slate-300"
         : "bg-white text-slate-700 border-slate-300 focus-within:ring-1"
     }
      ${

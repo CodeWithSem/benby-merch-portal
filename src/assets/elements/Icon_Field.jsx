@@ -19,7 +19,7 @@ const Icon_Field = ({
   } px-3 py-2 bg-white border rounded-md text-sm shadow-sm placeholder-slate-400 focus:ring-1 
     ${
       disabled
-        ? "disabled:bg-slate-50 disabled:text-slate-500 disabled:border-slate-200 disabled:shadow-none"
+        ? "disabled:bg-slate-50 disabled:text-slate-500 disabled:shadow-none"
         : ""
     }
     ${error_message ? "border-pink-500 text-pink-600" : "border-slate-300"}

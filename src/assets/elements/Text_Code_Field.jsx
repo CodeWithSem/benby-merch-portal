@@ -10,23 +10,21 @@ const Text_Code_Field = ({
   on_code_change,
   text_value,
   on_text_change,
+  on_click,
   disabled = false,
   error_message,
   code_name,
   text_name,
   code_width = "150px",
   required = false,
+  show_search_button = true,
   min,
   max,
 }) => {
   const input_class = `block w-full ${
     label ? "mt-1" : ""
   } px-3 py-2 bg-white border rounded-md text-sm shadow-sm placeholder-slate-400 focus:ring-1 
-    ${
-      disabled
-        ? "disabled:bg-slate-50 disabled:text-slate-500 disabled:border-slate-200"
-        : ""
-    }
+    ${disabled ? "disabled:bg-slate-50 disabled:text-slate-500" : ""}
     ${error_message ? "border-pink-500 text-pink-600" : "border-slate-300"}
     ${
       error_message
@@ -44,10 +42,10 @@ const Text_Code_Field = ({
   };
 
   const wrapper_class = `mt-1 flex rounded-md shadow-sm border text-sm
-    ${error_message ? "border-pink-500" : ""}
+    ${error_message ? "border-pink-500" : "border-slate-300"}
     ${
       disabled
-        ? "bg-slate-50 text-slate-500 focus-within:ring-0 focus-within:border-slate-200"
+        ? "bg-slate-50 focus-within:border-slate-300 text-slate-500 focus-within:ring-0"
         : "bg-white text-slate-700 focus-within:ring-1 border-slate-300"
     }
      ${
@@ -67,7 +65,7 @@ const Text_Code_Field = ({
         </span>
       )}
 
-      <div className="flex gap-2">
+      <div className="flex gap-3">
         {/* Left input (code) */}
         <div className={`w-[${code_width}]`}>
           <input
@@ -101,12 +99,18 @@ const Text_Code_Field = ({
             autoComplete="off"
             spellCheck={false}
           />
-
-          <div className={button_wrapper_class}>
-            <button type="button" title="Search" className={button_class}>
-              <Search size={18} />
-            </button>
-          </div>
+          {show_search_button && (
+            <div className={button_wrapper_class}>
+              <button
+                type="button"
+                title="Search"
+                className={button_class}
+                onClick={on_click}
+              >
+                <Search size={18} />
+              </button>
+            </div>
+          )}
         </div>
       </div>
 

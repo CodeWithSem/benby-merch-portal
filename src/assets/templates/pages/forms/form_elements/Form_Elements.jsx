@@ -441,6 +441,7 @@ const Form_Elements = () => {
                 text_value={search_value}
                 on_text_change={handle_change}
                 code_width="150px"
+                show_search_button={true}
                 disabled
               />
             </div>

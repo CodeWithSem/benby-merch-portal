@@ -84,7 +84,7 @@ const Sidebar = ({
       type: "dropdown",
       name: "Templates",
       icon: <Box size={18} />,
-      sub_items: ["Form Elements"],
+      sub_items: ["Form Elements", "Tabs", "Create Invoice", "Basic Tables"],
     },
   ];
 

@@ -5,6 +5,9 @@ import Dashboard from "../modules/dashboard/Dashboard";
 import Admin from "../modules/user_management/admin/Admin";
 import Form_Elements from "assets/templates/pages/forms/form_elements/Form_Elements";
 import Purchase_Order from "../modules/inbound/purchase_order/Purchase_Order";
+import Tabs from "assets/templates/pages/ui_elements/tabs/Tabs";
+import Create_Invoice from "assets/templates/pages/templates/create_invoice/Create_Invoice";
+import Basic_Tables from "assets/templates/pages/tables/basic_tables/Basic_Tables";
 
 const Layout = () => {
   const [active_item, set_active_item] = useState(() => {
@@ -51,6 +54,12 @@ const Layout = () => {
         return <Purchase_Order />;
       case "Templates-Form Elements":
         return <Form_Elements />;
+      case "Templates-Tabs":
+        return <Tabs />;
+      case "Templates-Create Invoice":
+        return <Create_Invoice />;
+      case "Templates-Basic Tables":
+        return <Basic_Tables />;
     }
   };
 

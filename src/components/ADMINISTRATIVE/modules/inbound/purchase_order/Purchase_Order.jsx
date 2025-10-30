@@ -8,10 +8,8 @@ import {
   View,
   PlusCircle,
   RefreshCw,
-  Filter,
   SlidersHorizontal,
   FileUp,
-  FilePenLine,
   FileInput,
 } from "lucide-react";
 import Icon_Field from "assets/elements/Icon_Field";
@@ -21,10 +19,17 @@ import Button from "assets/elements/Button";
 import { useToast } from "../../../layout/Toast_Provider";
 import Date_Range_Field from "assets/elements/Date_Range_Field";
 import Checkbox_Field from "assets/elements/Checkbox_Field";
+import Create_New_PO from "./create_new_po/Create_New_PO";
+import Post_View_PO from "./modals/post_view_po/Post_View_PO";
+import Edit_PO from "./edit_po/Edit_PO";
+import Delete_PO from "./modals/post_view_po/delete_po/Delete_PO";
 
 const Purchase_Order = () => {
   const filter_ref = useRef(null);
   const [show_filter, set_show_filter] = useState(false);
+  const [page, set_page] = useState("main");
+  const [display_modal, set_display_modal] = useState("");
+  const [for_posting, set_for_posting] = useState(false);
 
   // Close dropdown on outside click
   const { show_toast } = useToast();
@@ -202,313 +207,338 @@ const Purchase_Order = () => {
 
   // - For Date Range Field
 
-  // RETURN ORIGIN
-  return (
-    <React.Fragment>
-      <div className="w-full">
-        <div className="flex flex-wrap items-center justify-between gap-3 py-5">
-          <h1 className="text-xl">Inbound</h1>
-          <nav>
-            <ol className="flex flex-wrap items-center gap-1.5">
-              <li>
-                <a className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-sky-500 cursor-pointer">
-                  Home
-                </a>
-              </li>
-              <li className="flex items-center gap-1.5 text-sm text-gray-500">
-                <span>/</span>
-                <a className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-sky-500 cursor-pointer">
-                  Inbound
-                </a>
-              </li>
-              <li className="flex items-center gap-1.5 text-sm text-gray-500">
-                <span>/</span>
-                <span className="text-gray-800">Purchase Order</span>
-              </li>
-            </ol>
-          </nav>
-        </div>
+  const handle_create_new_po = () => {
+    set_page("po_creation");
+  };
 
-        <div className="w-full bg-white rounded-lg border">
-          <div className="flex flex-wrap items-center justify-between gap-3 p-5">
-            <h1 className="text-lg">Purchase Order</h1>
-            <div className="flex gap-2">
-              <Button
-                variant="primary"
-                icon={PlusCircle}
-                icon_position="left"
-                //   on_click={() => set_display_modal("add_admin")}
-              >
-                Create New
-              </Button>
-              <Button
-                variant="primary"
-                icon={FileUp}
-                icon_position="left"
-                //   on_click={() => set_display_modal("add_admin")}
-              >
-                Upload
-              </Button>
-            </div>
+  const handle_view_po = () => {
+    set_for_posting(false);
+    set_display_modal("view_po");
+  };
+
+  const handle_post_po = () => {
+    set_for_posting(true);
+    set_display_modal("post_po");
+  };
+
+  const handle_edit_po = () => {
+    set_page("edit_po");
+  };
+
+  const handle_delete_po = () => {
+    set_display_modal("delete_po");
+  };
+
+  // + PO Main
+  const PO_Main = () => {
+    return (
+      <React.Fragment>
+        <div className="w-full">
+          <div className="flex flex-wrap items-center justify-between gap-3 py-5">
+            <h1 className="text-xl">Inbound</h1>
+            <nav>
+              <ol className="flex flex-wrap items-center gap-1.5">
+                <li>
+                  <a className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-sky-500 cursor-pointer">
+                    Home
+                  </a>
+                </li>
+                <li className="flex items-center gap-1.5 text-sm text-gray-500">
+                  <span>/</span>
+                  <a className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-sky-500 cursor-pointer">
+                    Inbound
+                  </a>
+                </li>
+                <li className="flex items-center gap-1.5 text-sm text-gray-500">
+                  <span>/</span>
+                  <span className="text-gray-800">Purchase Order</span>
+                </li>
+              </ol>
+            </nav>
           </div>
 
-          <div className="p-5 sm:p-6 border-t">
-            <div className="w-full border rounded-lg">
-              <div className="w-full md:flex md:justify-between p-4 gap-4">
-                <div className="flex items-center text-sm gap-2">
-                  <div>Show</div>
-                  <div className="w-[90px]">
-                    <Select_Field
-                      name="option"
-                      value={select_option}
-                      on_change={(e) => {
-                        set_select_option(Number(e.target.value));
-                        set_current_page(1);
-                      }}
-                      options={[
-                        { label: "5", value: 5 },
-                        { label: "10", value: 10 },
-                        { label: "50", value: 50 },
-                      ]}
-                    />
-                  </div>
-                  <div className="mr-2">entries</div>
-                  <Button
-                    variant="white"
-                    icon={RefreshCw}
-                    icon_position="left"
-                    //   on_click={() => load_data()}
-                  ></Button>
-                </div>
+          <div className="w-full bg-white rounded-lg border">
+            <div className="flex flex-wrap items-center justify-between gap-3 p-5">
+              <h1 className="text-lg">Purchase Order</h1>
+              <div className="flex gap-2">
+                <Button
+                  variant="primary"
+                  icon={PlusCircle}
+                  icon_position="left"
+                  on_click={handle_create_new_po}
+                >
+                  Create New PO
+                </Button>
+                <Button
+                  variant="primary"
+                  icon={FileUp}
+                  icon_position="left"
+                  //   on_click={() => set_display_modal("add_admin")}
+                >
+                  Upload
+                </Button>
+              </div>
+            </div>
 
-                <div className="w-full mt-4 md:mt-0 md:w-[600px]">
-                  <div className="w-full flex items-center gap-2">
-                    <div className="w-full">
-                      <Icon_Field
-                        name="search"
-                        placeholder="Search..."
-                        icon={Search}
-                        icon_position="left"
-                        value={search_query}
-                        on_change={(e) => set_search_query(e.target.value)}
+            <div className="p-5 sm:p-6 border-t">
+              <div className="w-full border rounded-lg">
+                <div className="w-full md:flex md:justify-between p-4 gap-4">
+                  <div className="flex items-center text-sm gap-2">
+                    <div>Show</div>
+                    <div className="w-[90px]">
+                      <Select_Field
+                        name="option"
+                        value={select_option}
+                        on_change={(e) => {
+                          set_select_option(Number(e.target.value));
+                          set_current_page(1);
+                        }}
+                        options={[
+                          { label: "5", value: 5 },
+                          { label: "10", value: 10 },
+                          { label: "50", value: 50 },
+                        ]}
                       />
                     </div>
-                    <div className="relative" ref={filter_ref}>
-                      <Button
-                        variant="white"
-                        width="w-[100px]"
-                        icon={SlidersHorizontal}
-                        icon_position="left"
-                        // loading
-                        on_click={() => set_show_filter((prev) => !prev)}
-                      >
-                        Filter
-                      </Button>
+                    <div className="mr-2">entries</div>
+                    <Button
+                      variant="white"
+                      icon={RefreshCw}
+                      icon_position="left"
+                      //   on_click={() => load_data()}
+                    ></Button>
+                  </div>
 
-                      {/* Filter Popover */}
-                      {show_filter && (
-                        <React.Fragment>
-                          <div
-                            className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40"
-                            // onClick={() => set_show_filter(false)}
-                          ></div>
-                          <div className="absolute top-full mt-2 right-0 z-50 bg-white border rounded-lg shadow-md p-4 w-[260px]">
-                            <div>
-                              <Date_Range_Field
-                                label="Date Range"
-                                ref={dateRangeRef}
-                              />
-                            </div>
-                            <div className="mt-4">
-                              <Checkbox_Field
-                                label="Is Draft?"
-                                name="terms"
-                                box_size={20}
-                                icon_size={12}
-                                //   checked={check}
-                                //   on_change={(e) => set_check(e.target.checked)}
-                              />
-                            </div>
+                  <div className="w-full mt-4 md:mt-0 md:w-[600px]">
+                    <div className="w-full flex items-center gap-2">
+                      <div className="w-full">
+                        <Icon_Field
+                          name="search"
+                          placeholder="Search..."
+                          icon={Search}
+                          icon_position="left"
+                          value={search_query}
+                          on_change={(e) => set_search_query(e.target.value)}
+                        />
+                      </div>
+                      <div className="relative" ref={filter_ref}>
+                        <Button
+                          variant="white"
+                          width="w-[100px]"
+                          icon={SlidersHorizontal}
+                          icon_position="left"
+                          // loading
+                          on_click={() => set_show_filter((prev) => !prev)}
+                        >
+                          Filter
+                        </Button>
 
-                            <div className="flex justify-end gap-2 mt-4">
-                              <Button
-                                size="sm"
-                                variant="primary"
-                                on_click={() => set_show_filter(false)}
-                              >
-                                Apply
-                              </Button>
-                              <Button
-                                size="sm"
-                                variant="secondary"
-                                on_click={() => set_show_filter(false)}
-                              >
-                                Cancel
-                              </Button>
+                        {/* Filter Popover */}
+                        {show_filter && (
+                          <React.Fragment>
+                            <div
+                              className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40"
+                              // onClick={() => set_show_filter(false)}
+                            ></div>
+                            <div className="absolute top-full mt-2 right-0 z-50 bg-white border rounded-lg shadow-md p-4 w-[260px]">
+                              <div>
+                                <Date_Range_Field
+                                  label="Date Range"
+                                  ref={dateRangeRef}
+                                />
+                              </div>
+                              <div className="mt-4">
+                                <Checkbox_Field
+                                  label="Is Draft?"
+                                  name="terms"
+                                  box_size={20}
+                                  icon_size={12}
+                                  //   checked={check}
+                                  //   on_change={(e) => set_check(e.target.checked)}
+                                />
+                              </div>
+
+                              <div className="flex justify-end gap-2 mt-4">
+                                <Button
+                                  size="sm"
+                                  variant="primary"
+                                  on_click={() => set_show_filter(false)}
+                                >
+                                  Apply
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  variant="secondary"
+                                  on_click={() => set_show_filter(false)}
+                                >
+                                  Cancel
+                                </Button>
+                              </div>
                             </div>
-                          </div>
-                        </React.Fragment>
-                      )}
+                          </React.Fragment>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
 
-              {/* Table */}
-              <div className="overflow-x-auto">
-                {loading ? (
-                  <div className="p-6 text-center text-gray-500 text-sm">
-                    Loading...
-                  </div>
-                ) : filtered_data.length === 0 ? (
-                  <div className="p-6 text-center text-gray-500 text-sm">
-                    No data found
-                  </div>
-                ) : (
-                  <table className="min-w-full">
-                    <thead className="bg-gray-100">
-                      <tr className="whitespace-nowrap">
-                        {columns.map((col, i) => {
-                          const renderHeaderCell = (col) => {
-                            const is_sorted = sort_by === col.key;
+                {/* Table */}
+                <div className="overflow-x-auto">
+                  {loading ? (
+                    <div className="p-6 text-center text-gray-500 text-sm">
+                      Loading...
+                    </div>
+                  ) : filtered_data.length === 0 ? (
+                    <div className="p-6 text-center text-gray-500 text-sm">
+                      No data found
+                    </div>
+                  ) : (
+                    <table className="min-w-full">
+                      <thead className="bg-gray-100">
+                        <tr className="whitespace-nowrap">
+                          {columns.map((col, i) => {
+                            const renderHeaderCell = (col) => {
+                              const is_sorted = sort_by === col.key;
 
+                              return (
+                                <div className="flex items-center justify-between w-full">
+                                  <span>{col.label}</span>
+                                  {col.sortable &&
+                                    is_sorted &&
+                                    (sort_order === "asc" ? (
+                                      <ChevronUp
+                                        size={14}
+                                        className="text-gray-500"
+                                      />
+                                    ) : (
+                                      <ChevronDown
+                                        size={14}
+                                        className="text-gray-500"
+                                      />
+                                    ))}
+                                </div>
+                              );
+                            };
                             return (
-                              <div className="flex items-center justify-between w-full">
-                                <span>{col.label}</span>
-                                {col.sortable &&
-                                  is_sorted &&
-                                  (sort_order === "asc" ? (
-                                    <ChevronUp
-                                      size={14}
-                                      className="text-gray-500"
-                                    />
-                                  ) : (
-                                    <ChevronDown
-                                      size={14}
-                                      className="text-gray-500"
-                                    />
-                                  ))}
-                              </div>
-                            );
-                          };
-                          return (
-                            <th
-                              key={col.key}
-                              onClick={() =>
-                                col.sortable && handle_sort(col.key)
-                              }
-                              className={`border px-4 py-3 text-left text-[12px] font-medium text-gray-700 ${
-                                col.sortable ? "cursor-pointer select-none" : ""
-                              } ${i === 0 ? "border-l-0" : ""} ${
-                                i === columns.length - 1 ? "border-r-0" : ""
-                              }`}
-                            >
-                              {renderHeaderCell(col)}
-                            </th>
-                          );
-                        })}
-                      </tr>
-                    </thead>
-                    <tbody className="bg-white">
-                      {filtered_data.map((row, idx) => {
-                        // + Cell Renderer
-                        const render_cell = (col, row) => {
-                          const value = row[col.key];
-                          if (col.key === "actions") {
-                            return (
-                              <div className="flex gap-2">
-                                <div className="relative group flex jusity-center items-center">
-                                  <button
-                                    className="text-gray-500 hover:text-sky-600 text-[12px] outline-none"
-                                    //   onClick={() => handle_fetch_admin(row.id)}
-                                  >
-                                    <View size={19} />
-                                  </button>
-                                  <span className="absolute bottom-full mb-1 left-1/2 transform -translate-x-1/2 px-2 py-1 text-xs text-white bg-sky-600 rounded opacity-0 group-hover:opacity-100 transition-opacity">
-                                    View Record
-                                  </span>
-                                </div>
-                                <div className="relative group flex jusity-center items-center">
-                                  <button
-                                    className="text-gray-500 hover:text-sky-600 text-[12px] outline-none"
-                                    //   onClick={() => handle_fetch_admin(row.id)}
-                                  >
-                                    <FileInput size={19} />
-                                  </button>
-                                  <span className="absolute bottom-full mb-1 left-1/2 transform -translate-x-1/2 px-2 py-1 text-xs text-white bg-sky-600 rounded opacity-0 group-hover:opacity-100 transition-opacity">
-                                    Post Record
-                                  </span>
-                                </div>
-                                <div className="relative group flex jusity-center items-center">
-                                  <button
-                                    className="text-gray-500 hover:text-sky-600 text-[12px] outline-none"
-                                    //   onClick={() => handle_fetch_admin(row.id)}
-                                  >
-                                    <Edit size={19} />
-                                  </button>
-                                  <span className="absolute bottom-full mb-1 left-1/2 transform -translate-x-1/2 px-2 py-1 text-xs text-white bg-sky-600 rounded opacity-0 group-hover:opacity-100 transition-opacity">
-                                    Edit Record
-                                  </span>
-                                </div>
-                                <div className="relative group flex jusity-center items-center">
-                                  <button
-                                    className="text-gray-500 hover:text-red-600 text-[12px] mb-[1px] outline-none"
-                                    //   onClick={() => handle_fetch_admin(row.id)}
-                                  >
-                                    <Trash size={19} />
-                                  </button>
-                                  <span className="absolute bottom-full mb-1 left-1/2 transform -translate-x-1/2 px-2 py-1 text-xs text-white bg-red-600 rounded opacity-0 group-hover:opacity-100 transition-opacity">
-                                    Delete Record
-                                  </span>
-                                </div>
-                              </div>
-                            );
-                          }
-
-                          return value; // Default render for all other fields
-                        };
-                        // - Cell Renderer
-
-                        return (
-                          <tr
-                            key={idx}
-                            className="hover:bg-gray-50 whitespace-nowrap"
-                          >
-                            {columns.map((col, i) => (
-                              <td
-                                key={i}
-                                className={`border px-4 py-4 text-[12px] text-gray-600 ${
-                                  i === 0 ? "border-l-0" : ""
-                                } ${
-                                  i === columns.length - 1
-                                    ? "border-r-0 text-left"
+                              <th
+                                key={col.key}
+                                onClick={() =>
+                                  col.sortable && handle_sort(col.key)
+                                }
+                                className={`border px-4 py-3 text-left text-[12px] font-medium text-gray-700 ${
+                                  col.sortable
+                                    ? "cursor-pointer select-none"
                                     : ""
+                                } ${i === 0 ? "border-l-0" : ""} ${
+                                  i === columns.length - 1 ? "border-r-0" : ""
                                 }`}
                               >
-                                {render_cell(col, row)}
-                              </td>
-                            ))}
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
+                                {renderHeaderCell(col)}
+                              </th>
+                            );
+                          })}
+                        </tr>
+                      </thead>
+                      <tbody className="bg-white">
+                        {filtered_data.map((row, idx) => {
+                          // + Cell Renderer
+                          const render_cell = (col, row) => {
+                            const value = row[col.key];
+                            if (col.key === "actions") {
+                              return (
+                                <div className="flex gap-2">
+                                  <div className="relative group flex jusity-center items-center">
+                                    <button
+                                      className="text-gray-500 hover:text-sky-600 text-[12px] outline-none"
+                                      onClick={() => handle_view_po(row.id)}
+                                    >
+                                      <View size={19} />
+                                    </button>
+                                    <span className="absolute bottom-full mb-1 left-1/2 transform -translate-x-1/2 px-2 py-1 text-xs text-white bg-sky-600 rounded opacity-0 group-hover:opacity-100 transition-opacity">
+                                      View Record
+                                    </span>
+                                  </div>
+                                  <div className="relative group flex jusity-center items-center">
+                                    <button
+                                      className="text-gray-500 hover:text-sky-600 text-[12px] outline-none"
+                                      onClick={() => handle_post_po(row.id)}
+                                    >
+                                      <FileInput size={19} />
+                                    </button>
+                                    <span className="absolute bottom-full mb-1 left-1/2 transform -translate-x-1/2 px-2 py-1 text-xs text-white bg-sky-600 rounded opacity-0 group-hover:opacity-100 transition-opacity">
+                                      Post Record
+                                    </span>
+                                  </div>
+                                  <div className="relative group flex jusity-center items-center">
+                                    <button
+                                      className="text-gray-500 hover:text-sky-600 text-[12px] outline-none"
+                                      onClick={() => handle_edit_po(row.id)}
+                                    >
+                                      <Edit size={19} />
+                                    </button>
+                                    <span className="absolute bottom-full mb-1 left-1/2 transform -translate-x-1/2 px-2 py-1 text-xs text-white bg-sky-600 rounded opacity-0 group-hover:opacity-100 transition-opacity">
+                                      Edit Record
+                                    </span>
+                                  </div>
+                                  <div className="relative group flex jusity-center items-center">
+                                    <button
+                                      className="text-gray-500 hover:text-red-600 text-[12px] mb-[1px] outline-none"
+                                      onClick={() => handle_delete_po(row.id)}
+                                    >
+                                      <Trash size={19} />
+                                    </button>
+                                    <span className="absolute bottom-full mb-1 left-1/2 transform -translate-x-1/2 px-2 py-1 text-xs text-white bg-red-600 rounded opacity-0 group-hover:opacity-100 transition-opacity">
+                                      Delete Record
+                                    </span>
+                                  </div>
+                                </div>
+                              );
+                            }
+
+                            return value; // Default render for all other fields
+                          };
+                          // - Cell Renderer
+
+                          return (
+                            <tr
+                              key={idx}
+                              className="hover:bg-gray-50 whitespace-nowrap"
+                            >
+                              {columns.map((col, i) => (
+                                <td
+                                  key={i}
+                                  className={`border px-4 py-4 text-[12px] text-gray-600 ${
+                                    i === 0 ? "border-l-0" : ""
+                                  } ${
+                                    i === columns.length - 1
+                                      ? "border-r-0 text-left"
+                                      : ""
+                                  }`}
+                                >
+                                  {render_cell(col, row)}
+                                </td>
+                              ))}
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  )}
+                </div>
+
+                {total_pages > 0 && (
+                  <Pagination
+                    current_page={current_page}
+                    total_pages={total_pages}
+                    on_page_change={handle_page_change}
+                    variant="compact"
+                  />
                 )}
               </div>
-
-              {total_pages > 0 && (
-                <Pagination
-                  current_page={current_page}
-                  total_pages={total_pages}
-                  on_page_change={handle_page_change}
-                  variant="compact"
-                />
-              )}
             </div>
           </div>
         </div>
-      </div>
-      {/* <Add_Admin
+        {/* <Add_Admin
         is_open={display_modal === "add_admin"}
         on_close={() => set_display_modal("")}
         width="max-w-[820px]"
@@ -525,6 +555,28 @@ const Purchase_Order = () => {
         width="max-w-[820px]"
         delete_data={delete_data}
       /> */}
+      </React.Fragment>
+    );
+  };
+  // - PO Main
+  // RETURN ORIGIN
+  return (
+    <React.Fragment>
+      {page === "main" && <PO_Main />}
+      {page === "po_creation" && <Create_New_PO set_page={set_page} />}
+      {page === "edit_po" && <Edit_PO set_page={set_page} />}
+      {page === "post_po" && <Edit_PO set_page={set_page} />}
+      <Post_View_PO
+        is_open={display_modal === "view_po" || display_modal === "post_po"}
+        for_posting={for_posting}
+        on_close={() => set_display_modal("")}
+        width="max-w-[1280px]"
+      />
+      <Delete_PO
+        is_open={display_modal === "delete_po"}
+        on_close={() => set_display_modal("")}
+        width="max-w-[1280px]"
+      />
     </React.Fragment>
   );
 };

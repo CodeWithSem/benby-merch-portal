@@ -28,7 +28,7 @@ const Checkbox_Field = ({
           }
         }}
         style={{ width: box_size, height: box_size }}
-        className={`flex items-center justify-center cursor-pointer border rounded select-none transition-colors duration-200
+        className={`flex items-center justify-center cursor-pointer border rounded select-none transition-colors duration-200 outline-none
           ${
             disabled
               ? "bg-gray-100 border-gray-200 cursor-not-allowed"

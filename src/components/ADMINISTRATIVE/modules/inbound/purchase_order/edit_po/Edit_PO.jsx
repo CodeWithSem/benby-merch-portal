@@ -18,14 +18,9 @@ import PO_Status from "./po_details/PO_Status";
 import Shipment from "./po_details/Shipment";
 import Approval from "./po_details/Approval";
 import PO_Items from "./po_items/PO_Items";
-import Select_Vendor from "./modals/Select_Vendor";
-import Select_Branch from "./modals/Select_Branch";
-import Select_Plant from "./modals/Select_Plant";
-import Select_SLOC from "./modals/Select_SLOC";
 
-const Create_New_PO = ({ set_page }) => {
+const Edit_PO = ({ set_page }) => {
   const [active_tab, set_active_tab] = useState("delivery");
-  const [display_modal, set_display_modal] = useState("");
   return (
     <React.Fragment>
       <div className="w-full">
@@ -58,7 +53,7 @@ const Create_New_PO = ({ set_page }) => {
               </li>
               <li className="flex items-center gap-1.5 text-sm text-gray-500">
                 <span>/</span>
-                <span className="text-gray-800">Create New PO</span>
+                <span className="text-gray-800">Edit PO</span>
               </li>
             </ol>
           </nav>
@@ -75,7 +70,7 @@ const Create_New_PO = ({ set_page }) => {
                 on_click={() => set_page("main")}
               ></Button>
               {/* <ChevronLeft className="text-gray-500" size={24} /> */}
-              <h1 className="text-lg">Purchase Order Creation</h1>
+              <h1 className="text-lg">Edit Purchase Order</h1>
             </div>
 
             <div className="flex gap-2">
@@ -109,7 +104,7 @@ const Create_New_PO = ({ set_page }) => {
                     <Text_Field
                       label="PO Number"
                       type={"text"}
-                      value={"AUTO GENERATED"}
+                      // value={"AUTO GENERATED"}
                       // on_change={handle_text_change}
                       pattern="[A-Za-z]{1,}"
                       bg_color="slate-50"
@@ -137,7 +132,6 @@ const Create_New_PO = ({ set_page }) => {
                       // on_text_change={handle_change}
                       code_width="150px"
                       show_search_button={true}
-                      on_click={() => set_display_modal("select_vendor")}
                       disabled
                     />
                   </div>
@@ -150,7 +144,6 @@ const Create_New_PO = ({ set_page }) => {
                       // on_text_change={handle_change}
                       code_width="150px"
                       show_search_button={true}
-                      on_click={() => set_display_modal("select_branch")}
                       disabled
                     />
                   </div>
@@ -163,7 +156,6 @@ const Create_New_PO = ({ set_page }) => {
                       // on_text_change={handle_change}
                       code_width="150px"
                       show_search_button={true}
-                      on_click={() => set_display_modal("select_plant")}
                       disabled
                     />
                   </div>
@@ -176,7 +168,6 @@ const Create_New_PO = ({ set_page }) => {
                       // on_text_change={handle_change}
                       code_width="150px"
                       show_search_button={true}
-                      on_click={() => set_display_modal("select_sloc")}
                       disabled
                     />
                   </div>
@@ -297,32 +288,8 @@ const Create_New_PO = ({ set_page }) => {
           </div>
         </div>
       </div>
-      <Select_Vendor
-        is_open={display_modal === "select_vendor"}
-        on_close={() => set_display_modal("")}
-        width="max-w-[1000px]"
-        height="max-h-[700px]"
-      />
-      <Select_Branch
-        is_open={display_modal === "select_branch"}
-        on_close={() => set_display_modal("")}
-        width="max-w-[1000px]"
-        height="max-h-[700px]"
-      />
-      <Select_Plant
-        is_open={display_modal === "select_plant"}
-        on_close={() => set_display_modal("")}
-        width="max-w-[1000px]"
-        height="max-h-[700px]"
-      />
-      <Select_SLOC
-        is_open={display_modal === "select_sloc"}
-        on_close={() => set_display_modal("")}
-        width="max-w-[1000px]"
-        height="max-h-[700px]"
-      />
     </React.Fragment>
   );
 };
 
-export default Create_New_PO;
+export default Edit_PO;
