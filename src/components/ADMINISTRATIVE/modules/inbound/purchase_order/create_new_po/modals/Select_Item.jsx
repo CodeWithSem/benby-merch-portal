@@ -4,74 +4,114 @@ import Icon_Field from "assets/elements/Icon_Field";
 import Checkbox_Field from "assets/elements/Checkbox_Field";
 import Button from "assets/elements/Button";
 import Pagination_Modal from "assets/elements/Pagination_Modal";
+import { format_currency, format_percentage } from "assets/scripts/format";
 
-const Select_Branch = ({
+const Select_Item = ({
   is_open,
   on_close,
   width = "max-w-[700px]",
   height = "h-[500px]",
 }) => {
   // --- Mock Data (replace later with API call if needed)
-  const [all_branch, set_all_branch] = useState([
+  const [all_item, set_all_item] = useState([
     {
-      id: "BR-0001",
-      description: "Branch Description 1",
+      id: "00000001",
+      description: "Item Description 1",
+      unit_price: 0,
       creation_date: "10/08/2025 12:00:00",
     },
     {
-      id: "BR-0002",
-      description: "Branch Description 2",
+      id: "00000002",
+      description: "Item Description 2",
+      unit_price: 0,
       creation_date: "10/08/2025 12:00:00",
     },
     {
-      id: "BR-0003",
-      description: "Branch Description 3",
+      id: "00000003",
+      description: "Item Description 3",
+      unit_price: 0,
       creation_date: "10/09/2025 12:00:00",
+    },
+    {
+      id: "00000004",
+      description: "Item Description 4",
+      unit_price: 0,
+      creation_date: "10/09/2025 12:00:00",
+    },
+    {
+      id: "00000005",
+      description: "Item Description 5",
+      unit_price: 0,
+      creation_date: "10/10/2025 12:00:00",
+    },
+    {
+      id: "00000006",
+      description: "Item Description 6",
+      unit_price: 0,
+      creation_date: "10/11/2025 12:00:00",
+    },
+    {
+      id: "00000007",
+      description: "Item Description 7",
+      unit_price: 0,
+      creation_date: "10/11/2025 12:00:00",
+    },
+    {
+      id: "00000008",
+      description: "Item Description 8",
+      unit_price: 0,
+      creation_date: "10/11/2025 12:00:00",
+    },
+    {
+      id: "00000009",
+      description: "Item Description 9",
+      unit_price: 0,
+      creation_date: "10/11/2025 12:00:00",
     },
   ]);
 
   // --- States ---
-  const [filtered_branches, set_filtered_branches] = useState([]);
+  const [filtered_item, set_filtered_item] = useState([]);
   const [current_page, set_current_page] = useState(1);
   const [rows_per_page, set_rows_per_page] = useState(5);
   const [search_query, set_search_query] = useState("");
-  const [selected_branch, set_selected_branch] = useState(null);
+  const [selected_item, set_selected_item] = useState(null);
 
   // --- Pagination + Filtering Logic ---
   useEffect(() => {
-    let data = [...all_branch];
+    let data = [...all_item];
 
     if (search_query.trim() !== "") {
       const q = search_query.toLowerCase();
       data = data.filter(
-        (branch) =>
-          branch.id.toLowerCase().includes(q) ||
-          branch.description.toLowerCase().includes(q)
+        (item) =>
+          item.id.toLowerCase().includes(q) ||
+          item.description.toLowerCase().includes(q)
       );
     }
 
     const start_idx = (current_page - 1) * rows_per_page;
     const end_idx = start_idx + rows_per_page;
-    set_filtered_branches(data.slice(start_idx, end_idx));
-  }, [all_branch, search_query, current_page, rows_per_page]);
+    set_filtered_item(data.slice(start_idx, end_idx));
+  }, [all_item, search_query, current_page, rows_per_page]);
 
   const total_pages = Math.ceil(
-    all_branch.filter(
-      (branch) =>
-        branch.id.toLowerCase().includes(search_query.toLowerCase()) ||
-        branch.description.toLowerCase().includes(search_query.toLowerCase())
+    all_item.filter(
+      (item) =>
+        item.id.toLowerCase().includes(search_query.toLowerCase()) ||
+        item.description.toLowerCase().includes(search_query.toLowerCase())
     ).length / rows_per_page
   );
 
   // --- Handlers ---
   const handle_page_change = (page) => set_current_page(page);
 
-  const handle_select_branch = () => {
-    if (!selected_branch) {
-      alert("Please select a branch before proceeding.");
+  const handle_select_item = () => {
+    if (!selected_item) {
+      alert("Please select a item before proceeding.");
       return;
     }
-    alert(`Selected: ${selected_branch.description}`);
+    alert(`Selected: ${selected_item.description}`);
   };
 
   return is_open ? (
@@ -94,7 +134,7 @@ const Select_Branch = ({
 
           {/* + Modal Label */}
           <div className="text-lg md:text-xl font-bold mb-5">
-            Branch Selection
+            Item Selection
           </div>
           {/* - Modal Label */}
 
@@ -103,7 +143,7 @@ const Select_Branch = ({
             <div className="overflow-hidden rounded-lg border border-gray-200 bg-white pt-4">
               <div className="flex flex-col gap-5 px-6 mb-4 sm:flex-row sm:items-center sm:justify-between">
                 <h3 className="font-semibold text-gray-800 whitespace-nowrap">
-                  List of Branches
+                  List of Items
                 </h3>
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center md:w-[500px]">
                   <div className="w-full">
@@ -129,7 +169,10 @@ const Select_Branch = ({
                     <tr className="font-semibold text-xs">
                       <th className="px-6 py-3 w-[80px]"></th>
                       <th className="px-6 py-3 text-gray-500 text-left">
-                        Branch
+                        Item
+                      </th>
+                      <th className="px-6 py-3 text-gray-500 text-left">
+                        Unit Price
                       </th>
                       <th className="px-6 py-3 text-gray-500 text-left">
                         Creation Date
@@ -138,45 +181,48 @@ const Select_Branch = ({
                   </thead>
 
                   <tbody className="divide-y divide-gray-100">
-                    {filtered_branches.length === 0 ? (
+                    {filtered_item.length === 0 ? (
                       <tr>
                         <td
                           colSpan={3}
                           className="text-center py-6 text-gray-500 text-sm"
                         >
-                          No branches found.
+                          No SLOC found.
                         </td>
                       </tr>
                     ) : (
-                      filtered_branches.map((branch) => (
+                      filtered_item.map((item) => (
                         <tr
-                          key={branch.id}
+                          key={item.id}
                           className={`hover:bg-sky-50/50 cursor-pointer ${
-                            selected_branch?.id === branch.id ? "bg-sky-50" : ""
+                            selected_item?.id === item.id ? "bg-sky-50" : ""
                           }`}
-                          onClick={() => set_selected_branch(branch)}
+                          onClick={() => set_selected_item(item)}
                         >
                           <td className="px-5 py-4 sm:px-6 text-center">
                             <Checkbox_Field
                               name="check"
                               box_size={18}
                               icon_size={12}
-                              checked={selected_branch?.id === branch.id}
-                              on_change={() => set_selected_branch(branch)}
+                              checked={selected_item?.id === item.id}
+                              on_change={() => set_selected_item(item)}
                             />
                           </td>
                           <td className="px-5 py-4 sm:px-6">
                             <div className="block font-medium text-gray-800 text-sm">
                               <span className="block text-gray-500 text-xs">
-                                {branch.id}
+                                {item.id}
                               </span>
                               <span className="block text-gray-800 text-sm">
-                                {branch.description}
+                                {item.description}
                               </span>
                             </div>
                           </td>
                           <td className="px-6 py-3 text-gray-700 text-xs tracking-wide">
-                            {branch.creation_date}
+                            {format_currency(item.unit_price, 2, true)}
+                          </td>
+                          <td className="px-6 py-3 text-gray-700 text-xs tracking-wide">
+                            {item.creation_date}
                           </td>
                         </tr>
                       ))
@@ -205,7 +251,7 @@ const Select_Branch = ({
             <div className="flex justify-center sm:justify-end gap-2 w-full">
               <Button
                 variant="primary"
-                on_click={handle_select_branch}
+                on_click={handle_select_item}
                 class_name="w-full md:w-[100px]"
               >
                 Proceed
@@ -226,4 +272,4 @@ const Select_Branch = ({
   ) : null;
 };
 
-export default Select_Branch;
+export default Select_Item;

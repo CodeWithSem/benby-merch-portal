@@ -50,7 +50,7 @@ const Select_SLOC = ({
   const [current_page, set_current_page] = useState(1);
   const [rows_per_page, set_rows_per_page] = useState(5);
   const [search_query, set_search_query] = useState("");
-  const [selected_plant, set_selected_plant] = useState(null);
+  const [selected_sloc, set_selected_sloc] = useState(null);
 
   // --- Pagination + Filtering Logic ---
   useEffect(() => {
@@ -59,9 +59,9 @@ const Select_SLOC = ({
     if (search_query.trim() !== "") {
       const q = search_query.toLowerCase();
       data = data.filter(
-        (plant) =>
-          plant.id.toLowerCase().includes(q) ||
-          plant.description.toLowerCase().includes(q)
+        (sloc) =>
+          sloc.id.toLowerCase().includes(q) ||
+          sloc.description.toLowerCase().includes(q)
       );
     }
 
@@ -72,21 +72,21 @@ const Select_SLOC = ({
 
   const total_pages = Math.ceil(
     all_sloc.filter(
-      (plant) =>
-        plant.id.toLowerCase().includes(search_query.toLowerCase()) ||
-        plant.description.toLowerCase().includes(search_query.toLowerCase())
+      (sloc) =>
+        sloc.id.toLowerCase().includes(search_query.toLowerCase()) ||
+        sloc.description.toLowerCase().includes(search_query.toLowerCase())
     ).length / rows_per_page
   );
 
   // --- Handlers ---
   const handle_page_change = (page) => set_current_page(page);
 
-  const handle_select_plant = () => {
-    if (!selected_plant) {
-      alert("Please select a plant before proceeding.");
+  const handle_select_sloc = () => {
+    if (!selected_sloc) {
+      alert("Please select a sloc before proceeding.");
       return;
     }
-    alert(`Vendor Selected: ${selected_plant.description}`);
+    alert(`Selected: ${selected_sloc.description}`);
   };
 
   return is_open ? (
@@ -163,35 +163,35 @@ const Select_SLOC = ({
                         </td>
                       </tr>
                     ) : (
-                      filtered_sloc.map((plant) => (
+                      filtered_sloc.map((sloc) => (
                         <tr
-                          key={plant.id}
+                          key={sloc.id}
                           className={`hover:bg-sky-50/50 cursor-pointer ${
-                            selected_plant?.id === plant.id ? "bg-sky-50" : ""
+                            selected_sloc?.id === sloc.id ? "bg-sky-50" : ""
                           }`}
-                          onClick={() => set_selected_plant(plant)}
+                          onClick={() => set_selected_sloc(sloc)}
                         >
                           <td className="px-5 py-4 sm:px-6 text-center">
                             <Checkbox_Field
                               name="check"
                               box_size={18}
                               icon_size={12}
-                              checked={selected_plant?.id === plant.id}
-                              on_change={() => set_selected_plant(plant)}
+                              checked={selected_sloc?.id === sloc.id}
+                              on_change={() => set_selected_sloc(sloc)}
                             />
                           </td>
                           <td className="px-5 py-4 sm:px-6">
                             <div className="block font-medium text-gray-800 text-sm">
                               <span className="block text-gray-500 text-xs">
-                                {plant.id}
+                                {sloc.id}
                               </span>
                               <span className="block text-gray-800 text-sm">
-                                {plant.description}
+                                {sloc.description}
                               </span>
                             </div>
                           </td>
                           <td className="px-6 py-3 text-gray-700 text-xs tracking-wide">
-                            {plant.creation_date}
+                            {sloc.creation_date}
                           </td>
                         </tr>
                       ))
@@ -220,7 +220,7 @@ const Select_SLOC = ({
             <div className="flex justify-center sm:justify-end gap-2 w-full">
               <Button
                 variant="primary"
-                on_click={handle_select_plant}
+                on_click={handle_select_sloc}
                 class_name="w-full md:w-[100px]"
               >
                 Proceed

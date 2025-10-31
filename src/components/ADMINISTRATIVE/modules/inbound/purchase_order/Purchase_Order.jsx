@@ -22,7 +22,8 @@ import Checkbox_Field from "assets/elements/Checkbox_Field";
 import Create_New_PO from "./create_new_po/Create_New_PO";
 import Post_View_PO from "./modals/post_view_po/Post_View_PO";
 import Edit_PO from "./edit_po/Edit_PO";
-import Delete_PO from "./modals/post_view_po/delete_po/Delete_PO";
+import Delete_PO from "./modals/delete_po/Delete_PO";
+import Select_PO_Type from "./modals/select_po_type/Select_PO_Type";
 
 const Purchase_Order = () => {
   const filter_ref = useRef(null);
@@ -58,7 +59,7 @@ const Purchase_Order = () => {
       po_type: "LFPO",
       company: "QS IT Services",
       creation_date: "10/29/2025 04:04:23 PM",
-      status: "Posted",
+      status: "Pending",
     },
   ]);
   const [filtered_data, set_filtered_data] = useState([]);
@@ -180,35 +181,15 @@ const Purchase_Order = () => {
   const handle_page_change = (page) => set_current_page(page);
 
   // + For Date Range Field
-  const dateRangeRef = useRef(null);
-
-  const [date_range_data, set_date_range_data] = useState({
-    start_date: "",
-    end_date: "",
-  });
-  const handleGetDate = () => {
-    if (dateRangeRef.current) {
-      const selectedDates = dateRangeRef.current.flatpickr.selectedDates;
-
-      set_date_range_data({
-        start_date: selectedDates[0] || "",
-        end_date: selectedDates[1] || "",
-      });
-    }
-  };
-
-  const formatDate = (date) => {
-    if (!date) return "";
-    const mm = String(date.getMonth() + 1).padStart(2, "0"); // months are 0-indexed
-    const dd = String(date.getDate()).padStart(2, "0");
-    const yyyy = date.getFullYear();
-    return `${mm}/${dd}/${yyyy}`;
-  };
-
+  const date_range_ref = useRef(null);
   // - For Date Range Field
 
   const handle_create_new_po = () => {
-    set_page("po_creation");
+    set_display_modal("select_po_type");
+  };
+
+  const handle_upload_po = () => {
+    alert("Under Maintenance");
   };
 
   const handle_view_po = () => {
@@ -273,7 +254,7 @@ const Purchase_Order = () => {
                   variant="primary"
                   icon={FileUp}
                   icon_position="left"
-                  //   on_click={() => set_display_modal("add_admin")}
+                  on_click={handle_upload_po}
                 >
                   Upload
                 </Button>
@@ -344,7 +325,7 @@ const Purchase_Order = () => {
                               <div>
                                 <Date_Range_Field
                                   label="Date Range"
-                                  ref={dateRangeRef}
+                                  ref={date_range_ref}
                                 />
                               </div>
                               <div className="mt-4">
@@ -355,6 +336,7 @@ const Purchase_Order = () => {
                                   icon_size={12}
                                   //   checked={check}
                                   //   on_change={(e) => set_check(e.target.checked)}
+                                  on_change={(e) => alert("Is Draft")}
                                 />
                               </div>
 
@@ -444,6 +426,19 @@ const Purchase_Order = () => {
                           // + Cell Renderer
                           const render_cell = (col, row) => {
                             const value = row[col.key];
+                            if (col.key === "status") {
+                              return (
+                                <span
+                                  className={`inline-flex items-center justify-center gap-1 rounded-full px-3 py-0.5 text-xs font-medium ${
+                                    row.status === "Posted"
+                                      ? "bg-green-100 text-green-500"
+                                      : "bg-yellow-100 text-yellow-600"
+                                  }`}
+                                >
+                                  {row.status}
+                                </span>
+                              );
+                            }
                             if (col.key === "actions") {
                               return (
                                 <div className="flex gap-2">
@@ -566,6 +561,13 @@ const Purchase_Order = () => {
       {page === "po_creation" && <Create_New_PO set_page={set_page} />}
       {page === "edit_po" && <Edit_PO set_page={set_page} />}
       {page === "post_po" && <Edit_PO set_page={set_page} />}
+      <Select_PO_Type
+        is_open={display_modal === "select_po_type"}
+        on_close={() => set_display_modal("")}
+        width="max-w-[1280px]"
+        height="max-h-[700px]"
+        set_page={set_page}
+      />
       <Post_View_PO
         is_open={display_modal === "view_po" || display_modal === "post_po"}
         for_posting={for_posting}

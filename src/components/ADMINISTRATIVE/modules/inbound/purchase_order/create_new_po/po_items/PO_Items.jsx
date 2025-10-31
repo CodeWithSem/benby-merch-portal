@@ -1,15 +1,49 @@
 import React, { useState } from "react";
 import Text_Field from "assets/elements/Text_Field";
 import Select_Field from "assets/elements/Select_Field";
-import { Info, ScanEye, Search, SquarePen, Trash2 } from "lucide-react";
+import { FileText, Info, Search, SquarePen, Trash2 } from "lucide-react";
 import Icon_Field from "assets/elements/Icon_Field";
 import Quantity_Field from "assets/elements/Quantity_Field";
 import Find_Field from "assets/elements/Find_Field";
+import Show_Item_Details from "./modals/Show_Item_Details";
+import { format_currency, format_percentage } from "assets/scripts/format";
+import Edit_Item from "./modals/Edit_Item";
 
-const PO_Items = () => {
+const PO_Items = ({ set_display_modal }) => {
+  const [display_item_modal, set_display_item_modal] = useState("");
   // + For Quantity Field
   const [quantity, set_quantity] = useState(1);
   // - For Quantity Field
+  const items = [
+    {
+      id: 1,
+      item_code: "00000001",
+      name: 'Macbook Pro 13"',
+      quantity: 5,
+      unit_price: 100000,
+      discount: 0,
+      total: 500000,
+    },
+    {
+      id: 2,
+      item_code: "00000002",
+      name: "iPhone 15 Pro Max",
+      quantity: 1,
+      unit_price: 60000,
+      discount: 0,
+      total: 60000,
+    },
+  ];
+  const handle_add_item = () => {
+    alert("Under Maintenance");
+  };
+  const handle_show_details = () => {
+    set_display_item_modal("show_details");
+  };
+  const handle_edit_item = () => {
+    set_display_item_modal("edit_item");
+  };
+  // RETURN ORIGIN
   return (
     <React.Fragment>
       {/* + Item Section */}
@@ -54,76 +88,69 @@ const PO_Items = () => {
                   <th className="px-5 py-4 font-semibold whitespace-nowrap text-gray-700 dark:text-gray-400">
                     Total
                   </th>
-                  <th className="relative px-5 py-4 whitespace-nowrap text-gray-700 dark:text-gray-400"></th>
+                  <th className="px-5 py-4 whitespace-nowrap text-gray-700 dark:text-gray-400"></th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100 bg-white dark:divide-gray-800 dark:bg-white/[0.03]">
-                <tr className="text-sm">
-                  <td className="px-5 py-4 whitespace-nowrap text-gray-500 dark:text-gray-400">
-                    1
-                  </td>
-                  <td className="px-5 py-4 font-medium whitespace-nowrap text-gray-800 dark:text-white/90">
-                    Macbook pro 13"
-                  </td>
-                  <td className="px-5 py-4 whitespace-nowrap text-gray-500 dark:text-gray-400">
-                    5
-                  </td>
-                  <td className="px-5 py-4 whitespace-nowrap text-gray-500 dark:text-gray-400">
-                    P 100,000.00
-                  </td>
-                  <td className="px-5 py-4 whitespace-nowrap text-gray-500 dark:text-gray-400">
-                    0%
-                  </td>
-                  <td className="px-5 py-4 whitespace-nowrap text-gray-500 dark:text-gray-400">
-                    P 500,000.00
-                  </td>
-                  <td className="px-5 py-4 whitespace-nowrap text-gray-500 dark:text-gray-400">
-                    <div className="flex items-center justify-center gap-2">
-                      <div className="flex items-center justify-center hover:text-sky-500 cursor-pointer">
-                        <ScanEye size={20} />
+                {items.map((item, index) => (
+                  <tr key={item.id} className="text-sm">
+                    <td className="px-5 py-4 whitespace-nowrap text-gray-500 dark:text-gray-400">
+                      {index + 1}
+                    </td>
+                    <td className="px-5 py-4 font-medium whitespace-nowrap text-gray-800 dark:text-white/90">
+                      {item.name}
+                    </td>
+                    <td className="px-5 py-4 whitespace-nowrap text-gray-500 dark:text-gray-400">
+                      {item.quantity}
+                    </td>
+                    <td className="px-5 py-4 whitespace-nowrap text-gray-500 dark:text-gray-400">
+                      {format_currency(item.unit_price, 2, true)}
+                    </td>
+                    <td className="px-5 py-4 whitespace-nowrap text-gray-500 dark:text-gray-400">
+                      {format_percentage(item.discount, 0)}
+                    </td>
+                    <td className="px-5 py-4 whitespace-nowrap text-gray-500 dark:text-gray-400">
+                      {format_currency(item.total, 2, true)}
+                    </td>
+                    <td className="px-5 py-4 whitespace-nowrap text-gray-500 dark:text-gray-400">
+                      <div className="flex gap-2">
+                        <div className="relative group flex justify-center items-center">
+                          <button
+                            className="text-gray-500 hover:text-sky-600 text-[12px] outline-none"
+                            onClick={() => handle_show_details(item)}
+                          >
+                            <FileText size={20} />
+                          </button>
+                          <span className="absolute bottom-full mb-1 left-1/2 transform -translate-x-1/2 px-2 py-1 text-xs text-white bg-sky-600 rounded opacity-0 group-hover:opacity-100 transition-opacity">
+                            Show Details
+                          </span>
+                        </div>
+                        <div className="relative group flex justify-center items-center">
+                          <button
+                            className="text-gray-500 hover:text-sky-600 text-[12px] outline-none"
+                            onClick={() => handle_edit_item(item)}
+                          >
+                            <SquarePen size={20} />
+                          </button>
+                          <span className="absolute bottom-full mb-1 left-1/2 transform -translate-x-1/2 px-2 py-1 text-xs text-white bg-sky-600 rounded opacity-0 group-hover:opacity-100 transition-opacity">
+                            Edit Item
+                          </span>
+                        </div>
+                        <div className="relative group flex justify-center items-center">
+                          <button
+                            className="text-gray-500 hover:text-red-600 text-[12px] mb-[1px] outline-none"
+                            // onClick={() => handleDeleteItem(item)}
+                          >
+                            <Trash2 size={20} />
+                          </button>
+                          <span className="absolute bottom-full mb-1 left-1/2 transform -translate-x-1/2 px-2 py-1 text-xs text-white bg-red-600 rounded opacity-0 group-hover:opacity-100 transition-opacity">
+                            Delete Item
+                          </span>
+                        </div>
                       </div>
-                      <div className="flex items-center justify-center hover:text-sky-500 cursor-pointer">
-                        <SquarePen size={20} />
-                      </div>
-                      <div className="flex items-center justify-center hover:text-red-500 cursor-pointer pb-[1px]">
-                        <Trash2 size={20} />
-                      </div>
-                    </div>
-                  </td>
-                </tr>
-                <tr className="text-sm">
-                  <td className="px-5 py-4 whitespace-nowrap text-gray-500 dark:text-gray-400">
-                    2
-                  </td>
-                  <td className="px-5 py-4 font-medium whitespace-nowrap text-gray-800 dark:text-white/90">
-                    iPhone 15 Pro max
-                  </td>
-                  <td className="px-5 py-4 whitespace-nowrap text-gray-500 dark:text-gray-400">
-                    1
-                  </td>
-                  <td className="px-5 py-4 whitespace-nowrap text-gray-500 dark:text-gray-400">
-                    P 60,000.00
-                  </td>
-                  <td className="px-5 py-4 whitespace-nowrap text-gray-500 dark:text-gray-400">
-                    0%
-                  </td>
-                  <td className="px-5 py-4 whitespace-nowrap text-gray-500 dark:text-gray-400">
-                    P 60,000.00
-                  </td>
-                  <td className="px-5 py-4 whitespace-nowrap text-gray-500 dark:text-gray-400">
-                    <div className="flex items-center justify-center gap-2">
-                      <div className="flex items-center justify-center hover:text-sky-500 cursor-pointer">
-                        <ScanEye size={20} />
-                      </div>
-                      <div className="flex items-center justify-center hover:text-sky-500 cursor-pointer">
-                        <SquarePen size={20} />
-                      </div>
-                      <div className="flex items-center justify-center hover:text-red-500 cursor-pointer pb-[1px]">
-                        <Trash2 size={20} />
-                      </div>
-                    </div>
-                  </td>
-                </tr>
+                    </td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>
@@ -146,13 +173,13 @@ const PO_Items = () => {
                 name="item_name"
                 // value={search_value}
                 // on_change={handle_change}
-                // on_find={handle_find}
+                on_find={() => set_display_modal("select_item")}
                 disabled
               />
             </div>
             <div className="w-full lg:col-span-4">
               <Text_Field
-                label="Price"
+                label="Unit Price"
                 type={"text"}
                 // value={text}
                 // on_change={handle_text_change}
@@ -190,7 +217,10 @@ const PO_Items = () => {
               />
             </div>
             <div className="flex w-full items-end pb-[1px] lg:col-span-2">
-              <button className="w-full h-[37px] bg-sky-600 text-white text-sm rounded-md hover:bg-sky-700 focus:ring-sky-500 disabled:bg-sky-300 disabled:cursor-not-allowed">
+              <button
+                className="w-full h-[37px] bg-sky-600 text-white text-sm rounded-md hover:bg-sky-700 focus:ring-sky-500 disabled:bg-sky-300 disabled:cursor-not-allowed outline-none"
+                onClick={handle_add_item}
+              >
                 Add Item
               </button>
             </div>
@@ -238,6 +268,16 @@ const PO_Items = () => {
         </div>
       </div>
       {/* - Item Section */}
+      <Show_Item_Details
+        is_open={display_item_modal === "show_details"}
+        on_close={() => set_display_item_modal("")}
+        width="max-w-[1280px]"
+      />
+      <Edit_Item
+        is_open={display_item_modal === "edit_item"}
+        on_close={() => set_display_item_modal("")}
+        width="max-w-[1280px]"
+      />
     </React.Fragment>
   );
 };

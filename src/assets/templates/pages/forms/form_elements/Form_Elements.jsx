@@ -19,6 +19,7 @@ import Find_Field from "assets/elements/Find_Field";
 import Verify_Field from "assets/elements/Verify_Field";
 import Quantity_Field from "assets/elements/Quantity_Field";
 import Text_Code_Field from "assets/elements/Text_Code_Field";
+import Text_Field_Adorn from "assets/elements/Text_Field_Adorn";
 
 const Form_Elements = () => {
   // + For Input Field (Text)
@@ -458,6 +459,16 @@ const Form_Elements = () => {
                 on_find={handleFind}
                 on_verify={handleVerify}
                 verify_status={verifyStatus}
+              />
+            </div>
+            <div className="w-full mt-5">
+              <Text_Field_Adorn
+                label="Price"
+                // value={1000}
+                // on_change={(e) => setPrice(e.target.value)}
+                placeholder="Enter unit price"
+                adornment="KG"
+                adornment_position="right"
               />
             </div>
             {/* <div className="w-full mt-5">

@@ -86,7 +86,7 @@ const Select_Plant = ({
       alert("Please select a plant before proceeding.");
       return;
     }
-    alert(`Vendor Selected: ${selected_plant.description}`);
+    alert(`Selected: ${selected_plant.description}`);
   };
 
   return is_open ? (

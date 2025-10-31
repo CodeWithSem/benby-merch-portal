@@ -43,7 +43,7 @@ const Sidebar = ({
       icon: <PackagePlus size={18} />,
       sub_items: [
         "Purchase Order",
-        "Goods Receive",
+        "Goods Receipt",
         "Batch",
         "Inbound History",
       ],
@@ -53,12 +53,7 @@ const Sidebar = ({
       type: "dropdown",
       name: "Outbound",
       icon: <PackageMinus size={18} />,
-      sub_items: [
-        // "Purchase Order",
-        // "Goods Receive",
-        // "Batch",
-        // "Inbound History",
-      ],
+      sub_items: [],
     },
     {
       key: "Warehouse",
@@ -79,13 +74,19 @@ const Sidebar = ({
       icon: <Settings size={18} />,
       sub_items: ["General Structure", "Financial", "Vendor", "Purchase Order"],
     },
-    {
-      key: "Templates",
-      type: "dropdown",
-      name: "Templates",
-      icon: <Box size={18} />,
-      sub_items: ["Form Elements", "Tabs", "Create Invoice", "Basic Tables"],
-    },
+    // {
+    //   key: "Templates",
+    //   type: "dropdown",
+    //   name: "Templates",
+    //   icon: <Box size={18} />,
+    //   sub_items: [
+    //     "Form Elements",
+    //     "Tabs",
+    //     "Create Invoice",
+    //     "Basic Tables",
+    //     "Data Tables",
+    //   ],
+    // },
   ];
 
   const handle_item_click = (key) => set_active_item(key);

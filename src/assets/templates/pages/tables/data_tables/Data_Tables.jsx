@@ -16,7 +16,6 @@ import Select_Field from "../../../../elements/Select_Field";
 import Pagination from "../../../../elements/Pagination";
 import Button from "../../../../elements/Button";
 import Toggle_Switch from "../../../../elements/Toggle_Switch";
-import { useToast } from "../../../layout/Toast_Provider";
 
 const Data_Tables = () => {
   const [showFilter, setShowFilter] = useState(false);
@@ -150,8 +149,6 @@ const Data_Tables = () => {
     current_page * per_page
   );
 
-  const { show_toast } = useToast();
-
   const handle_show_toast = (type, title, message) => {
     const icon =
       type === "success" ? (
@@ -161,15 +158,6 @@ const Data_Tables = () => {
       ) : (
         <Info size={21} className="text-red-500" />
       );
-
-    show_toast({
-      type,
-      title,
-      message,
-      icon,
-      width: "270px",
-      position: "top-right",
-    });
   };
 
   // RETURN ORIGIN

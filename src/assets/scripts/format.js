@@ -13,3 +13,24 @@ export function format_date(date, format) {
     return `${month}/${day}/${year} ${hours}:${minutes}:${seconds}`;
   }
 }
+
+export function format_currency(
+  number,
+  decimals = 2,
+  show_symbol = true,
+  symbol = "₱"
+) {
+  const formatted = Number(number).toLocaleString("en-US", {
+    minimumFractionDigits: decimals,
+    maximumFractionDigits: decimals,
+  });
+  return show_symbol ? `${symbol} ${formatted}` : formatted;
+}
+
+export function format_percentage(number, decimals = 2) {
+  const formatted = Number(number).toLocaleString("en-US", {
+    minimumFractionDigits: decimals,
+    maximumFractionDigits: decimals,
+  });
+  return `${formatted} %`;
+}

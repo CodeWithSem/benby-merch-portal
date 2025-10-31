@@ -22,10 +22,24 @@ import Select_Vendor from "./modals/Select_Vendor";
 import Select_Branch from "./modals/Select_Branch";
 import Select_Plant from "./modals/Select_Plant";
 import Select_SLOC from "./modals/Select_SLOC";
+import Select_Item from "./modals/Select_Item";
 
 const Create_New_PO = ({ set_page }) => {
   const [active_tab, set_active_tab] = useState("delivery");
   const [display_modal, set_display_modal] = useState("");
+
+  const handle_preview = () => {
+    alert("Under Maintenance");
+  };
+
+  const handle_save_as_draft = () => {
+    alert("Under Maintenance");
+  };
+
+  const handle_save = () => {
+    alert("Under Maintenance");
+  };
+  // RETURN ORIGIN
   return (
     <React.Fragment>
       <div className="w-full">
@@ -263,7 +277,7 @@ const Create_New_PO = ({ set_page }) => {
               {/* - Tab Content */}
             </div>
           </div>
-          <PO_Items />
+          <PO_Items set_display_modal={set_display_modal} />
           <div className="p-4 sm:p-8 border-t">
             <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
               <Button
@@ -272,6 +286,7 @@ const Create_New_PO = ({ set_page }) => {
                 // width="w-[100px]"
                 icon={Eye}
                 icon_position="left"
+                on_click={handle_preview}
               >
                 Preview
               </Button>
@@ -281,6 +296,7 @@ const Create_New_PO = ({ set_page }) => {
                 // width="w-[100px]"
                 icon={SaveAll}
                 icon_position="left"
+                on_click={handle_save_as_draft}
               >
                 Save as Draft
               </Button>
@@ -290,6 +306,7 @@ const Create_New_PO = ({ set_page }) => {
                 // width="w-[100px]"
                 icon={Save}
                 icon_position="left"
+                on_click={handle_save}
               >
                 Save
               </Button>
@@ -317,6 +334,12 @@ const Create_New_PO = ({ set_page }) => {
       />
       <Select_SLOC
         is_open={display_modal === "select_sloc"}
+        on_close={() => set_display_modal("")}
+        width="max-w-[1000px]"
+        height="max-h-[700px]"
+      />
+      <Select_Item
+        is_open={display_modal === "select_item"}
         on_close={() => set_display_modal("")}
         width="max-w-[1000px]"
         height="max-h-[700px]"

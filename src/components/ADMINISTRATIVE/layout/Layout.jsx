@@ -8,6 +8,7 @@ import Purchase_Order from "../modules/inbound/purchase_order/Purchase_Order";
 import Tabs from "assets/templates/pages/ui_elements/tabs/Tabs";
 import Create_Invoice from "assets/templates/pages/templates/create_invoice/Create_Invoice";
 import Basic_Tables from "assets/templates/pages/tables/basic_tables/Basic_Tables";
+import Data_Tables from "assets/templates/pages/tables/data_tables/Data_Tables";
 
 const Layout = () => {
   const [active_item, set_active_item] = useState(() => {
@@ -60,6 +61,8 @@ const Layout = () => {
         return <Create_Invoice />;
       case "Templates-Basic Tables":
         return <Basic_Tables />;
+      case "Templates-Data Tables":
+        return <Data_Tables />;
     }
   };
 
