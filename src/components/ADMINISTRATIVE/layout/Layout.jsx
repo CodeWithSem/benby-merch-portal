@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import Sidebar from "./Sidebar";
 import Header from "./Header";
 import Dashboard from "../modules/dashboard/Dashboard";
-import Admin from "../modules/user_management/admin/Admin";
+import Admin from "../../AUTHENTICATION/user_management/admin/Admin";
 import Form_Elements from "assets/templates/pages/forms/form_elements/Form_Elements";
 import Purchase_Order from "../modules/inbound/purchase_order/Purchase_Order";
 import Tabs from "assets/templates/pages/ui_elements/tabs/Tabs";

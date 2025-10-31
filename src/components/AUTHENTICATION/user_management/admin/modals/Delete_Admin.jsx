@@ -1,82 +1,26 @@
-import React, { useState } from "react";
-import { registerUserByAdmin } from "../../../../../../api/firebase_auth_api";
+import React, { useEffect, useState } from "react";
+import { registerUserByAdmin } from "../../../../../api/firebase_auth_api";
 import { X } from "lucide-react";
 import Button from "assets/elements/Button";
 import Text_Field from "assets/elements/Text_Field";
 import Textarea_Field from "assets/elements/Textarea_Field";
 import Password_Field from "assets/elements/Password_Field";
 import Select_Field from "assets/elements/Select_Field";
-import { useToast } from "../../../../layout/Toast_Provider";
+import { useToast } from "../../../../ADMINISTRATIVE/layout/Toast_Provider";
 
-const Add_Admin = ({ is_open, on_close, width = "max-w-[700px]" }) => {
+const Delete_Admin = ({
+  is_open,
+  on_close,
+  width = "max-w-[700px]",
+  delete_data,
+}) => {
   const { show_toast } = useToast();
   const [loading, set_loading] = useState(false);
-  const [form_data, set_form_data] = useState({
-    first_name: "",
-    last_name: "",
-    user_code: "",
-    email: "",
-    password: "",
-    category: "",
-  });
+  const [form_data, set_form_data] = useState({});
 
-  // Generic change handler
-  const handle_change = (e) => {
-    const { name, value } = e.target;
-    set_form_data((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
-  const category_list = [
-    { label: "TDS", value: "TDS" },
-    { label: "Diser", value: "DISER" },
-    { label: "Supervisor", value: "SUPV" },
-  ];
-
-  const handle_proceed = async () => {
-    try {
-      set_loading(true);
-
-      // Call the admin registration API
-      const new_user = await registerUserByAdmin(
-        form_data.email,
-        form_data.password,
-        `${form_data.first_name} ${form_data.last_name}`, // display_name
-        form_data.first_name,
-        form_data.last_name,
-        form_data.user_code,
-        form_data.category
-      );
-
-      show_toast({
-        type: "success",
-        title: "User Created",
-        message: `${new_user.email} has been successfully added.`,
-      });
-
-      // Reset form or close modal
-      set_form_data({
-        first_name: "",
-        last_name: "",
-        user_code: "",
-        email: "",
-        password: "",
-        category: "",
-      });
-      on_close();
-    } catch (err) {
-      console.error(err);
-      show_toast({
-        type: "danger",
-        title: "Registration Failed",
-        message: err.message || "Something went wrong",
-      });
-    } finally {
-      set_loading(false);
-    }
-  };
+  useEffect(() => {
+    set_form_data(delete_data);
+  }, [is_open]);
 
   // RETURN ORIGIN
   return is_open ? (
@@ -107,9 +51,8 @@ const Add_Admin = ({ is_open, on_close, width = "max-w-[700px]" }) => {
                     label="First Name"
                     name="first_name"
                     type={"text"}
-                    placeholder="Enter first name"
                     value={form_data.first_name}
-                    on_change={handle_change}
+                    disabled
                   />
                 </div>
                 <div>
@@ -117,9 +60,8 @@ const Add_Admin = ({ is_open, on_close, width = "max-w-[700px]" }) => {
                     label="Last Name"
                     name="last_name"
                     type={"text"}
-                    placeholder="Enter last name"
                     value={form_data.last_name}
-                    on_change={handle_change}
+                    disabled
                   />
                 </div>
                 <div className="col-span-full">
@@ -127,19 +69,8 @@ const Add_Admin = ({ is_open, on_close, width = "max-w-[700px]" }) => {
                     label="Username"
                     name={"username"}
                     type={"text"}
-                    placeholder="Enter username"
                     value={form_data.username}
-                    on_change={handle_change}
-                  />
-                </div>
-                <div className="col-span-full">
-                  <Password_Field
-                    label="Password"
-                    name={"password"}
-                    type={"password"}
-                    placeholder="Enter your password"
-                    value={form_data.password}
-                    on_change={handle_change}
+                    disabled
                   />
                 </div>
                 <div className="col-span-full">
@@ -147,19 +78,17 @@ const Add_Admin = ({ is_open, on_close, width = "max-w-[700px]" }) => {
                     label="Email"
                     name={"email"}
                     type={"email"}
-                    placeholder="Info@gmail.com"
                     value={form_data.email}
-                    on_change={handle_change}
+                    disabled
                   />
                 </div>
                 <div className="col-span-full">
-                  <Select_Field
+                  <Text_Field
                     label="Category"
-                    name="category"
+                    name={"category"}
+                    type={"text"}
                     value={form_data.category}
-                    on_change={handle_change}
-                    options={category_list}
-                    placeholder="Select Category"
+                    disabled
                   />
                 </div>
               </div>
@@ -179,10 +108,10 @@ const Add_Admin = ({ is_open, on_close, width = "max-w-[700px]" }) => {
           <div className="flex justify-end gap-2 mt-5">
             <Button
               width="w-[100px]"
-              variant="primary"
-              on_click={handle_proceed}
+              variant="danger"
+              //   on_click={handle_proceed}
             >
-              Proceed
+              Delete
             </Button>
             <Button width="w-[100px]" variant="white" on_click={on_close}>
               Cancel
@@ -197,4 +126,4 @@ const Add_Admin = ({ is_open, on_close, width = "max-w-[700px]" }) => {
   ) : null;
 };
 
-export default Add_Admin;
+export default Delete_Admin;
