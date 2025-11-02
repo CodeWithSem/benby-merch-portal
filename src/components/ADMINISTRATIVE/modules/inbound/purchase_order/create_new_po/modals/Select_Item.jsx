@@ -123,7 +123,7 @@ const Select_Item = ({
 
         {/* + Modal Content */}
         <div
-          className={`relative bg-white rounded-lg shadow-xl ${width} w-full p-7 m-5 z-[99]`}
+          className={`relative bg-white rounded-lg shadow-xl ${width} w-full py-7 m-5 z-[99]`}
         >
           <button
             className="absolute top-5 right-5 p-2 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-400 hover:text-gray-500"
@@ -133,38 +133,33 @@ const Select_Item = ({
           </button>
 
           {/* + Modal Label */}
-          <div className="text-lg md:text-xl font-bold mb-5">
+          <div className="text-lg md:text-xl font-bold mb-5 px-7">
             Item Selection
           </div>
           {/* - Modal Label */}
 
           {/* + Modal Body */}
           <div className={`w-full overflow-y-auto ${height} scrollbar-custom`}>
-            <div className="overflow-hidden rounded-lg border border-gray-200 bg-white pt-4">
+            <div className="overflow-hidden border border-gray-200 bg-white pt-4">
               <div className="flex flex-col gap-5 px-6 mb-4 sm:flex-row sm:items-center sm:justify-between">
-                <h3 className="font-semibold text-gray-800 whitespace-nowrap">
-                  List of Items
-                </h3>
-                <div className="flex flex-col gap-3 sm:flex-row sm:items-center md:w-[500px]">
-                  <div className="w-full">
-                    <Icon_Field
-                      name="search"
-                      placeholder="Search..."
-                      icon={Search}
-                      icon_position="left"
-                      value={search_query}
-                      on_change={(e) => {
-                        set_search_query(e.target.value);
-                        set_current_page(1);
-                      }}
-                    />
-                  </div>
+                <div className="w-full">
+                  <Icon_Field
+                    name="search"
+                    placeholder="Search..."
+                    icon={Search}
+                    icon_position="left"
+                    value={search_query}
+                    on_change={(e) => {
+                      set_search_query(e.target.value);
+                      set_current_page(1);
+                    }}
+                  />
                 </div>
               </div>
 
               {/* Table */}
               <div className="max-w-full overflow-x-auto custom-scrollbar">
-                <table className="min-w-full">
+                <table className="min-w-full whitespace-nowrap">
                   <thead className="border-gray-100 border-y bg-gray-50">
                     <tr className="font-semibold text-xs">
                       <th className="px-6 py-3 w-[80px]"></th>
@@ -184,33 +179,35 @@ const Select_Item = ({
                     {filtered_item.length === 0 ? (
                       <tr>
                         <td
-                          colSpan={3}
+                          colSpan={4}
                           className="text-center py-6 text-gray-500 text-sm"
                         >
-                          No SLOC found.
+                          No data found
                         </td>
                       </tr>
                     ) : (
                       filtered_item.map((item) => (
                         <tr
                           key={item.id}
-                          className={`hover:bg-sky-50/50 cursor-pointer ${
+                          className={`hover:bg-sky-50/50 cursor-pointer text-[12px] ${
                             selected_item?.id === item.id ? "bg-sky-50" : ""
                           }`}
                           onClick={() => set_selected_item(item)}
                         >
                           <td className="px-5 py-4 sm:px-6 text-center">
-                            <Checkbox_Field
-                              name="check"
-                              box_size={18}
-                              icon_size={12}
-                              checked={selected_item?.id === item.id}
-                              on_change={() => set_selected_item(item)}
-                            />
+                            <div className="flex justify-center items-center">
+                              <Checkbox_Field
+                                name="check"
+                                box_size={18}
+                                icon_size={12}
+                                checked={selected_item?.id === item.id}
+                                on_change={() => set_selected_item(item)}
+                              />
+                            </div>
                           </td>
                           <td className="px-5 py-4 sm:px-6">
-                            <div className="block font-medium text-gray-800 text-sm">
-                              <span className="block text-gray-500 text-xs">
+                            <div className="block font-medium">
+                              <span className="block text-gray-500 text-[10px]">
                                 {item.id}
                               </span>
                               <span className="block text-gray-800 text-sm">
@@ -218,10 +215,10 @@ const Select_Item = ({
                               </span>
                             </div>
                           </td>
-                          <td className="px-6 py-3 text-gray-700 text-xs tracking-wide">
+                          <td className="px-6 py-3 text-gray-700 tracking-wide">
                             {format_currency(item.unit_price, 2, true)}
                           </td>
-                          <td className="px-6 py-3 text-gray-700 text-xs tracking-wide">
+                          <td className="px-6 py-3 text-gray-700 tracking-wide">
                             {item.creation_date}
                           </td>
                         </tr>
@@ -235,7 +232,7 @@ const Select_Item = ({
           {/* - Modal Body */}
 
           {/* + Modal Footer */}
-          <div className="flex flex-col items-center sm:flex-row sm:justify-between gap-3 mt-5">
+          <div className="flex flex-col items-center sm:flex-row sm:justify-between gap-3 mt-5 px-7">
             {/* Pagination */}
             {total_pages > 0 && (
               <div className="w-full sm:w-auto">
@@ -253,6 +250,7 @@ const Select_Item = ({
                 variant="primary"
                 on_click={handle_select_item}
                 class_name="w-full md:w-[100px]"
+                disabled={!selected_item}
               >
                 Proceed
               </Button>

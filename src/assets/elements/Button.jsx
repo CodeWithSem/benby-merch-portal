@@ -49,15 +49,15 @@ const Button = ({
 
   const variant_classes = {
     primary:
-      "bg-sky-600 text-white hover:bg-sky-700 focus:ring-sky-500 disabled:bg-sky-300 disabled:cursor-not-allowed",
+      "bg-sky-600 text-white hover:bg-sky-700 focus:ring-sky-500 disabled:bg-sky-300/50 disabled:cursor-not-allowed",
     secondary:
-      "bg-gray-100 text-gray-700 hover:bg-gray-200 focus:ring-gray-300 disabled:bg-gray-50 disabled:text-gray-400 disabled:cursor-not-allowed",
+      "bg-gray-100 text-gray-700 hover:bg-gray-200 focus:ring-gray-300 disabled:bg-gray-50 disabled:text-gray-400/50 disabled:cursor-not-allowed",
     success:
-      "bg-green-500 text-white hover:bg-green-600 focus:ring-green-500 disabled:bg-green-300 disabled:cursor-not-allowed",
+      "bg-green-500 text-white hover:bg-green-600 focus:ring-green-500 disabled:bg-green-300/50 disabled:cursor-not-allowed",
     warning:
-      "bg-yellow-300 text-gray-800 hover:bg-yellow-400 focus:ring-yellow-300 disabled:bg-yellow-200 disabled:cursor-not-allowed",
+      "bg-yellow-300 text-gray-800 hover:bg-yellow-400 focus:ring-yellow-300 disabled:bg-yellow-300/50 disabled:cursor-not-allowed",
     danger:
-      "bg-red-600 text-white hover:bg-red-700 focus:ring-red-500 disabled:bg-red-300 disabled:cursor-not-allowed",
+      "bg-red-600 text-white hover:bg-red-700 focus:ring-red-500 disabled:bg-red-300/50 disabled:cursor-not-allowed",
     white:
       "bg-white text-slate-700 border border-slate-300 hover:bg-slate-50 focus:ring-slate-200 disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed",
   };

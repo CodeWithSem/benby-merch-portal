@@ -19,13 +19,14 @@ import Button from "assets/elements/Button";
 import { useToast } from "../../../layout/Toast_Provider";
 import Date_Range_Field from "assets/elements/Date_Range_Field";
 import Checkbox_Field from "assets/elements/Checkbox_Field";
-import Create_New_PO from "./create_new_po/Create_New_PO";
-import Post_View_PO from "./modals/post_view_po/Post_View_PO";
-import Edit_PO from "./edit_po/Edit_PO";
-import Delete_PO from "./modals/delete_po/Delete_PO";
-import Select_PO_Type from "./modals/select_po_type/Select_PO_Type";
+import Select_PO from "./modals/select_po/Select_PO";
+// import Create_New_PO from "./create_new_po/Create_New_PO";
+// import Post_View_PO from "./modals/post_view_po/Post_View_PO";
+// import Edit_PO from "./edit_po/Edit_PO";
+// import Delete_PO from "./modals/delete_po/Delete_PO";
+// import Select_PO_Type from "./modals/select_po_type/Select_PO_Type";
 
-const Purchase_Order = () => {
+const Goods_Receipt = () => {
   const filter_ref = useRef(null);
   const [show_filter, set_show_filter] = useState(false);
   const [page, set_page] = useState("main");
@@ -35,8 +36,14 @@ const Purchase_Order = () => {
   // Close dropdown on outside click
   const { show_toast } = useToast();
 
+  const company_list = [
+    { id: 1, company_code: "20001", company_desc: "Company 1" },
+    { id: 2, company_code: "20002", company_desc: "Company 2" },
+  ];
+
   const columns = [
     { key: "po_number", label: "PO Number", sortable: true },
+    { key: "gr_number", label: "GR Number", sortable: true },
     { key: "po_type", label: "PO Type", sortable: true },
     { key: "company", label: "Company", sortable: true },
     { key: "creation_date", label: "Creation Date", sortable: true },
@@ -45,20 +52,13 @@ const Purchase_Order = () => {
   ];
 
   // --- State ---
-  //   const all_data = [
-  //     {
-  //       po_number: "10000001",
-  //       po_type: "LFPO",
-  //       company: "QS IT Services",
-  //       creation_date: "10/29/2025 04:04:23 PM",
-  //     },
-  //   ];
   const [all_data, set_all_data] = useState([
     {
       po_number: "10000001",
+      gr_number: "20000001",
       po_type: "LFPO",
-      company: "QS IT Services",
-      creation_date: "10/29/2025 04:04:23 PM",
+      company_code: "20001",
+      creation_date: "11/02/2025 08:30:00 PM",
       status: "Pending",
     },
   ]);
@@ -184,11 +184,11 @@ const Purchase_Order = () => {
   const date_range_ref = useRef(null);
   // - For Date Range Field
 
-  const handle_create_new_po = () => {
-    set_display_modal("select_po_type");
+  const handle_create_new_gr = () => {
+    set_display_modal("select_po");
   };
 
-  const handle_upload_po = () => {
+  const handle_upload_gr = () => {
     alert("Under Maintenance");
   };
 
@@ -233,7 +233,7 @@ const Purchase_Order = () => {
                   </li>
                   <li className="flex items-center gap-1.5 text-sm text-gray-500">
                     <span>/</span>
-                    <span className="text-gray-800">Purchase Order</span>
+                    <span className="text-gray-800">Goods Receipt</span>
                   </li>
                 </ol>
               </nav>
@@ -241,21 +241,21 @@ const Purchase_Order = () => {
 
             <div className="w-full bg-white rounded-lg border">
               <div className="flex flex-wrap items-center justify-between gap-3 p-5">
-                <h1 className="text-lg">Purchase Order</h1>
+                <h1 className="text-lg">Goods Receipt</h1>
                 <div className="flex gap-2">
                   <Button
                     variant="primary"
                     icon={PlusCircle}
                     icon_position="left"
-                    on_click={handle_create_new_po}
+                    on_click={handle_create_new_gr}
                   >
-                    Create New PO
+                    Create New GR
                   </Button>
                   <Button
                     variant="primary"
                     icon={FileUp}
                     icon_position="left"
-                    on_click={handle_upload_po}
+                    on_click={handle_upload_gr}
                   >
                     Upload
                   </Button>
@@ -295,7 +295,7 @@ const Purchase_Order = () => {
                       <div className="w-full flex items-center gap-2">
                         <div className="w-full">
                           <Icon_Field
-                            name="search"
+                            //   name="search"
                             placeholder="Search..."
                             icon={Search}
                             icon_position="left"
@@ -329,18 +329,6 @@ const Purchase_Order = () => {
                                     ref={date_range_ref}
                                   />
                                 </div>
-                                <div className="mt-4">
-                                  <Checkbox_Field
-                                    label="Is Draft?"
-                                    name="terms"
-                                    box_size={20}
-                                    icon_size={12}
-                                    //   checked={check}
-                                    //   on_change={(e) => set_check(e.target.checked)}
-                                    on_change={(e) => alert("Is Draft")}
-                                  />
-                                </div>
-
                                 <div className="flex justify-end gap-2 mt-4">
                                   <Button
                                     size="sm"
@@ -424,9 +412,17 @@ const Purchase_Order = () => {
                         </thead>
                         <tbody className="bg-white">
                           {filtered_data.map((row, idx) => {
+                            const company = company_list.find(
+                              (c) => c.company_code === row.company_code
+                            );
                             // + Cell Renderer
                             const render_cell = (col, row) => {
                               const value = row[col.key];
+                              if (col.key === "company") {
+                                return (
+                                  <div>{company?.company_desc || "-"}</div>
+                                );
+                              }
                               if (col.key === "status") {
                                 return (
                                   <span
@@ -553,10 +549,17 @@ const Purchase_Order = () => {
       /> */}
         </React.Fragment>
       )}
-      {page === "po_creation" && <Create_New_PO set_page={set_page} />}
+      {/* {page === "po_creation" && <Create_New_PO set_page={set_page} />}
       {page === "edit_po" && <Edit_PO set_page={set_page} />}
-      {page === "post_po" && <Edit_PO set_page={set_page} />}
-      <Select_PO_Type
+      {page === "post_po" && <Edit_PO set_page={set_page} />} */}
+      <Select_PO
+        is_open={display_modal === "select_po"}
+        on_close={() => set_display_modal("")}
+        width="max-w-[1280px]"
+        height="max-h-[700px]"
+        set_page={set_page}
+      />
+      {/* <Select_PO_Type
         is_open={display_modal === "select_po_type"}
         on_close={() => set_display_modal("")}
         width="max-w-[1280px]"
@@ -573,9 +576,9 @@ const Purchase_Order = () => {
         is_open={display_modal === "delete_po"}
         on_close={() => set_display_modal("")}
         width="max-w-[1280px]"
-      />
+      /> */}
     </React.Fragment>
   );
 };
 
-export default Purchase_Order;
+export default Goods_Receipt;

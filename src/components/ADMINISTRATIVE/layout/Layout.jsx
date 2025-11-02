@@ -9,6 +9,7 @@ import Tabs from "assets/templates/pages/ui_elements/tabs/Tabs";
 import Create_Invoice from "assets/templates/pages/templates/create_invoice/Create_Invoice";
 import Basic_Tables from "assets/templates/pages/tables/basic_tables/Basic_Tables";
 import Data_Tables from "assets/templates/pages/tables/data_tables/Data_Tables";
+import Goods_Receipt from "../modules/inbound/goods_receipt/Goods_Receipt";
 
 const Layout = () => {
   const [active_item, set_active_item] = useState(() => {
@@ -53,6 +54,8 @@ const Layout = () => {
         return <Dashboard />;
       case "Inbound-Purchase Order":
         return <Purchase_Order />;
+      case "Inbound-Goods Receipt":
+        return <Goods_Receipt />;
       case "Templates-Form Elements":
         return <Form_Elements />;
       case "Templates-Tabs":

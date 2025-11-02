@@ -1,71 +1,70 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { Search, X } from "lucide-react";
 import Icon_Field from "assets/elements/Icon_Field";
 import Checkbox_Field from "assets/elements/Checkbox_Field";
 import Button from "assets/elements/Button";
 import Pagination_Modal from "assets/elements/Pagination_Modal";
 
-const Select_PO_Type = ({
+const Select_PO = ({
   is_open,
   on_close,
   width = "max-w-[700px]",
   height = "h-[500px]",
   set_page,
 }) => {
-  // --- Mock reference lists ---
+  // --- Reference Lists ---
   const company_list = [
     { id: 1, company_code: "COM-0001", company_desc: "Company Description 1" },
     { id: 2, company_code: "COM-0002", company_desc: "Company Description 2" },
   ];
-  const purc_org_list = [
-    { id: 1, purc_org_code: "PCO-0001", purc_org_desc: "Purchasing Org 1" },
-    { id: 2, purc_org_code: "PCO-0002", purc_org_desc: "Purchasing Org 2" },
-  ];
-  const purc_group_list = [
-    {
-      id: 1,
-      purc_group_code: "PCG-0001",
-      purc_group_desc: "Purchasing Group 1",
-    },
-    {
-      id: 2,
-      purc_group_code: "PCG-0002",
-      purc_group_desc: "Purchasing Group 2",
-    },
+  const po_type_list = [
+    { id: 1, po_type_code: "PT-0001", po_type_desc: "PO Type Description 1" },
+    { id: 2, po_type_code: "PT-0002", po_type_desc: "PO Type Description 2" },
   ];
 
-  // --- Mock Data (replace later with API call if needed)
-  const [all_po_type] = useState([
+  // --- Mock PO Data ---
+  const [all_po] = useState([
     {
       id: 1,
+      po_number: "PO-0000001",
       po_type_code: "PT-0001",
-      po_type_desc: "PO Type Description 1",
       company_code: "COM-0001",
-      purc_org_code: "PCO-0001",
-      purc_group_code: "PCG-0001",
+      creation_date: "11/02/2025 09:00:00 PM",
     },
     {
       id: 2,
+      po_number: "PO-0000002",
       po_type_code: "PT-0002",
-      po_type_desc: "PO Type Description 2",
       company_code: "COM-0002",
-      purc_org_code: "PCO-0002",
-      purc_group_code: "PCG-0002",
+      creation_date: "11/02/2025 09:00:00 PM",
     },
   ]);
 
   // --- States ---
-  const [filtered_po_type, set_filtered_po_type] = useState([]);
+  const [filtered_po, set_filtered_po] = useState([]);
   const [current_page, set_current_page] = useState(1);
   const [rows_per_page, set_rows_per_page] = useState(5);
-
-  // 🔍 search input (immediate value)
   const [search_query, set_search_query] = useState("");
-  // 🔍 debounced search value
   const [debounced_query, set_debounced_query] = useState("");
-  const [selected_po_type, set_selected_po_type] = useState(null);
+  const [selected_po, set_selected_po] = useState(null);
 
-  // --- Debounce search ---
+  // --- Lookup Maps for faster access ---
+  const company_map = useMemo(
+    () =>
+      Object.fromEntries(
+        company_list.map((c) => [c.company_code, c.company_desc])
+      ),
+    [company_list]
+  );
+  const po_type_map = useMemo(
+    () =>
+      Object.fromEntries(
+        po_type_list.map((p) => [p.po_type_code, p.po_type_desc])
+      ),
+    [po_type_list]
+  );
+
+  // --- Debounce search query ---
   useEffect(() => {
     const timer = setTimeout(() => {
       set_debounced_query(search_query);
@@ -74,40 +73,29 @@ const Select_PO_Type = ({
     return () => clearTimeout(timer);
   }, [search_query]);
 
-  // --- Create lookup maps once (outside render / effect) ---
-  const company_map = Object.fromEntries(
-    company_list.map((c) => [c.company_code, c])
-  );
-  const purc_org_map = Object.fromEntries(
-    purc_org_list.map((p) => [p.purc_org_code, p])
-  );
-  const purc_group_map = Object.fromEntries(
-    purc_group_list.map((g) => [g.purc_group_code, g])
-  );
-
   // --- Filtering + Pagination ---
   useEffect(() => {
-    let data = [...all_po_type];
+    let data = [...all_po];
 
     if (debounced_query.trim() !== "") {
       const q = debounced_query.toLowerCase();
 
-      data = data.filter((po_type) => {
+      data = data.filter((po) => {
         // lookup related records
-        const company = company_map[po_type.company_code];
-        const purc_org = purc_org_map[po_type.purc_org_code];
-        const purc_group = purc_group_map[po_type.purc_group_code];
+        const po_type = po_type_list.find(
+          (p) => p.po_type_code === po.po_type_code
+        );
+        const company = company_list.find(
+          (c) => c.company_code === po.company_code
+        );
 
         // create one searchable string
         const combined = [
-          po_type.po_type_code,
-          po_type.po_type_desc,
-          po_type.company_code,
+          po.po_number,
+          po.po_type_code,
+          po_type?.po_type_desc,
+          po.company_code,
           company?.company_desc,
-          po_type.purc_org_code,
-          purc_org?.purc_org_desc,
-          po_type.purc_group_code,
-          purc_group?.purc_group_desc,
         ]
           .filter(Boolean)
           .join(" ")
@@ -119,39 +107,40 @@ const Select_PO_Type = ({
 
     const start_idx = (current_page - 1) * rows_per_page;
     const end_idx = start_idx + rows_per_page;
-    set_filtered_po_type(data.slice(start_idx, end_idx));
-  }, [all_po_type, debounced_query, current_page, rows_per_page]);
+    set_filtered_po(data.slice(start_idx, end_idx));
+  }, [all_po, debounced_query, current_page, rows_per_page]);
 
+  // --- Total Pages ---
   const total_pages = Math.ceil(
-    all_po_type.filter((po_type) =>
-      po_type.po_type_desc.toLowerCase().includes(debounced_query.toLowerCase())
-    ).length / rows_per_page
+    all_po.filter((po) => {
+      const po_type_desc = po_type_map[po.po_type_code] || "";
+      const company_desc = company_map[po.company_code] || "";
+      const q = debounced_query.toLowerCase();
+      return (
+        po.po_number.toLowerCase().includes(q) ||
+        po_type_desc.toLowerCase().includes(q) ||
+        company_desc.toLowerCase().includes(q)
+      );
+    }).length / rows_per_page
   );
 
   // --- Handlers ---
   const handle_page_change = (page) => set_current_page(page);
-
   const handle_proceed = () => {
-    console.log(selected_po_type);
+    console.log(selected_po);
     set_page("po_creation");
-    set_selected_po_type(null);
+    set_selected_po(null);
     on_close();
   };
 
-  // --- Render ---
   if (!is_open) return null;
 
   return (
     <div className="fixed inset-0 flex items-center justify-center z-[97] px-4">
-      {/* + Blur */}
-      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm z-[98]"></div>
-      {/* - Blur */}
-
-      {/* + Modal Content */}
+      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm z-[98]" />
       <div
         className={`relative bg-white rounded-lg shadow-xl ${width} w-full py-7 m-5 z-[99]`}
       >
-        {/* Close button */}
         <button
           className="absolute top-5 right-5 p-2 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-400 hover:text-gray-500"
           onClick={on_close}
@@ -161,12 +150,13 @@ const Select_PO_Type = ({
 
         {/* Header */}
         <div className="text-lg md:text-xl font-bold mb-5 px-7">
-          PO Type Selection
+          PO Selection
         </div>
 
         {/* Body */}
         <div className={`w-full overflow-y-auto ${height} scrollbar-custom`}>
           <div className="overflow-hidden border border-gray-200 bg-white pt-4">
+            {/* Search */}
             <div className="flex flex-col gap-5 px-6 mb-4 sm:flex-row sm:items-center sm:justify-between">
               <div className="w-full">
                 <Icon_Field
@@ -187,50 +177,45 @@ const Select_PO_Type = ({
                   <tr className="font-semibold text-xs">
                     <th className="px-6 py-3 w-[80px]"></th>
                     <th className="px-6 py-3 text-gray-500 text-left">
+                      PO Number
+                    </th>
+                    <th className="px-6 py-3 text-gray-500 text-left">
                       PO Type
                     </th>
                     <th className="px-6 py-3 text-gray-500 text-left">
                       Company
                     </th>
                     <th className="px-6 py-3 text-gray-500 text-left">
-                      Purchasing Org
-                    </th>
-                    <th className="px-6 py-3 text-gray-500 text-left">
-                      Purchasing Group
+                      Creation Date
                     </th>
                   </tr>
                 </thead>
-
                 <tbody className="divide-y divide-gray-100">
-                  {filtered_po_type.length === 0 ? (
+                  {filtered_po.length === 0 ? (
                     <tr>
                       <td
-                        colSpan={5}
+                        colSpan={4}
                         className="text-center py-6 text-gray-500 text-sm"
                       >
-                        No data found
+                        No data found.
                       </td>
                     </tr>
                   ) : (
-                    filtered_po_type.map((po_type) => {
+                    filtered_po.map((po) => {
+                      const po_type = po_type_list.find(
+                        (p) => p.po_type_code === po.po_type_code
+                      );
                       const company = company_list.find(
-                        (c) => c.company_code === po_type.company_code
+                        (c) => c.company_code === po.company_code
                       );
-                      const purc_org = purc_org_list.find(
-                        (p) => p.purc_org_code === po_type.purc_org_code
-                      );
-                      const purc_group = purc_group_list.find(
-                        (g) => g.purc_group_code === po_type.purc_group_code
-                      );
+
                       return (
                         <tr
-                          key={po_type.id}
+                          key={po.id}
                           className={`hover:bg-sky-50/50 cursor-pointer text-[12px] ${
-                            selected_po_type?.id === po_type.id
-                              ? "bg-sky-50"
-                              : ""
+                            selected_po?.id === po.id ? "bg-sky-50" : ""
                           }`}
-                          onClick={() => set_selected_po_type(po_type)}
+                          onClick={() => set_selected_po(po)}
                         >
                           <td className="px-5 py-4 sm:px-6 text-center">
                             <div className="flex justify-center items-center">
@@ -238,28 +223,32 @@ const Select_PO_Type = ({
                                 name="check"
                                 box_size={20}
                                 icon_size={14}
-                                checked={
-                                  selected_po_type?.po_type_code ===
-                                  po_type.po_type_code
-                                }
-                                on_change={() => set_selected_po_type(po_type)}
+                                checked={selected_po?.id === po.id}
+                                on_change={() => set_selected_po(po)}
                               />
                             </div>
                           </td>
+
+                          <td className="px-5 py-4 sm:px-6">
+                            <div className="block font-medium text-gray-800">
+                              {po.po_number}
+                            </div>
+                          </td>
+
                           <td className="px-5 py-4 sm:px-6">
                             <div className="block font-medium">
                               <span className="block text-gray-500 text-[10px]">
-                                {po_type.po_type_code}
+                                {po_type?.po_type_code || "-"}
                               </span>
                               <span className="block text-gray-800">
-                                {po_type.po_type_desc}
+                                {po_type?.po_type_desc || "-"}
                               </span>
                             </div>
                           </td>
                           <td className="px-5 py-4 sm:px-6">
                             <div className="block font-medium">
                               <span className="block text-gray-500 text-[10px]">
-                                {po_type.company_code}
+                                {company?.company_code || "-"}
                               </span>
                               <span className="block text-gray-800">
                                 {company?.company_desc || "-"}
@@ -267,23 +256,8 @@ const Select_PO_Type = ({
                             </div>
                           </td>
                           <td className="px-5 py-4 sm:px-6">
-                            <div className="block font-medium">
-                              <span className="block text-gray-500 text-[10px]">
-                                {po_type.purc_org_code}
-                              </span>
-                              <span className="block text-gray-800">
-                                {purc_org?.purc_org_desc || "-"}
-                              </span>
-                            </div>
-                          </td>
-                          <td className="px-5 py-4 sm:px-6">
-                            <div className="block font-medium">
-                              <span className="block text-gray-500 text-[10px]">
-                                {po_type.purc_group_code}
-                              </span>
-                              <span className="block text-gray-800">
-                                {purc_group?.purc_group_desc || "-"}
-                              </span>
+                            <div className="block font-medium text-gray-800 tracking-wide">
+                              {po.creation_date}
                             </div>
                           </td>
                         </tr>
@@ -298,7 +272,6 @@ const Select_PO_Type = ({
 
         {/* Footer */}
         <div className="flex flex-col items-center sm:flex-row sm:justify-between gap-3 mt-5 px-7">
-          {/* Pagination */}
           {total_pages > 0 && (
             <div className="w-full sm:w-auto">
               <Pagination_Modal
@@ -308,14 +281,12 @@ const Select_PO_Type = ({
               />
             </div>
           )}
-
-          {/* Buttons */}
           <div className="flex justify-center sm:justify-end gap-2 w-full">
             <Button
               variant="primary"
               on_click={handle_proceed}
               class_name="w-full md:w-[100px]"
-              disabled={!selected_po_type}
+              disabled={!selected_po}
             >
               Proceed
             </Button>
@@ -333,4 +304,4 @@ const Select_PO_Type = ({
   );
 };
 
-export default Select_PO_Type;
+export default Select_PO;

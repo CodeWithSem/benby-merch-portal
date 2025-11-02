@@ -98,7 +98,7 @@ const Select_Plant = ({
 
         {/* + Modal Content */}
         <div
-          className={`relative bg-white rounded-lg shadow-xl ${width} w-full p-7 m-5 z-[99]`}
+          className={`relative bg-white rounded-lg shadow-xl ${width} w-full py-7 m-5 z-[99]`}
         >
           <button
             className="absolute top-5 right-5 p-2 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-400 hover:text-gray-500"
@@ -108,38 +108,33 @@ const Select_Plant = ({
           </button>
 
           {/* + Modal Label */}
-          <div className="text-lg md:text-xl font-bold mb-5">
+          <div className="text-lg md:text-xl font-bold mb-5 px-7">
             Plant / DC Selection
           </div>
           {/* - Modal Label */}
 
           {/* + Modal Body */}
           <div className={`w-full overflow-y-auto ${height} scrollbar-custom`}>
-            <div className="overflow-hidden rounded-lg border border-gray-200 bg-white pt-4">
+            <div className="overflow-hidden border border-gray-200 bg-white pt-4">
               <div className="flex flex-col gap-5 px-6 mb-4 sm:flex-row sm:items-center sm:justify-between">
-                <h3 className="font-semibold text-gray-800 whitespace-nowrap">
-                  List of Plant / DC
-                </h3>
-                <div className="flex flex-col gap-3 sm:flex-row sm:items-center md:w-[500px]">
-                  <div className="w-full">
-                    <Icon_Field
-                      name="search"
-                      placeholder="Search..."
-                      icon={Search}
-                      icon_position="left"
-                      value={search_query}
-                      on_change={(e) => {
-                        set_search_query(e.target.value);
-                        set_current_page(1);
-                      }}
-                    />
-                  </div>
+                <div className="w-full">
+                  <Icon_Field
+                    name="search"
+                    placeholder="Search..."
+                    icon={Search}
+                    icon_position="left"
+                    value={search_query}
+                    on_change={(e) => {
+                      set_search_query(e.target.value);
+                      set_current_page(1);
+                    }}
+                  />
                 </div>
               </div>
 
               {/* Table */}
               <div className="max-w-full overflow-x-auto custom-scrollbar">
-                <table className="min-w-full">
+                <table className="min-w-full whitespace-nowrap">
                   <thead className="border-gray-100 border-y bg-gray-50">
                     <tr className="font-semibold text-xs">
                       <th className="px-6 py-3 w-[80px]"></th>
@@ -159,30 +154,32 @@ const Select_Plant = ({
                           colSpan={3}
                           className="text-center py-6 text-gray-500 text-sm"
                         >
-                          No plant / dc found.
+                          No data found
                         </td>
                       </tr>
                     ) : (
                       filtered_plant_dc.map((plant) => (
                         <tr
                           key={plant.id}
-                          className={`hover:bg-sky-50/50 cursor-pointer ${
+                          className={`hover:bg-sky-50/50 cursor-pointer text-[12px] ${
                             selected_plant?.id === plant.id ? "bg-sky-50" : ""
                           }`}
                           onClick={() => set_selected_plant(plant)}
                         >
-                          <td className="px-5 py-4 sm:px-6 text-center">
-                            <Checkbox_Field
-                              name="check"
-                              box_size={18}
-                              icon_size={12}
-                              checked={selected_plant?.id === plant.id}
-                              on_change={() => set_selected_plant(plant)}
-                            />
+                          <td className="px-5 py-4 sm:px-6">
+                            <div className="flex justify-center items-center">
+                              <Checkbox_Field
+                                name="check"
+                                box_size={18}
+                                icon_size={12}
+                                checked={selected_plant?.id === plant.id}
+                                on_change={() => set_selected_plant(plant)}
+                              />
+                            </div>
                           </td>
                           <td className="px-5 py-4 sm:px-6">
-                            <div className="block font-medium text-gray-800 text-sm">
-                              <span className="block text-gray-500 text-xs">
+                            <div className="block font-medium text-gray-800">
+                              <span className="block text-gray-500 text-[10px]">
                                 {plant.id}
                               </span>
                               <span className="block text-gray-800 text-sm">
@@ -190,7 +187,7 @@ const Select_Plant = ({
                               </span>
                             </div>
                           </td>
-                          <td className="px-6 py-3 text-gray-700 text-xs tracking-wide">
+                          <td className="px-6 py-3 text-gray-700 tracking-wide">
                             {plant.creation_date}
                           </td>
                         </tr>
@@ -204,7 +201,7 @@ const Select_Plant = ({
           {/* - Modal Body */}
 
           {/* + Modal Footer */}
-          <div className="flex flex-col items-center sm:flex-row sm:justify-between gap-3 mt-5">
+          <div className="flex flex-col items-center sm:flex-row sm:justify-between gap-3 mt-5 px-7">
             {/* Pagination */}
             {total_pages > 0 && (
               <div className="w-full sm:w-auto">
@@ -222,6 +219,7 @@ const Select_Plant = ({
                 variant="primary"
                 on_click={handle_select_plant}
                 class_name="w-full md:w-[100px]"
+                disabled={!selected_plant}
               >
                 Proceed
               </Button>
