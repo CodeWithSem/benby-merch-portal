@@ -11,6 +11,7 @@ import Basic_Tables from "assets/templates/pages/tables/basic_tables/Basic_Table
 import Data_Tables from "assets/templates/pages/tables/data_tables/Data_Tables";
 import Goods_Receipt from "../modules/inbound/goods_receipt/Goods_Receipt";
 import Batch from "../modules/inbound/batch/Batch";
+import Input_Fields from "components/TEMPLATES/input_fields/Input_Fields";
 
 const Layout = () => {
   const [active_item, set_active_item] = useState(() => {
@@ -69,6 +70,8 @@ const Layout = () => {
         return <Basic_Tables />;
       case "Templates-Data Tables":
         return <Data_Tables />;
+      case "Templates-Input Fields":
+        return <Input_Fields />;
     }
   };
 
