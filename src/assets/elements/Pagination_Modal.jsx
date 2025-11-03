@@ -7,6 +7,7 @@ const Pagination_Modal = ({
   total_pages,
   on_page_change,
   variant = "compact",
+  show_simple_page = false, // NEW PROP: show only "Page X of Y"
 }) => {
   const arrow_btn_classes = `
     flex items-center justify-center w-9 h-8 mx-1
@@ -44,14 +45,10 @@ const Pagination_Modal = ({
 
   const pages = getPageNumbers();
 
-  // =============== VARIANT 1: COMPACT ===============
-  if (variant === "compact") {
+  // =============== SIMPLE MODE: show only "Page X of Y" ===============
+  if (show_simple_page) {
     return (
-      <div
-        className="flex md:justify-end justify-center items-center gap-1 pr-4 w-full"
-        style={{ userSelect: "none" }}
-      >
-        {/* Previous */}
+      <div className="flex justify-center items-center gap-2 w-full">
         <button
           onClick={() => on_page_change(current_page - 1)}
           disabled={current_page === 1}
@@ -60,7 +57,36 @@ const Pagination_Modal = ({
           <ChevronLeft size={16} />
         </button>
 
-        {/* Desktop: numbered pages */}
+        <span className="text-sm text-gray-600 font-medium">
+          Page {current_page} of {total_pages}
+        </span>
+
+        <button
+          onClick={() => on_page_change(current_page + 1)}
+          disabled={current_page === total_pages}
+          className={arrow_btn_classes}
+        >
+          <ChevronRight size={16} />
+        </button>
+      </div>
+    );
+  }
+
+  // =============== VARIANT 1: COMPACT ===============
+  if (variant === "compact") {
+    return (
+      <div
+        className="flex md:justify-end justify-center items-center gap-1 pr-4 w-full"
+        style={{ userSelect: "none" }}
+      >
+        <button
+          onClick={() => on_page_change(current_page - 1)}
+          disabled={current_page === 1}
+          className={arrow_btn_classes}
+        >
+          <ChevronLeft size={16} />
+        </button>
+
         <div className="hidden sm:flex items-center justify-center gap-1">
           {pages.map((page, idx) =>
             page === "..." ? (
@@ -86,12 +112,10 @@ const Pagination_Modal = ({
           )}
         </div>
 
-        {/* Mobile: show Page X of Y */}
         <div className="sm:hidden flex items-center justify-center text-sm text-gray-600 font-medium px-2">
           Page {current_page} of {total_pages}
         </div>
 
-        {/* Next */}
         <button
           onClick={() => on_page_change(current_page + 1)}
           disabled={current_page === total_pages}
@@ -109,7 +133,6 @@ const Pagination_Modal = ({
       className="flex justify-between items-center w-full px-4 py-3"
       style={{ userSelect: "none" }}
     >
-      {/* Previous Button */}
       <Button
         variant="white"
         icon={ChevronLeft}
@@ -121,7 +144,6 @@ const Pagination_Modal = ({
         <span className="hidden sm:inline">Previous</span>
       </Button>
 
-      {/* Desktop: numbered pages */}
       <div className="hidden sm:flex items-center justify-center gap-1">
         {pages.map((page, idx) =>
           page === "..." ? (
@@ -147,12 +169,10 @@ const Pagination_Modal = ({
         )}
       </div>
 
-      {/* Mobile: show "Page X of Y" */}
       <div className="sm:hidden flex items-center justify-center text-sm text-gray-600 font-medium">
         Page {current_page} of {total_pages}
       </div>
 
-      {/* Next Button */}
       <Button
         variant="white"
         icon={ChevronRight}

@@ -10,6 +10,7 @@ import Create_Invoice from "assets/templates/pages/templates/create_invoice/Crea
 import Basic_Tables from "assets/templates/pages/tables/basic_tables/Basic_Tables";
 import Data_Tables from "assets/templates/pages/tables/data_tables/Data_Tables";
 import Goods_Receipt from "../modules/inbound/goods_receipt/Goods_Receipt";
+import Batch from "../modules/inbound/batch/Batch";
 
 const Layout = () => {
   const [active_item, set_active_item] = useState(() => {
@@ -56,6 +57,8 @@ const Layout = () => {
         return <Purchase_Order />;
       case "Inbound-Goods Receipt":
         return <Goods_Receipt />;
+      case "Inbound-Batch":
+        return <Batch />;
       case "Templates-Form Elements":
         return <Form_Elements />;
       case "Templates-Tabs":

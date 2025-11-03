@@ -128,7 +128,7 @@ const Select_PO = ({
   const handle_page_change = (page) => set_current_page(page);
   const handle_proceed = () => {
     console.log(selected_po);
-    set_page("po_creation");
+    set_page("gr_creation");
     set_selected_po(null);
     on_close();
   };

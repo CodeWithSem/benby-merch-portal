@@ -20,8 +20,11 @@ import { useToast } from "../../../layout/Toast_Provider";
 import Date_Range_Field from "assets/elements/Date_Range_Field";
 import Checkbox_Field from "assets/elements/Checkbox_Field";
 import Select_PO from "./modals/select_po/Select_PO";
+import Create_New_GR from "./create_new_gr/Create_New_GR";
+import Edit_GR from "./edit_gr/Edit_GR";
+import Post_View_GR from "./modals/post_view_gr/Post_View_GR";
 // import Create_New_PO from "./create_new_po/Create_New_PO";
-// import Post_View_PO from "./modals/post_view_po/Post_View_PO";
+// import Post_View_PO from "./modals/post_view_gr/Post_View_PO";
 // import Edit_PO from "./edit_po/Edit_PO";
 // import Delete_PO from "./modals/delete_po/Delete_PO";
 // import Select_PO_Type from "./modals/select_po_type/Select_PO_Type";
@@ -54,8 +57,9 @@ const Goods_Receipt = () => {
   // --- State ---
   const [all_data, set_all_data] = useState([
     {
-      po_number: "10000001",
-      gr_number: "20000001",
+      id: 1,
+      po_number: "PO-0000001",
+      gr_number: "GR-0000001",
       po_type: "LFPO",
       company_code: "20001",
       creation_date: "11/02/2025 08:30:00 PM",
@@ -192,18 +196,19 @@ const Goods_Receipt = () => {
     alert("Under Maintenance");
   };
 
-  const handle_view_po = () => {
+  const handle_view_gr = () => {
     set_for_posting(false);
-    set_display_modal("view_po");
+    set_display_modal("view_gr");
   };
 
-  const handle_post_po = () => {
+  const handle_post_gr = () => {
     set_for_posting(true);
-    set_display_modal("post_po");
+    set_display_modal("post_gr");
   };
 
-  const handle_edit_po = () => {
-    set_page("edit_po");
+  const handle_edit_gr = (id) => {
+    alert(`GR ID : ${id}`);
+    set_page("edit_gr");
   };
 
   const handle_delete_po = () => {
@@ -442,7 +447,7 @@ const Goods_Receipt = () => {
                                     <div className="relative group flex jusity-center items-center">
                                       <button
                                         className="text-gray-500 hover:text-sky-600 text-[12px] outline-none"
-                                        onClick={() => handle_view_po(row.id)}
+                                        onClick={() => handle_view_gr(row.id)}
                                       >
                                         <View size={19} />
                                       </button>
@@ -453,7 +458,7 @@ const Goods_Receipt = () => {
                                     <div className="relative group flex jusity-center items-center">
                                       <button
                                         className="text-gray-500 hover:text-sky-600 text-[12px] outline-none"
-                                        onClick={() => handle_post_po(row.id)}
+                                        onClick={() => handle_post_gr(row.id)}
                                       >
                                         <FileInput size={19} />
                                       </button>
@@ -464,7 +469,7 @@ const Goods_Receipt = () => {
                                     <div className="relative group flex jusity-center items-center">
                                       <button
                                         className="text-gray-500 hover:text-sky-600 text-[12px] outline-none"
-                                        onClick={() => handle_edit_po(row.id)}
+                                        onClick={() => handle_edit_gr(row.id)}
                                       >
                                         <Edit size={19} />
                                       </button>
@@ -517,7 +522,6 @@ const Goods_Receipt = () => {
                       </table>
                     )}
                   </div>
-
                   {total_pages > 0 && (
                     <Pagination
                       current_page={current_page}
@@ -530,28 +534,10 @@ const Goods_Receipt = () => {
               </div>
             </div>
           </div>
-          {/* <Add_Admin
-        is_open={display_modal === "add_admin"}
-        on_close={() => set_display_modal("")}
-        width="max-w-[820px]"
-      />
-      <Edit_Admin
-        is_open={display_modal === "edit_admin"}
-        on_close={() => set_display_modal("")}
-        width="max-w-[820px]"
-        edit_data={edit_data}
-      />
-      <Delete_Admin
-        is_open={display_modal === "delete_admin"}
-        on_close={() => set_display_modal("")}
-        width="max-w-[820px]"
-        delete_data={delete_data}
-      /> */}
         </React.Fragment>
       )}
-      {/* {page === "po_creation" && <Create_New_PO set_page={set_page} />}
-      {page === "edit_po" && <Edit_PO set_page={set_page} />}
-      {page === "post_po" && <Edit_PO set_page={set_page} />} */}
+      {page === "gr_creation" && <Create_New_GR set_page={set_page} />}
+      {page === "edit_gr" && <Edit_GR set_page={set_page} />}
       <Select_PO
         is_open={display_modal === "select_po"}
         on_close={() => set_display_modal("")}
@@ -559,24 +545,12 @@ const Goods_Receipt = () => {
         height="max-h-[700px]"
         set_page={set_page}
       />
-      {/* <Select_PO_Type
-        is_open={display_modal === "select_po_type"}
-        on_close={() => set_display_modal("")}
-        width="max-w-[1280px]"
-        height="max-h-[700px]"
-        set_page={set_page}
-      />
-      <Post_View_PO
-        is_open={display_modal === "view_po" || display_modal === "post_po"}
+      <Post_View_GR
+        is_open={display_modal === "view_gr" || display_modal === "post_gr"}
         for_posting={for_posting}
         on_close={() => set_display_modal("")}
         width="max-w-[1280px]"
       />
-      <Delete_PO
-        is_open={display_modal === "delete_po"}
-        on_close={() => set_display_modal("")}
-        width="max-w-[1280px]"
-      /> */}
     </React.Fragment>
   );
 };

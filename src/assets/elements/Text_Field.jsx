@@ -14,6 +14,7 @@ const Text_Field = ({
   bg_color = "white",
   min,
   max,
+  int_only = false, // NEW: boolean to restrict input to integers
 }) => {
   const input_class = `block w-full ${
     label ? "mt-1" : ""
@@ -30,6 +31,13 @@ const Text_Field = ({
   const handle_wheel = (e) => {
     if (type === "number") {
       e.target.blur(); // Prevent scroll change
+    }
+  };
+
+  // Optional: handle keydown to restrict dot and minus
+  const handle_key_down = (e) => {
+    if (int_only && (e.key === "." || e.key === "-")) {
+      e.preventDefault();
     }
   };
 
@@ -53,6 +61,7 @@ const Text_Field = ({
         min={min}
         max={max}
         onWheel={handle_wheel}
+        onKeyDown={handle_key_down} // APPLY INTEGER ONLY RESTRICTION
         className={input_class}
         autoComplete="off"
         spellCheck={false}

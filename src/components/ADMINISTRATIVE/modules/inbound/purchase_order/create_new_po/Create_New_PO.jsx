@@ -126,7 +126,6 @@ const Create_New_PO = ({ set_page }) => {
                       value={"AUTO GENERATED"}
                       // on_change={handle_text_change}
                       pattern="[A-Za-z]{1,}"
-                      bg_color="slate-50"
                       disabled
                     />
                   </div>
