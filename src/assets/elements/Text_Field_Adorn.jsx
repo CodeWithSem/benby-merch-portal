@@ -2,6 +2,7 @@ import React from "react";
 
 const Text_Field_Adorn = ({
   label,
+  type = "text",
   value,
   on_change,
   name,
@@ -10,6 +11,7 @@ const Text_Field_Adorn = ({
   error_message,
   adornment = "", // Text or symbol
   adornment_position = "right", // "left" or "right"
+  int_only = false,
 }) => {
   const wrapper_class = `mt-1 flex rounded-md shadow-sm border text-sm
     ${error_message ? "border-pink-500" : "border-slate-300"}
@@ -29,6 +31,18 @@ const Text_Field_Adorn = ({
       ? `${adornment_class_base} border-l border-slate-300 rounded-r-md`
       : `${adornment_class_base} border-r border-slate-300 rounded-l-md`;
 
+  const handle_wheel = (e) => {
+    if (type === "number") {
+      e.target.blur();
+    }
+  };
+
+  const handle_key_down = (e) => {
+    if (int_only && (e.key === "." || e.key === "-")) {
+      e.preventDefault();
+    }
+  };
+
   return (
     <div className="block">
       {label && (
@@ -45,12 +59,14 @@ const Text_Field_Adorn = ({
 
         {/* Input Field */}
         <input
-          type="text"
+          type={type}
           placeholder={placeholder}
           name={name}
           value={value}
           onChange={on_change}
           disabled={disabled}
+          onWheel={handle_wheel}
+          onKeyDown={handle_key_down}
           className={input_class}
           autoComplete="off"
           spellCheck={false}

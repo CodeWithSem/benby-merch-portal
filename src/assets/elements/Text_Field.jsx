@@ -14,7 +14,7 @@ const Text_Field = ({
   bg_color = "white",
   min,
   max,
-  int_only = false, // NEW: boolean to restrict input to integers
+  int_only = false,
 }) => {
   const input_class = `block w-full ${
     label ? "mt-1" : ""
@@ -61,7 +61,7 @@ const Text_Field = ({
         min={min}
         max={max}
         onWheel={handle_wheel}
-        onKeyDown={handle_key_down} // APPLY INTEGER ONLY RESTRICTION
+        onKeyDown={handle_key_down}
         className={input_class}
         autoComplete="off"
         spellCheck={false}
