@@ -72,7 +72,10 @@ const Input_Fields = () => {
       ),
       copyFunction: () =>
         navigator.clipboard.writeText(
-          `<Password_Field label="Password" name="password" placeholder="Enter your password" />`
+          `<Password_Field
+          label="Password"
+          name="password"
+          placeholder="Enter your password" />`
         ),
     },
     {
@@ -90,7 +93,13 @@ const Input_Fields = () => {
       ),
       copyFunction: () =>
         navigator.clipboard.writeText(
-          `<Select_Field label="Select Field" name="select_field" // value={selected_data} // on_change={handle_option_change} // options={options} placeholder="Select Option" />`
+          `<Select_Field
+          label="Select Field"
+          name="select_field"
+          // value={selected_data}
+          // on_change={handle_option_change}
+          // options={options}
+          placeholder="Select Option" />`
         ),
     },
     {
@@ -107,7 +116,12 @@ const Input_Fields = () => {
       ),
       copyFunction: () =>
         navigator.clipboard.writeText(
-          `<Date_Field label="Date Field" name="date_field" // value={selected_data} // on_change={handle_date_change} placeholder="Select Date" />`
+          `<Date_Field
+          label="Date Field"
+          name="date_field"
+          // value={selected_data}
+          // on_change={handle_date_change}
+          placeholder="Select Date" />`
         ),
     },
     {
@@ -121,7 +135,9 @@ const Input_Fields = () => {
       ),
       copyFunction: () =>
         navigator.clipboard.writeText(
-          `<Date_Range_Field label="Select Date" // ref={date_range_ref} />`
+          `<Date_Range_Field
+          label="Select Date"
+          // ref={date_range_ref} />`
         ),
     },
     {
@@ -140,7 +156,14 @@ const Input_Fields = () => {
       ),
       copyFunction: () =>
         navigator.clipboard.writeText(
-          `<Time_Field label="Select Time" name="time_field" // value={time} // on_change={handle_time_change} // min="09:00" // max="17:00" // step="900" />`
+          `<Time_Field
+          label="Select Time"
+          name="time_field"
+          // value={time}
+          // on_change={handle_time_change}
+          // min="09:00"
+          // max="17:00"
+          // step="900" />`
         ),
     },
     {
@@ -157,7 +180,12 @@ const Input_Fields = () => {
       ),
       copyFunction: () =>
         navigator.clipboard.writeText(
-          `<Payment_Field label={"Payment Field"} name="payment_field" // value={data} // on_change={handle_data_change} placeholder="1234 5678 9012 3456" />`
+          `<Payment_Field
+          label={"Payment Field"}
+          name="payment_field"
+          // value={data}
+          // on_change={handle_data_change}
+          placeholder="1234 5678 9012 3456" />`
         ),
     },
     {
@@ -176,7 +204,14 @@ const Input_Fields = () => {
       ),
       copyFunction: () =>
         navigator.clipboard.writeText(
-          `<Icon_Field label="Icon Field" name="icon_field" // value={data} // on_change={(e) => handle_data_change(e.target.value)} placeholder="Search..." icon={Search} icon_position="left" />`
+          `<Icon_Field
+          label="Icon Field"
+          name="icon_field"
+          // value={data}
+          // on_change={(e) => handle_data_change(e.target.value)}
+          placeholder="Search..."
+          icon={Search}
+          icon_position="left" />`
         ),
     },
     {
@@ -192,7 +227,11 @@ const Input_Fields = () => {
       ),
       copyFunction: () =>
         navigator.clipboard.writeText(
-          `<Upload_Field label="Upload Field" name="upload_field" // on_change={handle_file_change} accept=".pdf,.doc,.docx,.xlsx" />`
+          `<Upload_Field
+          label="Upload Field"
+          name="upload_field"
+          // on_change={handle_file_change}
+          accept=".pdf,.doc,.docx,.xlsx" />`
         ),
     },
     {
@@ -209,7 +248,12 @@ const Input_Fields = () => {
       ),
       copyFunction: () =>
         navigator.clipboard.writeText(
-          `<Copy_Field label="Copy Field" name="copy" // value={data} // on_change={handle_data_change} copy_button_label="Copy" />`
+          `<Copy_Field
+          label="Copy Field"
+          name="copy"
+          // value={data}
+          // on_change={handle_data_change}
+          copy_button_label="Copy" />`
         ),
     },
     {
@@ -227,7 +271,13 @@ const Input_Fields = () => {
       ),
       copyFunction: () =>
         navigator.clipboard.writeText(
-          `<Find_Field label="Find Field" name="find_field" // value={data} // on_change={handle_data_change} // on_find={handle_data_find} disabled />`
+          `<Find_Field
+          label="Find Field"
+          name="find_field"
+          // value={data}
+          // on_change={handle_data_change}
+          // on_find={handle_data_find}
+          disabled />`
         ),
     },
     {
@@ -247,7 +297,15 @@ const Input_Fields = () => {
       ),
       copyFunction: () =>
         navigator.clipboard.writeText(
-          `<Text_Code_Field label="Text Code Field" // code_value={code_data} // on_code_change={handle_code_data_change} // text_value={text_data} // on_text_change={handle_text_data_change} code_width="150px" show_search_button={true} disabled />`
+          `<Text_Code_Field
+          label="Text Code Field"
+          // code_value={code_data}
+          // on_code_change={handle_code_data_change}
+          // text_value={text_data}
+          // on_text_change={handle_text_data_change}
+          code_width="150px"
+          show_search_button={true}
+          disabled />`
         ),
     },
     {
@@ -271,7 +329,19 @@ const Input_Fields = () => {
       ),
       copyFunction: () =>
         navigator.clipboard.writeText(
-          `<Verify_Field label="Verify Field" name="verify_field" placeholder="Enter text" // value={data} // on_change={(e) => { // set_text_verify(e.target.value); // set_verify_status(""); // }} show_find_button={true} // on_find={handle_find} // on_verify={handle_verify} // verify_status={verify_status} />`
+          `<Verify_Field
+          label="Verify Field"
+          name="verify_field"
+          placeholder="Enter text"
+          // value={data}
+          // on_change={(e) => {
+          //   set_text_verify(e.target.value);
+          //   set_verify_status("");
+          // }}
+          show_find_button={true}
+          // on_find={handle_find}
+          // on_verify={handle_verify}
+          // verify_status={verify_status} />`
         ),
     },
     {
@@ -290,7 +360,14 @@ const Input_Fields = () => {
       ),
       copyFunction: () =>
         navigator.clipboard.writeText(
-          `<Text_Field_Adorn label="Text Field Adorn" type="text" // value={data} // on_change={(e) => handle_data_change(e.target.value)} placeholder="Enter text" adornment="PHP" adornment_position="right" />`
+          `<Text_Field_Adorn
+          label="Text Field Adorn"
+          type="text"
+          // value={data}
+          // on_change={(e) => handle_data_change(e.target.value)}
+          placeholder="Enter text"
+          adornment="PHP"
+          adornment_position="right" />`
         ),
     },
     {
@@ -308,7 +385,12 @@ const Input_Fields = () => {
       ),
       copyFunction: () =>
         navigator.clipboard.writeText(
-          `<Textarea_Field label="Textarea Field" name="textarea_field" // value={data} // on_change={(e) => handle_data_change(e.target.value)} placeholder="Enter your description..." height="121px" />`
+          `<Textarea_Field 
+          label="Textarea Field" 
+          name="textarea_field" 
+          // value={data} 
+          // on_change={(e) => handle_data_change(e.target.value)} 
+          placeholder="Enter your description..." height="121px" />`
         ),
     },
     {
@@ -325,7 +407,12 @@ const Input_Fields = () => {
       ),
       copyFunction: () =>
         navigator.clipboard.writeText(
-          `<Quantity_Field label="Quantity" value={quantity} min={1} // max={10} on_change={set_quantity} />`
+          `<Quantity_Field 
+          label="Quantity" 
+          value={quantity} 
+          min={1} 
+          // max={10} 
+          // on_change={set_quantity} />`
         ),
     },
     {
@@ -343,7 +430,13 @@ const Input_Fields = () => {
       ),
       copyFunction: () =>
         navigator.clipboard.writeText(
-          `<Checkbox_Field label="Checkbox Field" name="checkbox_field" box_size={24} icon_size={14} checked={check} on_change={(e) => set_check(e.target.checked)} />`
+          `<Checkbox_Field 
+          label="Checkbox Field" 
+          name="checkbox_field" 
+          box_size={24} 
+          icon_size={14} 
+          checked={check} 
+          on_change={(e) => set_check(e.target.checked)} />`
         ),
     },
     {
@@ -363,7 +456,15 @@ const Input_Fields = () => {
       ),
       copyFunction: () =>
         navigator.clipboard.writeText(
-          `<Toggle_Switch id="example-toggle" label="Toggle Switch" checked={toggle} on_change={(e) => set_toggle(e.target.checked)} width={46} height={26} knob_size={21} gap={3} />`
+          `<Toggle_Switch 
+          id="example-toggle" 
+          label="Toggle Switch" 
+          checked={toggle} 
+          on_change={(e) => set_toggle(e.target.checked)} 
+          width={46} 
+          height={26} 
+          knob_size={21} 
+          gap={3} />`
         ),
     },
     {
@@ -379,7 +480,11 @@ const Input_Fields = () => {
       ),
       copyFunction: () =>
         navigator.clipboard.writeText(
-          `<Radio_Button label="Radio Button" name="radio_button" checked={radio === "radio_button"} on_change={(e) => set_radio(e.target.name)} />`
+          `<Radio_Button 
+          label="Radio Button" 
+          name="radio_button" 
+          checked={radio === "radio_button"} 
+          on_change={(e) => set_radio(e.target.name)} />`
         ),
     },
   ];

@@ -1,0 +1,42 @@
+[debug] [2025-11-04T15:41:30.134Z] ----------------------------------------------------------------------
+[debug] [2025-11-04T15:41:30.136Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\Admin\AppData\Roaming\npm\node_modules\firebase-tools\lib\bin\firebase.js deploy
+[debug] [2025-11-04T15:41:30.137Z] CLI Version:   14.6.0
+[debug] [2025-11-04T15:41:30.137Z] Platform:      win32
+[debug] [2025-11-04T15:41:30.137Z] Node Version:  v20.19.4
+[debug] [2025-11-04T15:41:30.137Z] Time:          Tue Nov 04 2025 23:41:30 GMT+0800 (China Standard Time)
+[debug] [2025-11-04T15:41:30.137Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2025-11-04T15:41:30.139Z] >>> [apiv2][query] GET https://firebase-public.firebaseio.com/cli.json [none]
+[debug] [2025-11-04T15:41:30.368Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2025-11-04T15:41:30.368Z] > authorizing via signed-in user (benbymobileapp@gmail.com)
+[debug] [2025-11-04T15:41:30.368Z] [iam] checking project qs-system-demo for permissions ["firebase.projects.get","firebasehosting.sites.update"]
+[debug] [2025-11-04T15:41:30.369Z] Checked if tokens are valid: false, expires at: 1760709155389
+[debug] [2025-11-04T15:41:30.369Z] Checked if tokens are valid: false, expires at: 1760709155389
+[debug] [2025-11-04T15:41:30.369Z] > refreshing access token with scopes: []
+[debug] [2025-11-04T15:41:30.370Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2025-11-04T15:41:30.370Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-11-04T15:41:30.509Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2025-11-04T15:41:30.509Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-11-04T15:41:30.539Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/qs-system-demo:testIamPermissions [none]
+[debug] [2025-11-04T15:41:30.539Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/qs-system-demo:testIamPermissions x-goog-quota-user=projects/qs-system-demo
+[debug] [2025-11-04T15:41:30.539Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/qs-system-demo:testIamPermissions {"permissions":["firebase.projects.get","firebasehosting.sites.update"]}
+[debug] [2025-11-04T15:41:30.916Z] <<< [apiv2][status] GET https://firebase-public.firebaseio.com/cli.json 200
+[debug] [2025-11-04T15:41:30.916Z] <<< [apiv2][body] GET https://firebase-public.firebaseio.com/cli.json {"cloudBuildErrorAfter":1594252800000,"cloudBuildWarnAfter":1590019200000,"defaultNode10After":1594252800000,"minVersion":"3.0.5","node8DeploysDisabledAfter":1613390400000,"node8RuntimeDisabledAfter":1615809600000,"node8WarnAfter":1600128000000}
+[debug] [2025-11-04T15:41:31.699Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/qs-system-demo:testIamPermissions 200
+[debug] [2025-11-04T15:41:31.699Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/qs-system-demo:testIamPermissions {}
+[debug] [2025-11-04T15:41:31.699Z] [iam] error while checking permissions, command may fail: Authorization failed. This account is missing the following required permissions on project qs-system-demo:
+
+  firebase.projects.get
+  firebasehosting.sites.update
+[debug] [2025-11-04T15:41:31.700Z] Checked if tokens are valid: true, expires at: 1762274489510
+[debug] [2025-11-04T15:41:31.700Z] Checked if tokens are valid: true, expires at: 1762274489510
+[debug] [2025-11-04T15:41:31.700Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/qs-system-demo [none]
+[debug] [2025-11-04T15:41:32.078Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/qs-system-demo 403
+[debug] [2025-11-04T15:41:32.078Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/qs-system-demo {"error":{"code":403,"message":"The caller does not have permission","status":"PERMISSION_DENIED"}}
+[debug] [2025-11-04T15:41:32.078Z] Request to https://firebase.googleapis.com/v1beta1/projects/qs-system-demo had HTTP Error: 403, The caller does not have permission
+[debug] [2025-11-04T15:41:32.079Z] FirebaseError: Request to https://firebase.googleapis.com/v1beta1/projects/qs-system-demo had HTTP Error: 403, The caller does not have permission
+    at responseToError (C:\Users\Admin\AppData\Roaming\npm\node_modules\firebase-tools\lib\responseToError.js:52:12)
+    at RetryOperation._fn (C:\Users\Admin\AppData\Roaming\npm\node_modules\firebase-tools\lib\apiv2.js:312:77)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+[error] 
+[error] Error: Failed to get Firebase project qs-system-demo. Please make sure the project exists and your account has permission to access it.

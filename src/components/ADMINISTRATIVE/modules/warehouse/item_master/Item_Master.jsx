@@ -10,7 +10,6 @@ import {
   RefreshCw,
   SlidersHorizontal,
   FileUp,
-  FileInput,
 } from "lucide-react";
 import Icon_Field from "assets/elements/Icon_Field";
 import Select_Field from "assets/elements/Select_Field";
@@ -18,7 +17,7 @@ import Pagination from "assets/elements/Pagination";
 import Button from "assets/elements/Button";
 import { useToast } from "../../../layout/Toast_Provider";
 import Date_Range_Field from "assets/elements/Date_Range_Field";
-import Checkbox_Field from "assets/elements/Checkbox_Field";
+import Create_New_Item from "./create_new_item/Create_New_Item";
 
 const Item_Master = () => {
   const filter_ref = useRef(null);
@@ -54,11 +53,37 @@ const Item_Master = () => {
   //   ];
   const [all_data, set_all_data] = useState([
     {
-      po_number: "10000001",
-      po_type: "LFPO",
-      company: "QS IT Services",
-      creation_date: "10/29/2025 04:04:23 PM",
-      status: "Pending",
+      id: 1,
+      item_code: "ITM-0001",
+      item_desc: "NVIDIA GeForce GTX 1050 Graphics Card",
+      item_type: "PC Component",
+      item_category: "GPU",
+      uom: "PC",
+      batch_manage: false,
+      std_cost: 150,
+      status: "Active",
+    },
+    {
+      id: 2,
+      item_code: "ITM-0002",
+      item_desc: "Intel Core i5-10400F Processor",
+      item_type: "PC Component",
+      item_category: "CPU",
+      uom: "PC",
+      batch_manage: false,
+      std_cost: 180,
+      status: "Active",
+    },
+    {
+      id: 3,
+      item_code: "ITM-0003",
+      item_desc: "Kingston 16GB DDR4 3200MHz RAM",
+      item_type: "PC Component",
+      item_category: "Memory",
+      uom: "PC",
+      batch_manage: false,
+      std_cost: 60,
+      status: "Active",
     },
   ]);
   const [filtered_data, set_filtered_data] = useState([]);
@@ -184,7 +209,7 @@ const Item_Master = () => {
   // - For Date Range Field
 
   const handle_create_new_item = () => {
-    set_display_modal("select_po_type");
+    set_page("item_creation");
   };
 
   const handle_upload_item = () => {
@@ -418,6 +443,11 @@ const Item_Master = () => {
                               if (col.key === "index") {
                                 return <div>{idx + 1}</div>;
                               }
+                              if (col.key === "batch_manage") {
+                                return (
+                                  <div>{row.batch_manage ? "YES" : "NO"}</div>
+                                );
+                              }
                               if (col.key === "actions") {
                                 return (
                                   <div className="flex gap-2">
@@ -503,7 +533,7 @@ const Item_Master = () => {
           </div>
         </React.Fragment>
       )}
-      {/* {page === "po_creation" && <Create_New_PO set_page={set_page} />} */}
+      {page === "item_creation" && <Create_New_Item set_page={set_page} />}
     </React.Fragment>
   );
 };
