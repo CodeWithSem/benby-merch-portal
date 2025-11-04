@@ -28,14 +28,13 @@ const Checkbox_Field = ({
           }
         }}
         style={{ width: box_size, height: box_size }}
-        className={`flex items-center justify-center cursor-pointer border rounded select-none transition-colors duration-200 outline-none
+        className={`flex items-center justify-center border rounded select-none transition-colors duration-200 outline-none
           ${
-            disabled
-              ? "bg-gray-100 border-gray-200 cursor-not-allowed"
-              : checked
+            checked
               ? "bg-sky-600 border-sky-600"
               : "bg-white border-gray-300 hover:border-gray-400"
           }
+         ${disabled ? "cursor-not-allowed" : "cursor-pointer"}
         `}
       >
         {checked && <Check size={icon_size} color="white" />}

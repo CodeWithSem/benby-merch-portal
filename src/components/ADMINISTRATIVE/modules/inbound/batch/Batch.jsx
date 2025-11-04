@@ -23,6 +23,8 @@ import Select_Plant from "./modals/Select_Plant";
 import Select_SLOC from "./modals/Select_SLOC";
 import Select_Item from "./modals/Select_Item";
 import Create_New_Batch from "./create_new_batch/Create_New_Batch";
+import View_Batch from "./modals/view_batch/View_Batch";
+import Edit_Batch from "./edit_batch/Edit_Batch";
 
 const Batch = () => {
   const [page, set_page] = useState("main");
@@ -181,10 +183,10 @@ const Batch = () => {
 
   const handle_create_new_batch = () => set_page("batch_creation");
   const handle_upload_batch = () => alert("Under Maintenance");
-  const handle_view_batch = (id) => set_display_modal("view_gr");
+  const handle_view_batch = (id) => set_display_modal("view_batch");
   const handle_edit_batch = (id) => {
     alert(`Batch ID : ${id}`);
-    set_page("edit_gr");
+    set_page("edit_batch");
   };
   const handle_delete_batch = (id) => set_display_modal("delete_po");
 
@@ -435,6 +437,7 @@ const Batch = () => {
         </div>
       )}
       {page === "batch_creation" && <Create_New_Batch set_page={set_page} />}
+      {page === "edit_batch" && <Edit_Batch set_page={set_page} />}
       <Select_Branch
         is_open={display_modal === "select_branch"}
         on_close={() => set_display_modal("")}
@@ -457,6 +460,12 @@ const Batch = () => {
         is_open={display_modal === "select_item"}
         on_close={() => set_display_modal("")}
         width="max-w-[1000px]"
+        height="max-h-[700px]"
+      />
+      <View_Batch
+        is_open={display_modal === "view_batch"}
+        on_close={() => set_display_modal("")}
+        width="max-w-[1280px]"
         height="max-h-[700px]"
       />
     </React.Fragment>

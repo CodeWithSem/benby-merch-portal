@@ -19,13 +19,8 @@ import Button from "assets/elements/Button";
 import { useToast } from "../../../layout/Toast_Provider";
 import Date_Range_Field from "assets/elements/Date_Range_Field";
 import Checkbox_Field from "assets/elements/Checkbox_Field";
-import Create_New_PO from "./create_new_po/Create_New_PO";
-import Post_View_PO from "./modals/post_view_po/Post_View_PO";
-import Edit_PO from "./edit_po/Edit_PO";
-import Delete_PO from "./modals/delete_po/Delete_PO";
-import Select_PO_Type from "./modals/select_po_type/Select_PO_Type";
 
-const Purchase_Order = () => {
+const Item_Master = () => {
   const filter_ref = useRef(null);
   const [show_filter, set_show_filter] = useState(false);
   const [page, set_page] = useState("main");
@@ -36,10 +31,14 @@ const Purchase_Order = () => {
   const { show_toast } = useToast();
 
   const columns = [
-    { key: "po_number", label: "PO Number", sortable: true },
-    { key: "po_type", label: "PO Type", sortable: true },
-    { key: "company", label: "Company", sortable: true },
-    { key: "creation_date", label: "Creation Date", sortable: true },
+    { key: "index", label: "No.", sortable: true },
+    { key: "item_code", label: "Item Code", sortable: true },
+    { key: "item_desc", label: "Description", sortable: true },
+    { key: "item_type", label: "Type", sortable: true },
+    { key: "item_category", label: "Category", sortable: true },
+    { key: "uom", label: "UoM", sortable: true },
+    { key: "batch_manage", label: "Batch Manage", sortable: true },
+    { key: "std_cost", label: "Cost", sortable: true },
     { key: "status", label: "Status", sortable: true },
     { key: "actions", label: "", sortable: false },
   ];
@@ -184,11 +183,11 @@ const Purchase_Order = () => {
   const date_range_ref = useRef(null);
   // - For Date Range Field
 
-  const handle_create_new_po = () => {
+  const handle_create_new_item = () => {
     set_display_modal("select_po_type");
   };
 
-  const handle_upload_po = () => {
+  const handle_upload_item = () => {
     alert("Under Maintenance");
   };
 
@@ -233,7 +232,7 @@ const Purchase_Order = () => {
                   </li>
                   <li className="flex items-center gap-1.5 text-sm text-gray-500">
                     <span>/</span>
-                    <span className="text-gray-800">Purchase Order</span>
+                    <span className="text-gray-800">Item Master</span>
                   </li>
                 </ol>
               </nav>
@@ -241,21 +240,21 @@ const Purchase_Order = () => {
 
             <div className="w-full bg-white rounded-lg border">
               <div className="flex flex-wrap items-center justify-between gap-3 p-5">
-                <h1 className="text-lg">Purchase Order</h1>
+                <h1 className="text-lg">Item Master</h1>
                 <div className="flex gap-2">
                   <Button
                     variant="primary"
                     icon={PlusCircle}
                     icon_position="left"
-                    on_click={handle_create_new_po}
+                    on_click={handle_create_new_item}
                   >
-                    Create New PO
+                    Create New Item
                   </Button>
                   <Button
                     variant="primary"
                     icon={FileUp}
                     icon_position="left"
-                    on_click={handle_upload_po}
+                    on_click={handle_upload_item}
                   >
                     Upload
                   </Button>
@@ -327,17 +326,6 @@ const Purchase_Order = () => {
                                   <Date_Range_Field
                                     label="Date Range"
                                     ref={date_range_ref}
-                                  />
-                                </div>
-                                <div className="mt-4">
-                                  <Checkbox_Field
-                                    label="Is Draft?"
-                                    name="terms"
-                                    box_size={20}
-                                    icon_size={12}
-                                    //   checked={check}
-                                    //   on_change={(e) => set_check(e.target.checked)}
-                                    on_change={(e) => alert("Is Draft")}
                                   />
                                 </div>
 
@@ -427,18 +415,8 @@ const Purchase_Order = () => {
                             // + Cell Renderer
                             const render_cell = (col, row) => {
                               const value = row[col.key];
-                              if (col.key === "status") {
-                                return (
-                                  <span
-                                    className={`inline-flex items-center justify-center gap-1 rounded-full px-3 py-0.5 text-xs font-medium ${
-                                      row.status === "Posted"
-                                        ? "bg-green-100 text-green-500"
-                                        : "bg-yellow-100 text-yellow-600"
-                                    }`}
-                                  >
-                                    {row.status}
-                                  </span>
-                                );
+                              if (col.key === "index") {
+                                return <div>{idx + 1}</div>;
                               }
                               if (col.key === "actions") {
                                 return (
@@ -451,18 +429,7 @@ const Purchase_Order = () => {
                                         <View size={19} />
                                       </button>
                                       <span className="absolute bottom-full mb-1 left-1/2 transform -translate-x-1/2 px-2 py-1 text-xs text-white bg-sky-600 rounded opacity-0 group-hover:opacity-100 transition-opacity">
-                                        View Record
-                                      </span>
-                                    </div>
-                                    <div className="relative group flex jusity-center items-center">
-                                      <button
-                                        className="text-gray-500 hover:text-sky-600 text-[12px] outline-none"
-                                        onClick={() => handle_post_po(row.id)}
-                                      >
-                                        <FileInput size={19} />
-                                      </button>
-                                      <span className="absolute bottom-full mb-1 left-1/2 transform -translate-x-1/2 px-2 py-1 text-xs text-white bg-sky-600 rounded opacity-0 group-hover:opacity-100 transition-opacity">
-                                        Post Record
+                                        View Item
                                       </span>
                                     </div>
                                     <div className="relative group flex jusity-center items-center">
@@ -473,7 +440,7 @@ const Purchase_Order = () => {
                                         <Edit size={19} />
                                       </button>
                                       <span className="absolute bottom-full mb-1 left-1/2 transform -translate-x-1/2 px-2 py-1 text-xs text-white bg-sky-600 rounded opacity-0 group-hover:opacity-100 transition-opacity">
-                                        Edit Record
+                                        Edit Item
                                       </span>
                                     </div>
                                     <div className="relative group flex jusity-center items-center">
@@ -484,7 +451,7 @@ const Purchase_Order = () => {
                                         <Trash size={19} />
                                       </button>
                                       <span className="absolute bottom-full mb-1 left-1/2 transform -translate-x-1/2 px-2 py-1 text-xs text-white bg-red-600 rounded opacity-0 group-hover:opacity-100 transition-opacity">
-                                        Delete Record
+                                        Delete Item
                                       </span>
                                     </div>
                                   </div>
@@ -536,29 +503,9 @@ const Purchase_Order = () => {
           </div>
         </React.Fragment>
       )}
-      {page === "po_creation" && <Create_New_PO set_page={set_page} />}
-      {page === "edit_po" && <Edit_PO set_page={set_page} />}
-      {page === "post_po" && <Edit_PO set_page={set_page} />}
-      <Select_PO_Type
-        is_open={display_modal === "select_po_type"}
-        on_close={() => set_display_modal("")}
-        width="max-w-[1280px]"
-        height="max-h-[700px]"
-        set_page={set_page}
-      />
-      <Post_View_PO
-        is_open={display_modal === "view_po" || display_modal === "post_po"}
-        for_posting={for_posting}
-        on_close={() => set_display_modal("")}
-        width="max-w-[1280px]"
-      />
-      <Delete_PO
-        is_open={display_modal === "delete_po"}
-        on_close={() => set_display_modal("")}
-        width="max-w-[1280px]"
-      />
+      {/* {page === "po_creation" && <Create_New_PO set_page={set_page} />} */}
     </React.Fragment>
   );
 };
 
-export default Purchase_Order;
+export default Item_Master;

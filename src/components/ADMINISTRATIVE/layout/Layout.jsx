@@ -12,6 +12,9 @@ import Data_Tables from "assets/templates/pages/tables/data_tables/Data_Tables";
 import Goods_Receipt from "../modules/inbound/goods_receipt/Goods_Receipt";
 import Batch from "../modules/inbound/batch/Batch";
 import Input_Fields from "components/TEMPLATES/input_fields/Input_Fields";
+import Stock_Transfer from "../modules/warehouse/stock_transfer/Stock_Transfer";
+import Inventory_Master from "../modules/warehouse/inventory_master/Inventory_Master";
+import Item_Master from "../modules/warehouse/item_master/Item_Master";
 
 const Layout = () => {
   const [active_item, set_active_item] = useState(() => {
@@ -60,6 +63,12 @@ const Layout = () => {
         return <Goods_Receipt />;
       case "Inbound-Batch":
         return <Batch />;
+      case "Warehouse-Stock Transfer":
+        return <Stock_Transfer />;
+      case "Warehouse-Inventory Master":
+        return <Inventory_Master />;
+      case "Warehouse-Item Master":
+        return <Item_Master />;
       case "Templates-Form Elements":
         return <Form_Elements />;
       case "Templates-Tabs":

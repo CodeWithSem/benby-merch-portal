@@ -16,11 +16,7 @@ const Textarea_Field = ({
     label ? "mt-1" : ""
   } px-3 py-2 bg-white border rounded-md text-sm shadow-sm placeholder-slate-400
     focus:outline-none focus:ring-1 resize-none
-    ${
-      disabled
-        ? "bg-slate-50 text-slate-500 border-slate-200 cursor-not-allowed"
-        : ""
-    }
+    ${disabled ? "disabled:bg-slate-50 disabled:text-slate-500" : ""}
     ${
       error_message
         ? "border-pink-500 text-pink-600 focus:ring-pink-500 focus:border-pink-500"

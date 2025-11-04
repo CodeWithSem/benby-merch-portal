@@ -1,25 +1,9 @@
 import React, { useState } from "react";
 import Text_Field from "assets/elements/Text_Field";
-import Select_Field from "assets/elements/Select_Field";
-import Checkbox_Field from "assets/elements/Checkbox_Field";
 import Textarea_Field from "assets/elements/Textarea_Field";
-import Date_Field from "assets/elements/Date_Field";
+import Checkbox_Field from "assets/elements/Checkbox_Field";
 
 const Batch_Details = () => {
-  // + For Select Incoterms
-  const [selected_unserved_reason, set_selected_unserved_reason] = useState("");
-  const handle_select_unserved_reason = (e) => {
-    const selected = e.target.value;
-    set_selected_unserved_reason(selected);
-  };
-
-  const period_indicator_option = [
-    { label: "Data 1", value: "1" },
-    { label: "Data 2", value: "2" },
-    { label: "Data 3", value: "3" },
-  ];
-  // - For Select Incoterms
-
   // RETURN ORIGIN
   return (
     <React.Fragment>
@@ -27,47 +11,44 @@ const Batch_Details = () => {
         <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
           {/* + Manufacturing Date */}
           <div>
-            <Date_Field
+            <Text_Field
               label="Manufacturing Date"
-              name="date_range"
-              placeholder="Select Date"
-              on_change={(e) => console.log(e.target.value)}
+              type={"text"}
+              pattern="[A-Za-z]{1,}"
+              disabled
             />
           </div>
           {/* - Manufacturing Date */}
-          {/* + Delivery Remarks */}
+          {/* + Batch Type */}
           <div>
             <Text_Field
               label="Batch Type"
               type={"text"}
-              placeholder="Enter batch type"
               pattern="[A-Za-z]{1,}"
+              disabled
             />
           </div>
-          {/* - Delivery Remarks */}
-
+          {/* - Batch Type */}
           {/* + SLED / BBD */}
           <div>
-            <Date_Field
+            <Text_Field
               label="SLED / BBD"
-              name="date_range"
-              placeholder="Select Date"
-              on_change={(e) => console.log(e.target.value)}
+              type={"text"}
+              pattern="[A-Za-z]{1,}"
+              disabled
             />
           </div>
           {/* - SLED / BBD */}
-          {/* + Item Remarks */}
+          {/* + Period Indicator */}
           <div>
-            <Select_Field
+            <Text_Field
               label="Period Indicator"
-              name="period_indicator"
-              // value={selected_unserved_reason}
-              // on_change={handle_select_unserved_reason}
-              options={period_indicator_option}
-              placeholder="Select Period Indicator"
+              type={"text"}
+              pattern="[A-Za-z]{1,}"
+              disabled
             />
           </div>
-          {/* - Item Remarks */}
+          {/* - Period Indicator */}
           {/* + Item Remarks */}
           <div className="col-span-full">
             <Textarea_Field
@@ -75,8 +56,8 @@ const Batch_Details = () => {
               name="item_remarks"
               // value={description}
               // on_change={handle_textarea_change}
-              placeholder="Enter your item remarks..."
               height="100px"
+              disabled
             />
           </div>
           {/* - Item Remarks */}
@@ -87,9 +68,11 @@ const Batch_Details = () => {
               name="batch_deletion_ind"
               box_size={24}
               icon_size={14}
+              // checked={true}
               // checked={check}
               // on_change={(e) => set_check(e.target.checked)}
-              on_change={() => alert("Batch Deletion Indicator")}
+              // on_change={() => alert("Batch Deletion Indicator")}
+              disabled
             />
           </div>
           {/* - Batch Deletion Indicator */}

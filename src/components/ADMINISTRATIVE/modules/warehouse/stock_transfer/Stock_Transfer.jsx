@@ -1,65 +1,92 @@
 import React, { useEffect, useRef, useState } from "react";
 import {
+  ArrowLeftRight,
   Search,
   ChevronDown,
   ChevronUp,
   Edit,
   Trash,
   View,
-  PlusCircle,
   RefreshCw,
   SlidersHorizontal,
-  FileUp,
   FileInput,
 } from "lucide-react";
+import { useToast } from "../../../layout/Toast_Provider";
+import Button from "assets/elements/Button";
 import Icon_Field from "assets/elements/Icon_Field";
 import Select_Field from "assets/elements/Select_Field";
-import Pagination from "assets/elements/Pagination";
-import Button from "assets/elements/Button";
-import { useToast } from "../../../layout/Toast_Provider";
 import Date_Range_Field from "assets/elements/Date_Range_Field";
-import Checkbox_Field from "assets/elements/Checkbox_Field";
-import Create_New_PO from "./create_new_po/Create_New_PO";
-import Post_View_PO from "./modals/post_view_po/Post_View_PO";
-import Edit_PO from "./edit_po/Edit_PO";
-import Delete_PO from "./modals/delete_po/Delete_PO";
-import Select_PO_Type from "./modals/select_po_type/Select_PO_Type";
+import Pagination from "assets/elements/Pagination";
+import Transfer_Process from "./transfer_process/Transfer_Process";
 
-const Purchase_Order = () => {
+const Stock_Transfer = () => {
   const filter_ref = useRef(null);
   const [show_filter, set_show_filter] = useState(false);
   const [page, set_page] = useState("main");
   const [display_modal, set_display_modal] = useState("");
-  const [for_posting, set_for_posting] = useState(false);
+  const date_range_ref = useRef(null);
 
   // Close dropdown on outside click
   const { show_toast } = useToast();
 
+  const company_list = [
+    { id: 1, company_code: "20001", company_desc: "Company 1" },
+    { id: 2, company_code: "20002", company_desc: "Company 2" },
+  ];
+
   const columns = [
-    { key: "po_number", label: "PO Number", sortable: true },
-    { key: "po_type", label: "PO Type", sortable: true },
-    { key: "company", label: "Company", sortable: true },
-    { key: "creation_date", label: "Creation Date", sortable: true },
+    { key: "id", label: "ID", sortable: true },
+    { key: "from_branch_code", label: "From Branch", sortable: true },
+    { key: "to_branch_code", label: "To Branch", sortable: true },
+    { key: "transfer_date", label: "Transfer Date", sortable: true },
     { key: "status", label: "Status", sortable: true },
+    { key: "created_by", label: "Created By", sortable: true },
+    { key: "approved_by", label: "Approved By", sortable: true },
+    { key: "receive_by", label: "Received By", sortable: true },
     { key: "actions", label: "", sortable: false },
   ];
 
   // --- State ---
-  //   const all_data = [
-  //     {
-  //       po_number: "10000001",
-  //       po_type: "LFPO",
-  //       company: "QS IT Services",
-  //       creation_date: "10/29/2025 04:04:23 PM",
-  //     },
-  //   ];
   const [all_data, set_all_data] = useState([
     {
-      po_number: "10000001",
-      po_type: "LFPO",
-      company: "QS IT Services",
-      creation_date: "10/29/2025 04:04:23 PM",
-      status: "Pending",
+      id: 1,
+      from_branch_code: "BR001",
+      to_branch_code: "BR002",
+      transfer_date: "11/04/2025 10:05:50",
+      status: "In Transit",
+      created_by: "John Doe",
+      approved_by: "",
+      receive_by: "",
+    },
+    {
+      id: 2,
+      from_branch_code: "BR003",
+      to_branch_code: "BR005",
+      transfer_date: "11/04/2025 10:05:50",
+      status: "Approved",
+      created_by: "Jane Smith",
+      approved_by: "Michael Reyes",
+      receive_by: "",
+    },
+    {
+      id: 3,
+      from_branch_code: "BR002",
+      to_branch_code: "BR004",
+      transfer_date: "11/04/2025 10:05:50",
+      status: "Received",
+      created_by: "Alex Cruz",
+      approved_by: "Sarah Lim",
+      receive_by: "Paul Santos",
+    },
+    {
+      id: 4,
+      from_branch_code: "BR001",
+      to_branch_code: "BR003",
+      transfer_date: "11/04/2025 10:05:50",
+      status: "Cancelled",
+      created_by: "Maria Dela Cruz",
+      approved_by: "",
+      receive_by: "",
     },
   ]);
   const [filtered_data, set_filtered_data] = useState([]);
@@ -180,44 +207,19 @@ const Purchase_Order = () => {
   // - Sort Filtering
   const handle_page_change = (page) => set_current_page(page);
 
-  // + For Date Range Field
-  const date_range_ref = useRef(null);
-  // - For Date Range Field
-
-  const handle_create_new_po = () => {
-    set_display_modal("select_po_type");
+  const handle_transfer_process = () => {
+    set_page("transfer_process");
   };
-
-  const handle_upload_po = () => {
-    alert("Under Maintenance");
-  };
-
-  const handle_view_po = () => {
-    set_for_posting(false);
-    set_display_modal("view_po");
-  };
-
-  const handle_post_po = () => {
-    set_for_posting(true);
-    set_display_modal("post_po");
-  };
-
-  const handle_edit_po = () => {
-    set_page("edit_po");
-  };
-
-  const handle_delete_po = () => {
-    set_display_modal("delete_po");
-  };
-
   // RETURN ORIGIN
   return (
     <React.Fragment>
       {page === "main" && (
         <React.Fragment>
           <div className="w-full">
+            {/* + Header */}
             <div className="flex flex-wrap items-center justify-between gap-3 py-5">
-              <h1 className="text-xl">Inbound</h1>
+              <h1 className="text-xl">Warehouse</h1>
+              {/* + Breadcrumb */}
               <nav>
                 <ol className="flex flex-wrap items-center gap-1.5">
                   <li>
@@ -228,40 +230,35 @@ const Purchase_Order = () => {
                   <li className="flex items-center gap-1.5 text-sm text-gray-500">
                     <span>/</span>
                     <a className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-sky-500 cursor-pointer">
-                      Inbound
+                      Warehouse
                     </a>
                   </li>
                   <li className="flex items-center gap-1.5 text-sm text-gray-500">
                     <span>/</span>
-                    <span className="text-gray-800">Purchase Order</span>
+                    <span className="text-gray-800">Stock Transfer</span>
                   </li>
                 </ol>
               </nav>
+              {/* - Breadcrumb */}
             </div>
-
+            {/* - Header */}
             <div className="w-full bg-white rounded-lg border">
+              {/* + Title */}
               <div className="flex flex-wrap items-center justify-between gap-3 p-5">
-                <h1 className="text-lg">Purchase Order</h1>
+                <h1 className="text-lg">Stock Transfer</h1>
                 <div className="flex gap-2">
                   <Button
                     variant="primary"
-                    icon={PlusCircle}
+                    icon={ArrowLeftRight}
                     icon_position="left"
-                    on_click={handle_create_new_po}
+                    on_click={handle_transfer_process}
                   >
-                    Create New PO
-                  </Button>
-                  <Button
-                    variant="primary"
-                    icon={FileUp}
-                    icon_position="left"
-                    on_click={handle_upload_po}
-                  >
-                    Upload
+                    Transfer
                   </Button>
                 </div>
               </div>
-
+              {/* - Title */}
+              {/* + Content */}
               <div className="p-5 sm:p-6 border-t">
                 <div className="w-full border rounded-lg">
                   <div className="w-full md:flex md:justify-between p-4 gap-4">
@@ -295,7 +292,7 @@ const Purchase_Order = () => {
                       <div className="w-full flex items-center gap-2">
                         <div className="w-full">
                           <Icon_Field
-                            name="search"
+                            //   name="search"
                             placeholder="Search..."
                             icon={Search}
                             icon_position="left"
@@ -329,18 +326,6 @@ const Purchase_Order = () => {
                                     ref={date_range_ref}
                                   />
                                 </div>
-                                <div className="mt-4">
-                                  <Checkbox_Field
-                                    label="Is Draft?"
-                                    name="terms"
-                                    box_size={20}
-                                    icon_size={12}
-                                    //   checked={check}
-                                    //   on_change={(e) => set_check(e.target.checked)}
-                                    on_change={(e) => alert("Is Draft")}
-                                  />
-                                </div>
-
                                 <div className="flex justify-end gap-2 mt-4">
                                   <Button
                                     size="sm"
@@ -376,9 +361,9 @@ const Purchase_Order = () => {
                         No data found
                       </div>
                     ) : (
-                      <table className="min-w-full">
+                      <table className="min-w-full whitespace-nowrap">
                         <thead className="bg-gray-100">
-                          <tr className="whitespace-nowrap">
+                          <tr>
                             {columns.map((col, i) => {
                               const renderHeaderCell = (col) => {
                                 const is_sorted = sort_by === col.key;
@@ -424,16 +409,30 @@ const Purchase_Order = () => {
                         </thead>
                         <tbody className="bg-white">
                           {filtered_data.map((row, idx) => {
+                            const company = company_list.find(
+                              (c) => c.company_code === row.company_code
+                            );
                             // + Cell Renderer
                             const render_cell = (col, row) => {
                               const value = row[col.key];
+                              if (col.key === "company") {
+                                return (
+                                  <div>{company?.company_desc || "-"}</div>
+                                );
+                              }
                               if (col.key === "status") {
                                 return (
                                   <span
                                     className={`inline-flex items-center justify-center gap-1 rounded-full px-3 py-0.5 text-xs font-medium ${
-                                      row.status === "Posted"
-                                        ? "bg-green-100 text-green-500"
-                                        : "bg-yellow-100 text-yellow-600"
+                                      {
+                                        Draft: "bg-yellow-100 text-yellow-600",
+                                        Approved: "bg-green-100 text-green-500",
+                                        "In Transit":
+                                          "bg-yellow-100 text-yellow-600",
+                                        Received: "bg-green-100 text-green-500",
+                                        Cancelled: "bg-red-100 text-red-500",
+                                      }[row.status] ||
+                                      "bg-gray-100 text-gray-500"
                                     }`}
                                   >
                                     {row.status}
@@ -444,47 +443,11 @@ const Purchase_Order = () => {
                                 return (
                                   <div className="flex gap-2">
                                     <div className="relative group flex jusity-center items-center">
-                                      <button
-                                        className="text-gray-500 hover:text-sky-600 text-[12px] outline-none"
-                                        onClick={() => handle_view_po(row.id)}
-                                      >
+                                      <button className="text-gray-500 hover:text-sky-600 text-[12px] outline-none">
                                         <View size={19} />
                                       </button>
                                       <span className="absolute bottom-full mb-1 left-1/2 transform -translate-x-1/2 px-2 py-1 text-xs text-white bg-sky-600 rounded opacity-0 group-hover:opacity-100 transition-opacity">
                                         View Record
-                                      </span>
-                                    </div>
-                                    <div className="relative group flex jusity-center items-center">
-                                      <button
-                                        className="text-gray-500 hover:text-sky-600 text-[12px] outline-none"
-                                        onClick={() => handle_post_po(row.id)}
-                                      >
-                                        <FileInput size={19} />
-                                      </button>
-                                      <span className="absolute bottom-full mb-1 left-1/2 transform -translate-x-1/2 px-2 py-1 text-xs text-white bg-sky-600 rounded opacity-0 group-hover:opacity-100 transition-opacity">
-                                        Post Record
-                                      </span>
-                                    </div>
-                                    <div className="relative group flex jusity-center items-center">
-                                      <button
-                                        className="text-gray-500 hover:text-sky-600 text-[12px] outline-none"
-                                        onClick={() => handle_edit_po(row.id)}
-                                      >
-                                        <Edit size={19} />
-                                      </button>
-                                      <span className="absolute bottom-full mb-1 left-1/2 transform -translate-x-1/2 px-2 py-1 text-xs text-white bg-sky-600 rounded opacity-0 group-hover:opacity-100 transition-opacity">
-                                        Edit Record
-                                      </span>
-                                    </div>
-                                    <div className="relative group flex jusity-center items-center">
-                                      <button
-                                        className="text-gray-500 hover:text-red-600 text-[12px] mb-[1px] outline-none"
-                                        onClick={() => handle_delete_po(row.id)}
-                                      >
-                                        <Trash size={19} />
-                                      </button>
-                                      <span className="absolute bottom-full mb-1 left-1/2 transform -translate-x-1/2 px-2 py-1 text-xs text-white bg-red-600 rounded opacity-0 group-hover:opacity-100 transition-opacity">
-                                        Delete Record
                                       </span>
                                     </div>
                                   </div>
@@ -496,10 +459,7 @@ const Purchase_Order = () => {
                             // - Cell Renderer
 
                             return (
-                              <tr
-                                key={idx}
-                                className="hover:bg-gray-50 whitespace-nowrap"
-                              >
+                              <tr key={idx} className="hover:bg-gray-50">
                                 {columns.map((col, i) => (
                                   <td
                                     key={i}
@@ -521,7 +481,6 @@ const Purchase_Order = () => {
                       </table>
                     )}
                   </div>
-
                   {total_pages > 0 && (
                     <Pagination
                       current_page={current_page}
@@ -532,33 +491,14 @@ const Purchase_Order = () => {
                   )}
                 </div>
               </div>
+              {/* - Content */}
             </div>
           </div>
         </React.Fragment>
       )}
-      {page === "po_creation" && <Create_New_PO set_page={set_page} />}
-      {page === "edit_po" && <Edit_PO set_page={set_page} />}
-      {page === "post_po" && <Edit_PO set_page={set_page} />}
-      <Select_PO_Type
-        is_open={display_modal === "select_po_type"}
-        on_close={() => set_display_modal("")}
-        width="max-w-[1280px]"
-        height="max-h-[700px]"
-        set_page={set_page}
-      />
-      <Post_View_PO
-        is_open={display_modal === "view_po" || display_modal === "post_po"}
-        for_posting={for_posting}
-        on_close={() => set_display_modal("")}
-        width="max-w-[1280px]"
-      />
-      <Delete_PO
-        is_open={display_modal === "delete_po"}
-        on_close={() => set_display_modal("")}
-        width="max-w-[1280px]"
-      />
+      {page === "transfer_process" && <Transfer_Process set_page={set_page} />}
     </React.Fragment>
   );
 };
 
-export default Purchase_Order;
+export default Stock_Transfer;
