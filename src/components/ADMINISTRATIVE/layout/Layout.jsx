@@ -15,6 +15,10 @@ import Input_Fields from "components/TEMPLATES/input_fields/Input_Fields";
 import Stock_Transfer from "../modules/warehouse/stock_transfer/Stock_Transfer";
 import Inventory_Master from "../modules/warehouse/inventory_master/Inventory_Master";
 import Item_Master from "../modules/warehouse/item_master/Item_Master";
+import General_Structure from "../modules/maintenance/general_structure/General_Structure";
+import Financial from "../modules/maintenance/financial/Financial";
+import Vendor from "../modules/maintenance/vendor/Vendor";
+import Purchase_Order_Maint from "../modules/maintenance/purchase_order/Purchase_Order_Maint";
 
 const Layout = () => {
   const [active_item, set_active_item] = useState(() => {
@@ -69,6 +73,14 @@ const Layout = () => {
         return <Inventory_Master />;
       case "Warehouse-Item Master":
         return <Item_Master />;
+      case "Maintenance-General Structure":
+        return <General_Structure />;
+      case "Maintenance-Financial":
+        return <Financial />;
+      case "Maintenance-Vendor":
+        return <Vendor />;
+      case "Maintenance-Purchase Order":
+        return <Purchase_Order_Maint />;
       case "Templates-Form Elements":
         return <Form_Elements />;
       case "Templates-Tabs":

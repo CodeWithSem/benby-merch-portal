@@ -18,6 +18,8 @@ import Button from "assets/elements/Button";
 import { useToast } from "../../../layout/Toast_Provider";
 import Date_Range_Field from "assets/elements/Date_Range_Field";
 import Create_New_Item from "./create_new_item/Create_New_Item";
+import Edit_Item from "./edit_item/Edit_Item";
+import View_Item from "./modals/view_item/View_Item";
 
 const Item_Master = () => {
   const filter_ref = useRef(null);
@@ -216,18 +218,12 @@ const Item_Master = () => {
     alert("Under Maintenance");
   };
 
-  const handle_view_po = () => {
-    set_for_posting(false);
-    set_display_modal("view_po");
+  const handle_view_item = () => {
+    set_display_modal("view_item");
   };
 
-  const handle_post_po = () => {
-    set_for_posting(true);
-    set_display_modal("post_po");
-  };
-
-  const handle_edit_po = () => {
-    set_page("edit_po");
+  const handle_edit_item = () => {
+    set_page("edit_item");
   };
 
   const handle_delete_po = () => {
@@ -454,7 +450,7 @@ const Item_Master = () => {
                                     <div className="relative group flex jusity-center items-center">
                                       <button
                                         className="text-gray-500 hover:text-sky-600 text-[12px] outline-none"
-                                        onClick={() => handle_view_po(row.id)}
+                                        onClick={() => handle_view_item(row.id)}
                                       >
                                         <View size={19} />
                                       </button>
@@ -465,7 +461,7 @@ const Item_Master = () => {
                                     <div className="relative group flex jusity-center items-center">
                                       <button
                                         className="text-gray-500 hover:text-sky-600 text-[12px] outline-none"
-                                        onClick={() => handle_edit_po(row.id)}
+                                        onClick={() => handle_edit_item(row.id)}
                                       >
                                         <Edit size={19} />
                                       </button>
@@ -534,6 +530,13 @@ const Item_Master = () => {
         </React.Fragment>
       )}
       {page === "item_creation" && <Create_New_Item set_page={set_page} />}
+      {page === "edit_item" && <Edit_Item set_page={set_page} />}
+
+      <View_Item
+        is_open={display_modal === "view_item"}
+        on_close={() => set_display_modal("")}
+        width="max-w-[1280px]"
+      />
     </React.Fragment>
   );
 };

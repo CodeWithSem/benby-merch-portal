@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useState } from "react";
 import Text_Field from "assets/elements/Text_Field";
 import Date_Field from "assets/elements/Date_Field";
+import { format_date_1 } from "assets/scripts/format";
 
 const Shipment = () => {
   return (
@@ -12,7 +13,8 @@ const Shipment = () => {
             <Date_Field
               label="Original Date"
               name="date"
-              placeholder="mm/dd/yyyy"
+              placeholder="mm-dd-yyyy"
+              on_change={(e) => alert(format_date_1(e.target.value))}
             />
           </div>
           <div>

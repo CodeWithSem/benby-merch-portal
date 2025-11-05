@@ -1,8 +1,14 @@
-import React from "react";
+import React, { useState } from "react";
 import Text_Field from "assets/elements/Text_Field";
 import Date_Field from "assets/elements/Date_Field";
+import { format_date_1 } from "assets/scripts/format";
 
 const Shipment = () => {
+  const [orig_date, set_orig_date] = useState("");
+  const handle_orig_date_change = (e) => {
+    const formatted_date = format_date_1(e.target.value);
+    set_orig_date(formatted_date);
+  };
   return (
     <React.Fragment>
       <div className="rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6 dark:border-gray-800 dark:bg-gray-900">
@@ -12,8 +18,9 @@ const Shipment = () => {
             <Date_Field
               label="Original Date"
               name="date"
-              placeholder="mm/dd/yyyy"
-              on_change={() => console.log("Change Date")}
+              placeholder="mm-dd-yyyy"
+              value={orig_date}
+              on_change={handle_orig_date_change}
             />
           </div>
           <div>

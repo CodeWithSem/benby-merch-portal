@@ -15,7 +15,7 @@ const Purchasing = () => {
             <Text_Code_Field
               label="Plant / DC" // code_value={code_data} // on_code_change={handle_code_data_change} // text_value={text_data} // on_text_change={handle_text_data_change}
               code_width="150px"
-              show_search_button={true}
+              show_search_button={false}
               disabled
             />
           </div>
@@ -23,7 +23,7 @@ const Purchasing = () => {
             <Text_Code_Field
               label="SLOC" // code_value={code_data} // on_code_change={handle_code_data_change} // text_value={text_data} // on_text_change={handle_text_data_change}
               code_width="150px"
-              show_search_button={true}
+              show_search_button={false}
               disabled
             />
           </div>
@@ -33,71 +33,59 @@ const Purchasing = () => {
         <h1 className="mb-5 font-semibold text-sky-700">Purchasing Details</h1>
         <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
           <div>
-            <Select_Field
+            <Text_Field
               label="Item Group"
-              name="item_group"
-              // value={selected_data}
-              // // on_change={handle_option_change}
-              // // options={options}
-              placeholder="Select Option"
+              type={"text"}
+              pattern="[A-Za-z]{1,}"
+              disabled
             />
           </div>
           <div>
-            <Select_Field
+            <Text_Field
               label="Purchasing Group"
-              name="gen_group_category"
-              // value={selected_data}
-              // // on_change={handle_option_change}
-              // // options={options}
-              placeholder="Select Option"
+              type={"text"}
+              pattern="[A-Za-z]{1,}"
+              disabled
             />
           </div>
           <div>
-            <Select_Field
+            <Text_Field
               label="Base Unit of Measure"
-              name="base_uom"
-              // value={selected_data}
-              // // on_change={handle_option_change}
-              // // options={options}
-              placeholder="Select Option"
+              type={"text"}
+              pattern="[A-Za-z]{1,}"
+              disabled
             />
           </div>
           <div>
-            <Select_Field
+            <Text_Field
               label="Ordering Unit"
-              name="ordering_unit"
-              // value={selected_data}
-              // // on_change={handle_option_change}
-              // // options={options}
-              placeholder="Select Option"
+              type={"text"}
+              pattern="[A-Za-z]{1,}"
+              disabled
             />
           </div>
           <div>
-            <Date_Field
+            <Text_Field
               label="Validity From"
-              name="valid_from"
-              // value={selected_data}
-              on_change={(e) => alert(e.target.value)}
-              placeholder="Select Date"
+              type={"text"}
+              pattern="[A-Za-z]{1,}"
+              disabled
             />
           </div>
           <div>
-            <Date_Field
+            <Text_Field
               label="Validity To"
-              name="valid_to"
-              // value={selected_data}
-              on_change={(e) => alert(e.target.value)}
-              placeholder="Select Date"
+              type={"text"}
+              pattern="[A-Za-z]{1,}"
+              disabled
             />
           </div>
           <div>
-            <Select_Field
+            <Text_Field
               label="Plant Specific Status"
-              name="plant_spec_status"
-              // value={selected_data}
-              // // on_change={handle_option_change}
-              // // options={options}
-              placeholder="Select Option"
+              type={"text"}
+              pattern="[A-Za-z]{1,}"
+              disabled
             />
           </div>
           <div className="mt-4 flex items-end col-span-full">
@@ -106,8 +94,7 @@ const Purchasing = () => {
               name="batch_manage"
               box_size={24}
               icon_size={14}
-              // checked={check}
-              on_change={(e) => alert("Batch Management")}
+              disabled
             />
           </div>
         </div>
@@ -121,25 +108,20 @@ const Purchasing = () => {
             <Text_Field
               label="To Quality Inspection"
               type={"text"}
-              placeholder="Enter quality inspection"
-              pattern="[0-9]{1,}"
+              pattern="[A-Za-z]{1,}"
+              disabled
             />
           </div>
           <div>
             <Text_Field
               label="Source Hub"
               type={"text"}
-              placeholder="Enter source hub"
-              pattern="[0-9]{1,}"
+              pattern="[A-Za-z]{1,}"
+              disabled
             />
           </div>
           <div>
-            <Textarea_Field
-              label="Purchasing Text"
-              name="purchasing_text" // value={data} // on_change={(e) => handle_data_change(e.target.value)}
-              placeholder="Enter your description..."
-              height="121px"
-            />
+            <Textarea_Field label="Purchasing Text" height="120px" disabled />
           </div>
         </div>
       </div>

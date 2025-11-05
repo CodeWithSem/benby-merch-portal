@@ -45,20 +45,12 @@ const Purchase_Order = () => {
   ];
 
   // --- State ---
-  //   const all_data = [
-  //     {
-  //       po_number: "10000001",
-  //       po_type: "LFPO",
-  //       company: "QS IT Services",
-  //       creation_date: "10/29/2025 04:04:23 PM",
-  //     },
-  //   ];
   const [all_data, set_all_data] = useState([
     {
       po_number: "10000001",
       po_type: "LFPO",
       company: "QS IT Services",
-      creation_date: "10/29/2025 04:04:23 PM",
+      creation_date: "11-05-2025 04:04:23",
       status: "Pending",
     },
   ]);

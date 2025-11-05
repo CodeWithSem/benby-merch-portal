@@ -45,16 +45,16 @@ const Sidebar = ({
         "Purchase Order",
         "Goods Receipt",
         "Batch",
-        "Inbound History",
+        // "Inbound History",
       ],
     },
-    {
-      key: "Outbound",
-      type: "dropdown",
-      name: "Outbound",
-      icon: <PackageMinus size={18} />,
-      sub_items: [],
-    },
+    // {
+    //   key: "Outbound",
+    //   type: "dropdown",
+    //   name: "Outbound",
+    //   icon: <PackageMinus size={18} />,
+    //   sub_items: [],
+    // },
     {
       key: "Warehouse",
       type: "dropdown",
@@ -64,7 +64,7 @@ const Sidebar = ({
         "Stock Transfer",
         "Inventory Master",
         "Item Master",
-        "Inventory History",
+        // "Inventory History",
       ],
     },
     {

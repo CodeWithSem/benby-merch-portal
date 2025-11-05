@@ -12,7 +12,7 @@ import {
 } from "firebase/auth";
 import { doc, setDoc, getDoc, collection, deleteDoc } from "firebase/firestore";
 import { auth, firestore_db, secondary_auth } from "../assets/scripts/firebase";
-import { format_date } from "../assets/scripts/format";
+import { format_date_2 } from "../assets/scripts/format";
 
 /**
  * Register a new user with email and password
@@ -55,7 +55,7 @@ export const registerUser = async (
       last_name,
       user_code,
       category: category || "Viewer",
-      creation_date: format_date(new Date(), "military"),
+      creation_date: format_date_2(new Date(), "military"),
     });
 
     return user;
@@ -100,7 +100,7 @@ export const registerUserByAdmin = async (
       last_name,
       user_code,
       category: category || "Viewer",
-      creation_date: format_date(new Date(), "military"),
+      creation_date: format_date_2(new Date(), "military"),
     });
 
     await signOut(secondary_auth);

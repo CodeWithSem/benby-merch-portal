@@ -1,7 +1,37 @@
-export function format_date(date, format) {
-  if (format === "military") {
-    const pad = (n) => n.toString().padStart(2, "0");
+// + Get Date Now
+export function get_date_now() {
+  const date_now = new Date();
 
+  return date_now;
+}
+// - Get Date Now
+
+// + Format Date 1 (mm-dd-yyyy)
+export function format_date_1(date_input) {
+  let date;
+
+  if (!date_input) return "";
+
+  if (typeof date_input === "string") {
+    date = new Date(date_input);
+  } else if (date_input instanceof Date) {
+    date = date_input;
+  } else {
+    throw new Error("Invalid date input");
+  }
+
+  const mm = String(date.getMonth() + 1).padStart(2, "0"); // Months are 0-based
+  const dd = String(date.getDate()).padStart(2, "0");
+  const yyyy = date.getFullYear();
+
+  return `${mm}-${dd}-${yyyy}`;
+}
+// - Format Date 1 (mm-dd-yyyy)
+
+// + Format Date 2 (mm-dd-yyyy with time)
+export function format_date_2(date, format) {
+  const pad = (n) => n.toString().padStart(2, "0");
+  if (format === "military") {
     const month = pad(date.getMonth() + 1); // Months are 0-based
     const day = pad(date.getDate());
     const year = date.getFullYear();
@@ -10,10 +40,25 @@ export function format_date(date, format) {
     const minutes = pad(date.getMinutes());
     const seconds = pad(date.getSeconds());
 
-    return `${month}/${day}/${year} ${hours}:${minutes}:${seconds}`;
+    return `${month}-${day}-${year} ${hours}:${minutes}:${seconds}`;
+  } else if (format === "ampm") {
+    const month = pad(date.getMonth() + 1);
+    const day = pad(date.getDate());
+    const year = date.getFullYear();
+
+    let hours = date.getHours();
+    const minutes = pad(date.getMinutes());
+    const seconds = pad(date.getSeconds());
+
+    const ampm = hours >= 12 ? "PM" : "AM";
+    hours = hours % 12;
+    hours = hours === 0 ? 12 : hours; // Convert 0 to 12 for 12 AM/PM
+    hours = pad(hours);
+
+    return `${month}-${day}-${year} ${hours}:${minutes}:${seconds} ${ampm}`;
   }
 }
-
+// - Format Date 2 (mm-dd-yyyy with time)
 export function format_currency(
   number,
   decimals = 2,

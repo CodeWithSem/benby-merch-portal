@@ -8,7 +8,7 @@ import {
 } from "firebase/firestore";
 import bcrypt from "bcryptjs";
 import { firestore_db } from "../assets/scripts/firebase";
-import { format_date } from "../assets/scripts/format";
+import { format_date_2 } from "../assets/scripts/format";
 
 // + Register User
 export const register_user = async (
@@ -45,7 +45,7 @@ export const register_user = async (
       last_name,
       category,
       created_by,
-      creation_date: format_date(new Date(), "military"),
+      creation_date: format_date_2(new Date(), "military"),
       updated_by: "",
       updated_date: "",
       timestamp: serverTimestamp(),

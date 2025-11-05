@@ -15,6 +15,7 @@ import Select_Branch from "./modals/Select_Branch";
 import Select_Plant from "./modals/Select_Plant";
 import Select_SLOC from "./modals/Select_SLOC";
 import Select_Item from "./modals/Select_Item";
+import { get_date_now, format_date_1 } from "assets/scripts/format";
 
 const Create_New_PO = ({ set_page }) => {
   const [active_tab, set_active_tab] = useState("delivery");
@@ -86,7 +87,7 @@ const Create_New_PO = ({ set_page }) => {
 
             <div className="flex gap-2">
               <div className="text-gray-500 text-sm tracking-wider">
-                10/30/2025
+                {format_date_1(get_date_now())}
               </div>
               {/* <Button
                 variant="primary"
