@@ -67,7 +67,7 @@ const Text_Code_Field = ({
 
       <div className="flex gap-3">
         {/* Left input (code) */}
-        <div className={`w-[${code_width}]`}>
+        <div className={`w-[${code_width}] hidden md:block`}>
           <input
             type={type}
             placeholder={placeholder}

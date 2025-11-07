@@ -11,6 +11,7 @@ const Text_Field_Adorn = ({
   error_message,
   adornment = "", // Text or symbol
   adornment_position = "right", // "left" or "right"
+  adornment_width = "", // ✅ New parameter for width control
   int_only = false,
 }) => {
   const wrapper_class = `mt-1 flex rounded-md shadow-sm border text-sm
@@ -24,7 +25,7 @@ const Text_Field_Adorn = ({
 
   const input_class = `flex-1 min-w-0 bg-transparent focus:ring-0 px-3 py-2 placeholder-slate-400 disabled:bg-transparent focus:outline-none`;
 
-  const adornment_class_base = `inline-flex items-center px-3 text-slate-700 bg-slate-100 select-none`;
+  const adornment_class_base = `inline-flex items-center px-3 justify-center text-slate-700 bg-slate-100 select-none ${adornment_width}`;
 
   const adornment_class =
     adornment_position === "right"

@@ -19,6 +19,7 @@ import General_Structure from "../modules/maintenance/general_structure/General_
 import Financial from "../modules/maintenance/financial/Financial";
 import Vendor from "../modules/maintenance/vendor/Vendor";
 import Purchase_Order_Maint from "../modules/maintenance/purchase_order/Purchase_Order_Maint";
+import Sales_Order from "../modules/outbound/sales_order/Sales_Order";
 
 const Layout = () => {
   const [active_item, set_active_item] = useState(() => {
@@ -67,6 +68,8 @@ const Layout = () => {
         return <Goods_Receipt />;
       case "Inbound-Batch":
         return <Batch />;
+      case "Outbound-Sales Order":
+        return <Sales_Order />;
       case "Warehouse-Stock Transfer":
         return <Stock_Transfer />;
       case "Warehouse-Inventory Master":

@@ -48,13 +48,19 @@ const Sidebar = ({
         // "Inbound History",
       ],
     },
-    // {
-    //   key: "Outbound",
-    //   type: "dropdown",
-    //   name: "Outbound",
-    //   icon: <PackageMinus size={18} />,
-    //   sub_items: [],
-    // },
+    {
+      key: "Outbound",
+      type: "dropdown",
+      name: "Outbound",
+      icon: <PackageMinus size={18} />,
+      sub_items: [
+        "Sales Order",
+        "Goods Issue",
+        "Shipment",
+        "Customer",
+        "Truck",
+      ],
+    },
     {
       key: "Warehouse",
       type: "dropdown",
