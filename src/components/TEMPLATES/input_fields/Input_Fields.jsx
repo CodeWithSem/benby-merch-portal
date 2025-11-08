@@ -84,7 +84,6 @@ const Input_Fields = () => {
       element: (
         <Select_Field
           label="Select Field"
-          name="select_field"
           // value={selected_data}
           // on_change={handle_option_change}
           // options={options}
@@ -95,7 +94,6 @@ const Input_Fields = () => {
         navigator.clipboard.writeText(
           `<Select_Field
           label="Select Field"
-          name="select_field"
           // value={selected_data}
           // on_change={handle_option_change}
           // options={options}
@@ -108,9 +106,8 @@ const Input_Fields = () => {
       element: (
         <Date_Field
           label="Date Field"
-          name="date_field"
           // value={selected_data}
-          // on_change={handle_date_change}
+          on_change={(e) => alert(e.target.value)}
           placeholder="Select Date"
         />
       ),
@@ -118,9 +115,8 @@ const Input_Fields = () => {
         navigator.clipboard.writeText(
           `<Date_Field
           label="Date Field"
-          name="date_field"
           // value={selected_data}
-          // on_change={handle_date_change}
+          on_change={(e) => alert(e.target.value)}
           placeholder="Select Date" />`
         ),
     },
@@ -146,7 +142,6 @@ const Input_Fields = () => {
       element: (
         <Time_Field
           label="Select Time"
-          name="time_field"
           // value={time}
           // on_change={handle_time_change}
           // min="09:00"
@@ -158,7 +153,6 @@ const Input_Fields = () => {
         navigator.clipboard.writeText(
           `<Time_Field
           label="Select Time"
-          name="time_field"
           // value={time}
           // on_change={handle_time_change}
           // min="09:00"
@@ -172,7 +166,6 @@ const Input_Fields = () => {
       element: (
         <Payment_Field
           label={"Payment Field"}
-          name="payment_field"
           // value={data}
           // on_change={handle_data_change}
           placeholder="1234 5678 9012 3456"
@@ -182,7 +175,6 @@ const Input_Fields = () => {
         navigator.clipboard.writeText(
           `<Payment_Field
           label={"Payment Field"}
-          name="payment_field"
           // value={data}
           // on_change={handle_data_change}
           placeholder="1234 5678 9012 3456" />`
@@ -194,7 +186,6 @@ const Input_Fields = () => {
       element: (
         <Icon_Field
           label="Icon Field"
-          name="icon_field"
           // value={data}
           // on_change={(e) => handle_data_change(e.target.value)}
           placeholder="Search..."
@@ -206,7 +197,6 @@ const Input_Fields = () => {
         navigator.clipboard.writeText(
           `<Icon_Field
           label="Icon Field"
-          name="icon_field"
           // value={data}
           // on_change={(e) => handle_data_change(e.target.value)}
           placeholder="Search..."
@@ -220,7 +210,6 @@ const Input_Fields = () => {
       element: (
         <Upload_Field
           label="Upload Field"
-          name="upload_field"
           // on_change={handle_file_change}
           accept=".pdf,.doc,.docx,.xlsx"
         />
@@ -229,7 +218,6 @@ const Input_Fields = () => {
         navigator.clipboard.writeText(
           `<Upload_Field
           label="Upload Field"
-          name="upload_field"
           // on_change={handle_file_change}
           accept=".pdf,.doc,.docx,.xlsx" />`
         ),
@@ -240,7 +228,6 @@ const Input_Fields = () => {
       element: (
         <Copy_Field
           label="Copy Field"
-          name="copy"
           // value={data}
           // on_change={handle_data_change}
           copy_button_label="Copy"
@@ -250,7 +237,6 @@ const Input_Fields = () => {
         navigator.clipboard.writeText(
           `<Copy_Field
           label="Copy Field"
-          name="copy"
           // value={data}
           // on_change={handle_data_change}
           copy_button_label="Copy" />`
@@ -262,7 +248,6 @@ const Input_Fields = () => {
       element: (
         <Find_Field
           label="Find Field"
-          name="find_field"
           // value={data}
           // on_change={handle_data_change}
           // on_find={handle_data_find}
@@ -273,7 +258,6 @@ const Input_Fields = () => {
         navigator.clipboard.writeText(
           `<Find_Field
           label="Find Field"
-          name="find_field"
           // value={data}
           // on_change={handle_data_change}
           // on_find={handle_data_find}
@@ -314,7 +298,6 @@ const Input_Fields = () => {
       element: (
         <Verify_Field
           label="Verify Field"
-          name="verify_field"
           placeholder="Enter text"
           // value={data}
           // on_change={(e) => {
@@ -331,7 +314,6 @@ const Input_Fields = () => {
         navigator.clipboard.writeText(
           `<Verify_Field
           label="Verify Field"
-          name="verify_field"
           placeholder="Enter text"
           // value={data}
           // on_change={(e) => {
@@ -376,21 +358,19 @@ const Input_Fields = () => {
       element: (
         <Textarea_Field
           label="Textarea Field"
-          name="textarea_field"
           // value={data}
           // on_change={(e) => handle_data_change(e.target.value)}
           placeholder="Enter your description..."
-          height="121px"
+          height="120px"
         />
       ),
       copyFunction: () =>
         navigator.clipboard.writeText(
           `<Textarea_Field 
           label="Textarea Field" 
-          name="textarea_field" 
           // value={data} 
           // on_change={(e) => handle_data_change(e.target.value)} 
-          placeholder="Enter your description..." height="121px" />`
+          placeholder="Enter your description..." height="120px" />`
         ),
     },
     {
@@ -421,7 +401,6 @@ const Input_Fields = () => {
       element: (
         <Checkbox_Field
           label="Checkbox Field"
-          name="checkbox_field"
           box_size={24}
           icon_size={14}
           checked={check}
@@ -432,7 +411,6 @@ const Input_Fields = () => {
         navigator.clipboard.writeText(
           `<Checkbox_Field 
           label="Checkbox Field" 
-          name="checkbox_field" 
           box_size={24} 
           icon_size={14} 
           checked={check} 

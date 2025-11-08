@@ -1,13 +1,21 @@
 import React, { useState } from "react";
 import Text_Field from "assets/elements/Text_Field";
 import Select_Field from "assets/elements/Select_Field";
-import { FileText, Info, Search, SquarePen, Trash2 } from "lucide-react";
+import {
+  CirclePlus,
+  FileText,
+  Info,
+  Search,
+  SquarePen,
+  Trash2,
+} from "lucide-react";
 import Icon_Field from "assets/elements/Icon_Field";
 import Quantity_Field from "assets/elements/Quantity_Field";
 import Find_Field from "assets/elements/Find_Field";
 import Show_Item_Details from "./modals/Show_Item_Details";
 import { format_currency, format_percentage } from "assets/scripts/format";
 import Edit_Item from "./modals/Edit_Item";
+import Button from "assets/elements/Button";
 
 const PO_Items = ({ set_display_modal }) => {
   const [display_item_modal, set_display_item_modal] = useState("");
@@ -206,7 +214,7 @@ const PO_Items = ({ set_display_modal }) => {
                 min={1}
               />
             </div>
-            <div className="w-full lg:col-span-2">
+            {/* <div className="w-full lg:col-span-2">
               <Select_Field
                 label="Discount"
                 name="discount"
@@ -215,14 +223,25 @@ const PO_Items = ({ set_display_modal }) => {
                 // options={discount_options}
                 // placeholder="Select Payment Condition"
               />
+            </div> */}
+            <div className="flex w-full items-end lg:col-span-2">
+              <Button
+                variant="white"
+                width="w-full"
+                // icon={SlidersHorizontal}
+              >
+                Discount
+              </Button>
             </div>
-            <div className="flex w-full items-end pb-[1px] lg:col-span-2">
-              <button
-                className="w-full h-[37px] bg-sky-600 text-white text-sm rounded-md hover:bg-sky-700 focus:ring-sky-500 disabled:bg-sky-300 disabled:cursor-not-allowed outline-none"
+            <div className="flex w-full items-end lg:col-span-2">
+              <Button
+                variant="primary"
+                width="w-full"
+                icon={CirclePlus}
                 onClick={handle_add_item}
               >
                 Add Item
-              </button>
+              </Button>
             </div>
           </div>
           <div className="mt-5 flex max-w-2xl items-center gap-2 text-gray-500">

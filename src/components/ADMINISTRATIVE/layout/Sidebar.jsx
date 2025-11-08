@@ -80,20 +80,20 @@ const Sidebar = ({
       icon: <Settings size={18} />,
       sub_items: ["General Structure", "Financial", "Vendor", "Purchase Order"],
     },
-    // {
-    //   key: "Templates",
-    //   type: "dropdown",
-    //   name: "Templates",
-    //   icon: <Box size={18} />,
-    //   sub_items: [
-    //     "Form Elements",
-    //     "Tabs",
-    //     "Create Invoice",
-    //     "Basic Tables",
-    //     "Data Tables",
-    //     "Input Fields",
-    //   ],
-    // },
+    {
+      key: "Templates",
+      type: "dropdown",
+      name: "Templates",
+      icon: <Box size={18} />,
+      sub_items: [
+        "Form Elements",
+        "Tabs",
+        "Create Invoice",
+        "Basic Tables",
+        "Data Tables",
+        "Input Fields",
+      ],
+    },
   ];
 
   const handle_item_click = (key) => set_active_item(key);

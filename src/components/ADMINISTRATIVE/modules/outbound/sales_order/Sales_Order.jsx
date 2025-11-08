@@ -19,6 +19,8 @@ import Button from "assets/elements/Button";
 import { useToast } from "../../../layout/Toast_Provider";
 import Date_Range_Field from "assets/elements/Date_Range_Field";
 import Checkbox_Field from "assets/elements/Checkbox_Field";
+import Select_SO_Type from "./modals/select_so_type/Select_SO_Type";
+import Create_New_SO from "./create_new_so/Create_New_SO";
 
 const Sales_Order = () => {
   const filter_ref = useRef(null);
@@ -523,9 +525,16 @@ const Sales_Order = () => {
           </div>
         </React.Fragment>
       )}
-      {/* {page === "so_creation" && <Create_New_PO set_page={set_page} />}
-      {page === "edit_po" && <Edit_PO set_page={set_page} />}
-      {page === "post_po" && <Edit_PO set_page={set_page} />} */}
+      {page === "so_creation" && <Create_New_SO set_page={set_page} />}
+
+      <Select_SO_Type
+        is_open={display_modal === "select_so_type"}
+        on_close={() => set_display_modal("")}
+        width="max-w-[1280px]"
+        height="max-h-[700px]"
+        set_page={set_page}
+      />
+
       {/* <Select_PO_Type
         is_open={display_modal === "select_so_type"}
         on_close={() => set_display_modal("")}

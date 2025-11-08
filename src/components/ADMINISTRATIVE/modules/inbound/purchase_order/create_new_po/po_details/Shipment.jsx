@@ -17,7 +17,6 @@ const Shipment = () => {
           <div>
             <Date_Field
               label="Original Date"
-              name="date"
               placeholder="mm-dd-yyyy"
               value={orig_date}
               on_change={handle_orig_date_change}
