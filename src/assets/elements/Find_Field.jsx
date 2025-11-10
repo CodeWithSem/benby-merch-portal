@@ -8,7 +8,7 @@ const Find_Field = ({
   name,
   disabled = false,
   error_message,
-  on_find,
+  on_click,
   placeholder = "",
 }) => {
   const wrapper_class = `mt-1 flex rounded-md shadow-sm border text-sm
@@ -53,7 +53,7 @@ const Find_Field = ({
         <div className={button_wrapper_class}>
           <button
             type="button"
-            onClick={on_find}
+            onClick={on_click}
             title="Search"
             className={button_class}
           >

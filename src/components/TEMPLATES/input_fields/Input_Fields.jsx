@@ -250,7 +250,7 @@ const Input_Fields = () => {
           label="Find Field"
           // value={data}
           // on_change={handle_data_change}
-          // on_find={handle_data_find}
+          // on_click={handle_find_click}
           disabled
         />
       ),
@@ -260,7 +260,7 @@ const Input_Fields = () => {
           label="Find Field"
           // value={data}
           // on_change={handle_data_change}
-          // on_find={handle_data_find}
+          // on_click={handle_find_click}
           disabled />`
         ),
     },

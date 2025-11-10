@@ -3,12 +3,8 @@ import {
   Home,
   LogOut,
   ChevronDown,
-  UserCircle,
-  Users,
   Settings,
-  ShoppingCart,
   Box,
-  ClipboardCheck,
   PackagePlus,
   PackageMinus,
   Warehouse,
@@ -23,8 +19,9 @@ const Sidebar = ({
   is_desktop,
   is_collapsed,
   is_open,
+  toggle_sidebar,
 }) => {
-  const { set_active_user, set_page } = Use_App();
+  const { set_page } = Use_App();
   const { show_toast } = useToast();
   const [open_dropdowns, set_open_dropdowns] = useState({});
   const dropdown_refs = useRef({});
@@ -187,79 +184,56 @@ const Sidebar = ({
       document.removeEventListener("mousedown", handle_click_outside);
   }, []);
 
+  // RETURN ORIGIN
   return (
-    <div
-      className={`fixed bg-white text-gray-900 border-r border-gray-200 flex flex-col ${
-        !is_desktop ? "pt-[100px]" : ""
-      } ${
-        is_desktop ? (is_collapsed ? "w-20" : "w-64") : "w-64"
-      } p-4 transition-all duration-300 z-[10] h-full inset-y-0 left-0 ${
-        is_open ? "translate-x-0" : "-translate-x-full"
-      } md:translate-x-0`}
-      style={{ userSelect: "none" }}
-    >
-      {/* Title */}
-      {is_desktop &&
-        (is_collapsed ? (
-          <div className="w-[50px] h-[50px] text-[10px] border flex justify-center items-center rounded-lg bg-gray-100">
-            <img src={delphys_logo} alt="Logo" />
-          </div>
-        ) : (
-          <div className="w-full h-[50px] flex justify-center items-center">
+    <React.Fragment>
+      {/* Overlay for Mobile */}
+      {!is_desktop && is_open && (
+        <div
+          className="fixed inset-0 bg-black/30 backdrop-blur-sm z-[9]"
+          onClick={toggle_sidebar} // optional
+        ></div>
+      )}
+      <div
+        className={`fixed bg-white text-gray-900 border-r border-gray-200 flex flex-col ${
+          !is_desktop ? "pt-[100px]" : ""
+        } ${
+          is_desktop ? (is_collapsed ? "w-20" : "w-64") : "w-64"
+        } p-4 transition-all duration-300 z-[10] h-full inset-y-0 left-0 ${
+          is_open ? "translate-x-0" : "-translate-x-full"
+        } md:translate-x-0`}
+        style={{ userSelect: "none" }}
+      >
+        {/* Title */}
+        {is_desktop &&
+          (is_collapsed ? (
             <div className="w-[50px] h-[50px] text-[10px] border flex justify-center items-center rounded-lg bg-gray-100">
               <img src={delphys_logo} alt="Logo" />
             </div>
-            <div className="ml-3 flex-1 text-gray-700 font-bold text-[20px] whitespace-nowrap">
-              Delphys 7
+          ) : (
+            <div className="w-full h-[50px] flex justify-center items-center">
+              <div className="w-[50px] h-[50px] text-[10px] border flex justify-center items-center rounded-lg bg-gray-100">
+                <img src={delphys_logo} alt="Logo" />
+              </div>
+              <div className="ml-3 flex-1 text-gray-700 font-bold text-[20px] whitespace-nowrap">
+                Delphys 7
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
 
-      {/* Navigation */}
-      <nav className="flex flex-col space-y-2 flex-1 mt-5 font-medium">
-        {sidebar_items.map((item) => {
-          if (item.type === "link") {
-            const is_active = active_item === item.key;
-            return (
-              <a
-                key={item.key}
-                onClick={() => handle_item_click(item.key)}
-                className={`relative flex items-center rounded transition-all duration-300 outline-none ${
-                  is_desktop && is_collapsed ? "justify-center p-3" : "p-3"
-                } ${
-                  is_active
-                    ? "bg-sky-100 text-sky-600"
-                    : "hover:bg-gray-100 text-gray-600"
-                }`}
-              >
-                {item.icon}
-                <span
-                  className={`ml-3 absolute left-[30px] text-sm transition-opacity duration-300 whitespace-nowrap ${
-                    is_desktop && is_collapsed ? "opacity-0" : "opacity-100"
-                  }`}
-                >
-                  {item.name}
-                </span>
-              </a>
-            );
-          }
-
-          if (item.type === "dropdown") {
-            const is_parent_active = item.sub_items?.some(
-              (sub) => active_item === `${item.key}-${sub}`
-            );
-            return (
-              <div
-                key={item.key}
-                className="relative"
-                ref={(el) => (dropdown_refs.current[item.key] = el)}
-              >
-                <button
-                  onClick={() => toggle_dropdown(item.key)}
-                  className={`relative flex items-center rounded w-full transition-all duration-300 outline-none ${
+        {/* Navigation */}
+        <nav className="flex flex-col space-y-2 flex-1 mt-5 font-medium">
+          {sidebar_items.map((item) => {
+            if (item.type === "link") {
+              const is_active = active_item === item.key;
+              return (
+                <a
+                  key={item.key}
+                  onClick={() => handle_item_click(item.key)}
+                  className={`relative flex items-center rounded transition-all duration-300 outline-none ${
                     is_desktop && is_collapsed ? "justify-center p-3" : "p-3"
                   } ${
-                    is_parent_active
+                    is_active
                       ? "bg-sky-100 text-sky-600"
                       : "hover:bg-gray-100 text-gray-600"
                   }`}
@@ -272,43 +246,76 @@ const Sidebar = ({
                   >
                     {item.name}
                   </span>
-                  <span
-                    className={`ml-3 absolute right-[24px] text-sm transition-opacity duration-300 ${
-                      is_desktop && is_collapsed ? "opacity-0" : "opacity-100"
+                </a>
+              );
+            }
+
+            if (item.type === "dropdown") {
+              const is_parent_active = item.sub_items?.some(
+                (sub) => active_item === `${item.key}-${sub}`
+              );
+              return (
+                <div
+                  key={item.key}
+                  className="relative"
+                  ref={(el) => (dropdown_refs.current[item.key] = el)}
+                >
+                  <button
+                    onClick={() => toggle_dropdown(item.key)}
+                    className={`relative flex items-center rounded w-full transition-all duration-300 outline-none ${
+                      is_desktop && is_collapsed ? "justify-center p-3" : "p-3"
+                    } ${
+                      is_parent_active
+                        ? "bg-sky-100 text-sky-600"
+                        : "hover:bg-gray-100 text-gray-600"
                     }`}
                   >
-                    <ChevronDown size={14} />
-                  </span>
-                </button>
+                    {item.icon}
+                    <span
+                      className={`ml-3 absolute left-[30px] text-sm transition-opacity duration-300 whitespace-nowrap ${
+                        is_desktop && is_collapsed ? "opacity-0" : "opacity-100"
+                      }`}
+                    >
+                      {item.name}
+                    </span>
+                    <span
+                      className={`ml-3 absolute right-[24px] text-sm transition-opacity duration-300 ${
+                        is_desktop && is_collapsed ? "opacity-0" : "opacity-100"
+                      }`}
+                    >
+                      <ChevronDown size={14} />
+                    </span>
+                  </button>
 
-                {render_dropdown(item.key, item.sub_items)}
-              </div>
-            );
-          }
+                  {render_dropdown(item.key, item.sub_items)}
+                </div>
+              );
+            }
 
-          return null;
-        })}
-      </nav>
+            return null;
+          })}
+        </nav>
 
-      {/* Logout */}
-      <div className="pt-2 mt-auto">
-        <a
-          className={`relative flex items-center rounded hover:bg-gray-100 text-gray-600 font-medium transition-all duration-300 cursor-pointer ${
-            is_desktop && is_collapsed ? "justify-center p-3" : "p-3"
-          }`}
-          onClick={handle_sign_out}
-        >
-          <LogOut size={18} />
-          <span
-            className={`ml-3 absolute left-[30px] text-sm transition-opacity duration-1 ${
-              is_desktop && is_collapsed ? "opacity-0" : "opacity-100"
+        {/* Logout */}
+        <div className="pt-2 mt-auto">
+          <a
+            className={`relative flex items-center rounded hover:bg-gray-100 text-gray-600 font-medium transition-all duration-300 cursor-pointer ${
+              is_desktop && is_collapsed ? "justify-center p-3" : "p-3"
             }`}
+            onClick={handle_sign_out}
           >
-            Logout
-          </span>
-        </a>
+            <LogOut size={18} />
+            <span
+              className={`ml-3 absolute left-[30px] text-sm transition-opacity duration-1 ${
+                is_desktop && is_collapsed ? "opacity-0" : "opacity-100"
+              }`}
+            >
+              Logout
+            </span>
+          </a>
+        </div>
       </div>
-    </div>
+    </React.Fragment>
   );
 };
 

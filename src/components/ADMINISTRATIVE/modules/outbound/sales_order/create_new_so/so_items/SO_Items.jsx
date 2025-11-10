@@ -17,9 +17,11 @@ import Find_Field from "assets/elements/Find_Field";
 import { format_currency, format_percentage } from "assets/scripts/format";
 import Button from "assets/elements/Button";
 import Checkbox_Field from "assets/elements/Checkbox_Field";
+import Show_Item_Details from "./modals/Show_Item_Details";
+import Edit_Item from "./modals/Edit_Item";
 // import Edit_Item from "./modals/Edit_Item";
 
-const SO_Items = ({ set_display_modal }) => {
+const SO_Items = ({ handle_open_item_modal }) => {
   const [display_item_modal, set_display_item_modal] = useState("");
   const filter_ref = useRef(null);
   const [selected_row, set_selected_row] = useState(null);
@@ -348,7 +350,7 @@ const SO_Items = ({ set_display_modal }) => {
                 name="item_name"
                 // value={search_value}
                 // on_change={handle_change}
-                on_find={() => set_display_modal("select_item")}
+                on_click={handle_open_item_modal}
                 disabled
               />
             </div>
@@ -454,7 +456,7 @@ const SO_Items = ({ set_display_modal }) => {
         </div>
       </div>
       {/* - Item Section */}
-      {/* <Show_Item_Details
+      <Show_Item_Details
         is_open={display_item_modal === "show_details"}
         on_close={() => set_display_item_modal("")}
         width="max-w-[1280px]"
@@ -463,7 +465,7 @@ const SO_Items = ({ set_display_modal }) => {
         is_open={display_item_modal === "edit_item"}
         on_close={() => set_display_item_modal("")}
         width="max-w-[1280px]"
-      /> */}
+      />
     </React.Fragment>
   );
 };

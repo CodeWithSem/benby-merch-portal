@@ -5,13 +5,22 @@ import { X } from "lucide-react";
 import Find_Field from "assets/elements/Find_Field";
 import Item_Data_1 from "./item_sub_details/Item_Data_1";
 import Item_Data_2 from "./item_sub_details/Item_Data_2";
-import Invoices from "./item_sub_details/Invoices";
-import Delivery from "./item_sub_details/Delivery";
-import PO_History from "./item_sub_details/PO_History";
-import Text_Ref from "./item_sub_details/Text_Ref";
+import Billing from "./item_sub_details/Billing";
+import Status from "./item_sub_details/Status";
+import Condition from "./item_sub_details/Condition";
+import Pricing from "./item_sub_details/Pricing";
 
 const Show_Item_Details = ({ is_open, on_close, width = "max-w-[700px]" }) => {
   const [active_tab, set_active_tab] = useState("item_data_1");
+
+  const tabs = [
+    { key: "item_data_1", title: "Item Data 1" },
+    { key: "item_data_2", title: "Item Data 2" },
+    { key: "billing", title: "Billing" },
+    { key: "status", title: "Status" },
+    { key: "condition", title: "Condition" },
+    { key: "pricing", title: "Pricing" },
+  ];
 
   const handle_post_po = () => {
     alert("Post PO");
@@ -75,66 +84,19 @@ const Show_Item_Details = ({ is_open, on_close, width = "max-w-[700px]" }) => {
                   <div className="w-full bg-white rounded-lg border">
                     <div className="w-full border-b p-2">
                       <nav className="flex overflow-x-auto rounded-lg bg-gray-100 p-1 dark:bg-gray-900 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-200 dark:[&::-webkit-scrollbar-thumb]:bg-gray-600 [&::-webkit-scrollbar-track]:bg-white dark:[&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar]:h-1.5">
-                        <button
-                          onClick={() => set_active_tab("item_data_1")}
-                          className={`inline-flex items-center rounded-md px-5 py-2 text-sm font-medium transition-colors duration-200 ease-in-out outline-none whitespace-nowrap ${
-                            active_tab === "item_data_1"
-                              ? "bg-white text-gray-900 shadow-xs"
-                              : "bg-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
-                          }`}
-                        >
-                          Item Data 1
-                        </button>
-                        <button
-                          onClick={() => set_active_tab("item_data_2")}
-                          className={`inline-flex items-center rounded-md px-5 py-2 text-sm font-medium transition-colors duration-200 ease-in-out outline-none whitespace-nowrap ${
-                            active_tab === "item_data_2"
-                              ? "bg-white text-gray-900 shadow-xs"
-                              : "bg-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
-                          }`}
-                        >
-                          Item Data 2
-                        </button>
-                        <button
-                          onClick={() => set_active_tab("invoices")}
-                          className={`inline-flex items-center rounded-md px-5 py-2 text-sm font-medium transition-colors duration-200 ease-in-out outline-none whitespace-nowrap ${
-                            active_tab === "invoices"
-                              ? "bg-white text-gray-900 shadow-xs"
-                              : "bg-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
-                          }`}
-                        >
-                          Invoices
-                        </button>
-                        <button
-                          onClick={() => set_active_tab("delivery")}
-                          className={`inline-flex items-center rounded-md px-5 py-2 text-sm font-medium transition-colors duration-200 ease-in-out outline-none whitespace-nowrap ${
-                            active_tab === "delivery"
-                              ? "bg-white text-gray-900 shadow-xs"
-                              : "bg-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
-                          }`}
-                        >
-                          Delivery
-                        </button>
-                        <button
-                          onClick={() => set_active_tab("po_history")}
-                          className={`inline-flex items-center rounded-md px-5 py-2 text-sm font-medium transition-colors duration-200 ease-in-out outline-none whitespace-nowrap ${
-                            active_tab === "po_history"
-                              ? "bg-white text-gray-900 shadow-xs"
-                              : "bg-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
-                          }`}
-                        >
-                          PO History
-                        </button>
-                        <button
-                          onClick={() => set_active_tab("text_ref")}
-                          className={`inline-flex items-center rounded-md px-5 py-2 text-sm font-medium transition-colors duration-200 ease-in-out outline-none whitespace-nowrap ${
-                            active_tab === "text_ref"
-                              ? "bg-white text-gray-900 shadow-xs"
-                              : "bg-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
-                          }`}
-                        >
-                          Text Ref
-                        </button>
+                        {tabs.map((tab) => (
+                          <button
+                            key={tab.key}
+                            onClick={() => set_active_tab(tab.key)}
+                            className={`inline-flex items-center rounded-md px-5 py-2 text-sm font-medium transition-colors duration-200 ease-in-out outline-none whitespace-nowrap ${
+                              active_tab === tab.key
+                                ? "bg-white text-gray-900 shadow-xs"
+                                : "bg-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                            }`}
+                          >
+                            {tab.title}
+                          </button>
+                        ))}
                       </nav>
                     </div>
 
@@ -142,10 +104,10 @@ const Show_Item_Details = ({ is_open, on_close, width = "max-w-[700px]" }) => {
                     <div className="p-6">
                       {active_tab === "item_data_1" && <Item_Data_1 />}
                       {active_tab === "item_data_2" && <Item_Data_2 />}
-                      {active_tab === "invoices" && <Invoices />}
-                      {active_tab === "delivery" && <Delivery />}
-                      {active_tab === "po_history" && <PO_History />}
-                      {active_tab === "text_ref" && <Text_Ref />}
+                      {active_tab === "billing" && <Billing />}
+                      {active_tab === "status" && <Status />}
+                      {active_tab === "condition" && <Condition />}
+                      {active_tab === "pricing" && <Pricing />}
                     </div>
                     {/* - Tab Content */}
                   </div>

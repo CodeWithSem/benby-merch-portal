@@ -4,7 +4,8 @@ import Text_Field from "assets/elements/Text_Field";
 import Textarea_Field from "assets/elements/Textarea_Field";
 import React from "react";
 
-const Shipping = () => {
+const Shipping = ({ handle_open_plant_modal, handle_open_sloc_modal }) => {
+  // RETURN ORIGIN
   return (
     <React.Fragment>
       <div className="rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6 dark:border-gray-800 dark:bg-gray-900 whitespace-nowrap">
@@ -18,6 +19,7 @@ const Shipping = () => {
               // on_text_change={handle_text_data_change}
               code_width="150px"
               show_search_button={true}
+              on_click={handle_open_plant_modal}
               disabled
             />
           </div>
@@ -30,6 +32,7 @@ const Shipping = () => {
               // on_text_change={handle_text_data_change}
               code_width="150px"
               show_search_button={true}
+              on_click={handle_open_sloc_modal}
               disabled
             />
           </div>

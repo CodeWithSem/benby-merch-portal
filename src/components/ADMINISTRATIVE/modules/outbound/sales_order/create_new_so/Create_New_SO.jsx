@@ -12,6 +12,11 @@ import Instructions from "./so_details/Instructions";
 import References from "./so_details/References";
 import Customer from "./so_details/Customer";
 import SO_Items from "./so_items/SO_Items";
+import Select_Sold_To from "./modals/Select_Sold_To";
+import Select_Ship_To from "./modals/Select_Ship_To";
+import Select_Plant from "./modals/Select_Plant";
+import Select_SLOC from "./modals/Select_SLOC";
+import Select_Item from "./modals/Select_Item";
 
 const Create_New_SO = ({ set_page }) => {
   const [active_tab, set_active_tab] = useState("sales");
@@ -24,6 +29,18 @@ const Create_New_SO = ({ set_page }) => {
     { key: "references", title: "References" },
     { key: "customer", title: "Customer" },
   ];
+
+  const handle_open_plant_modal = () => {
+    set_display_modal("select_plant");
+  };
+
+  const handle_open_sloc_modal = () => {
+    set_display_modal("select_sloc");
+  };
+
+  const handle_open_item_modal = () => {
+    set_display_modal("select_item");
+  };
 
   const handle_preview = () => {
     alert("Under Maintenance");
@@ -217,7 +234,12 @@ const Create_New_SO = ({ set_page }) => {
               {/* + Tab Content */}
               <div className="p-6">
                 {active_tab === "sales" && <Sales />}
-                {active_tab === "shipping" && <Shipping />}
+                {active_tab === "shipping" && (
+                  <Shipping
+                    handle_open_plant_modal={handle_open_plant_modal}
+                    handle_open_sloc_modal={handle_open_sloc_modal}
+                  />
+                )}
                 {active_tab === "instructions" && <Instructions />}
                 {active_tab === "references" && <References />}
                 {active_tab === "customer" && <Customer />}
@@ -225,7 +247,7 @@ const Create_New_SO = ({ set_page }) => {
               {/* - Tab Content */}
             </div>
           </div>
-          <SO_Items set_display_modal={set_display_modal} />
+          <SO_Items handle_open_item_modal={handle_open_item_modal} />
           <div className="p-4 sm:p-8 border-t">
             <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
               <Button
@@ -262,14 +284,14 @@ const Create_New_SO = ({ set_page }) => {
           </div>
         </div>
       </div>
-      {/* <Select_Vendor
-        is_open={display_modal === "select_vendor"}
+      <Select_Sold_To
+        is_open={display_modal === "select_sold_to"}
         on_close={() => set_display_modal("")}
         width="max-w-[1000px]"
         height="max-h-[700px]"
       />
-      <Select_Branch
-        is_open={display_modal === "select_branch"}
+      <Select_Ship_To
+        is_open={display_modal === "select_ship_to"}
         on_close={() => set_display_modal("")}
         width="max-w-[1000px]"
         height="max-h-[700px]"
@@ -291,7 +313,7 @@ const Create_New_SO = ({ set_page }) => {
         on_close={() => set_display_modal("")}
         width="max-w-[1000px]"
         height="max-h-[700px]"
-      /> */}
+      />
     </React.Fragment>
   );
 };

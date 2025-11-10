@@ -1,7 +1,5 @@
 import React, { useState } from "react";
 import Text_Field from "assets/elements/Text_Field";
-import Select_Field from "assets/elements/Select_Field";
-import Checkbox_Field from "assets/elements/Checkbox_Field";
 import Text_Field_Adorn from "assets/elements/Text_Field_Adorn";
 
 const Delivery = () => {

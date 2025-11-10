@@ -85,15 +85,14 @@ const Edit_Item = ({ is_open, on_close, width = "max-w-[700px]" }) => {
                     min={1}
                   />
                 </div>
-                <div className="w-full lg:col-span-2">
-                  <Select_Field
-                    label="Discount"
-                    name="discount"
-                    // value={discount}
-                    // on_change={handle_discount_change}
-                    // options={discount_options}
-                    // placeholder="Select Payment Condition"
-                  />
+                <div className="flex w-full items-end lg:col-span-2">
+                  <Button
+                    variant="white"
+                    width="w-full"
+                    // icon={SlidersHorizontal}
+                  >
+                    Discount
+                  </Button>
                 </div>
               </div>
               <div className="mt-5 flex max-w-2xl items-center gap-2 text-gray-500">

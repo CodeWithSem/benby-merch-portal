@@ -110,6 +110,7 @@ const Layout = () => {
             is_desktop={is_desktop}
             is_collapsed={is_collapsed}
             is_open={is_open}
+            toggle_sidebar={toggle_sidebar}
           />
         </div>
         <div

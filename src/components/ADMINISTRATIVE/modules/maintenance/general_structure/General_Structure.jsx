@@ -19,6 +19,7 @@ import {
   Warehouse,
 } from "lucide-react";
 import React, { useState } from "react";
+import Company from "./components/company/Company";
 
 const General_Structure = () => {
   const [page, set_page] = useState("main");
@@ -141,11 +142,12 @@ const General_Structure = () => {
                           key={idx}
                           className="relative select-none border h-[150px] bg-white rounded-lg shadow-sm flex justify-center items-center p-5 hover:border-sky-500 cursor-pointer outline-none transition"
                           onClick={() =>
-                            alert(
-                              typeof item.title === "string"
-                                ? item.title
-                                : item.plain_title || ""
-                            )
+                            // alert(
+                            //   typeof item.title === "string"
+                            //     ? item.title
+                            //     : item.plain_title || ""
+                            // )
+                            set_page(item.key)
                           }
                           //   onClick={() => alert(item.key)}
                         >
@@ -170,6 +172,7 @@ const General_Structure = () => {
           </div>
         </React.Fragment>
       )}
+      {page === "company" && <Company set_page={set_page} />}
     </React.Fragment>
   );
 };
