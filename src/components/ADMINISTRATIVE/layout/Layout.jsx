@@ -20,6 +20,9 @@ import Financial from "../modules/maintenance/financial/Financial";
 import Vendor from "../modules/maintenance/vendor/Vendor";
 import Purchase_Order_Maint from "../modules/maintenance/purchase_order/Purchase_Order_Maint";
 import Sales_Order from "../modules/outbound/sales_order/Sales_Order";
+import Goods_Issue from "../modules/outbound/goods_issue/Goods_Issue";
+import Shipment from "../modules/outbound/shipment/Shipment";
+import Customer from "../modules/outbound/customer/Customer";
 
 const Layout = () => {
   const [active_item, set_active_item] = useState(() => {
@@ -70,6 +73,12 @@ const Layout = () => {
         return <Batch />;
       case "Outbound-Sales Order":
         return <Sales_Order />;
+      case "Outbound-Goods Issue":
+        return <Goods_Issue />;
+      case "Outbound-Shipment":
+        return <Shipment />;
+      case "Outbound-Customer":
+        return <Customer />;
       case "Warehouse-Stock Transfer":
         return <Stock_Transfer />;
       case "Warehouse-Inventory Master":

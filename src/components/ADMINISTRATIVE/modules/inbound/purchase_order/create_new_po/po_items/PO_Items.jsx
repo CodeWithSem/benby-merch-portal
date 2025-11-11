@@ -214,22 +214,8 @@ const PO_Items = ({ set_display_modal }) => {
                 min={1}
               />
             </div>
-            {/* <div className="w-full lg:col-span-2">
-              <Select_Field
-                label="Discount"
-                name="discount"
-                // value={discount}
-                // on_change={handle_discount_change}
-                // options={discount_options}
-                // placeholder="Select Payment Condition"
-              />
-            </div> */}
             <div className="flex w-full items-end lg:col-span-2">
-              <Button
-                variant="white"
-                width="w-full"
-                // icon={SlidersHorizontal}
-              >
+              <Button variant="white" width="w-full">
                 Discount
               </Button>
             </div>

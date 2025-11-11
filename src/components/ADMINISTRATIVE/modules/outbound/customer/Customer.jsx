@@ -19,36 +19,35 @@ import Button from "assets/elements/Button";
 import { useToast } from "../../../layout/Toast_Provider";
 import Date_Range_Field from "assets/elements/Date_Range_Field";
 import Checkbox_Field from "assets/elements/Checkbox_Field";
-import Select_SO_Type from "./modals/select_so_type/Select_SO_Type";
-import Create_New_SO from "./create_new_so/Create_New_SO";
+import Create_New_Customer from "./create_new_customer/Create_New_Customer";
+// import Select_SO from "./modals/select_so/Select_SO";
+// import Create_New_GI from "./create_new_customer/Create_New_GI";
+// import Edit_GI from "./edit_customer/Edit_GI";
+// import Post_View_GI from "./modals/post_view_customer/Post_View_GI";
 
-const Sales_Order = () => {
+const Customer = () => {
   const filter_ref = useRef(null);
   const [show_filter, set_show_filter] = useState(false);
   const [page, set_page] = useState("main");
   const [display_modal, set_display_modal] = useState("");
   const [for_posting, set_for_posting] = useState(false);
 
-  // Close dropdown on outside click
   const { show_toast } = useToast();
 
   const columns = [
-    { key: "so_number", label: "SO Number", sortable: true },
-    { key: "so_type", label: "SO Type", sortable: true },
-    { key: "customer", label: "Customer", sortable: true },
+    { key: "id", label: "ID", sortable: true },
+    { key: "customer_code", label: "Customer Code", sortable: true },
+    { key: "customer_name_1", label: "Customer Name", sortable: true },
     { key: "creation_date", label: "Creation Date", sortable: true },
-    { key: "status", label: "Status", sortable: true },
     { key: "actions", label: "", sortable: false },
   ];
 
-  // --- State ---
-  const [all_data, set_all_data] = useState([
+  const [customer_list, set_customer_list] = useState([
     {
-      so_number: "SO-000000001",
-      so_type: "LFSO",
-      customer: "QS IT Services",
-      creation_date: "11-05-2025 04:04:23",
-      status: "Pending",
+      id: 1,
+      customer_code: "CS-0001",
+      customer_name_1: "Customer Name 1",
+      creation_date: "MM-DD-YYYY 12:00:00",
     },
   ]);
   const [filtered_data, set_filtered_data] = useState([]);
@@ -60,7 +59,6 @@ const Sales_Order = () => {
   const [search_query, set_search_query] = useState("");
   const [debounced_query, set_debounced_query] = useState("");
 
-  // --- Debounce search ---
   useEffect(() => {
     const timer = setTimeout(() => {
       set_debounced_query(search_query);
@@ -69,7 +67,6 @@ const Sales_Order = () => {
     return () => clearTimeout(timer);
   }, [search_query]);
 
-  // --- Close dropdown outside click ---
   useEffect(() => {
     const handle_click_outside = (event) => {
       if (filter_ref.current && !filter_ref.current.contains(event.target)) {
@@ -81,23 +78,9 @@ const Sales_Order = () => {
       document.removeEventListener("mousedown", handle_click_outside);
   }, []);
 
-  // --- Load all users once ---
-  //   const load_data = async () => {
-  //     set_loading(true);
-  //     const data = await fetch_all_data();
-  //     set_all_data(data);
-  //     set_loading(false);
-  //   };
-
-  //   useEffect(() => {
-  //     load_data();
-  //   }, []);
-
-  // + Client-side Filtering
   useEffect(() => {
-    let temp = [...all_data];
+    let temp = [...customer_list];
 
-    // + Column Filter
     if (debounced_query.trim() !== "") {
       const q = debounced_query.toLowerCase();
       temp = temp.filter((u) =>
@@ -108,9 +91,7 @@ const Sales_Order = () => {
         })
       );
     }
-    // - Column Filter
 
-    // + Sort Function
     temp.sort((a, b) => {
       const val_a = a[sort_by];
       const val_b = b[sort_by];
@@ -122,27 +103,23 @@ const Sales_Order = () => {
       if (val_a > val_b) return sort_order === "asc" ? 1 : -1;
       return 0;
     });
-    // - Sort Function
 
-    // + Pagination Function
     const start_idx = (current_page - 1) * select_option;
     const end_idx = start_idx + select_option;
-    // - Pagination Function
+
     set_filtered_data(temp.slice(start_idx, end_idx));
   }, [
-    all_data,
+    customer_list,
     debounced_query,
     sort_by,
     sort_order,
     current_page,
     select_option,
   ]);
-  // - Client-side Filtering
 
-  // + Total page of Pagination
   const total_pages = Math.ceil(
     (debounced_query
-      ? all_data.filter((u) =>
+      ? customer_list.filter((u) =>
           columns.some((col) => {
             if (col.key === "actions") return false;
             const val = u[col.key];
@@ -152,11 +129,9 @@ const Sales_Order = () => {
               .includes(debounced_query.toLowerCase());
           })
         ).length
-      : all_data.length) / select_option
+      : customer_list.length) / select_option
   );
-  // - Total page of Pagination
 
-  // + Sort Filtering
   const handle_sort = (column) => {
     if (sort_by === column)
       set_sort_order(sort_order === "asc" ? "desc" : "asc");
@@ -166,40 +141,33 @@ const Sales_Order = () => {
     }
     set_current_page(1);
   };
-  // - Sort Filtering
+
   const handle_page_change = (page) => set_current_page(page);
 
-  // + For Date Range Field
   const date_range_ref = useRef(null);
-  // - For Date Range Field
 
-  const handle_create_new_so = () => {
-    set_display_modal("select_so_type");
+  const handle_create_new_customer = () => {
+    set_page("customer_creation");
   };
 
-  const handle_upload_po = () => {
+  const handle_upload_customer = () => {
     alert("Under Maintenance");
   };
 
-  const handle_view_po = () => {
+  const handle_view_customer = () => {
     set_for_posting(false);
-    set_display_modal("view_po");
+    set_display_modal("view_customer");
   };
 
-  const handle_post_po = () => {
-    set_for_posting(true);
-    set_display_modal("post_po");
+  const handle_edit_customer = (id) => {
+    alert(`CUSTOMER ID : ${id}`);
+    set_page("edit_customer");
   };
 
-  const handle_edit_po = () => {
-    set_page("edit_po");
+  const handle_delete_so = () => {
+    set_display_modal("delete_so");
   };
 
-  const handle_delete_po = () => {
-    set_display_modal("delete_po");
-  };
-
-  // RETURN ORIGIN
   return (
     <React.Fragment>
       {page === "main" && (
@@ -222,7 +190,7 @@ const Sales_Order = () => {
                   </li>
                   <li className="flex items-center gap-1.5 text-sm text-gray-500">
                     <span>/</span>
-                    <span className="text-gray-800">Sales Order</span>
+                    <span className="text-gray-800">Customer</span>
                   </li>
                 </ol>
               </nav>
@@ -230,21 +198,21 @@ const Sales_Order = () => {
 
             <div className="w-full bg-white rounded-lg border">
               <div className="flex flex-wrap items-center justify-between gap-3 p-5">
-                <h1 className="text-lg">Sales Order</h1>
+                <h1 className="text-lg">Customer</h1>
                 <div className="flex gap-2">
                   <Button
                     variant="primary"
                     icon={PlusCircle}
                     icon_position="left"
-                    on_click={handle_create_new_so}
+                    on_click={handle_create_new_customer}
                   >
-                    Create New SO
+                    Create New Customer
                   </Button>
                   <Button
                     variant="primary"
                     icon={FileUp}
                     icon_position="left"
-                    on_click={handle_upload_po}
+                    on_click={handle_upload_customer}
                   >
                     Upload
                   </Button>
@@ -276,7 +244,6 @@ const Sales_Order = () => {
                         variant="white"
                         icon={RefreshCw}
                         icon_position="left"
-                        //   on_click={() => load_data()}
                       ></Button>
                     </div>
 
@@ -284,7 +251,6 @@ const Sales_Order = () => {
                       <div className="w-full flex items-center gap-2">
                         <div className="w-full">
                           <Icon_Field
-                            name="search"
                             placeholder="Search..."
                             icon={Search}
                             icon_position="left"
@@ -298,19 +264,14 @@ const Sales_Order = () => {
                             width="w-[100px]"
                             icon={SlidersHorizontal}
                             icon_position="left"
-                            // loading
                             on_click={() => set_show_filter((prev) => !prev)}
                           >
                             Filter
                           </Button>
 
-                          {/* Filter Popover */}
                           {show_filter && (
                             <React.Fragment>
-                              <div
-                                className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40"
-                                // onClick={() => set_show_filter(false)}
-                              ></div>
+                              <div className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40"></div>
                               <div className="absolute top-full mt-2 right-0 z-50 bg-white border rounded-lg shadow-md p-4 w-[260px]">
                                 <div>
                                   <Date_Range_Field
@@ -318,18 +279,6 @@ const Sales_Order = () => {
                                     ref={date_range_ref}
                                   />
                                 </div>
-                                <div className="mt-4">
-                                  <Checkbox_Field
-                                    label="Is Draft?"
-                                    name="terms"
-                                    box_size={20}
-                                    icon_size={12}
-                                    //   checked={check}
-                                    //   on_change={(e) => set_check(e.target.checked)}
-                                    on_change={(e) => alert("Is Draft")}
-                                  />
-                                </div>
-
                                 <div className="flex justify-end gap-2 mt-4">
                                   <Button
                                     size="sm"
@@ -354,7 +303,6 @@ const Sales_Order = () => {
                     </div>
                   </div>
 
-                  {/* Table */}
                   <div className="overflow-x-auto">
                     {loading ? (
                       <div className="p-6 text-center text-gray-500 text-sm">
@@ -369,10 +317,21 @@ const Sales_Order = () => {
                         <thead className="bg-gray-100">
                           <tr className="whitespace-nowrap">
                             {columns.map((col, i) => {
-                              const renderHeaderCell = (col) => {
-                                const is_sorted = sort_by === col.key;
-
-                                return (
+                              const is_sorted = sort_by === col.key;
+                              return (
+                                <th
+                                  key={col.key}
+                                  onClick={() =>
+                                    col.sortable && handle_sort(col.key)
+                                  }
+                                  className={`border px-4 py-3 text-left text-[12px] font-medium text-gray-700 ${
+                                    col.sortable
+                                      ? "cursor-pointer select-none"
+                                      : ""
+                                  } ${i === 0 ? "border-l-0" : ""} ${
+                                    i === columns.length - 1 ? "border-r-0" : ""
+                                  }`}
+                                >
                                   <div className="flex items-center justify-between w-full">
                                     <span>{col.label}</span>
                                     {col.sortable &&
@@ -389,23 +348,6 @@ const Sales_Order = () => {
                                         />
                                       ))}
                                   </div>
-                                );
-                              };
-                              return (
-                                <th
-                                  key={col.key}
-                                  onClick={() =>
-                                    col.sortable && handle_sort(col.key)
-                                  }
-                                  className={`border px-4 py-3 text-left text-[12px] font-medium text-gray-700 ${
-                                    col.sortable
-                                      ? "cursor-pointer select-none"
-                                      : ""
-                                  } ${i === 0 ? "border-l-0" : ""} ${
-                                    i === columns.length - 1 ? "border-r-0" : ""
-                                  }`}
-                                >
-                                  {renderHeaderCell(col)}
                                 </th>
                               );
                             })}
@@ -413,29 +355,17 @@ const Sales_Order = () => {
                         </thead>
                         <tbody className="bg-white">
                           {filtered_data.map((row, idx) => {
-                            // + Cell Renderer
                             const render_cell = (col, row) => {
                               const value = row[col.key];
-                              if (col.key === "status") {
-                                return (
-                                  <span
-                                    className={`inline-flex items-center justify-center gap-1 rounded-full px-3 py-0.5 text-xs font-medium ${
-                                      row.status === "Posted"
-                                        ? "bg-green-100 text-green-500"
-                                        : "bg-yellow-100 text-yellow-600"
-                                    }`}
-                                  >
-                                    {row.status}
-                                  </span>
-                                );
-                              }
                               if (col.key === "actions") {
                                 return (
                                   <div className="flex gap-2">
                                     <div className="relative group flex jusity-center items-center">
                                       <button
                                         className="text-gray-500 hover:text-sky-600 text-[12px] outline-none"
-                                        onClick={() => handle_view_po(row.id)}
+                                        onClick={() =>
+                                          handle_view_customer(row.id)
+                                        }
                                       >
                                         <View size={19} />
                                       </button>
@@ -446,18 +376,9 @@ const Sales_Order = () => {
                                     <div className="relative group flex jusity-center items-center">
                                       <button
                                         className="text-gray-500 hover:text-sky-600 text-[12px] outline-none"
-                                        onClick={() => handle_post_po(row.id)}
-                                      >
-                                        <FileInput size={19} />
-                                      </button>
-                                      <span className="absolute bottom-full mb-1 left-1/2 transform -translate-x-1/2 px-2 py-1 text-xs text-white bg-sky-600 rounded opacity-0 group-hover:opacity-100 transition-opacity">
-                                        Post Record
-                                      </span>
-                                    </div>
-                                    <div className="relative group flex jusity-center items-center">
-                                      <button
-                                        className="text-gray-500 hover:text-sky-600 text-[12px] outline-none"
-                                        onClick={() => handle_edit_po(row.id)}
+                                        // onClick={() =>
+                                        //   handle_edit_customer(row.id)
+                                        // }
                                       >
                                         <Edit size={19} />
                                       </button>
@@ -468,7 +389,7 @@ const Sales_Order = () => {
                                     <div className="relative group flex jusity-center items-center">
                                       <button
                                         className="text-gray-500 hover:text-red-600 text-[12px] mb-[1px] outline-none"
-                                        onClick={() => handle_delete_po(row.id)}
+                                        onClick={() => handle_delete_so(row.id)}
                                       >
                                         <Trash size={19} />
                                       </button>
@@ -479,10 +400,8 @@ const Sales_Order = () => {
                                   </div>
                                 );
                               }
-
-                              return value; // Default render for all other fields
+                              return value;
                             };
-                            // - Cell Renderer
 
                             return (
                               <tr
@@ -510,7 +429,6 @@ const Sales_Order = () => {
                       </table>
                     )}
                   </div>
-
                   {total_pages > 0 && (
                     <Pagination
                       current_page={current_page}
@@ -525,31 +443,21 @@ const Sales_Order = () => {
           </div>
         </React.Fragment>
       )}
-      {page === "so_creation" && <Create_New_SO set_page={set_page} />}
-
-      <Select_SO_Type
-        is_open={display_modal === "select_so_type"}
+      {page === "customer_creation" && (
+        <Create_New_Customer set_page={set_page} />
+      )}
+      {/* {page === "gi_creation" && <Create_New_GI set_page={set_page} />}
+      {page === "edit_customer" && <Edit_GI set_page={set_page} />}
+      <Select_SO
+        is_open={display_modal === "select_so"}
         on_close={() => set_display_modal("")}
         width="max-w-[1280px]"
         height="max-h-[700px]"
         set_page={set_page}
       />
-
-      {/* <Select_PO_Type
-        is_open={display_modal === "select_so_type"}
-        on_close={() => set_display_modal("")}
-        width="max-w-[1280px]"
-        height="max-h-[700px]"
-        set_page={set_page}
-      />
-      <Post_View_PO
-        is_open={display_modal === "view_po" || display_modal === "post_po"}
+      <Post_View_GI
+        is_open={display_modal === "view_customer" || display_modal === "post_customer"}
         for_posting={for_posting}
-        on_close={() => set_display_modal("")}
-        width="max-w-[1280px]"
-      />
-      <Delete_PO
-        is_open={display_modal === "delete_po"}
         on_close={() => set_display_modal("")}
         width="max-w-[1280px]"
       /> */}
@@ -557,4 +465,4 @@ const Sales_Order = () => {
   );
 };
 
-export default Sales_Order;
+export default Customer;

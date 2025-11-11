@@ -11,17 +11,14 @@ import {
   Trash2,
 } from "lucide-react";
 import Icon_Field from "assets/elements/Icon_Field";
-import Quantity_Field from "assets/elements/Quantity_Field";
 import Find_Field from "assets/elements/Find_Field";
 // import Show_Item_Details from "./modals/Show_Item_Details";
 import { format_currency, format_percentage } from "assets/scripts/format";
 import Button from "assets/elements/Button";
 import Checkbox_Field from "assets/elements/Checkbox_Field";
-import Show_Item_Details from "./modals/Show_Item_Details";
-import Edit_Item from "./modals/Edit_Item";
 // import Edit_Item from "./modals/Edit_Item";
 
-const SO_Items = ({ handle_open_item_modal }) => {
+const SH_Delivery_Order = ({ handle_open_item_modal }) => {
   const [display_item_modal, set_display_item_modal] = useState("");
   const filter_ref = useRef(null);
   const [selected_row, set_selected_row] = useState(null);
@@ -43,81 +40,37 @@ const SO_Items = ({ handle_open_item_modal }) => {
   const item_list = [
     {
       id: 1,
-      item_code: "ITM-0001",
-      item_desc: "Item Description 1",
-      qty: "10",
-      unit: "PCS",
-      price: "8000",
-      discount_type: "PERCENT",
-      discount: "5",
-      net_price: "7600",
-      total_gross: "80000",
-      total_net: "76000",
-      currency: "PHP",
-      pricing_date: "2025-11-08",
-      on_hand: "150",
-      committed: "20",
-      is_approved: 0,
-      remarks: "For office equipment",
+      do_number: "DO-000000001",
+      sold_to: "CM-0001",
+      sh_type: "SH-01",
+      total_qty: "5",
+      total_amount: "3000",
     },
     {
       id: 2,
-      item_code: "ITM-0002",
-      item_desc: "Item Description 2",
-      qty: "5",
-      unit: "BOX",
-      price: "1200",
-      discount_type: "AMOUNT",
-      discount: "100",
-      net_price: "1100",
-      total_gross: "6000",
-      total_net: "5500",
-      currency: "PHP",
-      pricing_date: "2025-11-07",
-      on_hand: "80",
-      committed: "10",
-      is_approved: 1,
-      remarks: "Printer ink pack",
-    },
-    {
-      id: 3,
-      item_code: "ITM-0003",
-      item_desc: "Item Description 3",
-      qty: "20",
-      unit: "SET",
-      price: "2500",
-      discount_type: "PERCENT",
-      discount: "10",
-      net_price: "2250",
-      total_gross: "50000",
-      total_net: "45000",
-      currency: "USD",
-      pricing_date: "2025-10-30",
-      on_hand: "300",
-      committed: "50",
-      is_approved: 1,
-      remarks: "Computer accessories bundle",
+      do_number: "DO-000000002",
+      sold_to: "CM-0002",
+      sh_type: "SH-02",
+      total_qty: "10",
+      total_amount: "5000",
     },
   ];
 
   // 🔹 Define your columns
   const all_columns = [
     { key: "no", label: "No.", visible: true },
-    { key: "item_desc", label: "Item", visible: true },
-    { key: "qty", label: "Qty", visible: true },
-    { key: "unit", label: "Unit", visible: true },
-    { key: "price", label: "Price", visible: true },
-    { key: "discount_type", label: "Discount Type", visible: false },
-    { key: "discount", label: "Discount", visible: false },
-    { key: "net_price", label: "Net Price", visible: true },
-    { key: "total_gross", label: "Total Gross", visible: false },
-    { key: "total_net", label: "Total Net", visible: false },
-    { key: "currency", label: "Currency", visible: false },
-    { key: "pricing_date", label: "Pricing Date", visible: false },
-    { key: "on_hand", label: "On Hand", visible: false },
-    { key: "committed", label: "Committed", visible: false },
-    { key: "is_approved", label: "Is Approved", visible: false },
-    { key: "remarks", label: "Remarks", visible: false },
+    { key: "do_number", label: "DO Number", visible: true },
+    { key: "sold_to", label: "Sold To", visible: true },
+    { key: "name", label: "Name", visible: false },
+    { key: "address", label: "Address", visible: false },
+    { key: "route", label: "Route", visible: false },
+    { key: "sh_type", label: "Shipment Type", visible: true },
+    { key: "total_volume", label: "Total Volume", visible: false },
+    { key: "total_weight", label: "Total Weight", visible: false },
+    { key: "shipped_date", label: "Shipped Date", visible: false },
+    { key: "total_qty", label: "Total Qty", visible: true },
+    { key: "total_amount", label: "Total Amount", visible: true },
+    { key: "re_delivery", label: "Re-delivered", visible: false },
     { key: "actions", label: "", visible: true },
   ];
 
@@ -154,7 +107,7 @@ const SO_Items = ({ handle_open_item_modal }) => {
           <div className="flex flex-col gap-5 px-6 md:pl-6 md:pr-3 mb-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <h1 className="font-semibold text-gray-600 whitespace-nowrap">
-                List of Items
+                Shipment Details
               </h1>
             </div>
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center md:w-[500px]">
@@ -221,10 +174,14 @@ const SO_Items = ({ handle_open_item_modal }) => {
                 <tr className="border-b border-t border-gray-100 whitespace-nowrap dark:border-gray-800 text-xs">
                   {all_columns
                     .filter((col) => visible_columns.includes(col.key))
-                    .map((col) => (
+                    .map((col, colIndex, arr) => (
                       <th
                         key={col.key}
-                        className="px-5 py-4 font-semibold whitespace-nowrap text-gray-700"
+                        className={`px-5 py-4 font-semibold whitespace-nowrap text-gray-700 ${
+                          colIndex !== arr.length - 1
+                            ? "border-r border-gray-100"
+                            : ""
+                        }`}
                       >
                         {col.label}
                       </th>
@@ -245,56 +202,27 @@ const SO_Items = ({ handle_open_item_modal }) => {
                     >
                       {all_columns
                         .filter((col) => visible_columns.includes(col.key))
-                        .map((col) => {
+                        .map((col, colIndex, arr) => {
+                          const borderClass =
+                            colIndex !== arr.length - 1
+                              ? "border-r border-gray-100"
+                              : "";
                           switch (col.key) {
                             case "no":
                               return (
                                 <td
                                   key={col.key}
-                                  className="px-5 py-4 text-gray-500"
+                                  className={`px-5 py-4 text-gray-500 ${borderClass}`}
                                 >
                                   {index + 1}
                                 </td>
                               );
-                            case "price":
-                            case "net_price":
-                            case "total_gross":
-                            case "total_net":
-                              return (
-                                <td
-                                  key={col.key}
-                                  className="px-5 py-4 text-gray-500"
-                                >
-                                  {format_currency(item[col.key], 2, true)}
-                                </td>
-                              );
-                            case "discount":
-                              return (
-                                <td
-                                  key={col.key}
-                                  className="px-5 py-4 text-gray-500"
-                                >
-                                  {format_percentage(item[col.key], 0)}
-                                </td>
-                              );
-                            case "is_approved":
-                              return (
-                                <td
-                                  key={col.key}
-                                  className="px-5 py-4 text-gray-500"
-                                >
-                                  <Checkbox_Field
-                                    box_size={18}
-                                    icon_size={12}
-                                    checked={item.is_approved === 1}
-                                    disabled
-                                  />
-                                  {/* {item[col.key] ? "✅" : "❌"} */}
-                                </td>
-                              );
                             case "actions":
                               return (
-                                <td key={col.key} className="px-5 py-4">
+                                <td
+                                  key={col.key}
+                                  className={`px-5 py-4 text-gray-500 ${borderClass}`}
+                                >
                                   <div className="flex gap-2">
                                     <button
                                       className="text-gray-500 hover:text-sky-600"
@@ -318,7 +246,7 @@ const SO_Items = ({ handle_open_item_modal }) => {
                               return (
                                 <td
                                   key={col.key}
-                                  className="px-5 py-4 text-gray-500"
+                                  className={`px-5 py-4 text-gray-500 ${borderClass}`}
                                 >
                                   {item[col.key] ?? "-"}
                                 </td>
@@ -333,30 +261,19 @@ const SO_Items = ({ handle_open_item_modal }) => {
           </div>
         </div>
         <div className="mt-5 rounded-lg border border-gray-100 bg-gray-50 p-4 sm:p-6 dark:border-gray-800 dark:bg-gray-900">
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 lg:grid-cols-12">
-            <div className="w-full lg:col-span-3">
-              <Text_Field
-                label="Item Code"
-                type={"number"}
-                // value={text}
-                // on_change={handle_text_change}
-                pattern="[A-Za-z]{1,}"
-                disabled
-              />
-            </div>
-            <div className="w-full lg:col-span-9">
+          <div className="grid grid-cols-1 gap-4 lg:grid-cols-12">
+            <div className="w-full lg:col-span-4">
               <Find_Field
-                label="Item Name"
-                name="item_name"
+                label="DO Number"
                 // value={search_value}
                 // on_change={handle_change}
-                on_click={handle_open_item_modal}
+                // on_click={handle_open_item_modal}
                 disabled
               />
             </div>
             <div className="w-full lg:col-span-4">
               <Text_Field
-                label="Unit Price"
+                label="SO Number"
                 type={"text"}
                 // value={text}
                 // on_change={handle_text_change}
@@ -364,9 +281,9 @@ const SO_Items = ({ handle_open_item_modal }) => {
                 disabled
               />
             </div>
-            <div className="w-full lg:col-span-2">
+            <div className="w-full lg:col-span-4">
               <Text_Field
-                label="Unit"
+                label="PO Number"
                 type={"text"}
                 // value={text}
                 // on_change={handle_text_change}
@@ -374,33 +291,25 @@ const SO_Items = ({ handle_open_item_modal }) => {
                 disabled
               />
             </div>
-            <div className="w-full lg:col-span-2">
-              <Quantity_Field
-                label="Quantity"
-                value={quantity}
-                on_change={set_quantity}
-                placeholder="0"
-                min={1}
+            <div className="w-full lg:col-span-3">
+              <Text_Field
+                label="Sold To"
+                type={"text"}
+                // value={text}
+                // on_change={handle_text_change}
+                pattern="[A-Za-z]{1,}"
+                disabled
               />
             </div>
-            {/* <div className="w-full lg:col-span-2">
-              <Select_Field
-                label="Discount"
-                name="discount"
-                // value={discount}
-                // on_change={handle_discount_change}
-                // options={discount_options}
-                // placeholder="Select Payment Condition"
+            <div className="w-full lg:col-span-7">
+              <Text_Field
+                label="Name"
+                type={"text"}
+                // value={text}
+                // on_change={handle_text_change}
+                pattern="[A-Za-z]{1,}"
+                disabled
               />
-            </div> */}
-            <div className="flex w-full items-end lg:col-span-2">
-              <Button
-                variant="white"
-                width="w-full"
-                // icon={SlidersHorizontal}
-              >
-                Discount
-              </Button>
             </div>
             <div className="flex w-full items-end lg:col-span-2">
               <Button
@@ -409,54 +318,21 @@ const SO_Items = ({ handle_open_item_modal }) => {
                 icon={CirclePlus}
                 onClick={handle_add_item}
               >
-                Add Item
+                Add Shipment
               </Button>
             </div>
           </div>
           <div className="mt-5 flex max-w-2xl items-center gap-2 text-gray-500">
             <Info size={18} />
             <p className="text-sm dark:text-gray-400">
-              After filling in the item details, please make sure all the items
-              that you have listed is correct.
+              After filling in the shipment details, please make sure all the
+              orders that you have listed is correct.
             </p>
-          </div>
-        </div>
-        <div className="flex flex-wrap justify-between sm:justify-end">
-          <div className="mt-6 w-full space-y-1 text-right sm:w-[270px]">
-            <p className="mb-4 text-left text-sm font-medium text-gray-800 dark:text-white/90">
-              Order summary
-            </p>
-            <ul className="space-y-2">
-              <li className="flex justify-between gap-5">
-                <span className="text-sm text-gray-500 dark:text-gray-400">
-                  Sub Total
-                </span>
-                <span className="text-sm font-medium text-gray-700 dark:text-gray-400">
-                  492,800.00
-                </span>
-              </li>
-              <li className="flex justify-between gap-5">
-                <span className="text-sm text-gray-500 dark:text-gray-400">
-                  Vat (12%)
-                </span>
-                <span className="text-sm font-medium text-gray-700 dark:text-gray-400">
-                  67,200.00
-                </span>
-              </li>
-              <li className="flex justify-between gap-5">
-                <span className="font-medium text-gray-700 dark:text-gray-400">
-                  Total
-                </span>
-                <span className="text-lg font-semibold text-gray-800 dark:text-white/90">
-                  560,000.00
-                </span>
-              </li>
-            </ul>
           </div>
         </div>
       </div>
       {/* - Item Section */}
-      <Show_Item_Details
+      {/* <Show_Item_Details
         is_open={display_item_modal === "show_details"}
         on_close={() => set_display_item_modal("")}
         width="max-w-[1280px]"
@@ -465,9 +341,9 @@ const SO_Items = ({ handle_open_item_modal }) => {
         is_open={display_item_modal === "edit_item"}
         on_close={() => set_display_item_modal("")}
         width="max-w-[1280px]"
-      />
+      /> */}
     </React.Fragment>
   );
 };
 
-export default SO_Items;
+export default SH_Delivery_Order;
