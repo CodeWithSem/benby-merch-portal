@@ -23,6 +23,7 @@ import Sales_Order from "../modules/outbound/sales_order/Sales_Order";
 import Goods_Issue from "../modules/outbound/goods_issue/Goods_Issue";
 import Shipment from "../modules/outbound/shipment/Shipment";
 import Customer from "../modules/outbound/customer/Customer";
+import Truck from "../modules/outbound/truck/Truck";
 
 const Layout = () => {
   const [active_item, set_active_item] = useState(() => {
@@ -79,6 +80,8 @@ const Layout = () => {
         return <Shipment />;
       case "Outbound-Customer":
         return <Customer />;
+      case "Outbound-Truck":
+        return <Truck />;
       case "Warehouse-Stock Transfer":
         return <Stock_Transfer />;
       case "Warehouse-Inventory Master":
