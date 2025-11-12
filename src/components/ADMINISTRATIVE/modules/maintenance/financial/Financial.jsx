@@ -10,6 +10,13 @@ import {
   Search,
 } from "lucide-react";
 import React, { useState } from "react";
+import Movement_Type from "./components/movement_type/Movement_Type";
+import Business_Area from "./components/business_area/Business_Area";
+import Taxation_Code from "./components/taxation_code/Taxation_Code";
+import Exchange_Rate from "./components/exchange_rate/Exchange_Rate";
+import Payment_Terms from "./components/payment_terms/Payment_Terms";
+import Payment_Method from "./components/payment_method/Payment_Method";
+import Inv_Acc_Center from "./components/inv_acc_center/Inv_Acc_Center";
 
 const Financial = () => {
   const [page, set_page] = useState("main");
@@ -22,12 +29,12 @@ const Financial = () => {
       icon: LandPlot,
       title: "Business Area",
     },
-    { key: "tax_code", icon: ScrollText, title: "Taxation Code" },
+    { key: "taxation_code", icon: ScrollText, title: "Taxation Code" },
     { key: "exchange_rate", icon: ArrowLeftRight, title: "Exchange Rate" },
     { key: "payment_terms", icon: HandshakeIcon, title: "Payment Terms" },
     { key: "payment_method", icon: Banknote, title: "Payment Method" },
     {
-      key: "inv_acc_center",
+      key: "inv_account_center",
       icon: ClipboardList,
       title: "Inventory Account Center",
     },
@@ -102,13 +109,7 @@ const Financial = () => {
                         <div
                           key={idx}
                           className="relative select-none border h-[150px] bg-white rounded-lg shadow-sm flex justify-center items-center p-5 hover:border-sky-500 cursor-pointer outline-none transition"
-                          onClick={() =>
-                            alert(
-                              typeof item.title === "string"
-                                ? item.title
-                                : item.plain_title || ""
-                            )
-                          }
+                          onClick={() => set_page(item.key)}
                           //   onClick={() => alert(item.key)}
                         >
                           <div className="absolute left-2 top-2 h-[28px] w-[28px] rounded bg-sky-600 text-white flex justify-center items-center">
@@ -132,6 +133,13 @@ const Financial = () => {
           </div>
         </React.Fragment>
       )}
+      {page === "movement_type" && <Movement_Type set_page={set_page} />}
+      {page === "business_area" && <Business_Area set_page={set_page} />}
+      {page === "taxation_code" && <Taxation_Code set_page={set_page} />}
+      {page === "exchange_rate" && <Exchange_Rate set_page={set_page} />}
+      {page === "payment_terms" && <Payment_Terms set_page={set_page} />}
+      {page === "payment_method" && <Payment_Method set_page={set_page} />}
+      {page === "inv_account_center" && <Inv_Acc_Center set_page={set_page} />}
     </React.Fragment>
   );
 };

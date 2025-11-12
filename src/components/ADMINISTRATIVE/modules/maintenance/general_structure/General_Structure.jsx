@@ -158,14 +158,7 @@ const General_Structure = () => {
                         <div
                           key={idx}
                           className="relative select-none border h-[150px] bg-white rounded-lg shadow-sm flex justify-center items-center p-5 hover:border-sky-500 cursor-pointer outline-none transition"
-                          onClick={() =>
-                            // alert(
-                            //   typeof item.title === "string"
-                            //     ? item.title
-                            //     : item.plain_title || ""
-                            // )
-                            set_page(item.key)
-                          }
+                          onClick={() => set_page(item.key)}
                           //   onClick={() => alert(item.key)}
                         >
                           <div className="absolute left-2 top-2 h-[28px] w-[28px] rounded bg-sky-600 text-white flex justify-center items-center">
