@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Text_Field from "assets/elements/Text_Field";
 import Button from "assets/elements/Button";
 import { X } from "lucide-react";
+import Text_Code_Field from "assets/elements/Text_Code_Field";
 import { format_date_1, get_date_now } from "assets/scripts/format";
 
-const Delete_PL_Status = ({
+const Delete_Country = ({
   is_open,
   on_close,
   width = "max-w-[700px]",
@@ -12,8 +13,8 @@ const Delete_PL_Status = ({
 }) => {
   const [is_confirm_modal_open, set_is_confirm_modal_open] = useState(false);
 
-  const handle_delete_pl_status = () => {
-    alert("Delete Plant Status");
+  const handle_delete_country = () => {
+    alert("Delete Country");
   };
 
   const Confirm_Modal = () => {
@@ -29,10 +30,10 @@ const Delete_PL_Status = ({
           >
             {/* Modal Body */}
             <div className="w-full flex justify-center items-center text-lg md:text-xl font-bold mb-4">
-              Delete Plant Status
+              Delete Country
             </div>
             <p className="w-full text-center text-sm leading-6 text-gray-500 dark:text-gray-400 pt-4">
-              You are about to delete this Plant Status.
+              You are about to delete this Country.
             </p>
             <p className="w-full text-center text-sm leading-6 text-gray-500 dark:text-gray-400 pt-4">
               This action is permanent and cannot be undone. All related data
@@ -45,7 +46,7 @@ const Delete_PL_Status = ({
               <Button
                 width="w-[100px]"
                 variant="danger"
-                on_click={handle_delete_pl_status}
+                on_click={handle_delete_country}
               >
                 Yes
               </Button>
@@ -82,7 +83,7 @@ const Delete_PL_Status = ({
           </button>
           {/* + Modal Label */}
           <div className="text-lg md:text-xl font-bold mb-5">
-            Delete Plant Status
+            Delete Country
           </div>
           {/* - Modal Label */}
           {/* + Modal Body */}
@@ -90,7 +91,7 @@ const Delete_PL_Status = ({
             <div className="w-full">
               <div className="w-full bg-white rounded-lg border">
                 <div className="flex flex-wrap items-center justify-between gap-3 p-5">
-                  <h1 className="text-lg">Plant Status Details</h1>
+                  <h1 className="text-lg">Country Details</h1>
 
                   <div className="flex gap-2">
                     <div className="text-gray-500 text-sm tracking-wider">
@@ -103,18 +104,18 @@ const Delete_PL_Status = ({
                   <div className="grid grid-cols-1 gap-5">
                     <div className="col-span-full">
                       <Text_Field
-                        label="Plant Status Code"
+                        label="Country Code"
                         type={"text"}
-                        value={delete_data.pl_status_code}
+                        value={delete_data.country_code}
                         pattern="[A-Za-z]{1,}"
                         disabled
                       />
                     </div>
                     <div className="col-span-full">
                       <Text_Field
-                        label="Plant Status Description"
+                        label="Country Description"
                         type={"text"}
-                        value={delete_data.pl_status_desc}
+                        value={delete_data.country_desc}
                         pattern="[A-Za-z]{1,}"
                         disabled
                       />
@@ -148,4 +149,4 @@ const Delete_PL_Status = ({
   ) : null;
 };
 
-export default Delete_PL_Status;
+export default Delete_Country;

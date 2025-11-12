@@ -26,6 +26,17 @@ import Branch from "./components/branch/Branch";
 import Plant from "./components/plant/Plant";
 import Storage_Location from "./components/storage_location/Storage_Location";
 import Plant_Status from "./components/plant_status/Plant_Status";
+import Storage_Condition from "./components/storage_condition/Storage_Condition";
+import Stock_Type from "./components/stock_type/Stock_Type";
+import UoM from "./components/uom/UoM";
+import Currency from "./components/currency/Currency";
+import Language from "./components/language/Language";
+import City from "./components/city/City";
+import Region from "./components/region/Region";
+import District from "./components/district/District";
+import Country from "./components/country/Country";
+import Gen_Item_Group from "./components/gen_item_group/Gen_Item_Group";
+import Industry_Type from "./components/industry_type/Industry_Type";
 
 const General_Structure = () => {
   const [page, set_page] = useState("main");
@@ -185,6 +196,17 @@ const General_Structure = () => {
       {page === "plant" && <Plant set_page={set_page} />}
       {page === "sloc" && <Storage_Location set_page={set_page} />}
       {page === "plant_status" && <Plant_Status set_page={set_page} />}
+      {page === "scon" && <Storage_Condition set_page={set_page} />}
+      {page === "stock_type" && <Stock_Type set_page={set_page} />}
+      {page === "uom" && <UoM set_page={set_page} />}
+      {page === "currency" && <Currency set_page={set_page} />}
+      {page === "language" && <Language set_page={set_page} />}
+      {page === "city" && <City set_page={set_page} />}
+      {page === "region" && <Region set_page={set_page} />}
+      {page === "district" && <District set_page={set_page} />}
+      {page === "country" && <Country set_page={set_page} />}
+      {page === "gen_item_group" && <Gen_Item_Group set_page={set_page} />}
+      {page === "industry_type" && <Industry_Type set_page={set_page} />}
     </React.Fragment>
   );
 };
