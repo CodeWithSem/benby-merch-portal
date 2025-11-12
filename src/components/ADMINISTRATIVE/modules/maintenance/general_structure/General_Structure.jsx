@@ -20,6 +20,12 @@ import {
 } from "lucide-react";
 import React, { useState } from "react";
 import Company from "./components/company/Company";
+import Purchase_Org from "./components/purchase_org/Purchase_Org";
+import Purchase_Group from "./components/purchase_group/Purchase_Group";
+import Branch from "./components/branch/Branch";
+import Plant from "./components/plant/Plant";
+import Storage_Location from "./components/storage_location/Storage_Location";
+import Plant_Status from "./components/plant_status/Plant_Status";
 
 const General_Structure = () => {
   const [page, set_page] = useState("main");
@@ -173,6 +179,12 @@ const General_Structure = () => {
         </React.Fragment>
       )}
       {page === "company" && <Company set_page={set_page} />}
+      {page === "p_org" && <Purchase_Org set_page={set_page} />}
+      {page === "p_group" && <Purchase_Group set_page={set_page} />}
+      {page === "branch" && <Branch set_page={set_page} />}
+      {page === "plant" && <Plant set_page={set_page} />}
+      {page === "sloc" && <Storage_Location set_page={set_page} />}
+      {page === "plant_status" && <Plant_Status set_page={set_page} />}
     </React.Fragment>
   );
 };

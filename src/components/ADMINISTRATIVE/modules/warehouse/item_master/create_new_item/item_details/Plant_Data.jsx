@@ -39,7 +39,7 @@ const Plant_Data = () => {
         </div>
       </div>
       <div className="mt-5 rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6 dark:border-gray-800 dark:bg-gray-900">
-        <h1 className="mb-5 font-semibold text-sky-700">GEneral Data</h1>
+        <h1 className="mb-5 font-semibold text-sky-700">General Data</h1>
         <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
           <div>
             <Text_Field

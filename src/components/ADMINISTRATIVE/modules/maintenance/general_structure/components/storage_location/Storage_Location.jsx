@@ -16,24 +16,24 @@ import Select_Field from "assets/elements/Select_Field";
 import Pagination from "assets/elements/Pagination";
 import Button from "assets/elements/Button";
 import { useToast } from "../../../../../layout/Toast_Provider";
-import Create_Company from "./functions/Create_Company";
-import Edit_Company from "./functions/Edit_Company";
-import Delete_Company from "./functions/Delete_Company";
+import Create_SLOC from "./functions/Create_SLOC";
+import Edit_SLOC from "./functions/Edit_SLOC";
+import Delete_SLOC from "./functions/Delete_SLOC";
 
-const Company = ({ set_page }) => {
+const Storage_Location = ({ set_page }) => {
   // + Variables
   const filter_ref = useRef(null);
   const [sub_page, set_sub_page] = useState("main");
   const [display_modal, set_display_modal] = useState("");
   const [edit_data, set_edit_data] = useState({
     id: 0,
-    company_code: "",
-    company_desc: "",
+    sloc_code: "",
+    sloc_desc: "",
   });
   const [delete_data, set_delete_data] = useState({
     id: 0,
-    company_code: "",
-    company_desc: "",
+    sloc_code: "",
+    sloc_desc: "",
   });
   // - Variables
 
@@ -43,8 +43,8 @@ const Company = ({ set_page }) => {
   const columns = [
     { key: "index", label: "#", sortable: true },
     { key: "id", label: "ID", sortable: true },
-    { key: "company_code", label: "Company Code", sortable: true },
-    { key: "company_desc", label: "Company Description", sortable: true },
+    { key: "sloc_code", label: "SLOC Code", sortable: true },
+    { key: "sloc_desc", label: "SLOC Description", sortable: true },
     { key: "created_by", label: "Created By", sortable: true },
     { key: "creation_date", label: "Creation Date", sortable: true },
     { key: "updated_by", label: "Change By", sortable: true },
@@ -53,11 +53,11 @@ const Company = ({ set_page }) => {
   ];
 
   // --- State ---
-  const [company_list, set_company_list] = useState([
+  const [sloc_list, set_sloc_list] = useState([
     {
       id: 1,
-      company_code: "COM-001",
-      company_desc: "Company Description 1",
+      sloc_code: "SLOC-001",
+      sloc_desc: "SLOC Description 1",
       created_by: "Admin",
       creation_date: "11-11-2025",
       updated_by: "",
@@ -98,7 +98,7 @@ const Company = ({ set_page }) => {
   //   const load_data = async () => {
   //     set_loading(true);
   //     const data = await fetch_data_list();
-  //     set_company_list(data);
+  //     set_sloc_list(data);
   //     set_loading(false);
   //   };
 
@@ -108,7 +108,7 @@ const Company = ({ set_page }) => {
 
   // + Client-side Filtering
   useEffect(() => {
-    let temp = [...company_list];
+    let temp = [...sloc_list];
 
     // + Column Filter
     if (debounced_query.trim() !== "") {
@@ -143,7 +143,7 @@ const Company = ({ set_page }) => {
     // - Pagination Function
     set_filtered_data(temp.slice(start_idx, end_idx));
   }, [
-    company_list,
+    sloc_list,
     debounced_query,
     sort_by,
     sort_order,
@@ -155,7 +155,7 @@ const Company = ({ set_page }) => {
   // + Total page of Pagination
   const total_pages = Math.ceil(
     (debounced_query
-      ? company_list.filter((u) =>
+      ? sloc_list.filter((u) =>
           columns.some((col) => {
             if (col.key === "actions") return false;
             const val = u[col.key];
@@ -165,7 +165,7 @@ const Company = ({ set_page }) => {
               .includes(debounced_query.toLowerCase());
           })
         ).length
-      : company_list.length) / select_option
+      : sloc_list.length) / select_option
   );
   // - Total page of Pagination
 
@@ -182,17 +182,17 @@ const Company = ({ set_page }) => {
   // - Sort Filtering
   const handle_page_change = (page) => set_current_page(page);
 
-  const handle_create_new_company = () => {
-    set_sub_page("create_new_company");
+  const handle_create_new_sloc = () => {
+    set_sub_page("create_new_sloc");
   };
 
-  const handle_edit_company = (data) => {
+  const handle_edit_sloc = (data) => {
     set_edit_data(data);
-    set_sub_page("edit_company");
+    set_sub_page("edit_sloc");
   };
-  const handle_delete_company = (data) => {
+  const handle_delete_sloc = (data) => {
     set_delete_data(data);
-    set_display_modal("delete_company");
+    set_display_modal("delete_sloc");
   };
 
   const handle_go_back = (value) => {
@@ -248,7 +248,7 @@ const Company = ({ set_page }) => {
                   </li>
                   <li className="flex items-center gap-1.5 text-sm text-gray-500">
                     <span>/</span>
-                    <span className="text-gray-800">Company</span>
+                    <span className="text-gray-800">Storage Location</span>
                   </li>
                 </ol>
               </nav>
@@ -265,14 +265,14 @@ const Company = ({ set_page }) => {
                     on_click={go_back_to_main}
                   ></Button>
                   {/* <ChevronLeft className="text-gray-500" size={24} /> */}
-                  <h1 className="text-lg">Company</h1>
+                  <h1 className="text-lg">Storage Location</h1>
                 </div>
                 <div className="flex gap-2">
                   <Button
                     variant="primary"
                     icon={PlusCircle}
                     icon_position="left"
-                    on_click={handle_create_new_company}
+                    on_click={handle_create_new_sloc}
                   >
                     Create New Data
                   </Button>
@@ -469,7 +469,7 @@ const Company = ({ set_page }) => {
                                     {/* <div className="relative group flex jusity-center items-center">
                                       <button
                                         className="text-gray-500 hover:text-sky-600 text-[12px] outline-none"
-                                        // onClick={() => handle_view_company(row.id)}
+                                        // onClick={() => handle_view_sloc(row.id)}
                                       >
                                         <View size={19} />
                                       </button>
@@ -480,7 +480,7 @@ const Company = ({ set_page }) => {
                                     <div className="relative group flex jusity-center items-center">
                                       <button
                                         className="text-gray-500 hover:text-sky-600 text-[12px] outline-none"
-                                        onClick={() => handle_edit_company(row)}
+                                        onClick={() => handle_edit_sloc(row)}
                                       >
                                         <Edit size={19} />
                                       </button>
@@ -491,9 +491,7 @@ const Company = ({ set_page }) => {
                                     <div className="relative group flex jusity-center items-center">
                                       <button
                                         className="text-gray-500 hover:text-red-600 text-[12px] mb-[1px] outline-none"
-                                        onClick={() =>
-                                          handle_delete_company(row)
-                                        }
+                                        onClick={() => handle_delete_sloc(row)}
                                       >
                                         <Trash size={19} />
                                       </button>
@@ -550,18 +548,18 @@ const Company = ({ set_page }) => {
           </div>
         </React.Fragment>
       )}
-      {sub_page === "create_new_company" && (
-        <Create_Company handle_go_back={handle_go_back} />
+      {sub_page === "create_new_sloc" && (
+        <Create_SLOC handle_go_back={handle_go_back} />
       )}
-      {sub_page === "edit_company" && (
-        <Edit_Company
+      {sub_page === "edit_sloc" && (
+        <Edit_SLOC
           handle_go_back={handle_go_back}
           edit_data={edit_data}
           set_edit_data={set_edit_data}
         />
       )}
-      <Delete_Company
-        is_open={display_modal === "delete_company"}
+      <Delete_SLOC
+        is_open={display_modal === "delete_sloc"}
         on_close={() => set_display_modal("")}
         width="max-w-[1000px]"
         delete_data={delete_data}
@@ -570,4 +568,4 @@ const Company = ({ set_page }) => {
   );
 };
 
-export default Company;
+export default Storage_Location;

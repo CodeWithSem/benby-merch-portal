@@ -16,24 +16,24 @@ import Select_Field from "assets/elements/Select_Field";
 import Pagination from "assets/elements/Pagination";
 import Button from "assets/elements/Button";
 import { useToast } from "../../../../../layout/Toast_Provider";
-import Create_Company from "./functions/Create_Company";
-import Edit_Company from "./functions/Edit_Company";
-import Delete_Company from "./functions/Delete_Company";
+import Create_PL_Status from "./functions/Create_PL_Status";
+import Edit_PL_Status from "./functions/Edit_PL_Status";
+import Delete_PL_Status from "./functions/Delete_PL_Status";
 
-const Company = ({ set_page }) => {
+const Plant_Status = ({ set_page }) => {
   // + Variables
   const filter_ref = useRef(null);
   const [sub_page, set_sub_page] = useState("main");
   const [display_modal, set_display_modal] = useState("");
   const [edit_data, set_edit_data] = useState({
     id: 0,
-    company_code: "",
-    company_desc: "",
+    pl_status_code: "",
+    pl_status_desc: "",
   });
   const [delete_data, set_delete_data] = useState({
     id: 0,
-    company_code: "",
-    company_desc: "",
+    pl_status_code: "",
+    pl_status_desc: "",
   });
   // - Variables
 
@@ -43,8 +43,12 @@ const Company = ({ set_page }) => {
   const columns = [
     { key: "index", label: "#", sortable: true },
     { key: "id", label: "ID", sortable: true },
-    { key: "company_code", label: "Company Code", sortable: true },
-    { key: "company_desc", label: "Company Description", sortable: true },
+    { key: "pl_status_code", label: "Plant Status Code", sortable: true },
+    {
+      key: "pl_status_desc",
+      label: "Plant Status Description",
+      sortable: true,
+    },
     { key: "created_by", label: "Created By", sortable: true },
     { key: "creation_date", label: "Creation Date", sortable: true },
     { key: "updated_by", label: "Change By", sortable: true },
@@ -53,11 +57,11 @@ const Company = ({ set_page }) => {
   ];
 
   // --- State ---
-  const [company_list, set_company_list] = useState([
+  const [pl_status_list, set_pl_status_list] = useState([
     {
       id: 1,
-      company_code: "COM-001",
-      company_desc: "Company Description 1",
+      pl_status_code: "PL-S-001",
+      pl_status_desc: "Plant Status Description 1",
       created_by: "Admin",
       creation_date: "11-11-2025",
       updated_by: "",
@@ -98,7 +102,7 @@ const Company = ({ set_page }) => {
   //   const load_data = async () => {
   //     set_loading(true);
   //     const data = await fetch_data_list();
-  //     set_company_list(data);
+  //     set_pl_status_list(data);
   //     set_loading(false);
   //   };
 
@@ -108,7 +112,7 @@ const Company = ({ set_page }) => {
 
   // + Client-side Filtering
   useEffect(() => {
-    let temp = [...company_list];
+    let temp = [...pl_status_list];
 
     // + Column Filter
     if (debounced_query.trim() !== "") {
@@ -143,7 +147,7 @@ const Company = ({ set_page }) => {
     // - Pagination Function
     set_filtered_data(temp.slice(start_idx, end_idx));
   }, [
-    company_list,
+    pl_status_list,
     debounced_query,
     sort_by,
     sort_order,
@@ -155,7 +159,7 @@ const Company = ({ set_page }) => {
   // + Total page of Pagination
   const total_pages = Math.ceil(
     (debounced_query
-      ? company_list.filter((u) =>
+      ? pl_status_list.filter((u) =>
           columns.some((col) => {
             if (col.key === "actions") return false;
             const val = u[col.key];
@@ -165,7 +169,7 @@ const Company = ({ set_page }) => {
               .includes(debounced_query.toLowerCase());
           })
         ).length
-      : company_list.length) / select_option
+      : pl_status_list.length) / select_option
   );
   // - Total page of Pagination
 
@@ -182,17 +186,17 @@ const Company = ({ set_page }) => {
   // - Sort Filtering
   const handle_page_change = (page) => set_current_page(page);
 
-  const handle_create_new_company = () => {
-    set_sub_page("create_new_company");
+  const handle_create_new_pl_status = () => {
+    set_sub_page("create_new_pl_status");
   };
 
-  const handle_edit_company = (data) => {
+  const handle_edit_pl_status = (data) => {
     set_edit_data(data);
-    set_sub_page("edit_company");
+    set_sub_page("edit_pl_status");
   };
-  const handle_delete_company = (data) => {
+  const handle_delete_pl_status = (data) => {
     set_delete_data(data);
-    set_display_modal("delete_company");
+    set_display_modal("delete_pl_status");
   };
 
   const handle_go_back = (value) => {
@@ -248,7 +252,7 @@ const Company = ({ set_page }) => {
                   </li>
                   <li className="flex items-center gap-1.5 text-sm text-gray-500">
                     <span>/</span>
-                    <span className="text-gray-800">Company</span>
+                    <span className="text-gray-800">Plant Status</span>
                   </li>
                 </ol>
               </nav>
@@ -265,14 +269,14 @@ const Company = ({ set_page }) => {
                     on_click={go_back_to_main}
                   ></Button>
                   {/* <ChevronLeft className="text-gray-500" size={24} /> */}
-                  <h1 className="text-lg">Company</h1>
+                  <h1 className="text-lg">Plant Status</h1>
                 </div>
                 <div className="flex gap-2">
                   <Button
                     variant="primary"
                     icon={PlusCircle}
                     icon_position="left"
-                    on_click={handle_create_new_company}
+                    on_click={handle_create_new_pl_status}
                   >
                     Create New Data
                   </Button>
@@ -469,7 +473,7 @@ const Company = ({ set_page }) => {
                                     {/* <div className="relative group flex jusity-center items-center">
                                       <button
                                         className="text-gray-500 hover:text-sky-600 text-[12px] outline-none"
-                                        // onClick={() => handle_view_company(row.id)}
+                                        // onClick={() => handle_view_pl_status(row.id)}
                                       >
                                         <View size={19} />
                                       </button>
@@ -480,7 +484,9 @@ const Company = ({ set_page }) => {
                                     <div className="relative group flex jusity-center items-center">
                                       <button
                                         className="text-gray-500 hover:text-sky-600 text-[12px] outline-none"
-                                        onClick={() => handle_edit_company(row)}
+                                        onClick={() =>
+                                          handle_edit_pl_status(row)
+                                        }
                                       >
                                         <Edit size={19} />
                                       </button>
@@ -492,7 +498,7 @@ const Company = ({ set_page }) => {
                                       <button
                                         className="text-gray-500 hover:text-red-600 text-[12px] mb-[1px] outline-none"
                                         onClick={() =>
-                                          handle_delete_company(row)
+                                          handle_delete_pl_status(row)
                                         }
                                       >
                                         <Trash size={19} />
@@ -550,18 +556,18 @@ const Company = ({ set_page }) => {
           </div>
         </React.Fragment>
       )}
-      {sub_page === "create_new_company" && (
-        <Create_Company handle_go_back={handle_go_back} />
+      {sub_page === "create_new_pl_status" && (
+        <Create_PL_Status handle_go_back={handle_go_back} />
       )}
-      {sub_page === "edit_company" && (
-        <Edit_Company
+      {sub_page === "edit_pl_status" && (
+        <Edit_PL_Status
           handle_go_back={handle_go_back}
           edit_data={edit_data}
           set_edit_data={set_edit_data}
         />
       )}
-      <Delete_Company
-        is_open={display_modal === "delete_company"}
+      <Delete_PL_Status
+        is_open={display_modal === "delete_pl_status"}
         on_close={() => set_display_modal("")}
         width="max-w-[1000px]"
         delete_data={delete_data}
@@ -570,4 +576,4 @@ const Company = ({ set_page }) => {
   );
 };
 
-export default Company;
+export default Plant_Status;
