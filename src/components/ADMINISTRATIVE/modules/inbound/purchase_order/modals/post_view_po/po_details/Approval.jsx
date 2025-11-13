@@ -1,6 +1,5 @@
 import React from "react";
 import Checkbox_Field from "assets/elements/Checkbox_Field";
-import Find_Field from "assets/elements/Find_Field";
 import Text_Field from "assets/elements/Text_Field";
 
 const Approval = () => {

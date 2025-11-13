@@ -94,7 +94,7 @@ const Edit_Currency = ({ handle_go_back, edit_data, set_edit_data }) => {
                   type={"text"}
                   value={edit_data.currency_desc}
                   on_change={(e) => handle_change_currency_desc(e.target.value)}
-                  placeholder="Enter currency description"
+                  placeholder="Enter description"
                   pattern="[0-9]{1,}"
                 />
               </div>

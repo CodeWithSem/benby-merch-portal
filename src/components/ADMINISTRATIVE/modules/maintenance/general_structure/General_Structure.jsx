@@ -50,31 +50,9 @@ const General_Structure = () => {
       title: "Purchasing Organization",
     },
     { key: "p_group", icon: Users, title: "Purchasing Group" },
-    {
-      key: "da_com_org_group",
-      icon: Link,
-      title: (
-        <>
-          Data Assignment <br />
-          (Company &gt; Organization &gt; Group)
-        </>
-      ),
-      plain_title: "Data Assignment (Company > Organization > Group)",
-    },
     { key: "branch", icon: Factory, title: "Branch" },
     { key: "plant", icon: Warehouse, title: "Plant / DC" },
     { key: "sloc", icon: Archive, title: "Storage Location" },
-    {
-      key: "da_plant_sloc",
-      icon: Link,
-      title: (
-        <>
-          Data Assignment <br />
-          (Plant &gt; Storage Location)
-        </>
-      ),
-      plain_title: "Data Assignment (Plant > SLOC)", // 👈 for searching
-    },
     { key: "plant_status", icon: HousePlug, title: "Plant Status" },
     { key: "scon", icon: PackageCheck, title: "Storage Condition" },
     { key: "stock_type", icon: ChartBarStacked, title: "Stock Type" },
@@ -159,7 +137,6 @@ const General_Structure = () => {
                           key={idx}
                           className="relative select-none border h-[150px] bg-white rounded-lg shadow-sm flex justify-center items-center p-5 hover:border-sky-500 cursor-pointer outline-none transition"
                           onClick={() => set_page(item.key)}
-                          //   onClick={() => alert(item.key)}
                         >
                           <div className="absolute left-2 top-2 h-[28px] w-[28px] rounded bg-sky-600 text-white flex justify-center items-center">
                             <Icon size={18} />

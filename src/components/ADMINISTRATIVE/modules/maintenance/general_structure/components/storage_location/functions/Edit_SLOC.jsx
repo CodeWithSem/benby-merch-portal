@@ -94,7 +94,7 @@ const Edit_SLOC = ({ handle_go_back, edit_data, set_edit_data }) => {
                   type={"text"}
                   value={edit_data.sloc_desc}
                   on_change={(e) => handle_change_sloc_desc(e.target.value)}
-                  placeholder="Enter sloc description"
+                  placeholder="Enter description"
                   pattern="[0-9]{1,}"
                 />
               </div>

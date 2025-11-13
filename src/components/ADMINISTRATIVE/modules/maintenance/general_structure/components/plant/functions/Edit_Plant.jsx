@@ -94,7 +94,7 @@ const Edit_Plant = ({ handle_go_back, edit_data, set_edit_data }) => {
                   type={"text"}
                   value={edit_data.plant_desc}
                   on_change={(e) => handle_change_plant_desc(e.target.value)}
-                  placeholder="Enter plant description"
+                  placeholder="Enter description"
                   pattern="[0-9]{1,}"
                 />
               </div>

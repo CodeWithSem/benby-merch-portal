@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import Text_Field from "assets/elements/Text_Field";
-import Select_Field from "assets/elements/Select_Field";
 import {
   CirclePlus,
   FileText,
@@ -177,11 +176,10 @@ const PO_Items = ({ set_display_modal }) => {
             </div>
             <div className="w-full lg:col-span-9">
               <Find_Field
-                label="Item Name"
-                name="item_name"
+                label="Item Description"
                 // value={search_value}
                 // on_change={handle_change}
-                on_find={() => set_display_modal("select_item")}
+                on_click={() => set_display_modal("select_item")}
                 disabled
               />
             </div>

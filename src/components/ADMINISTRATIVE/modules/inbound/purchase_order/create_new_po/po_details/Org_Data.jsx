@@ -20,6 +20,7 @@ const Org_Data = () => {
             <Text_Field
               label="Common Reference"
               type={"text"}
+              placeholder={"Enter reference"}
               // value={}
               // on_change={handle_text_change}
               pattern="[A-Za-z]{1,}"
@@ -39,6 +40,7 @@ const Org_Data = () => {
             <Text_Field
               label="Other Reference"
               type={"text"}
+              placeholder={"Enter reference"}
               // value={}
               // on_change={handle_text_change}
               pattern="[A-Za-z]{1,}"

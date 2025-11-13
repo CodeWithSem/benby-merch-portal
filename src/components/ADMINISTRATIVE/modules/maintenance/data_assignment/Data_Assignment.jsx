@@ -1,15 +1,45 @@
 import Icon_Field from "assets/elements/Icon_Field";
-import { BanknoteArrowUp, BookText, ContactRound, Search } from "lucide-react";
+import { Link, Search } from "lucide-react";
 import React, { useState } from "react";
 
-const Vendor = () => {
+const Data_Assignment = () => {
   const [page, set_page] = useState("main");
   const [search_query, set_search_query] = useState("");
 
   const structure_list = [
-    { key: "vendor", icon: ContactRound, title: "Vendor" },
-    { key: "incoterms", icon: BanknoteArrowUp, title: "Incoterms" },
-    { key: "source_hub", icon: BookText, title: "Source Hub" },
+    {
+      key: "da_com_porg_pgroup",
+      icon: Link,
+      title: (
+        <>
+          Data Assignment <br />
+          (Company &gt; Organization &gt; Group)
+        </>
+      ),
+      plain_title: "Data Assignment (Company > Organization > Group)",
+    },
+    {
+      key: "da_plant_sloc",
+      icon: Link,
+      title: (
+        <>
+          Data Assignment <br />
+          (Plant &gt; Storage Location)
+        </>
+      ),
+      plain_title: "Data Assignment (Plant > SLOC)", // 👈 for searching
+    },
+    {
+      key: "da_pot_com",
+      icon: Link,
+      title: (
+        <>
+          Data Assignment <br />
+          (Purchase Order Type &gt; Company)
+        </>
+      ),
+      plain_title: "Data Assignment (Purchase Order Type > Company)",
+    },
   ];
 
   // ✅ Filter based on search query
@@ -45,7 +75,7 @@ const Vendor = () => {
                   </li>
                   <li className="flex items-center gap-1.5 text-sm text-gray-500">
                     <span>/</span>
-                    <span className="text-gray-800">Vendor</span>
+                    <span className="text-gray-800">Data Assignment</span>
                   </li>
                 </ol>
               </nav>
@@ -56,7 +86,7 @@ const Vendor = () => {
             <div className="w-full bg-white rounded-lg border">
               {/* + Title */}
               <div className="flex flex-wrap items-center justify-between gap-3 p-5">
-                <h1 className="text-lg">Vendor</h1>
+                <h1 className="text-lg">Data Assignment</h1>
               </div>
               {/* - Title */}
 
@@ -81,14 +111,7 @@ const Vendor = () => {
                         <div
                           key={idx}
                           className="relative select-none border h-[150px] bg-white rounded-lg shadow-sm flex justify-center items-center p-5 hover:border-sky-500 cursor-pointer outline-none transition"
-                          onClick={() =>
-                            alert(
-                              typeof item.title === "string"
-                                ? item.title
-                                : item.plain_title || ""
-                            )
-                          }
-                          //   onClick={() => alert(item.key)}
+                          onClick={() => set_page(item.key)}
                         >
                           <div className="absolute left-2 top-2 h-[28px] w-[28px] rounded bg-sky-600 text-white flex justify-center items-center">
                             <Icon size={18} />
@@ -111,8 +134,9 @@ const Vendor = () => {
           </div>
         </React.Fragment>
       )}
+      {/* {page === "company" && <Company set_page={set_page} />} */}
     </React.Fragment>
   );
 };
 
-export default Vendor;
+export default Data_Assignment;

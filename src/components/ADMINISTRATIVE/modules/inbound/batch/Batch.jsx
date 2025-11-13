@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Search,
   ChevronDown,
@@ -8,7 +8,6 @@ import {
   View,
   PlusCircle,
   RefreshCw,
-  SlidersHorizontal,
   FileUp,
 } from "lucide-react";
 import Icon_Field from "assets/elements/Icon_Field";
@@ -16,7 +15,6 @@ import Select_Field from "assets/elements/Select_Field";
 import Pagination from "assets/elements/Pagination";
 import Button from "assets/elements/Button";
 import { useToast } from "../../../layout/Toast_Provider";
-import Date_Range_Field from "assets/elements/Date_Range_Field";
 import Text_Code_Field from "assets/elements/Text_Code_Field";
 import Select_Branch from "./modals/Select_Branch";
 import Select_Plant from "./modals/Select_Plant";

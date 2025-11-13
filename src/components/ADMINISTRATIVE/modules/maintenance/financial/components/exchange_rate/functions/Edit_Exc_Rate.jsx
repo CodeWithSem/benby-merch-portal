@@ -1,8 +1,7 @@
 import Button from "assets/elements/Button";
-import Text_Code_Field from "assets/elements/Text_Code_Field";
 import Text_Field from "assets/elements/Text_Field";
 import { format_date_1, get_date_now } from "assets/scripts/format";
-import { ChevronLeft, CirclePlus, RefreshCcwDot } from "lucide-react";
+import { ChevronLeft, RefreshCcwDot } from "lucide-react";
 import React from "react";
 
 const Edit_Exc_Rate = ({ handle_go_back, edit_data, set_edit_data }) => {

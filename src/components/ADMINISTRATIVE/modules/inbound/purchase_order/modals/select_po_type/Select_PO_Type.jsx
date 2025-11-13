@@ -11,49 +11,11 @@ const Select_PO_Type = ({
   width = "max-w-[700px]",
   height = "h-[500px]",
   set_page,
+  company_list,
+  purc_org_list,
+  purc_group_list,
+  po_type_list,
 }) => {
-  // --- Mock reference lists ---
-  const company_list = [
-    { id: 1, company_code: "COM-0001", company_desc: "Company Description 1" },
-    { id: 2, company_code: "COM-0002", company_desc: "Company Description 2" },
-  ];
-  const purc_org_list = [
-    { id: 1, purc_org_code: "PCO-0001", purc_org_desc: "Purchasing Org 1" },
-    { id: 2, purc_org_code: "PCO-0002", purc_org_desc: "Purchasing Org 2" },
-  ];
-  const purc_group_list = [
-    {
-      id: 1,
-      purc_group_code: "PCG-0001",
-      purc_group_desc: "Purchasing Group 1",
-    },
-    {
-      id: 2,
-      purc_group_code: "PCG-0002",
-      purc_group_desc: "Purchasing Group 2",
-    },
-  ];
-
-  // --- Mock Data (replace later with API call if needed)
-  const [all_po_type] = useState([
-    {
-      id: 1,
-      po_type_code: "PT-0001",
-      po_type_desc: "PO Type Description 1",
-      company_code: "COM-0001",
-      purc_org_code: "PCO-0001",
-      purc_group_code: "PCG-0001",
-    },
-    {
-      id: 2,
-      po_type_code: "PT-0002",
-      po_type_desc: "PO Type Description 2",
-      company_code: "COM-0002",
-      purc_org_code: "PCO-0002",
-      purc_group_code: "PCG-0002",
-    },
-  ]);
-
   // --- States ---
   const [filtered_po_type, set_filtered_po_type] = useState([]);
   const [current_page, set_current_page] = useState(1);
@@ -87,7 +49,7 @@ const Select_PO_Type = ({
 
   // --- Filtering + Pagination ---
   useEffect(() => {
-    let data = [...all_po_type];
+    let data = [...po_type_list];
 
     if (debounced_query.trim() !== "") {
       const q = debounced_query.toLowerCase();
@@ -120,10 +82,10 @@ const Select_PO_Type = ({
     const start_idx = (current_page - 1) * rows_per_page;
     const end_idx = start_idx + rows_per_page;
     set_filtered_po_type(data.slice(start_idx, end_idx));
-  }, [all_po_type, debounced_query, current_page, rows_per_page]);
+  }, [po_type_list, debounced_query, current_page, rows_per_page]);
 
   const total_pages = Math.ceil(
-    all_po_type.filter((po_type) =>
+    po_type_list.filter((po_type) =>
       po_type.po_type_desc.toLowerCase().includes(debounced_query.toLowerCase())
     ).length / rows_per_page
   );

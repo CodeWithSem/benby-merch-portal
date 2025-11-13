@@ -1,6 +1,5 @@
 import React from "react";
 import Text_Field from "assets/elements/Text_Field";
-import Date_Field from "assets/elements/Date_Field";
 
 const Shipment = () => {
   return (

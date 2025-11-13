@@ -5,73 +5,55 @@ import Checkbox_Field from "assets/elements/Checkbox_Field";
 import Button from "assets/elements/Button";
 import Pagination_Modal from "assets/elements/Pagination_Modal";
 
-const Select_Branch = ({
+const Select_Plant = ({
   is_open,
   on_close,
   width = "max-w-[700px]",
   height = "h-[500px]",
+  plant_list,
 }) => {
-  // --- Mock Data (replace later with API call if needed)
-  const [all_branch, set_all_branch] = useState([
-    {
-      id: "BR-0001",
-      description: "Branch Description 1",
-      creation_date: "10/08/2025 12:00:00",
-    },
-    {
-      id: "BR-0002",
-      description: "Branch Description 2",
-      creation_date: "10/08/2025 12:00:00",
-    },
-    {
-      id: "BR-0003",
-      description: "Branch Description 3",
-      creation_date: "10/09/2025 12:00:00",
-    },
-  ]);
-
   // --- States ---
-  const [filtered_branches, set_filtered_branches] = useState([]);
+  const [filtered_plant_dc, set_filtered_plant_dc] = useState([]);
   const [current_page, set_current_page] = useState(1);
   const [rows_per_page, set_rows_per_page] = useState(5);
   const [search_query, set_search_query] = useState("");
-  const [selected_branch, set_selected_branch] = useState(null);
+  const [selected_plant, set_selected_plant] = useState(null);
 
   // --- Pagination + Filtering Logic ---
   useEffect(() => {
-    let data = [...all_branch];
+    let data = [...plant_list];
 
     if (search_query.trim() !== "") {
       const q = search_query.toLowerCase();
       data = data.filter(
-        (branch) =>
-          branch.id.toLowerCase().includes(q) ||
-          branch.description.toLowerCase().includes(q)
+        (data) =>
+          data.plant_code.toLowerCase().includes(q) ||
+          data.plant_desc.toLowerCase().includes(q)
       );
     }
 
     const start_idx = (current_page - 1) * rows_per_page;
     const end_idx = start_idx + rows_per_page;
-    set_filtered_branches(data.slice(start_idx, end_idx));
-  }, [all_branch, search_query, current_page, rows_per_page]);
+    set_filtered_plant_dc(data.slice(start_idx, end_idx));
+  }, [plant_list, search_query, current_page, rows_per_page]);
 
   const total_pages = Math.ceil(
-    all_branch.filter(
-      (branch) =>
-        branch.id.toLowerCase().includes(search_query.toLowerCase()) ||
-        branch.description.toLowerCase().includes(search_query.toLowerCase())
+    plant_list.filter(
+      (data) =>
+        data.plant_code.toLowerCase().includes(search_query.toLowerCase()) ||
+        data.plant_desc.toLowerCase().includes(search_query.toLowerCase())
     ).length / rows_per_page
   );
 
   // --- Handlers ---
   const handle_page_change = (page) => set_current_page(page);
 
-  const handle_select_branch = () => {
-    if (!selected_branch) {
-      alert("Please select a branch before proceeding.");
+  const handle_select_plant = () => {
+    if (!selected_plant) {
+      alert("Please select a plant before proceeding.");
       return;
     }
-    alert(`Selected: ${selected_branch.description}`);
+    alert(`Selected: ${selected_plant.description}`);
   };
 
   return is_open ? (
@@ -94,7 +76,7 @@ const Select_Branch = ({
 
           {/* + Modal Label */}
           <div className="text-lg md:text-xl font-bold mb-5 px-7">
-            Branch Selection
+            Plant / DC Selection
           </div>
           {/* - Modal Label */}
 
@@ -124,7 +106,7 @@ const Select_Branch = ({
                     <tr className="font-semibold text-xs">
                       <th className="px-6 py-3 w-[80px]"></th>
                       <th className="px-6 py-3 text-gray-500 text-left">
-                        Branch
+                        Plant / DC
                       </th>
                       <th className="px-6 py-3 text-gray-500 text-left">
                         Creation Date
@@ -133,7 +115,7 @@ const Select_Branch = ({
                   </thead>
 
                   <tbody className="divide-y divide-gray-100">
-                    {filtered_branches.length === 0 ? (
+                    {filtered_plant_dc.length === 0 ? (
                       <tr>
                         <td
                           colSpan={3}
@@ -143,37 +125,37 @@ const Select_Branch = ({
                         </td>
                       </tr>
                     ) : (
-                      filtered_branches.map((branch) => (
+                      filtered_plant_dc.map((data) => (
                         <tr
-                          key={branch.id}
+                          key={data.id}
                           className={`hover:bg-sky-50/50 cursor-pointer text-[12px] ${
-                            selected_branch?.id === branch.id ? "bg-sky-50" : ""
+                            selected_plant?.id === data.id ? "bg-sky-50" : ""
                           }`}
-                          onClick={() => set_selected_branch(branch)}
+                          onClick={() => set_selected_plant(data)}
                         >
-                          <td className="px-5 py-4 sm:px-6 text-center">
+                          <td className="px-5 py-4 sm:px-6">
                             <div className="flex justify-center items-center">
                               <Checkbox_Field
                                 name="check"
                                 box_size={18}
                                 icon_size={12}
-                                checked={selected_branch?.id === branch.id}
-                                on_change={() => set_selected_branch(branch)}
+                                checked={selected_plant?.id === data.id}
+                                on_change={() => set_selected_plant(data)}
                               />
                             </div>
                           </td>
                           <td className="px-5 py-4 sm:px-6">
                             <div className="block font-medium text-gray-800">
-                              <span className="block text-gray-500 text-[12px]">
-                                {branch.id}
+                              <span className="block text-gray-500 text-[10px]">
+                                {data.plant_code}
                               </span>
                               <span className="block text-gray-800 text-sm">
-                                {branch.description}
+                                {data.plant_desc}
                               </span>
                             </div>
                           </td>
                           <td className="px-6 py-3 text-gray-700 tracking-wide">
-                            {branch.creation_date}
+                            {data.creation_date}
                           </td>
                         </tr>
                       ))
@@ -202,9 +184,9 @@ const Select_Branch = ({
             <div className="flex justify-center sm:justify-end gap-2 w-full">
               <Button
                 variant="primary"
-                on_click={handle_select_branch}
+                on_click={handle_select_plant}
                 class_name="w-full md:w-[100px]"
-                disabled={!selected_branch}
+                disabled={!selected_plant}
               >
                 Proceed
               </Button>
@@ -224,4 +206,4 @@ const Select_Branch = ({
   ) : null;
 };
 
-export default Select_Branch;
+export default Select_Plant;

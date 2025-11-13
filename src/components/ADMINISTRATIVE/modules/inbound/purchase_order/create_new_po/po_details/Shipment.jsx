@@ -17,7 +17,7 @@ const Shipment = () => {
           <div>
             <Date_Field
               label="Original Date"
-              placeholder="mm-dd-yyyy"
+              placeholder="MM-DD-YYYY"
               value={orig_date}
               on_change={handle_orig_date_change}
             />
@@ -26,6 +26,7 @@ const Shipment = () => {
             <Text_Field
               label="Container Size"
               type={"text"}
+              placeholder="Enter container size"
               // value={}
               // on_change={handle_text_change}
               pattern="[A-Za-z]{1,}"
@@ -35,6 +36,7 @@ const Shipment = () => {
             <Text_Field
               label="Shipping Line"
               type={"text"}
+              placeholder="Enter shipping line"
               // value={}
               // on_change={handle_text_change}
               pattern="[A-Za-z]{1,}"
@@ -44,6 +46,7 @@ const Shipment = () => {
             <Text_Field
               label="Container Number"
               type={"text"}
+              placeholder="Enter container number"
               // value={}
               // on_change={handle_text_change}
               pattern="[A-Za-z]{1,}"
@@ -58,6 +61,7 @@ const Shipment = () => {
             <Text_Field
               label="Virtual Stopo"
               type={"text"}
+              placeholder="Enter virtual stopo"
               // value={}
               // on_change={handle_text_change}
               pattern="[A-Za-z]{1,}"
@@ -67,6 +71,7 @@ const Shipment = () => {
             <Text_Field
               label="Virtual Branch Group"
               type={"text"}
+              placeholder="Enter branch group"
               // value={}
               // on_change={handle_text_change}
               pattern="[A-Za-z]{1,}"

@@ -106,19 +106,13 @@ const Create_New_Item = ({ set_page }) => {
           <div className="p-5 sm:p-6 border-t">
             <div className="grid grid-cols-1 gap-5 lg:grid-cols-4">
               <div className="w-full">
-                <Verify_Field
+                <Text_Field
                   label="Item Code"
-                  name="item_code"
-                  placeholder="Enter item code"
-                  // value={text_verify}
-                  // on_change={(e) => {
-                  //   set_text_verify(e.target.value);
-                  //   setVerifyStatus("");
-                  // }}
-                  // on_find={handleFind}
-                  // on_verify={handleVerify}
-                  // verify_status={verifyStatus}
-                  show_find_button={false}
+                  type={"text"}
+                  value={"AUTO GENERATED"}
+                  // on_change={handle_text_change}
+                  pattern="[A-Za-z]{1,}"
+                  disabled
                 />
               </div>
               <div className="w-full lg:col-span-3">

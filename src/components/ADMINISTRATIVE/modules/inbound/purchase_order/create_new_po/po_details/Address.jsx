@@ -14,6 +14,7 @@ const Address = () => {
               // value={}
               // on_change={handle_text_change}
               pattern="[A-Za-z]{1,}"
+              disabled
             />
           </div>
           <div>
@@ -23,6 +24,7 @@ const Address = () => {
               // value={}
               // on_change={handle_text_change}
               pattern="[A-Za-z]{1,}"
+              disabled
             />
           </div>
           <div>
@@ -32,6 +34,7 @@ const Address = () => {
               // value={}
               // on_change={handle_text_change}
               pattern="[A-Za-z]{1,}"
+              disabled
             />
           </div>
           <div>
@@ -41,6 +44,7 @@ const Address = () => {
               // value={}
               // on_change={handle_text_change}
               pattern="[A-Za-z]{1,}"
+              disabled
             />
           </div>
           <div>
@@ -50,6 +54,7 @@ const Address = () => {
               // value={}
               // on_change={handle_text_change}
               pattern="[A-Za-z]{1,}"
+              disabled
             />
           </div>
           <div>
@@ -59,6 +64,7 @@ const Address = () => {
               // value={}
               // on_change={handle_text_change}
               pattern="[A-Za-z]{1,}"
+              disabled
             />
           </div>
         </div>
@@ -75,6 +81,7 @@ const Address = () => {
               // value={}
               // on_change={handle_text_change}
               pattern="[A-Za-z]{1,}"
+              disabled
             />
           </div>
           <div>
@@ -84,6 +91,7 @@ const Address = () => {
               // value={}
               // on_change={handle_text_change}
               pattern="[A-Za-z]{1,}"
+              disabled
             />
           </div>
           <div>
@@ -93,6 +101,7 @@ const Address = () => {
               // value={}
               // on_change={handle_text_change}
               pattern="[A-Za-z]{1,}"
+              disabled
             />
           </div>
           <div>
@@ -102,6 +111,7 @@ const Address = () => {
               // value={}
               // on_change={handle_text_change}
               pattern="[A-Za-z]{1,}"
+              disabled
             />
           </div>
           <div className="col-span-full">
@@ -111,6 +121,7 @@ const Address = () => {
               // value={}
               // on_change={handle_text_change}
               pattern="[A-Za-z]{1,}"
+              disabled
             />
           </div>
         </div>

@@ -138,7 +138,7 @@ const Purchasing = () => {
               label="Purchasing Text"
               name="purchasing_text" // value={data} // on_change={(e) => handle_data_change(e.target.value)}
               placeholder="Enter your description..."
-              height="120px"
+              height="121px"
             />
           </div>
         </div>

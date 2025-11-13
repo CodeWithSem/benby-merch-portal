@@ -1,20 +1,11 @@
 import React, { useState } from "react";
 import Text_Field from "assets/elements/Text_Field";
 import Button from "assets/elements/Button";
-import { ChevronLeft, Save, SaveAll } from "lucide-react";
+import { ChevronLeft, Save } from "lucide-react";
 import GR_Items from "./gr_items/GR_Items";
-import Select_Batch from "./modals/Select_Batch";
 
 const Create_New_GR = ({ set_page }) => {
   const [display_modal, set_display_modal] = useState("");
-
-  const handle_preview = () => {
-    alert("Under Maintenance");
-  };
-
-  const handle_save_as_draft = () => {
-    alert("Under Maintenance");
-  };
 
   const handle_save = () => {
     alert("Under Maintenance");

@@ -96,7 +96,7 @@ const Edit_G_Item_Group = ({ handle_go_back, edit_data, set_edit_data }) => {
                   on_change={(e) =>
                     handle_change_g_item_goup_desc(e.target.value)
                   }
-                  placeholder="Enter g_item_goup description"
+                  placeholder="Enter description"
                   pattern="[0-9]{1,}"
                 />
               </div>

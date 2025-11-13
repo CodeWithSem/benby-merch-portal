@@ -1,8 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import Text_Field from "assets/elements/Text_Field";
 import Button from "assets/elements/Button";
 import { X } from "lucide-react";
-import Find_Field from "assets/elements/Find_Field";
 import Item_Data_1 from "./item_sub_details/Item_Data_1";
 import Item_Data_2 from "./item_sub_details/Item_Data_2";
 import Invoices from "./item_sub_details/Invoices";

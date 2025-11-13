@@ -1,8 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import Text_Field from "assets/elements/Text_Field";
 import Button from "assets/elements/Button";
 import { X } from "lucide-react";
-import Text_Code_Field from "assets/elements/Text_Code_Field";
 import { format_date_1, get_date_now } from "assets/scripts/format";
 
 const Delete_Country = ({

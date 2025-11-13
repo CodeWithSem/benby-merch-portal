@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import Text_Field from "assets/elements/Text_Field";
 import Button from "assets/elements/Button";
 import { ChevronLeft, Eye, Save, SaveAll } from "lucide-react";
@@ -10,14 +10,20 @@ import PO_Status from "./po_details/PO_Status";
 import Shipment from "./po_details/Shipment";
 import Approval from "./po_details/Approval";
 import PO_Items from "./po_items/PO_Items";
-import Select_Vendor from "./modals/Select_Vendor";
-import Select_Branch from "./modals/Select_Branch";
-import Select_Plant from "./modals/Select_Plant";
-import Select_SLOC from "./modals/Select_SLOC";
-import Select_Item from "./modals/Select_Item";
+import Select_Vendor from "../sub_modals/Select_Vendor";
+import Select_Branch from "../sub_modals/Select_Branch";
+import Select_Plant from "../sub_modals/Select_Plant";
+import Select_SLOC from "../sub_modals/Select_SLOC";
+import Select_Item from "../sub_modals/Select_Item";
 import { get_date_now, format_date_1 } from "assets/scripts/format";
 
-const Create_New_PO = ({ set_page }) => {
+const Create_New_PO = ({
+  set_page,
+  vendor_list,
+  branch_list,
+  plant_list,
+  item_list,
+}) => {
   const [active_tab, set_active_tab] = useState("delivery");
   const [display_modal, set_display_modal] = useState("");
 
@@ -311,18 +317,21 @@ const Create_New_PO = ({ set_page }) => {
         on_close={() => set_display_modal("")}
         width="max-w-[1000px]"
         height="max-h-[700px]"
+        vendor_list={vendor_list}
       />
       <Select_Branch
         is_open={display_modal === "select_branch"}
         on_close={() => set_display_modal("")}
         width="max-w-[1000px]"
         height="max-h-[700px]"
+        branch_list={branch_list}
       />
       <Select_Plant
         is_open={display_modal === "select_plant"}
         on_close={() => set_display_modal("")}
         width="max-w-[1000px]"
         height="max-h-[700px]"
+        plant_list={plant_list}
       />
       <Select_SLOC
         is_open={display_modal === "select_sloc"}
@@ -335,6 +344,7 @@ const Create_New_PO = ({ set_page }) => {
         on_close={() => set_display_modal("")}
         width="max-w-[1000px]"
         height="max-h-[700px]"
+        item_list={item_list}
       />
     </React.Fragment>
   );

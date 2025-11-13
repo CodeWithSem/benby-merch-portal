@@ -8,6 +8,7 @@ import {
   ShoppingCart,
 } from "lucide-react";
 import React, { useState } from "react";
+import PO_Type from "./components/po_type/PO_Type";
 
 const Purchase_Order_Maint = () => {
   const [page, set_page] = useState("main");
@@ -15,17 +16,6 @@ const Purchase_Order_Maint = () => {
 
   const structure_list = [
     { key: "po_type", icon: ShoppingCart, title: "Purchase Order Type" },
-    {
-      key: "da_po_type_com",
-      icon: Link,
-      title: (
-        <>
-          Data Assignment <br />
-          (Purchase Order Type &gt; Company)
-        </>
-      ),
-      plain_title: "Data Assignment (Purchase Order Type > Company)",
-    },
   ];
 
   // ✅ Filter based on search query
@@ -97,14 +87,7 @@ const Purchase_Order_Maint = () => {
                         <div
                           key={idx}
                           className="relative select-none border h-[150px] bg-white rounded-lg shadow-sm flex justify-center items-center p-5 hover:border-sky-500 cursor-pointer outline-none transition"
-                          onClick={() =>
-                            alert(
-                              typeof item.title === "string"
-                                ? item.title
-                                : item.plain_title || ""
-                            )
-                          }
-                          //   onClick={() => alert(item.key)}
+                          onClick={() => set_page(item.key)}
                         >
                           <div className="absolute left-2 top-2 h-[28px] w-[28px] rounded bg-sky-600 text-white flex justify-center items-center">
                             <Icon size={18} />
@@ -127,6 +110,7 @@ const Purchase_Order_Maint = () => {
           </div>
         </React.Fragment>
       )}
+      {page === "po_type" && <PO_Type set_page={set_page} />}
     </React.Fragment>
   );
 };

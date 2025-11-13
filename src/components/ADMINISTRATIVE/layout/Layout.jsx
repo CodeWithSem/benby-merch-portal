@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import Sidebar from "./Sidebar";
 import Header from "./Header";
 import Dashboard from "../modules/dashboard/Dashboard";
-import Admin from "../../AUTHENTICATION/user_management/admin/Admin";
 import Form_Elements from "assets/templates/pages/forms/form_elements/Form_Elements";
 import Purchase_Order from "../modules/inbound/purchase_order/Purchase_Order";
 import Tabs from "assets/templates/pages/ui_elements/tabs/Tabs";
@@ -17,13 +16,15 @@ import Inventory_Master from "../modules/warehouse/inventory_master/Inventory_Ma
 import Item_Master from "../modules/warehouse/item_master/Item_Master";
 import General_Structure from "../modules/maintenance/general_structure/General_Structure";
 import Financial from "../modules/maintenance/financial/Financial";
-import Vendor from "../modules/maintenance/vendor/Vendor";
+import Vendor_Maint from "../modules/maintenance/vendor/Vendor_Maint";
 import Purchase_Order_Maint from "../modules/maintenance/purchase_order/Purchase_Order_Maint";
 import Sales_Order from "../modules/outbound/sales_order/Sales_Order";
 import Goods_Issue from "../modules/outbound/goods_issue/Goods_Issue";
 import Shipment from "../modules/outbound/shipment/Shipment";
 import Customer from "../modules/outbound/customer/Customer";
 import Truck from "../modules/outbound/truck/Truck";
+import Data_Assignment from "../modules/maintenance/data_assignment/Data_Assignment";
+import Vendor from "../modules/inbound/vendor/Vendor";
 
 const Layout = () => {
   const [active_item, set_active_item] = useState(() => {
@@ -72,6 +73,8 @@ const Layout = () => {
         return <Goods_Receipt />;
       case "Inbound-Batch":
         return <Batch />;
+      case "Inbound-Vendor":
+        return <Vendor />;
       case "Outbound-Sales Order":
         return <Sales_Order />;
       case "Outbound-Goods Issue":
@@ -93,9 +96,11 @@ const Layout = () => {
       case "Maintenance-Financial":
         return <Financial />;
       case "Maintenance-Vendor":
-        return <Vendor />;
+        return <Vendor_Maint />;
       case "Maintenance-Purchase Order":
         return <Purchase_Order_Maint />;
+      case "Maintenance-Data Assignment":
+        return <Data_Assignment />;
       case "Templates-Form Elements":
         return <Form_Elements />;
       case "Templates-Tabs":

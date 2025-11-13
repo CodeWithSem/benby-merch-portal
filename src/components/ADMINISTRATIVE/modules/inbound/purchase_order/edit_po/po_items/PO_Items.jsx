@@ -1,12 +1,13 @@
 import React, { useState } from "react";
 import Text_Field from "assets/elements/Text_Field";
 import Select_Field from "assets/elements/Select_Field";
-import { Info, Search, SquarePen, Trash2 } from "lucide-react";
+import { CirclePlus, Info, Search, SquarePen, Trash2 } from "lucide-react";
 import Icon_Field from "assets/elements/Icon_Field";
 import Quantity_Field from "assets/elements/Quantity_Field";
 import Find_Field from "assets/elements/Find_Field";
+import Button from "assets/elements/Button";
 
-const PO_Items = () => {
+const PO_Items = ({ set_display_modal }) => {
   // + For Quantity Field
   const [quantity, set_quantity] = useState(1);
   // - For Quantity Field
@@ -136,11 +137,10 @@ const PO_Items = () => {
             </div>
             <div className="w-full lg:col-span-9">
               <Find_Field
-                label="Item Name"
-                name="item_name"
+                label="Item Description"
                 // value={search_value}
                 // on_change={handle_change}
-                // on_find={handle_find}
+                on_click={() => set_display_modal("select_item")}
                 disabled
               />
             </div>
@@ -173,20 +173,20 @@ const PO_Items = () => {
                 min={1}
               />
             </div>
-            <div className="w-full lg:col-span-2">
-              <Select_Field
-                label="Discount"
-                name="discount"
-                // value={discount}
-                // on_change={handle_discount_change}
-                // options={discount_options}
-                // placeholder="Select Payment Condition"
-              />
+            <div className="flex w-full items-end lg:col-span-2">
+              <Button variant="white" width="w-full">
+                Discount
+              </Button>
             </div>
-            <div className="flex w-full items-end pb-[1px] lg:col-span-2">
-              <button className="w-full h-[37px] bg-sky-600 text-white text-sm rounded-md hover:bg-sky-700 focus:ring-sky-500 disabled:bg-sky-300 disabled:cursor-not-allowed">
+            <div className="flex w-full items-end lg:col-span-2">
+              <Button
+                variant="primary"
+                width="w-full"
+                icon={CirclePlus}
+                // onClick={handle_add_item}
+              >
                 Add Item
-              </button>
+              </Button>
             </div>
           </div>
           <div className="mt-5 flex max-w-2xl items-center gap-2 text-gray-500">

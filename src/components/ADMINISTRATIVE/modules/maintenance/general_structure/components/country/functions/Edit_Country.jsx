@@ -1,8 +1,7 @@
 import Button from "assets/elements/Button";
-import Text_Code_Field from "assets/elements/Text_Code_Field";
 import Text_Field from "assets/elements/Text_Field";
 import { format_date_1, get_date_now } from "assets/scripts/format";
-import { ChevronLeft, CirclePlus, RefreshCcwDot } from "lucide-react";
+import { ChevronLeft, RefreshCcwDot } from "lucide-react";
 import React from "react";
 
 const Edit_Country = ({ handle_go_back, edit_data, set_edit_data }) => {
@@ -94,7 +93,7 @@ const Edit_Country = ({ handle_go_back, edit_data, set_edit_data }) => {
                   type={"text"}
                   value={edit_data.country_desc}
                   on_change={(e) => handle_change_country_desc(e.target.value)}
-                  placeholder="Enter country description"
+                  placeholder="Enter description"
                   pattern="[0-9]{1,}"
                 />
               </div>

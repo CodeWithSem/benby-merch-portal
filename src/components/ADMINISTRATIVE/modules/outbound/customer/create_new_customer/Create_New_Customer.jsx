@@ -47,12 +47,12 @@ const Create_New_Customer = ({ set_page }) => {
                   className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-sky-500 cursor-pointer"
                   onClick={() => set_page("main")}
                 >
-                  Purchase Order
+                  Customer
                 </a>
               </li>
               <li className="flex items-center gap-1.5 text-sm text-gray-500">
                 <span>/</span>
-                <span className="text-gray-800">Create New PO</span>
+                <span className="text-gray-800">Create New Customer</span>
               </li>
             </ol>
           </nav>

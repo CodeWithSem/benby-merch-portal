@@ -96,7 +96,7 @@ const Edit_Stock_Type = ({ handle_go_back, edit_data, set_edit_data }) => {
                   on_change={(e) =>
                     handle_change_stock_type_desc(e.target.value)
                   }
-                  placeholder="Enter stock_type description"
+                  placeholder="Enter description"
                   pattern="[0-9]{1,}"
                 />
               </div>

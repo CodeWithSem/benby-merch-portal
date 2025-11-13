@@ -1,8 +1,6 @@
 import React, { useState } from "react";
-import Text_Field from "assets/elements/Text_Field";
 import { Info, Search } from "lucide-react";
 import Icon_Field from "assets/elements/Icon_Field";
-import { format_currency } from "assets/scripts/format";
 
 const GR_Items = ({ set_display_modal }) => {
   const [selected_item_id, set_selected_item_id] = useState(null);

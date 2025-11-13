@@ -5,7 +5,6 @@ import {
   ChevronUp,
   Edit,
   Trash,
-  View,
   PlusCircle,
   RefreshCw,
   FileUp,

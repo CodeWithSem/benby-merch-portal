@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import Text_Field from "assets/elements/Text_Field";
 import Button from "assets/elements/Button";
 import { X } from "lucide-react";

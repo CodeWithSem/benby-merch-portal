@@ -94,7 +94,7 @@ const Edit_Language = ({ handle_go_back, edit_data, set_edit_data }) => {
                   type={"text"}
                   value={edit_data.language_desc}
                   on_change={(e) => handle_change_language_desc(e.target.value)}
-                  placeholder="Enter language description"
+                  placeholder="Enter description"
                   pattern="[0-9]{1,}"
                 />
               </div>

@@ -94,7 +94,7 @@ const Edit_District = ({ handle_go_back, edit_data, set_edit_data }) => {
                   type={"text"}
                   value={edit_data.district_desc}
                   on_change={(e) => handle_change_district_desc(e.target.value)}
-                  placeholder="Enter district description"
+                  placeholder="Enter description"
                   pattern="[0-9]{1,}"
                 />
               </div>

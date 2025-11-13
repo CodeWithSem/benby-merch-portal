@@ -94,7 +94,7 @@ const Edit_Ind_Type = ({ handle_go_back, edit_data, set_edit_data }) => {
                   type={"text"}
                   value={edit_data.ind_type_desc}
                   on_change={(e) => handle_change_ind_type_desc(e.target.value)}
-                  placeholder="Enter ind_type description"
+                  placeholder="Enter description"
                   pattern="[0-9]{1,}"
                 />
               </div>

@@ -11,26 +11,49 @@ import {
   SlidersHorizontal,
   FileUp,
   FileInput,
+  Database,
 } from "lucide-react";
 import Icon_Field from "assets/elements/Icon_Field";
 import Select_Field from "assets/elements/Select_Field";
 import Pagination from "assets/elements/Pagination";
 import Button from "assets/elements/Button";
 import { useToast } from "../../../layout/Toast_Provider";
-import Date_Range_Field from "assets/elements/Date_Range_Field";
 import Checkbox_Field from "assets/elements/Checkbox_Field";
 import Create_New_PO from "./create_new_po/Create_New_PO";
 import Post_View_PO from "./modals/post_view_po/Post_View_PO";
 import Edit_PO from "./edit_po/Edit_PO";
 import Delete_PO from "./modals/delete_po/Delete_PO";
 import Select_PO_Type from "./modals/select_po_type/Select_PO_Type";
+import Date_Field from "assets/elements/Date_Field";
+import { format_date_1 } from "assets/scripts/format";
+import {
+  company_list,
+  purc_org_list,
+  purc_group_list,
+  po_type_list,
+  vendor_list,
+  branch_list,
+  plant_list,
+  item_list,
+} from "./PO_DATA_MAP";
 
 const Purchase_Order = () => {
+  // + Data Map
+
+  // - Data Map
+
   const filter_ref = useRef(null);
   const [show_filter, set_show_filter] = useState(false);
   const [page, set_page] = useState("main");
   const [display_modal, set_display_modal] = useState("");
   const [for_posting, set_for_posting] = useState(false);
+
+  const today = format_date_1(new Date());
+
+  const [start_date, set_start_date] = useState(today);
+  const [end_date, set_end_date] = useState(today);
+
+  const [show_load_data_button, set_show_load_data_button] = useState(false);
 
   // Close dropdown on outside click
   const { show_toast } = useToast();
@@ -47,8 +70,8 @@ const Purchase_Order = () => {
   // --- State ---
   const [all_data, set_all_data] = useState([
     {
-      po_number: "10000001",
-      po_type: "LFPO",
+      po_number: "PO-XXXXXXXXX",
+      po_type: "QSPO",
       company: "QS IT Services",
       creation_date: "11-05-2025 04:04:23",
       status: "Pending",
@@ -181,7 +204,8 @@ const Purchase_Order = () => {
   };
 
   const handle_upload_po = () => {
-    alert("Under Maintenance");
+    // alert("Under Maintenance");
+    alert(`Start : ${start_date}\nEnd : ${end_date}`);
   };
 
   const handle_view_po = () => {
@@ -200,6 +224,20 @@ const Purchase_Order = () => {
 
   const handle_delete_po = () => {
     set_display_modal("delete_po");
+  };
+
+  const handle_change_start_date = (value) => {
+    set_start_date(format_date_1(value));
+    set_show_load_data_button(true);
+  };
+
+  const handle_change_end_date = (value) => {
+    set_end_date(format_date_1(value));
+    set_show_load_data_button(true);
+  };
+
+  const handle_load_data = () => {
+    set_show_load_data_button(false);
   };
 
   // RETURN ORIGIN
@@ -253,7 +291,32 @@ const Purchase_Order = () => {
                   </Button>
                 </div>
               </div>
-
+              <div className="p-5 sm:p-6 border-t">
+                <div className="grid grid-cols-1 gap-5 md:w-[250px]">
+                  <Date_Field
+                    label="Start Date"
+                    value={start_date}
+                    on_change={(e) => handle_change_start_date(e.target.value)}
+                    placeholder="Select Date"
+                  />
+                  <Date_Field
+                    label="End Date"
+                    value={end_date}
+                    on_change={(e) => handle_change_end_date(e.target.value)}
+                    placeholder="Select Date"
+                  />
+                  {show_load_data_button && (
+                    <Button
+                      variant="primary"
+                      icon={Database}
+                      icon_position="left"
+                      on_click={handle_load_data}
+                    >
+                      Load Data
+                    </Button>
+                  )}
+                </div>
+              </div>
               <div className="p-5 sm:p-6 border-t">
                 <div className="w-full border rounded-lg">
                   <div className="w-full md:flex md:justify-between p-4 gap-4">
@@ -282,7 +345,6 @@ const Purchase_Order = () => {
                         //   on_click={() => load_data()}
                       ></Button>
                     </div>
-
                     <div className="w-full mt-4 md:mt-0 md:w-[600px]">
                       <div className="w-full flex items-center gap-2">
                         <div className="w-full">
@@ -315,15 +377,33 @@ const Purchase_Order = () => {
                                 // onClick={() => set_show_filter(false)}
                               ></div>
                               <div className="absolute top-full mt-2 right-0 z-50 bg-white border rounded-lg shadow-md p-4 w-[260px]">
-                                <div>
+                                {/* <div>
                                   <Date_Range_Field
                                     label="Date Range"
                                     ref={date_range_ref}
                                   />
-                                </div>
-                                <div className="mt-4">
+                                </div> */}
+                                <div className="mt-2 grid grid-cols-1 gap-3">
                                   <Checkbox_Field
-                                    label="Is Draft?"
+                                    label="Posted"
+                                    name="terms"
+                                    box_size={20}
+                                    icon_size={12}
+                                    //   checked={check}
+                                    //   on_change={(e) => set_check(e.target.checked)}
+                                    on_change={(e) => alert("Is Draft")}
+                                  />
+                                  <Checkbox_Field
+                                    label="Pending"
+                                    name="terms"
+                                    box_size={20}
+                                    icon_size={12}
+                                    //   checked={check}
+                                    //   on_change={(e) => set_check(e.target.checked)}
+                                    on_change={(e) => alert("Is Draft")}
+                                  />
+                                  <Checkbox_Field
+                                    label="Draft"
                                     name="terms"
                                     box_size={20}
                                     icon_size={12}
@@ -334,19 +414,19 @@ const Purchase_Order = () => {
                                 </div>
 
                                 <div className="flex justify-end gap-2 mt-4">
-                                  <Button
+                                  {/* <Button
                                     size="sm"
                                     variant="primary"
                                     on_click={() => set_show_filter(false)}
                                   >
                                     Apply
-                                  </Button>
+                                  </Button> */}
                                   <Button
                                     size="sm"
                                     variant="secondary"
                                     on_click={() => set_show_filter(false)}
                                   >
-                                    Cancel
+                                    Close
                                   </Button>
                                 </div>
                               </div>
@@ -528,15 +608,43 @@ const Purchase_Order = () => {
           </div>
         </React.Fragment>
       )}
-      {page === "po_creation" && <Create_New_PO set_page={set_page} />}
-      {page === "edit_po" && <Edit_PO set_page={set_page} />}
-      {page === "post_po" && <Edit_PO set_page={set_page} />}
+      {page === "po_creation" && (
+        <Create_New_PO
+          set_page={set_page}
+          vendor_list={vendor_list}
+          branch_list={branch_list}
+          plant_list={plant_list}
+          item_list={item_list}
+        />
+      )}
+      {page === "edit_po" && (
+        <Edit_PO
+          set_page={set_page}
+          vendor_list={vendor_list}
+          branch_list={branch_list}
+          plant_list={plant_list}
+          item_list={item_list}
+        />
+      )}
+      {page === "post_po" && (
+        <Edit_PO
+          set_page={set_page}
+          vendor_list={vendor_list}
+          branch_list={branch_list}
+          plant_list={plant_list}
+          item_list={item_list}
+        />
+      )}
       <Select_PO_Type
         is_open={display_modal === "select_po_type"}
         on_close={() => set_display_modal("")}
         width="max-w-[1280px]"
         height="max-h-[700px]"
         set_page={set_page}
+        company_list={company_list}
+        purc_org_list={purc_org_list}
+        purc_group_list={purc_group_list}
+        po_type_list={po_type_list}
       />
       <Post_View_PO
         is_open={display_modal === "view_po" || display_modal === "post_po"}

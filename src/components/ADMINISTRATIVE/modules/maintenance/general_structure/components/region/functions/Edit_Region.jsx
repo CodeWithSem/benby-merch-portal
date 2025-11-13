@@ -94,7 +94,7 @@ const Edit_Region = ({ handle_go_back, edit_data, set_edit_data }) => {
                   type={"text"}
                   value={edit_data.region_desc}
                   on_change={(e) => handle_change_region_desc(e.target.value)}
-                  placeholder="Enter region description"
+                  placeholder="Enter description"
                   pattern="[0-9]{1,}"
                 />
               </div>

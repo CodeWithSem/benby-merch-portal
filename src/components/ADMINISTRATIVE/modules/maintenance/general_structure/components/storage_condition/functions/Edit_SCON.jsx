@@ -94,7 +94,7 @@ const Edit_SCON = ({ handle_go_back, edit_data, set_edit_data }) => {
                   type={"text"}
                   value={edit_data.scon_desc}
                   on_change={(e) => handle_change_scon_desc(e.target.value)}
-                  placeholder="Enter scon description"
+                  placeholder="Enter description"
                   pattern="[0-9]{1,}"
                 />
               </div>

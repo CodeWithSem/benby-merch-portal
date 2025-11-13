@@ -1,15 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import Text_Field from "assets/elements/Text_Field";
 import Button from "assets/elements/Button";
-import {
-  ArrowLeft,
-  ChevronLeft,
-  Eye,
-  FileUp,
-  PlusCircle,
-  Save,
-  SaveAll,
-} from "lucide-react";
+import { ChevronLeft, Eye, Save, SaveAll } from "lucide-react";
 import Text_Code_Field from "assets/elements/Text_Code_Field";
 import Delivery from "./po_details/Delivery";
 import Address from "./po_details/Address";
@@ -18,10 +10,24 @@ import PO_Status from "./po_details/PO_Status";
 import Shipment from "./po_details/Shipment";
 import Approval from "./po_details/Approval";
 import PO_Items from "./po_items/PO_Items";
+import Select_Vendor from "../sub_modals/Select_Vendor";
+import Select_Branch from "../sub_modals/Select_Branch";
+import Select_Plant from "../sub_modals/Select_Plant";
+import Select_SLOC from "../sub_modals/Select_SLOC";
+import Select_Item from "../sub_modals/Select_Item";
 import { format_date_1, get_date_now } from "assets/scripts/format";
 
-const Edit_PO = ({ set_page }) => {
+const Edit_PO = ({
+  set_page,
+  vendor_list,
+  branch_list,
+  plant_list,
+  item_list,
+}) => {
   const [active_tab, set_active_tab] = useState("delivery");
+  const [display_modal, set_display_modal] = useState("");
+
+  // RETURN ORIGIN
   return (
     <React.Fragment>
       <div className="w-full">
@@ -133,6 +139,7 @@ const Edit_PO = ({ set_page }) => {
                       // on_text_change={handle_change}
                       code_width="150px"
                       show_search_button={true}
+                      on_click={() => set_display_modal("select_vendor")}
                       disabled
                     />
                   </div>
@@ -145,6 +152,7 @@ const Edit_PO = ({ set_page }) => {
                       // on_text_change={handle_change}
                       code_width="150px"
                       show_search_button={true}
+                      on_click={() => set_display_modal("select_branch")}
                       disabled
                     />
                   </div>
@@ -157,6 +165,7 @@ const Edit_PO = ({ set_page }) => {
                       // on_text_change={handle_change}
                       code_width="150px"
                       show_search_button={true}
+                      on_click={() => set_display_modal("select_plant")}
                       disabled
                     />
                   </div>
@@ -169,6 +178,7 @@ const Edit_PO = ({ set_page }) => {
                       // on_text_change={handle_change}
                       code_width="150px"
                       show_search_button={true}
+                      on_click={() => set_display_modal("select_sloc")}
                       disabled
                     />
                   </div>
@@ -255,7 +265,7 @@ const Edit_PO = ({ set_page }) => {
               {/* - Tab Content */}
             </div>
           </div>
-          <PO_Items />
+          <PO_Items set_display_modal={set_display_modal} />
           <div className="p-4 sm:p-8 border-t">
             <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
               <Button
@@ -289,6 +299,40 @@ const Edit_PO = ({ set_page }) => {
           </div>
         </div>
       </div>
+      <Select_Vendor
+        is_open={display_modal === "select_vendor"}
+        on_close={() => set_display_modal("")}
+        width="max-w-[1000px]"
+        height="max-h-[700px]"
+        vendor_list={vendor_list}
+      />
+      <Select_Branch
+        is_open={display_modal === "select_branch"}
+        on_close={() => set_display_modal("")}
+        width="max-w-[1000px]"
+        height="max-h-[700px]"
+        branch_list={branch_list}
+      />
+      <Select_Plant
+        is_open={display_modal === "select_plant"}
+        on_close={() => set_display_modal("")}
+        width="max-w-[1000px]"
+        height="max-h-[700px]"
+        plant_list={plant_list}
+      />
+      <Select_SLOC
+        is_open={display_modal === "select_sloc"}
+        on_close={() => set_display_modal("")}
+        width="max-w-[1000px]"
+        height="max-h-[700px]"
+      />
+      <Select_Item
+        is_open={display_modal === "select_item"}
+        on_close={() => set_display_modal("")}
+        width="max-w-[1000px]"
+        height="max-h-[700px]"
+        item_list={item_list}
+      />
     </React.Fragment>
   );
 };

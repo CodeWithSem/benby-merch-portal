@@ -96,7 +96,7 @@ const Edit_PL_Status = ({ handle_go_back, edit_data, set_edit_data }) => {
                   on_change={(e) =>
                     handle_change_pl_status_desc(e.target.value)
                   }
-                  placeholder="Enter pl_status description"
+                  placeholder="Enter description"
                   pattern="[0-9]{1,}"
                 />
               </div>

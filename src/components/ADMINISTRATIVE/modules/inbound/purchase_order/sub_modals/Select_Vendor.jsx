@@ -10,41 +10,8 @@ const Select_Vendor = ({
   on_close,
   width = "max-w-[700px]",
   height = "h-[500px]",
+  vendor_list,
 }) => {
-  // --- Mock Data (replace later with API call if needed)
-  const [all_vendors, set_all_vendors] = useState([
-    {
-      id: "VE-0001",
-      description: "Vendor Description 1",
-      creation_date: "10/08/2025 12:00:00",
-    },
-    {
-      id: "VE-0002",
-      description: "Vendor Description 2",
-      creation_date: "10/08/2025 12:00:00",
-    },
-    {
-      id: "VE-0003",
-      description: "Vendor Description 3",
-      creation_date: "10/09/2025 12:00:00",
-    },
-    {
-      id: "VE-0004",
-      description: "Vendor Description 4",
-      creation_date: "10/09/2025 12:00:00",
-    },
-    {
-      id: "VE-0005",
-      description: "Vendor Description 5",
-      creation_date: "10/10/2025 12:00:00",
-    },
-    {
-      id: "VE-0006",
-      description: "Vendor Description 6",
-      creation_date: "10/11/2025 12:00:00",
-    },
-  ]);
-
   // --- States ---
   const [filtered_vendors, set_filtered_vendors] = useState([]);
   const [current_page, set_current_page] = useState(1);
@@ -54,27 +21,27 @@ const Select_Vendor = ({
 
   // --- Pagination + Filtering Logic ---
   useEffect(() => {
-    let data = [...all_vendors];
+    let data = [...vendor_list];
 
     if (search_query.trim() !== "") {
       const q = search_query.toLowerCase();
       data = data.filter(
         (vendor) =>
-          vendor.id.toLowerCase().includes(q) ||
-          vendor.description.toLowerCase().includes(q)
+          vendor.vendor_code.toLowerCase().includes(q) ||
+          vendor.vendor_desc.toLowerCase().includes(q)
       );
     }
 
     const start_idx = (current_page - 1) * rows_per_page;
     const end_idx = start_idx + rows_per_page;
     set_filtered_vendors(data.slice(start_idx, end_idx));
-  }, [all_vendors, search_query, current_page, rows_per_page]);
+  }, [vendor_list, search_query, current_page, rows_per_page]);
 
   const total_pages = Math.ceil(
-    all_vendors.filter(
+    vendor_list.filter(
       (vendor) =>
-        vendor.id.toLowerCase().includes(search_query.toLowerCase()) ||
-        vendor.description.toLowerCase().includes(search_query.toLowerCase())
+        vendor.vendor_code.toLowerCase().includes(search_query.toLowerCase()) ||
+        vendor.vendor_desc.toLowerCase().includes(search_query.toLowerCase())
     ).length / rows_per_page
   );
 
@@ -158,13 +125,13 @@ const Select_Vendor = ({
                         </td>
                       </tr>
                     ) : (
-                      filtered_vendors.map((vendor) => (
+                      filtered_vendors.map((data) => (
                         <tr
-                          key={vendor.id}
+                          key={data.id}
                           className={`hover:bg-sky-50/50 cursor-pointer text-[12px] ${
-                            selected_vendor?.id === vendor.id ? "bg-sky-50" : ""
+                            selected_vendor?.id === data.id ? "bg-sky-50" : ""
                           }`}
-                          onClick={() => set_selected_vendor(vendor)}
+                          onClick={() => set_selected_vendor(data)}
                         >
                           <td className="px-5 py-4 sm:px-6 text-center">
                             <div className="flex justify-center items-center">
@@ -172,23 +139,23 @@ const Select_Vendor = ({
                                 name="check"
                                 box_size={18}
                                 icon_size={12}
-                                checked={selected_vendor?.id === vendor.id}
-                                on_change={() => set_selected_vendor(vendor)}
+                                checked={selected_vendor?.id === data.id}
+                                on_change={() => set_selected_vendor(data)}
                               />
                             </div>
                           </td>
                           <td className="px-5 py-4 sm:px-6">
                             <div className="block font-medium">
                               <span className="block text-gray-500 text-[10px]">
-                                {vendor.id}
+                                {data.vendor_code}
                               </span>
                               <span className="block text-gray-800 text-sm">
-                                {vendor.description}
+                                {data.vendor_desc}
                               </span>
                             </div>
                           </td>
                           <td className="px-6 py-3 text-gray-700 tracking-wide">
-                            {vendor.creation_date}
+                            {data.creation_date}
                           </td>
                         </tr>
                       ))

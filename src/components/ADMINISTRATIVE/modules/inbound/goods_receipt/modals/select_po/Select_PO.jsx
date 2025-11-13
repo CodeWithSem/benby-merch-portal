@@ -1,9 +1,11 @@
 import React, { useEffect, useState, useMemo } from "react";
-import { Search, X } from "lucide-react";
+import { Database, Search, X } from "lucide-react";
 import Icon_Field from "assets/elements/Icon_Field";
 import Checkbox_Field from "assets/elements/Checkbox_Field";
 import Button from "assets/elements/Button";
 import Pagination_Modal from "assets/elements/Pagination_Modal";
+import Date_Field from "assets/elements/Date_Field";
+import { format_date_1 } from "assets/scripts/format";
 
 const Select_PO = ({
   is_open,
@@ -23,7 +25,7 @@ const Select_PO = ({
   ];
 
   // --- Mock PO Data ---
-  const [all_po] = useState([
+  const [po_list] = useState([
     {
       id: 1,
       po_number: "PO-0000001",
@@ -39,6 +41,13 @@ const Select_PO = ({
       creation_date: "11/02/2025 09:00:00 PM",
     },
   ]);
+
+  const today = format_date_1(new Date());
+
+  const [start_date, set_start_date] = useState(today);
+  const [end_date, set_end_date] = useState(today);
+
+  const [show_load_data_button, set_show_load_data_button] = useState(false);
 
   // --- States ---
   const [filtered_po, set_filtered_po] = useState([]);
@@ -75,7 +84,7 @@ const Select_PO = ({
 
   // --- Filtering + Pagination ---
   useEffect(() => {
-    let data = [...all_po];
+    let data = [...po_list];
 
     if (debounced_query.trim() !== "") {
       const q = debounced_query.toLowerCase();
@@ -108,11 +117,11 @@ const Select_PO = ({
     const start_idx = (current_page - 1) * rows_per_page;
     const end_idx = start_idx + rows_per_page;
     set_filtered_po(data.slice(start_idx, end_idx));
-  }, [all_po, debounced_query, current_page, rows_per_page]);
+  }, [po_list, debounced_query, current_page, rows_per_page]);
 
   // --- Total Pages ---
   const total_pages = Math.ceil(
-    all_po.filter((po) => {
+    po_list.filter((po) => {
       const po_type_desc = po_type_map[po.po_type_code] || "";
       const company_desc = company_map[po.company_code] || "";
       const q = debounced_query.toLowerCase();
@@ -133,8 +142,23 @@ const Select_PO = ({
     on_close();
   };
 
+  const handle_change_start_date = (value) => {
+    set_start_date(format_date_1(value));
+    set_show_load_data_button(true);
+  };
+
+  const handle_change_end_date = (value) => {
+    set_end_date(format_date_1(value));
+    set_show_load_data_button(true);
+  };
+
+  const handle_load_data = () => {
+    set_show_load_data_button(false);
+  };
+
   if (!is_open) return null;
 
+  // RETURN ORIGIN
   return (
     <div className="fixed inset-0 flex items-center justify-center z-[97] px-4">
       <div className="absolute inset-0 bg-black/50 backdrop-blur-sm z-[98]" />
@@ -156,6 +180,32 @@ const Select_PO = ({
         {/* Body */}
         <div className={`w-full overflow-y-auto ${height} scrollbar-custom`}>
           <div className="overflow-hidden border border-gray-200 bg-white pt-4">
+            <div className="px-6 mb-5 grid grid-cols-1 gap-5 md:w-[800px] md:grid-cols-3">
+              <Date_Field
+                label="Start Date"
+                value={start_date}
+                on_change={(e) => handle_change_start_date(e.target.value)}
+                placeholder="Select Date"
+              />
+              <Date_Field
+                label="End Date"
+                value={end_date}
+                on_change={(e) => handle_change_end_date(e.target.value)}
+                placeholder="Select Date"
+              />
+              <div className="flex w-full items-end">
+                {show_load_data_button && (
+                  <Button
+                    variant="primary"
+                    icon={Database}
+                    icon_position="left"
+                    on_click={handle_load_data}
+                  >
+                    Load Data
+                  </Button>
+                )}
+              </div>
+            </div>
             {/* Search */}
             <div className="flex flex-col gap-5 px-6 mb-4 sm:flex-row sm:items-center sm:justify-between">
               <div className="w-full">
@@ -194,10 +244,10 @@ const Select_PO = ({
                   {filtered_po.length === 0 ? (
                     <tr>
                       <td
-                        colSpan={4}
+                        colSpan={5}
                         className="text-center py-6 text-gray-500 text-sm"
                       >
-                        No data found.
+                        No data found
                       </td>
                     </tr>
                   ) : (

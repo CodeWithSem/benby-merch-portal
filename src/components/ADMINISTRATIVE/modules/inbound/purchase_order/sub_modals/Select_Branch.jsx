@@ -5,88 +5,55 @@ import Checkbox_Field from "assets/elements/Checkbox_Field";
 import Button from "assets/elements/Button";
 import Pagination_Modal from "assets/elements/Pagination_Modal";
 
-const Select_Plant = ({
+const Select_Branch = ({
   is_open,
   on_close,
   width = "max-w-[700px]",
   height = "h-[500px]",
+  branch_list,
 }) => {
-  // --- Mock Data (replace later with API call if needed)
-  const [all_plant_dc, set_all_plant_dc] = useState([
-    {
-      id: "PL-0001",
-      description: "Plant/DC Description 1",
-      creation_date: "10/08/2025 12:00:00",
-    },
-    {
-      id: "PL-0002",
-      description: "Plant/DC Description 2",
-      creation_date: "10/08/2025 12:00:00",
-    },
-    {
-      id: "PL-0003",
-      description: "Plant/DC Description 3",
-      creation_date: "10/09/2025 12:00:00",
-    },
-    {
-      id: "PL-0004",
-      description: "Plant/DC Description 4",
-      creation_date: "10/09/2025 12:00:00",
-    },
-    {
-      id: "PL-0005",
-      description: "Plant/DC Description 5",
-      creation_date: "10/10/2025 12:00:00",
-    },
-    {
-      id: "PL-0006",
-      description: "Plant/DC Description 6",
-      creation_date: "10/11/2025 12:00:00",
-    },
-  ]);
-
   // --- States ---
-  const [filtered_plant_dc, set_filtered_plant_dc] = useState([]);
+  const [filtered_branches, set_filtered_branches] = useState([]);
   const [current_page, set_current_page] = useState(1);
   const [rows_per_page, set_rows_per_page] = useState(5);
   const [search_query, set_search_query] = useState("");
-  const [selected_plant, set_selected_plant] = useState(null);
+  const [selected_branch, set_selected_branch] = useState(null);
 
   // --- Pagination + Filtering Logic ---
   useEffect(() => {
-    let data = [...all_plant_dc];
+    let data = [...branch_list];
 
     if (search_query.trim() !== "") {
       const q = search_query.toLowerCase();
       data = data.filter(
-        (plant) =>
-          plant.id.toLowerCase().includes(q) ||
-          plant.description.toLowerCase().includes(q)
+        (branch) =>
+          branch.branch_code.toLowerCase().includes(q) ||
+          branch.branch_desc.toLowerCase().includes(q)
       );
     }
 
     const start_idx = (current_page - 1) * rows_per_page;
     const end_idx = start_idx + rows_per_page;
-    set_filtered_plant_dc(data.slice(start_idx, end_idx));
-  }, [all_plant_dc, search_query, current_page, rows_per_page]);
+    set_filtered_branches(data.slice(start_idx, end_idx));
+  }, [branch_list, search_query, current_page, rows_per_page]);
 
   const total_pages = Math.ceil(
-    all_plant_dc.filter(
-      (plant) =>
-        plant.id.toLowerCase().includes(search_query.toLowerCase()) ||
-        plant.description.toLowerCase().includes(search_query.toLowerCase())
+    branch_list.filter(
+      (branch) =>
+        branch.branch_code.toLowerCase().includes(search_query.toLowerCase()) ||
+        branch.branch_desc.toLowerCase().includes(search_query.toLowerCase())
     ).length / rows_per_page
   );
 
   // --- Handlers ---
   const handle_page_change = (page) => set_current_page(page);
 
-  const handle_select_plant = () => {
-    if (!selected_plant) {
-      alert("Please select a plant before proceeding.");
+  const handle_select_branch = () => {
+    if (!selected_branch) {
+      alert("Please select a branch before proceeding.");
       return;
     }
-    alert(`Selected: ${selected_plant.description}`);
+    alert(`Selected: ${selected_branch.description}`);
   };
 
   return is_open ? (
@@ -109,7 +76,7 @@ const Select_Plant = ({
 
           {/* + Modal Label */}
           <div className="text-lg md:text-xl font-bold mb-5 px-7">
-            Plant / DC Selection
+            Branch Selection
           </div>
           {/* - Modal Label */}
 
@@ -139,7 +106,7 @@ const Select_Plant = ({
                     <tr className="font-semibold text-xs">
                       <th className="px-6 py-3 w-[80px]"></th>
                       <th className="px-6 py-3 text-gray-500 text-left">
-                        Plant / DC
+                        Branch
                       </th>
                       <th className="px-6 py-3 text-gray-500 text-left">
                         Creation Date
@@ -148,7 +115,7 @@ const Select_Plant = ({
                   </thead>
 
                   <tbody className="divide-y divide-gray-100">
-                    {filtered_plant_dc.length === 0 ? (
+                    {filtered_branches.length === 0 ? (
                       <tr>
                         <td
                           colSpan={3}
@@ -158,37 +125,37 @@ const Select_Plant = ({
                         </td>
                       </tr>
                     ) : (
-                      filtered_plant_dc.map((plant) => (
+                      filtered_branches.map((data) => (
                         <tr
-                          key={plant.id}
+                          key={data.id}
                           className={`hover:bg-sky-50/50 cursor-pointer text-[12px] ${
-                            selected_plant?.id === plant.id ? "bg-sky-50" : ""
+                            selected_branch?.id === data.id ? "bg-sky-50" : ""
                           }`}
-                          onClick={() => set_selected_plant(plant)}
+                          onClick={() => set_selected_branch(data)}
                         >
-                          <td className="px-5 py-4 sm:px-6">
+                          <td className="px-5 py-4 sm:px-6 text-center">
                             <div className="flex justify-center items-center">
                               <Checkbox_Field
                                 name="check"
                                 box_size={18}
                                 icon_size={12}
-                                checked={selected_plant?.id === plant.id}
-                                on_change={() => set_selected_plant(plant)}
+                                checked={selected_branch?.id === data.id}
+                                on_change={() => set_selected_branch(data)}
                               />
                             </div>
                           </td>
                           <td className="px-5 py-4 sm:px-6">
                             <div className="block font-medium text-gray-800">
-                              <span className="block text-gray-500 text-[10px]">
-                                {plant.id}
+                              <span className="block text-gray-500 text-[12px]">
+                                {data.branch_code}
                               </span>
                               <span className="block text-gray-800 text-sm">
-                                {plant.description}
+                                {data.branch_desc}
                               </span>
                             </div>
                           </td>
                           <td className="px-6 py-3 text-gray-700 tracking-wide">
-                            {plant.creation_date}
+                            {data.creation_date}
                           </td>
                         </tr>
                       ))
@@ -217,9 +184,9 @@ const Select_Plant = ({
             <div className="flex justify-center sm:justify-end gap-2 w-full">
               <Button
                 variant="primary"
-                on_click={handle_select_plant}
+                on_click={handle_select_branch}
                 class_name="w-full md:w-[100px]"
-                disabled={!selected_plant}
+                disabled={!selected_branch}
               >
                 Proceed
               </Button>
@@ -239,4 +206,4 @@ const Select_Plant = ({
   ) : null;
 };
 
-export default Select_Plant;
+export default Select_Branch;

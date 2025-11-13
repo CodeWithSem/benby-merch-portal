@@ -4,7 +4,7 @@ import Icon_Field from "assets/elements/Icon_Field";
 import Checkbox_Field from "assets/elements/Checkbox_Field";
 import Button from "assets/elements/Button";
 import Pagination_Modal from "assets/elements/Pagination_Modal";
-import { format_currency, format_percentage } from "assets/scripts/format";
+import { format_currency } from "assets/scripts/format";
 
 const Select_Item = ({
   is_open,
