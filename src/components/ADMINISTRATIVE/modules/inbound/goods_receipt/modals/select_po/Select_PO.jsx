@@ -13,17 +13,9 @@ const Select_PO = ({
   width = "max-w-[700px]",
   height = "h-[500px]",
   set_page,
+  company_list,
+  po_type_list,
 }) => {
-  // --- Reference Lists ---
-  const company_list = [
-    { id: 1, company_code: "COM-0001", company_desc: "Company Description 1" },
-    { id: 2, company_code: "COM-0002", company_desc: "Company Description 2" },
-  ];
-  const po_type_list = [
-    { id: 1, po_type_code: "PT-0001", po_type_desc: "PO Type Description 1" },
-    { id: 2, po_type_code: "PT-0002", po_type_desc: "PO Type Description 2" },
-  ];
-
   // --- Mock PO Data ---
   const [po_list] = useState([
     {
@@ -31,14 +23,14 @@ const Select_PO = ({
       po_number: "PO-0000001",
       po_type_code: "PT-0001",
       company_code: "COM-0001",
-      creation_date: "11/02/2025 09:00:00 PM",
+      creation_date: "06-05-2025",
     },
     {
       id: 2,
       po_number: "PO-0000002",
       po_type_code: "PT-0002",
-      company_code: "COM-0002",
-      creation_date: "11/02/2025 09:00:00 PM",
+      company_code: "COM-0001",
+      creation_date: "06-05-2025",
     },
   ]);
 

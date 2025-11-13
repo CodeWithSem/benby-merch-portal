@@ -64,9 +64,8 @@ const Create_New_GR = ({ set_page }) => {
               ></Button>
               <h1 className="text-lg">Goods Receipt Creation</h1>
             </div>
-
             <div className="flex gap-2 text-gray-500 text-sm tracking-wider">
-              10/30/2025
+              06-05-2025
             </div>
           </div>
 
@@ -82,7 +81,7 @@ const Create_New_GR = ({ set_page }) => {
                       <Text_Field
                         label="PO Number"
                         type="text"
-                        value="PO-0000001"
+                        value="PO-XXXXXXXXX"
                         bg_color="slate-50"
                         disabled
                       />
@@ -110,7 +109,7 @@ const Create_New_GR = ({ set_page }) => {
                       <Text_Field
                         label="Creation Date"
                         type="text"
-                        value="10/30/2025"
+                        value="06-05-2025"
                         bg_color="slate-50"
                         disabled
                       />

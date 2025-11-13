@@ -22,6 +22,7 @@ import Select_PO from "./modals/select_po/Select_PO";
 import Create_New_GR from "./create_new_gr/Create_New_GR";
 import Edit_GR from "./edit_gr/Edit_GR";
 import Post_View_GR from "./modals/post_view_gr/Post_View_GR";
+import { company_list, po_type_list } from "./GR_DATA_MAP";
 
 const Goods_Receipt = () => {
   const filter_ref = useRef(null);
@@ -32,11 +33,6 @@ const Goods_Receipt = () => {
 
   // Close dropdown on outside click
   const { show_toast } = useToast();
-
-  const company_list = [
-    { id: 1, company_code: "20001", company_desc: "Company 1" },
-    { id: 2, company_code: "20002", company_desc: "Company 2" },
-  ];
 
   const columns = [
     { key: "po_number", label: "PO Number", sortable: true },
@@ -49,14 +45,14 @@ const Goods_Receipt = () => {
   ];
 
   // --- State ---
-  const [all_data, set_all_data] = useState([
+  const [gr_list, set_gr_list] = useState([
     {
       id: 1,
       po_number: "PO-0000001",
       gr_number: "GR-0000001",
       po_type: "LFPO",
-      company_code: "20001",
-      creation_date: "11/02/2025 08:30:00 PM",
+      company_code: "COM-0001",
+      creation_date: "06-05-2025",
       status: "Pending",
     },
   ]);
@@ -93,8 +89,8 @@ const Goods_Receipt = () => {
   // --- Load all users once ---
   //   const load_data = async () => {
   //     set_loading(true);
-  //     const data = await fetch_all_data();
-  //     set_all_data(data);
+  //     const data = await fetch_gr_list();
+  //     set_gr_list(data);
   //     set_loading(false);
   //   };
 
@@ -104,7 +100,7 @@ const Goods_Receipt = () => {
 
   // + Client-side Filtering
   useEffect(() => {
-    let temp = [...all_data];
+    let temp = [...gr_list];
 
     // + Column Filter
     if (debounced_query.trim() !== "") {
@@ -139,7 +135,7 @@ const Goods_Receipt = () => {
     // - Pagination Function
     set_filtered_data(temp.slice(start_idx, end_idx));
   }, [
-    all_data,
+    gr_list,
     debounced_query,
     sort_by,
     sort_order,
@@ -151,7 +147,7 @@ const Goods_Receipt = () => {
   // + Total page of Pagination
   const total_pages = Math.ceil(
     (debounced_query
-      ? all_data.filter((u) =>
+      ? gr_list.filter((u) =>
           columns.some((col) => {
             if (col.key === "actions") return false;
             const val = u[col.key];
@@ -161,7 +157,7 @@ const Goods_Receipt = () => {
               .includes(debounced_query.toLowerCase());
           })
         ).length
-      : all_data.length) / select_option
+      : gr_list.length) / select_option
   );
   // - Total page of Pagination
 
@@ -538,6 +534,8 @@ const Goods_Receipt = () => {
         width="max-w-[1280px]"
         height="max-h-[700px]"
         set_page={set_page}
+        company_list={company_list}
+        po_type_list={po_type_list}
       />
       <Post_View_GR
         is_open={display_modal === "view_gr" || display_modal === "post_gr"}
