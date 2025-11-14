@@ -10,17 +10,8 @@ const Select_Plate_No = ({
   on_close,
   width = "max-w-[700px]",
   height = "h-[500px]",
+  plate_no_list,
 }) => {
-  // --- Mock Data (replace later with API call if needed)
-  const [plate_no_list, set_plate_no_list] = useState([
-    {
-      id: 1,
-      plate_no_code: "TR-001",
-      plate_no_desc: "ABC-123",
-      creation_date: "MM-DD-YYYY",
-    },
-  ]);
-
   // --- States ---
   const [filtered_plate_no_list, set_filtered_plate_no_list] = useState([]);
   const [current_page, set_current_page] = useState(1);

@@ -20,7 +20,6 @@ import Button from "assets/elements/Button";
 import { useToast } from "../../../layout/Toast_Provider";
 import Checkbox_Field from "assets/elements/Checkbox_Field";
 import Create_New_PO from "./create_new_po/Create_New_PO";
-import Post_View_PO from "./modals/post_view_po/Post_View_PO";
 import Edit_PO from "./edit_po/Edit_PO";
 import Delete_PO from "./modals/delete_po/Delete_PO";
 import Select_PO_Type from "./modals/select_po_type/Select_PO_Type";
@@ -35,7 +34,9 @@ import {
   branch_list,
   plant_list,
   item_list,
+  sloc_list,
 } from "./PO_DATA_MAP";
+import Post_View_PO from "./post_view_po/Post_View_PO";
 
 const Purchase_Order = () => {
   // + Data Map
@@ -210,12 +211,12 @@ const Purchase_Order = () => {
 
   const handle_view_po = () => {
     set_for_posting(false);
-    set_display_modal("view_po");
+    set_page("post_view_po");
   };
 
   const handle_post_po = () => {
     set_for_posting(true);
-    set_display_modal("post_po");
+    set_page("post_view_po");
   };
 
   const handle_edit_po = () => {
@@ -614,7 +615,7 @@ const Purchase_Order = () => {
           vendor_list={vendor_list}
           branch_list={branch_list}
           plant_list={plant_list}
-          item_list={item_list}
+          sloc_list={sloc_list}
         />
       )}
       {page === "edit_po" && (
@@ -623,17 +624,11 @@ const Purchase_Order = () => {
           vendor_list={vendor_list}
           branch_list={branch_list}
           plant_list={plant_list}
-          item_list={item_list}
+          sloc_list={sloc_list}
         />
       )}
-      {page === "post_po" && (
-        <Edit_PO
-          set_page={set_page}
-          vendor_list={vendor_list}
-          branch_list={branch_list}
-          plant_list={plant_list}
-          item_list={item_list}
-        />
+      {page === "post_view_po" && (
+        <Post_View_PO set_page={set_page} for_posting={for_posting} />
       )}
       <Select_PO_Type
         is_open={display_modal === "select_po_type"}
@@ -645,12 +640,6 @@ const Purchase_Order = () => {
         purc_org_list={purc_org_list}
         purc_group_list={purc_group_list}
         po_type_list={po_type_list}
-      />
-      <Post_View_PO
-        is_open={display_modal === "view_po" || display_modal === "post_po"}
-        for_posting={for_posting}
-        on_close={() => set_display_modal("")}
-        width="max-w-[1280px]"
       />
       <Delete_PO
         is_open={display_modal === "delete_po"}

@@ -23,6 +23,7 @@ import Select_Item from "./modals/Select_Item";
 import Create_New_Batch from "./create_new_batch/Create_New_Batch";
 import View_Batch from "./modals/view_batch/View_Batch";
 import Edit_Batch from "./edit_batch/Edit_Batch";
+import { branch_list, plant_list, sloc_list } from "./BATCH_DATA_MAP";
 
 const Batch = () => {
   const [page, set_page] = useState("main");
@@ -441,18 +442,21 @@ const Batch = () => {
         on_close={() => set_display_modal("")}
         width="max-w-[1000px]"
         height="max-h-[700px]"
+        branch_list={branch_list}
       />
       <Select_Plant
         is_open={display_modal === "select_plant"}
         on_close={() => set_display_modal("")}
         width="max-w-[1000px]"
         height="max-h-[700px]"
+        plant_list={plant_list}
       />
       <Select_SLOC
         is_open={display_modal === "select_sloc"}
         on_close={() => set_display_modal("")}
         width="max-w-[1000px]"
         height="max-h-[700px]"
+        sloc_list={sloc_list}
       />
       <Select_Item
         is_open={display_modal === "select_item"}

@@ -9,7 +9,7 @@ const Approval = () => {
         <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
           <div>
             <Text_Field
-              label="Virtual Branch Group"
+              label="Approval Matrix"
               type={"text"}
               // value={}
               // on_change={handle_text_change}
@@ -20,7 +20,7 @@ const Approval = () => {
           <div>
             <Text_Field
               label="Approval Status"
-              type={"Not yet Approve"}
+              type={"text"}
               // value={}
               // on_change={handle_text_change}
               pattern="[A-Za-z]{1,}"

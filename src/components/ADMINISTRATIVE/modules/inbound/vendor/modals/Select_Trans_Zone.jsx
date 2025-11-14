@@ -5,64 +5,57 @@ import Checkbox_Field from "assets/elements/Checkbox_Field";
 import Button from "assets/elements/Button";
 import Pagination_Modal from "assets/elements/Pagination_Modal";
 
-const Select_SLOC = ({
+const Select_Trans_Zone = ({
   is_open,
   on_close,
   width = "max-w-[700px]",
   height = "h-[500px]",
+  trans_zone_list,
 }) => {
-  // --- Mock Data (replace later with API call if needed)
-  const [sloc_list, set_sloc_list] = useState([
-    {
-      id: 1,
-      sloc_code: "SLOC-0001",
-      sloc_desc: "SLOC Description 1",
-      creation_date: "10-08-2025",
-    },
-  ]);
-
   // --- States ---
-  const [filtered_sloc_list, set_filtered_sloc_list] = useState([]);
+  const [filtered_trans_zones, set_filtered_trans_zones] = useState([]);
   const [current_page, set_current_page] = useState(1);
   const [rows_per_page, set_rows_per_page] = useState(5);
   const [search_query, set_search_query] = useState("");
-  const [selected_plant, set_selected_plant] = useState(null);
+  const [selected_branch, set_selected_branch] = useState(null);
 
   // --- Pagination + Filtering Logic ---
   useEffect(() => {
-    let data = [...sloc_list];
+    let data = [...trans_zone_list];
 
     if (search_query.trim() !== "") {
       const q = search_query.toLowerCase();
       data = data.filter(
         (data) =>
-          data.sloc_code.toLowerCase().includes(q) ||
-          data.sloc_desc.toLowerCase().includes(q)
+          data.trans_zone_code.toLowerCase().includes(q) ||
+          data.trans_zone_desc.toLowerCase().includes(q)
       );
     }
 
     const start_idx = (current_page - 1) * rows_per_page;
     const end_idx = start_idx + rows_per_page;
-    set_filtered_sloc_list(data.slice(start_idx, end_idx));
-  }, [sloc_list, search_query, current_page, rows_per_page]);
+    set_filtered_trans_zones(data.slice(start_idx, end_idx));
+  }, [trans_zone_list, search_query, current_page, rows_per_page]);
 
   const total_pages = Math.ceil(
-    sloc_list.filter(
+    trans_zone_list.filter(
       (data) =>
-        data.sloc_code.toLowerCase().includes(search_query.toLowerCase()) ||
-        data.sloc_desc.toLowerCase().includes(search_query.toLowerCase())
+        data.trans_zone_code
+          .toLowerCase()
+          .includes(search_query.toLowerCase()) ||
+        data.trans_zone_desc.toLowerCase().includes(search_query.toLowerCase())
     ).length / rows_per_page
   );
 
   // --- Handlers ---
   const handle_page_change = (page) => set_current_page(page);
 
-  const handle_select_plant = () => {
-    if (!selected_plant) {
-      alert("Please select a plant before proceeding.");
+  const handle_select_branch = () => {
+    if (!selected_branch) {
+      alert("Please select a branch before proceeding.");
       return;
     }
-    alert(`Selected: ${selected_plant.sloc_desc}`);
+    alert(`Selected: ${selected_branch.description}`);
   };
 
   return is_open ? (
@@ -85,7 +78,7 @@ const Select_SLOC = ({
 
           {/* + Modal Label */}
           <div className="text-lg md:text-xl font-bold mb-5 px-7">
-            SLOC Selection
+            Tansportation Zone Selection
           </div>
           {/* - Modal Label */}
 
@@ -115,7 +108,7 @@ const Select_SLOC = ({
                     <tr className="font-semibold text-xs">
                       <th className="px-6 py-3 w-[80px]"></th>
                       <th className="px-6 py-3 text-gray-500 text-left">
-                        SLOC
+                        Transportation Zone
                       </th>
                       <th className="px-6 py-3 text-gray-500 text-left">
                         Creation Date
@@ -124,7 +117,7 @@ const Select_SLOC = ({
                   </thead>
 
                   <tbody className="divide-y divide-gray-100">
-                    {filtered_sloc_list.length === 0 ? (
+                    {filtered_trans_zones.length === 0 ? (
                       <tr>
                         <td
                           colSpan={3}
@@ -134,32 +127,32 @@ const Select_SLOC = ({
                         </td>
                       </tr>
                     ) : (
-                      filtered_sloc_list.map((data) => (
+                      filtered_trans_zones.map((data) => (
                         <tr
                           key={data.id}
                           className={`hover:bg-sky-50/50 cursor-pointer text-[12px] ${
-                            selected_plant?.id === data.id ? "bg-sky-50" : ""
+                            selected_branch?.id === data.id ? "bg-sky-50" : ""
                           }`}
-                          onClick={() => set_selected_plant(data)}
+                          onClick={() => set_selected_branch(data)}
                         >
-                          <td className="px-5 py-4 sm:px-6">
+                          <td className="px-5 py-4 sm:px-6 text-center">
                             <div className="flex justify-center items-center">
                               <Checkbox_Field
                                 name="check"
                                 box_size={18}
                                 icon_size={12}
-                                checked={selected_plant?.id === data.id}
-                                on_change={() => set_selected_plant(data)}
+                                checked={selected_branch?.id === data.id}
+                                on_change={() => set_selected_branch(data)}
                               />
                             </div>
                           </td>
                           <td className="px-5 py-4 sm:px-6">
                             <div className="block font-medium text-gray-800">
-                              <span className="block text-gray-500 text-[10px]">
-                                {data.sloc_code}
+                              <span className="block text-gray-500 text-[12px]">
+                                {data.trans_zone_code}
                               </span>
                               <span className="block text-gray-800 text-sm">
-                                {data.sloc_desc}
+                                {data.trans_zone_desc}
                               </span>
                             </div>
                           </td>
@@ -193,9 +186,9 @@ const Select_SLOC = ({
             <div className="flex justify-center sm:justify-end gap-2 w-full">
               <Button
                 variant="primary"
-                on_click={handle_select_plant}
+                on_click={handle_select_branch}
                 class_name="w-full md:w-[100px]"
-                disabled={!selected_plant}
+                disabled={!selected_branch}
               >
                 Proceed
               </Button>
@@ -215,4 +208,4 @@ const Select_SLOC = ({
   ) : null;
 };
 
-export default Select_SLOC;
+export default Select_Trans_Zone;

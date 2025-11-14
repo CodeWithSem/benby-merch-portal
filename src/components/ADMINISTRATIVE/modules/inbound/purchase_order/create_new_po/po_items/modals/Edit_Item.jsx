@@ -4,7 +4,7 @@ import Button from "assets/elements/Button";
 import { Info, X } from "lucide-react";
 import Find_Field from "assets/elements/Find_Field";
 import Quantity_Field from "assets/elements/Quantity_Field";
-import Select_Item from "../../../sub_modals/Select_Item";
+import Select_Item from "../../../modals/Select_Item";
 
 const Edit_Item = ({ is_open, on_close, width = "max-w-[700px]" }) => {
   const [display_item_modal, set_display_item_modal] = useState("");
@@ -51,7 +51,7 @@ const Edit_Item = ({ is_open, on_close, width = "max-w-[700px]" }) => {
                     name="item_name"
                     // value={search_value}
                     // on_change={handle_change}
-                    on_find={() => set_display_item_modal("select_item")}
+                    on_click={() => set_display_item_modal("select_item")}
                     disabled
                   />
                 </div>

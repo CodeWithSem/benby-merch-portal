@@ -10,17 +10,8 @@ const Select_SH_Type = ({
   on_close,
   width = "max-w-[700px]",
   height = "h-[500px]",
+  sh_type_list,
 }) => {
-  // --- Mock Data (replace later with API call if needed)
-  const [sh_type_list, set_sh_type_list] = useState([
-    {
-      id: 1,
-      sh_type_code: "LS-001",
-      sh_type_desc: "Shipment Type Description 1",
-      creation_date: "MM-DD-YYYY",
-    },
-  ]);
-
   // --- States ---
   const [filtered_sh_type_list, set_filtered_sh_type_list] = useState([]);
   const [current_page, set_current_page] = useState(1);

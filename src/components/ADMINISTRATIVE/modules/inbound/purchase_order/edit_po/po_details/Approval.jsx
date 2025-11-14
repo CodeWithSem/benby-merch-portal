@@ -1,7 +1,7 @@
 import React from "react";
 import Checkbox_Field from "assets/elements/Checkbox_Field";
-import Find_Field from "assets/elements/Find_Field";
 import Text_Field from "assets/elements/Text_Field";
+import Select_Field from "assets/elements/Select_Field";
 
 const Approval = () => {
   return (
@@ -9,13 +9,12 @@ const Approval = () => {
       <div className="rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6 dark:border-gray-800 dark:bg-gray-900">
         <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
           <div>
-            <Find_Field
+            <Select_Field
               label="Approval Matrix"
-              name="approval_matrix"
-              // value={search_value}
-              // on_change={handle_change}
-              // on_find={handle_find}
-              disabled
+              // value={selected_data}
+              // on_change={(e) => handle_data_change(e.target.value)}
+              // options={options}
+              placeholder="Select Option"
             />
           </div>
           <div>

@@ -10,26 +10,8 @@ const Select_Branch = ({
   on_close,
   width = "max-w-[700px]",
   height = "h-[500px]",
+  branch_list,
 }) => {
-  // --- Mock Data (replace later with API call if needed)
-  const [all_branch, set_all_branch] = useState([
-    {
-      id: "BR-0001",
-      description: "Branch Description 1",
-      creation_date: "10/08/2025 12:00:00",
-    },
-    {
-      id: "BR-0002",
-      description: "Branch Description 2",
-      creation_date: "10/08/2025 12:00:00",
-    },
-    {
-      id: "BR-0003",
-      description: "Branch Description 3",
-      creation_date: "10/09/2025 12:00:00",
-    },
-  ]);
-
   // --- States ---
   const [filtered_branches, set_filtered_branches] = useState([]);
   const [current_page, set_current_page] = useState(1);
@@ -39,27 +21,27 @@ const Select_Branch = ({
 
   // --- Pagination + Filtering Logic ---
   useEffect(() => {
-    let data = [...all_branch];
+    let data = [...branch_list];
 
     if (search_query.trim() !== "") {
       const q = search_query.toLowerCase();
       data = data.filter(
-        (branch) =>
-          branch.id.toLowerCase().includes(q) ||
-          branch.description.toLowerCase().includes(q)
+        (data) =>
+          data.branch_code.toLowerCase().includes(q) ||
+          data.branch_desc.toLowerCase().includes(q)
       );
     }
 
     const start_idx = (current_page - 1) * rows_per_page;
     const end_idx = start_idx + rows_per_page;
     set_filtered_branches(data.slice(start_idx, end_idx));
-  }, [all_branch, search_query, current_page, rows_per_page]);
+  }, [branch_list, search_query, current_page, rows_per_page]);
 
   const total_pages = Math.ceil(
-    all_branch.filter(
-      (branch) =>
-        branch.id.toLowerCase().includes(search_query.toLowerCase()) ||
-        branch.description.toLowerCase().includes(search_query.toLowerCase())
+    branch_list.filter(
+      (data) =>
+        data.branch_code.toLowerCase().includes(search_query.toLowerCase()) ||
+        data.branch_desc.toLowerCase().includes(search_query.toLowerCase())
     ).length / rows_per_page
   );
 
@@ -143,13 +125,13 @@ const Select_Branch = ({
                         </td>
                       </tr>
                     ) : (
-                      filtered_branches.map((branch) => (
+                      filtered_branches.map((data) => (
                         <tr
-                          key={branch.id}
+                          key={data.id}
                           className={`hover:bg-sky-50/50 cursor-pointer text-[12px] ${
-                            selected_branch?.id === branch.id ? "bg-sky-50" : ""
+                            selected_branch?.id === data.id ? "bg-sky-50" : ""
                           }`}
-                          onClick={() => set_selected_branch(branch)}
+                          onClick={() => set_selected_branch(data)}
                         >
                           <td className="px-5 py-4 sm:px-6 text-center">
                             <div className="flex justify-center items-center">
@@ -157,23 +139,23 @@ const Select_Branch = ({
                                 name="check"
                                 box_size={18}
                                 icon_size={12}
-                                checked={selected_branch?.id === branch.id}
-                                on_change={() => set_selected_branch(branch)}
+                                checked={selected_branch?.id === data.id}
+                                on_change={() => set_selected_branch(data)}
                               />
                             </div>
                           </td>
                           <td className="px-5 py-4 sm:px-6">
                             <div className="block font-medium text-gray-800">
                               <span className="block text-gray-500 text-[12px]">
-                                {branch.id}
+                                {data.branch_code}
                               </span>
                               <span className="block text-gray-800 text-sm">
-                                {branch.description}
+                                {data.branch_desc}
                               </span>
                             </div>
                           </td>
                           <td className="px-6 py-3 text-gray-700 tracking-wide">
-                            {branch.creation_date}
+                            {data.creation_date}
                           </td>
                         </tr>
                       ))

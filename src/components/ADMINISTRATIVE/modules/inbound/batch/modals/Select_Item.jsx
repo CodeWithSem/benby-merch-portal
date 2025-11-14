@@ -13,60 +13,13 @@ const Select_Item = ({
   height = "h-[500px]",
 }) => {
   // --- Mock Data (replace later with API call if needed)
-  const [all_item, set_all_item] = useState([
+  const [item_list, set_item_list] = useState([
     {
-      id: "00000001",
-      description: "Item Description 1",
+      id: 1,
+      item_code: "ITM-000000001",
+      item_desc: "Item Description 1",
       unit_price: 0,
-      creation_date: "10/08/2025 12:00:00",
-    },
-    {
-      id: "00000002",
-      description: "Item Description 2",
-      unit_price: 0,
-      creation_date: "10/08/2025 12:00:00",
-    },
-    {
-      id: "00000003",
-      description: "Item Description 3",
-      unit_price: 0,
-      creation_date: "10/09/2025 12:00:00",
-    },
-    {
-      id: "00000004",
-      description: "Item Description 4",
-      unit_price: 0,
-      creation_date: "10/09/2025 12:00:00",
-    },
-    {
-      id: "00000005",
-      description: "Item Description 5",
-      unit_price: 0,
-      creation_date: "10/10/2025 12:00:00",
-    },
-    {
-      id: "00000006",
-      description: "Item Description 6",
-      unit_price: 0,
-      creation_date: "10/11/2025 12:00:00",
-    },
-    {
-      id: "00000007",
-      description: "Item Description 7",
-      unit_price: 0,
-      creation_date: "10/11/2025 12:00:00",
-    },
-    {
-      id: "00000008",
-      description: "Item Description 8",
-      unit_price: 0,
-      creation_date: "10/11/2025 12:00:00",
-    },
-    {
-      id: "00000009",
-      description: "Item Description 9",
-      unit_price: 0,
-      creation_date: "10/11/2025 12:00:00",
+      creation_date: "06-05-2025",
     },
   ]);
 
@@ -79,27 +32,27 @@ const Select_Item = ({
 
   // --- Pagination + Filtering Logic ---
   useEffect(() => {
-    let data = [...all_item];
+    let data = [...item_list];
 
     if (search_query.trim() !== "") {
       const q = search_query.toLowerCase();
       data = data.filter(
-        (item) =>
-          item.id.toLowerCase().includes(q) ||
-          item.description.toLowerCase().includes(q)
+        (data) =>
+          data.item_code.toLowerCase().includes(q) ||
+          data.item_desc.toLowerCase().includes(q)
       );
     }
 
     const start_idx = (current_page - 1) * rows_per_page;
     const end_idx = start_idx + rows_per_page;
     set_filtered_item(data.slice(start_idx, end_idx));
-  }, [all_item, search_query, current_page, rows_per_page]);
+  }, [item_list, search_query, current_page, rows_per_page]);
 
   const total_pages = Math.ceil(
-    all_item.filter(
-      (item) =>
-        item.id.toLowerCase().includes(search_query.toLowerCase()) ||
-        item.description.toLowerCase().includes(search_query.toLowerCase())
+    item_list.filter(
+      (data) =>
+        data.item_code.toLowerCase().includes(search_query.toLowerCase()) ||
+        data.item_desc.toLowerCase().includes(search_query.toLowerCase())
     ).length / rows_per_page
   );
 
@@ -167,9 +120,6 @@ const Select_Item = ({
                         Item
                       </th>
                       <th className="px-6 py-3 text-gray-500 text-left">
-                        Unit Price
-                      </th>
-                      <th className="px-6 py-3 text-gray-500 text-left">
                         Creation Date
                       </th>
                     </tr>
@@ -186,13 +136,13 @@ const Select_Item = ({
                         </td>
                       </tr>
                     ) : (
-                      filtered_item.map((item) => (
+                      filtered_item.map((data) => (
                         <tr
-                          key={item.id}
+                          key={data.id}
                           className={`hover:bg-sky-50/50 cursor-pointer text-[12px] ${
-                            selected_item?.id === item.id ? "bg-sky-50" : ""
+                            selected_item?.id === data.id ? "bg-sky-50" : ""
                           }`}
-                          onClick={() => set_selected_item(item)}
+                          onClick={() => set_selected_item(data)}
                         >
                           <td className="px-5 py-4 sm:px-6 text-center">
                             <div className="flex justify-center items-center">
@@ -200,26 +150,23 @@ const Select_Item = ({
                                 name="check"
                                 box_size={18}
                                 icon_size={12}
-                                checked={selected_item?.id === item.id}
-                                on_change={() => set_selected_item(item)}
+                                checked={selected_item?.id === data.id}
+                                on_change={() => set_selected_item(data)}
                               />
                             </div>
                           </td>
                           <td className="px-5 py-4 sm:px-6">
                             <div className="block font-medium">
                               <span className="block text-gray-500 text-[10px]">
-                                {item.id}
+                                {data.item_code}
                               </span>
                               <span className="block text-gray-800 text-sm">
-                                {item.description}
+                                {data.item_desc}
                               </span>
                             </div>
                           </td>
                           <td className="px-6 py-3 text-gray-700 tracking-wide">
-                            {format_currency(item.unit_price, 2, true)}
-                          </td>
-                          <td className="px-6 py-3 text-gray-700 tracking-wide">
-                            {item.creation_date}
+                            {data.creation_date}
                           </td>
                         </tr>
                       ))

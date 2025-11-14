@@ -63,9 +63,7 @@ const GI_Items = ({ set_display_modal }) => {
                     Available Qty
                   </th>
                   <th className="px-5 py-4 font-semibold border-r">Unit</th>
-                  <th className="px-5 py-4 font-semibold border-r">
-                    Issued Qty
-                  </th>
+                  <th className="px-5 py-4 font-semibold">Issued Qty</th>
                 </tr>
               </thead>
               <tbody className="divide-y bg-white">
@@ -93,7 +91,7 @@ const GI_Items = ({ set_display_modal }) => {
                     </td>
 
                     {/* === Delivered Quantity === */}
-                    <td className="px-5 py-4 text-gray-600 border-r">
+                    <td className="px-5 py-4 text-gray-600">
                       {item.issued_quantity}
                     </td>
                   </tr>

@@ -11,51 +11,10 @@ const Select_SO_Type = ({
   width = "max-w-[700px]",
   height = "h-[500px]",
   set_page,
+  sales_org_list,
+  dist_channel_list,
+  so_type_list,
 }) => {
-  // --- Mock reference lists ---
-  const sales_org_list = [
-    {
-      id: 1,
-      sales_org_code: "SAO-0001",
-      sales_org_desc: "Sales Organization 1",
-    },
-    {
-      id: 2,
-      sales_org_code: "SAO-0002",
-      sales_org_desc: "Sales Organization 2",
-    },
-  ];
-  const dist_channel_list = [
-    {
-      id: 1,
-      dist_channel_code: "DST-0001",
-      dist_channel_desc: "Distribution Channel 1",
-    },
-    {
-      id: 2,
-      dist_channel_code: "DST-0002",
-      dist_channel_desc: "Distribution Channel 2",
-    },
-  ];
-
-  // --- Mock Data (replace later with API call if needed)
-  const [so_type_list] = useState([
-    {
-      id: 1,
-      so_type_code: "ST-0001",
-      so_type_desc: "SO Type Description 1",
-      sales_org_code: "SAO-0001",
-      dist_channel_code: "DST-0001",
-    },
-    {
-      id: 2,
-      so_type_code: "ST-0002",
-      so_type_desc: "SO Type Description 2",
-      sales_org_code: "SAO-0002",
-      dist_channel_code: "DST-0002",
-    },
-  ]);
-
   // --- States ---
   const [filtered_so_type, set_filtered_so_type] = useState([]);
   const [current_page, set_current_page] = useState(1);

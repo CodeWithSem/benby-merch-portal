@@ -5,7 +5,7 @@ import Icon_Field from "assets/elements/Icon_Field";
 import { format_currency } from "assets/scripts/format";
 import Select_Batch from "../modals/Select_Batch";
 
-const GI_Items = ({ set_display_modal }) => {
+const GI_Items = () => {
   const [selected_item_id, set_selected_item_id] = useState(null);
   const [display_item_modal, set_display_item_modal] = useState("");
   const [items, set_items] = useState([
@@ -71,9 +71,7 @@ const GI_Items = ({ set_display_modal }) => {
                     Available Qty
                   </th>
                   <th className="px-5 py-4 font-semibold border-r">Unit</th>
-                  <th className="px-5 py-4 font-semibold border-r">
-                    Issued Qty
-                  </th>
+                  <th className="px-5 py-4 font-semibold">Issued Qty</th>
                   {/* <th className="px-5 py-4 font-semibold">Batch</th> */}
                 </tr>
               </thead>
@@ -102,7 +100,7 @@ const GI_Items = ({ set_display_modal }) => {
                     </td>
 
                     {/* === Issued Quantity === */}
-                    <td className="px-5 py-4 text-gray-600 w-[160px] border-r">
+                    <td className="px-5 py-4 text-gray-600 w-[160px]">
                       <Text_Field
                         type="number"
                         value={item.issued_quantity}

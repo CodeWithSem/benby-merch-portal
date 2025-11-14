@@ -124,23 +124,23 @@ const Post_View_GI = ({
                             <Text_Field
                               label="SO Number"
                               type="text"
-                              value="SO-0000001"
+                              value="SO-XXXXXXXXX"
                               bg_color="slate-50"
                               disabled
                             />
                           </div>
                           {/* - SO Number */}
-                          {/* + GI Number */}
+                          {/* + DO Number */}
                           <div className="col-span-full">
                             <Text_Field
-                              label="GI Number"
+                              label="DO Number"
                               type="text"
-                              value="GI-0000001"
+                              value="DO-XXXXXXXXX"
                               bg_color="slate-50"
                               disabled
                             />
                           </div>
-                          {/* - GI Number */}
+                          {/* - DO Number */}
                         </div>
                       </div>
 

@@ -1,11 +1,13 @@
 // Select_SO.jsx
 
 import React, { useEffect, useState, useMemo } from "react";
-import { Search, X } from "lucide-react";
+import { Database, Search, X } from "lucide-react";
 import Icon_Field from "assets/elements/Icon_Field";
 import Checkbox_Field from "assets/elements/Checkbox_Field";
 import Button from "assets/elements/Button";
 import Pagination_Modal from "assets/elements/Pagination_Modal";
+import Date_Field from "assets/elements/Date_Field";
+import { format_date_1 } from "assets/scripts/format";
 
 const Select_SO = ({
   is_open,
@@ -25,7 +27,7 @@ const Select_SO = ({
   ];
 
   // --- Mock SO Data ---
-  const [all_so] = useState([
+  const [so_list] = useState([
     {
       id: 1,
       so_number: "SO-0000001",
@@ -41,6 +43,13 @@ const Select_SO = ({
       creation_date: "11/02/2025 09:00:00 PM",
     },
   ]);
+
+  const today = format_date_1(new Date());
+
+  const [start_date, set_start_date] = useState(today);
+  const [end_date, set_end_date] = useState(today);
+
+  const [show_load_data_button, set_show_load_data_button] = useState(false);
 
   // --- States ---
   const [filtered_so, set_filtered_so] = useState([]);
@@ -77,7 +86,7 @@ const Select_SO = ({
 
   // --- Filtering + Pagination ---
   useEffect(() => {
-    let data = [...all_so];
+    let data = [...so_list];
 
     if (debounced_query.trim() !== "") {
       const q = debounced_query.toLowerCase();
@@ -110,11 +119,11 @@ const Select_SO = ({
     const start_idx = (current_page - 1) * rows_per_page;
     const end_idx = start_idx + rows_per_page;
     set_filtered_so(data.slice(start_idx, end_idx));
-  }, [all_so, debounced_query, current_page, rows_per_page]);
+  }, [so_list, debounced_query, current_page, rows_per_page]);
 
   // --- Total Pages ---
   const total_pages = Math.ceil(
-    all_so.filter((so) => {
+    so_list.filter((so) => {
       const so_type_desc = so_type_map[so.so_type_code] || "";
       const company_desc = company_map[so.company_code] || "";
       const q = debounced_query.toLowerCase();
@@ -135,6 +144,20 @@ const Select_SO = ({
     on_close();
   };
 
+  const handle_change_start_date = (value) => {
+    set_start_date(format_date_1(value));
+    set_show_load_data_button(true);
+  };
+
+  const handle_change_end_date = (value) => {
+    set_end_date(format_date_1(value));
+    set_show_load_data_button(true);
+  };
+
+  const handle_load_data = () => {
+    set_show_load_data_button(false);
+  };
+
   if (!is_open) return null;
 
   return (
@@ -152,12 +175,38 @@ const Select_SO = ({
 
         {/* Header */}
         <div className="text-lg md:text-xl font-bold mb-5 px-7">
-          SO Selection
+          Sales Order Selection
         </div>
 
         {/* Body */}
         <div className={`w-full overflow-y-auto ${height} scrollbar-custom`}>
           <div className="overflow-hidden border border-gray-200 bg-white pt-4">
+            <div className="px-6 mb-5 grid grid-cols-1 gap-5 md:w-[800px] md:grid-cols-3">
+              <Date_Field
+                label="Start Date"
+                value={start_date}
+                on_change={(e) => handle_change_start_date(e.target.value)}
+                placeholder="Select Date"
+              />
+              <Date_Field
+                label="End Date"
+                value={end_date}
+                on_change={(e) => handle_change_end_date(e.target.value)}
+                placeholder="Select Date"
+              />
+              <div className="flex w-full items-end">
+                {show_load_data_button && (
+                  <Button
+                    variant="primary"
+                    icon={Database}
+                    icon_position="left"
+                    on_click={handle_load_data}
+                  >
+                    Load Data
+                  </Button>
+                )}
+              </div>
+            </div>
             {/* Search */}
             <div className="flex flex-col gap-5 px-6 mb-4 sm:flex-row sm:items-center sm:justify-between">
               <div className="w-full">

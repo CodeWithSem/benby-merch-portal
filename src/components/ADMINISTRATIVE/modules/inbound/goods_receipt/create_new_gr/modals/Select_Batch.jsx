@@ -7,8 +7,14 @@ import Checkbox_Field from "assets/elements/Checkbox_Field";
 import Pagination_Modal from "assets/elements/Pagination_Modal";
 
 const Select_Batch = ({ is_open, on_close, width = "max-w-[700px]" }) => {
+  //
   const [batch_list, set_batch_list] = useState([
-    { id: 1, batch_code: "00000001-B-001", batch_desc: "Batch Description 1" },
+    {
+      id: 1,
+      item_code: "ITM-000000001",
+      batch_code: "00000001-B-001",
+      batch_desc: "Batch Description 1",
+    },
     { id: 2, batch_code: "00000001-B-002", batch_desc: "Batch Description 2" },
     { id: 3, batch_code: "00000001-B-003", batch_desc: "Batch Description 3" },
     { id: 4, batch_code: "00000001-B-004", batch_desc: "Batch Description 4" },

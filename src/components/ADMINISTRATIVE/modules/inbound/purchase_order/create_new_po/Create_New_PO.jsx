@@ -10,11 +10,11 @@ import PO_Status from "./po_details/PO_Status";
 import Shipment from "./po_details/Shipment";
 import Approval from "./po_details/Approval";
 import PO_Items from "./po_items/PO_Items";
-import Select_Vendor from "../sub_modals/Select_Vendor";
-import Select_Branch from "../sub_modals/Select_Branch";
-import Select_Plant from "../sub_modals/Select_Plant";
-import Select_SLOC from "../sub_modals/Select_SLOC";
-import Select_Item from "../sub_modals/Select_Item";
+import Select_Vendor from "../modals/Select_Vendor";
+import Select_Branch from "../modals/Select_Branch";
+import Select_Plant from "../modals/Select_Plant";
+import Select_SLOC from "../modals/Select_SLOC";
+import Select_Item from "../modals/Select_Item";
 import { get_date_now, format_date_1 } from "assets/scripts/format";
 
 const Create_New_PO = ({
@@ -22,10 +22,19 @@ const Create_New_PO = ({
   vendor_list,
   branch_list,
   plant_list,
-  item_list,
+  sloc_list,
 }) => {
   const [active_tab, set_active_tab] = useState("delivery");
   const [display_modal, set_display_modal] = useState("");
+
+  const tabs = [
+    { key: "delivery", title: "Delivery" },
+    { key: "address", title: "Address" },
+    { key: "org_data", title: "Org Data" },
+    { key: "po_status", title: "PO Status" },
+    { key: "shipment", title: "Shipment" },
+    { key: "approval", title: "Approval" },
+  ];
 
   const handle_preview = () => {
     alert("Under Maintenance");
@@ -200,66 +209,19 @@ const Create_New_PO = ({
             <div className="w-full bg-white rounded-lg border">
               <div className="w-full border-b p-2">
                 <nav className="flex overflow-x-auto rounded-lg bg-gray-100 p-1 dark:bg-gray-900 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-200 dark:[&::-webkit-scrollbar-thumb]:bg-gray-600 [&::-webkit-scrollbar-track]:bg-white dark:[&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar]:h-1.5">
-                  <button
-                    onClick={() => set_active_tab("delivery")}
-                    className={`inline-flex items-center rounded-md px-5 py-2 text-sm font-medium transition-colors duration-200 ease-in-out outline-none whitespace-nowrap ${
-                      active_tab === "delivery"
-                        ? "bg-white text-gray-900 shadow-xs"
-                        : "bg-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
-                    }`}
-                  >
-                    Delivery
-                  </button>
-                  <button
-                    onClick={() => set_active_tab("address")}
-                    className={`inline-flex items-center rounded-md px-5 py-2 text-sm font-medium transition-colors duration-200 ease-in-out outline-none whitespace-nowrap ${
-                      active_tab === "address"
-                        ? "bg-white text-gray-900 shadow-xs"
-                        : "bg-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
-                    }`}
-                  >
-                    Address
-                  </button>
-                  <button
-                    onClick={() => set_active_tab("org_data")}
-                    className={`inline-flex items-center rounded-md px-5 py-2 text-sm font-medium transition-colors duration-200 ease-in-out outline-none whitespace-nowrap ${
-                      active_tab === "org_data"
-                        ? "bg-white text-gray-900 shadow-xs"
-                        : "bg-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
-                    }`}
-                  >
-                    Org Data
-                  </button>
-                  <button
-                    onClick={() => set_active_tab("po_status")}
-                    className={`inline-flex items-center rounded-md px-5 py-2 text-sm font-medium transition-colors duration-200 ease-in-out outline-none whitespace-nowrap ${
-                      active_tab === "po_status"
-                        ? "bg-white text-gray-900 shadow-xs"
-                        : "bg-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
-                    }`}
-                  >
-                    PO Status
-                  </button>
-                  <button
-                    onClick={() => set_active_tab("shipment")}
-                    className={`inline-flex items-center rounded-md px-5 py-2 text-sm font-medium transition-colors duration-200 ease-in-out outline-none whitespace-nowrap ${
-                      active_tab === "shipment"
-                        ? "bg-white text-gray-900 shadow-xs"
-                        : "bg-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
-                    }`}
-                  >
-                    Shipment
-                  </button>
-                  <button
-                    onClick={() => set_active_tab("approval")}
-                    className={`inline-flex items-center rounded-md px-5 py-2 text-sm font-medium transition-colors duration-200 ease-in-out outline-none whitespace-nowrap ${
-                      active_tab === "approval"
-                        ? "bg-white text-gray-900 shadow-xs"
-                        : "bg-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
-                    }`}
-                  >
-                    Approval
-                  </button>
+                  {tabs.map((tab) => (
+                    <button
+                      key={tab.key}
+                      onClick={() => set_active_tab(tab.key)}
+                      className={`inline-flex items-center rounded-md px-5 py-2 text-sm font-medium transition-colors duration-200 ease-in-out outline-none whitespace-nowrap ${
+                        active_tab === tab.key
+                          ? "bg-white text-gray-900 shadow-xs"
+                          : "bg-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                      }`}
+                    >
+                      {tab.title}
+                    </button>
+                  ))}
                 </nav>
               </div>
 
@@ -338,13 +300,13 @@ const Create_New_PO = ({
         on_close={() => set_display_modal("")}
         width="max-w-[1000px]"
         height="max-h-[700px]"
+        sloc_list={sloc_list}
       />
       <Select_Item
         is_open={display_modal === "select_item"}
         on_close={() => set_display_modal("")}
         width="max-w-[1000px]"
         height="max-h-[700px]"
-        item_list={item_list}
       />
     </React.Fragment>
   );

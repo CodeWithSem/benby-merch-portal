@@ -2,7 +2,7 @@ import Find_Field from "assets/elements/Find_Field";
 import Text_Field from "assets/elements/Text_Field";
 import React from "react";
 
-const Address = () => {
+const Address = ({ set_display_modal }) => {
   return (
     <React.Fragment>
       <div className="rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6 dark:border-gray-800 dark:bg-gray-900">
@@ -23,7 +23,7 @@ const Address = () => {
               label="City"
               // value={data}
               // on_change={(e) => handle_data_change(e.target.value)}
-              // on_click={handle_find_click}
+              on_click={() => set_display_modal("select_city")}
               disabled
             />
           </div>
@@ -72,7 +72,7 @@ const Address = () => {
               label="Transportation Zone"
               //  value={data}
               //  on_change={(e) => handle_data_change(e.target.value)}
-              //  on_click={handle_find_click}
+              on_click={() => set_display_modal("select_trans_zone")}
               disabled
             />
           </div>

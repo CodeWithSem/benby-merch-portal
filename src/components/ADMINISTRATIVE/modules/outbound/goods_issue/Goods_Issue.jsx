@@ -11,6 +11,7 @@ import {
   SlidersHorizontal,
   FileUp,
   FileInput,
+  Database,
 } from "lucide-react";
 import Icon_Field from "assets/elements/Icon_Field";
 import Select_Field from "assets/elements/Select_Field";
@@ -18,11 +19,13 @@ import Pagination from "assets/elements/Pagination";
 import Button from "assets/elements/Button";
 import { useToast } from "../../../layout/Toast_Provider";
 import Date_Range_Field from "assets/elements/Date_Range_Field";
-import Checkbox_Field from "assets/elements/Checkbox_Field";
 import Select_SO from "./modals/select_so/Select_SO";
 import Create_New_GI from "./create_new_gi/Create_New_GI";
 import Edit_GI from "./edit_gi/Edit_GI";
 import Post_View_GI from "./modals/post_view_gi/Post_View_GI";
+import Delete_GI from "./modals/delete_gi/Delete_GI";
+import { format_date_1 } from "assets/scripts/format";
+import Date_Field from "assets/elements/Date_Field";
 
 const Goods_Issue = () => {
   const filter_ref = useRef(null);
@@ -30,6 +33,13 @@ const Goods_Issue = () => {
   const [page, set_page] = useState("main");
   const [display_modal, set_display_modal] = useState("");
   const [for_posting, set_for_posting] = useState(false);
+
+  const today = format_date_1(new Date());
+
+  const [start_date, set_start_date] = useState(today);
+  const [end_date, set_end_date] = useState(today);
+
+  const [show_load_data_button, set_show_load_data_button] = useState(false);
 
   const { show_toast } = useToast();
 
@@ -178,10 +188,25 @@ const Goods_Issue = () => {
     set_page("edit_gi");
   };
 
-  const handle_delete_so = () => {
-    set_display_modal("delete_so");
+  const handle_delete_gi = () => {
+    set_display_modal("delete_gi");
   };
 
+  const handle_change_start_date = (value) => {
+    set_start_date(format_date_1(value));
+    set_show_load_data_button(true);
+  };
+
+  const handle_change_end_date = (value) => {
+    set_end_date(format_date_1(value));
+    set_show_load_data_button(true);
+  };
+
+  const handle_load_data = () => {
+    set_show_load_data_button(false);
+  };
+
+  // RETURN ORIGIN
   return (
     <React.Fragment>
       {page === "main" && (
@@ -232,7 +257,32 @@ const Goods_Issue = () => {
                   </Button>
                 </div>
               </div>
-
+              <div className="p-5 sm:p-6 border-t">
+                <div className="grid grid-cols-1 gap-5 md:w-[250px]">
+                  <Date_Field
+                    label="Start Date"
+                    value={start_date}
+                    on_change={(e) => handle_change_start_date(e.target.value)}
+                    placeholder="Select Date"
+                  />
+                  <Date_Field
+                    label="End Date"
+                    value={end_date}
+                    on_change={(e) => handle_change_end_date(e.target.value)}
+                    placeholder="Select Date"
+                  />
+                  {show_load_data_button && (
+                    <Button
+                      variant="primary"
+                      icon={Database}
+                      icon_position="left"
+                      on_click={handle_load_data}
+                    >
+                      Load Data
+                    </Button>
+                  )}
+                </div>
+              </div>
               <div className="p-5 sm:p-6 border-t">
                 <div className="w-full border rounded-lg">
                   <div className="w-full md:flex md:justify-between p-4 gap-4">
@@ -432,7 +482,7 @@ const Goods_Issue = () => {
                                     <div className="relative group flex jusity-center items-center">
                                       <button
                                         className="text-gray-500 hover:text-red-600 text-[12px] mb-[1px] outline-none"
-                                        onClick={() => handle_delete_so(row.id)}
+                                        onClick={() => handle_delete_gi(row.id)}
                                       >
                                         <Trash size={19} />
                                       </button>
@@ -498,6 +548,11 @@ const Goods_Issue = () => {
       <Post_View_GI
         is_open={display_modal === "view_gi" || display_modal === "post_gi"}
         for_posting={for_posting}
+        on_close={() => set_display_modal("")}
+        width="max-w-[1280px]"
+      />
+      <Delete_GI
+        is_open={display_modal === "delete_gi"}
         on_close={() => set_display_modal("")}
         width="max-w-[1280px]"
       />

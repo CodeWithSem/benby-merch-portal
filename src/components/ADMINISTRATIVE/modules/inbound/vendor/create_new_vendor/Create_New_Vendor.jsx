@@ -6,8 +6,19 @@ import React, { useState } from "react";
 import Account from "./vendor_details/Account";
 import Address from "./vendor_details/Address";
 import Accounting_Info from "./vendor_details/Accounting_Info";
+import Select_City from "../modals/Select_City";
+import Select_Trans_Zone from "../modals/Select_Trans_Zone";
+import Select_Company from "../modals/Select_Company";
 
-const Create_New_Vendor = ({ set_page }) => {
+const Create_New_Vendor = ({
+  set_page,
+  city_list,
+  company_list,
+  da_com_porg_pgroup_list,
+  purc_group_list,
+  purc_org_list,
+  trans_zone_list,
+}) => {
   const [active_tab, set_active_tab] = useState("address");
   const [display_modal, set_display_modal] = useState("");
 
@@ -117,9 +128,13 @@ const Create_New_Vendor = ({ set_page }) => {
               </div>
               {/* + Tab Content */}
               <div className="p-6">
-                {active_tab === "address" && <Address />}
+                {active_tab === "address" && (
+                  <Address set_display_modal={set_display_modal} />
+                )}
                 {active_tab === "account" && <Account />}
-                {active_tab === "accounting_info" && <Accounting_Info />}
+                {active_tab === "accounting_info" && (
+                  <Accounting_Info set_display_modal={set_display_modal} />
+                )}
               </div>
               {/* - Tab Content */}
             </div>
@@ -140,6 +155,30 @@ const Create_New_Vendor = ({ set_page }) => {
           </div>
         </div>
       </div>
+      <Select_City
+        is_open={display_modal === "select_city"}
+        on_close={() => set_display_modal("")}
+        width="max-w-[1000px]"
+        height="max-h-[700px]"
+        city_list={city_list}
+      />
+      <Select_Trans_Zone
+        is_open={display_modal === "select_trans_zone"}
+        on_close={() => set_display_modal("")}
+        width="max-w-[1000px]"
+        height="max-h-[700px]"
+        trans_zone_list={trans_zone_list}
+      />
+      <Select_Company
+        is_open={display_modal === "select_company"}
+        on_close={() => set_display_modal("")}
+        width="max-w-[1280px]"
+        height="max-h-[700px]"
+        company_list={company_list}
+        purc_org_list={purc_org_list}
+        purc_group_list={purc_group_list}
+        da_com_porg_pgroup_list={da_com_porg_pgroup_list}
+      />
     </React.Fragment>
   );
 };

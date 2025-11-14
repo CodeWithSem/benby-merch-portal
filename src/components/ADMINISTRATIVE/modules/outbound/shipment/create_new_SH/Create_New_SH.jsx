@@ -15,7 +15,13 @@ import Select_Trans_Plan from "./modals/Select_Trans_Plan";
 import Select_Forward_Agent from "./modals/Select_Forward_Agent";
 import SH_Delivery_Order from "./SH_delivery_order/SH_Delivery_Order";
 
-const Create_New_SH = ({ set_page }) => {
+const Create_New_SH = ({
+  set_page,
+  sh_type_list,
+  plate_no_list,
+  trans_plan_list,
+  forward_agent_list,
+}) => {
   const [active_tab, set_active_tab] = useState("truck");
   const [display_modal, set_display_modal] = useState("");
 
@@ -132,7 +138,7 @@ const Create_New_SH = ({ set_page }) => {
                 </div>
                 <div className="w-full">
                   <Date_Field
-                    label="Date Field"
+                    label="Shipment Date"
                     //  value={selected_data}
                     on_change={(e) => alert(e.target.value)}
                     placeholder="MM-DD-YYYY"
@@ -225,24 +231,28 @@ const Create_New_SH = ({ set_page }) => {
         on_close={() => set_display_modal("")}
         width="max-w-[1000px]"
         height="max-h-[700px]"
+        sh_type_list={sh_type_list}
       />
       <Select_Plate_No
         is_open={display_modal === "select_plate_no"}
         on_close={() => set_display_modal("")}
         width="max-w-[1000px]"
         height="max-h-[700px]"
+        plate_no_list={plate_no_list}
       />
       <Select_Trans_Plan
         is_open={display_modal === "select_trans_plan"}
         on_close={() => set_display_modal("")}
         width="max-w-[1000px]"
         height="max-h-[700px]"
+        trans_plan_list={trans_plan_list}
       />
       <Select_Forward_Agent
         is_open={display_modal === "select_forward_agent"}
         on_close={() => set_display_modal("")}
         width="max-w-[1000px]"
         height="max-h-[700px]"
+        forward_agent_list={forward_agent_list}
       />
     </React.Fragment>
   );

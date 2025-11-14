@@ -5,76 +5,55 @@ import Checkbox_Field from "assets/elements/Checkbox_Field";
 import Button from "assets/elements/Button";
 import Pagination_Modal from "assets/elements/Pagination_Modal";
 
-const Select_Sold_To = ({
+const Select_City = ({
   is_open,
   on_close,
   width = "max-w-[700px]",
   height = "h-[500px]",
+  city_list,
 }) => {
-  // --- Mock Data (replace later with API call if needed)
-  const [customer_list, set_customer_list] = useState([
-    {
-      id: 1,
-      customer_code: "CS-0001",
-      customer_desc: "Customer Description 1",
-      creation_date: "10-08-2025",
-    },
-    {
-      id: 2,
-      customer_code: "CS-0002",
-      customer_desc: "Customer Description 2",
-      creation_date: "10-08-2025",
-    },
-    {
-      id: 3,
-      customer_code: "CS-0003",
-      customer_desc: "Customer Description 3",
-      creation_date: "10-08-2025",
-    },
-  ]);
-
   // --- States ---
-  const [filtered_customer_list, set_filtered_customer_list] = useState([]);
+  const [filtered_cities, set_filtered_cities] = useState([]);
   const [current_page, set_current_page] = useState(1);
   const [rows_per_page, set_rows_per_page] = useState(5);
   const [search_query, set_search_query] = useState("");
-  const [selected_customer, set_selected_customer] = useState(null);
+  const [selected_branch, set_selected_branch] = useState(null);
 
   // --- Pagination + Filtering Logic ---
   useEffect(() => {
-    let data = [...customer_list];
+    let data = [...city_list];
 
     if (search_query.trim() !== "") {
       const q = search_query.toLowerCase();
       data = data.filter(
-        (customer) =>
-          customer.customer_code.toLowerCase().includes(q) ||
-          customer.customer_desc.toLowerCase().includes(q)
+        (data) =>
+          data.city_code.toLowerCase().includes(q) ||
+          data.city_desc.toLowerCase().includes(q)
       );
     }
 
     const start_idx = (current_page - 1) * rows_per_page;
     const end_idx = start_idx + rows_per_page;
-    set_filtered_customer_list(data.slice(start_idx, end_idx));
-  }, [customer_list, search_query, current_page, rows_per_page]);
+    set_filtered_cities(data.slice(start_idx, end_idx));
+  }, [city_list, search_query, current_page, rows_per_page]);
 
   const total_pages = Math.ceil(
-    customer_list.filter(
+    city_list.filter(
       (data) =>
-        data.customer_code.toLowerCase().includes(search_query.toLowerCase()) ||
-        data.customer_desc.toLowerCase().includes(search_query.toLowerCase())
+        data.city_code.toLowerCase().includes(search_query.toLowerCase()) ||
+        data.city_desc.toLowerCase().includes(search_query.toLowerCase())
     ).length / rows_per_page
   );
 
   // --- Handlers ---
   const handle_page_change = (page) => set_current_page(page);
 
-  const handle_select_sold_to = () => {
-    if (!selected_customer) {
+  const handle_select_branch = () => {
+    if (!selected_branch) {
       alert("Please select a branch before proceeding.");
       return;
     }
-    alert(`Selected: ${selected_customer.customer_desc}`);
+    alert(`Selected: ${selected_branch.description}`);
   };
 
   return is_open ? (
@@ -97,7 +76,7 @@ const Select_Sold_To = ({
 
           {/* + Modal Label */}
           <div className="text-lg md:text-xl font-bold mb-5 px-7">
-            Customer Selection
+            City Selection
           </div>
           {/* - Modal Label */}
 
@@ -127,7 +106,7 @@ const Select_Sold_To = ({
                     <tr className="font-semibold text-xs">
                       <th className="px-6 py-3 w-[80px]"></th>
                       <th className="px-6 py-3 text-gray-500 text-left">
-                        Customer
+                        City
                       </th>
                       <th className="px-6 py-3 text-gray-500 text-left">
                         Creation Date
@@ -136,7 +115,7 @@ const Select_Sold_To = ({
                   </thead>
 
                   <tbody className="divide-y divide-gray-100">
-                    {filtered_customer_list.length === 0 ? (
+                    {filtered_cities.length === 0 ? (
                       <tr>
                         <td
                           colSpan={3}
@@ -146,13 +125,13 @@ const Select_Sold_To = ({
                         </td>
                       </tr>
                     ) : (
-                      filtered_customer_list.map((data) => (
+                      filtered_cities.map((data) => (
                         <tr
                           key={data.id}
                           className={`hover:bg-sky-50/50 cursor-pointer text-[12px] ${
-                            selected_customer?.id === data.id ? "bg-sky-50" : ""
+                            selected_branch?.id === data.id ? "bg-sky-50" : ""
                           }`}
-                          onClick={() => set_selected_customer(data)}
+                          onClick={() => set_selected_branch(data)}
                         >
                           <td className="px-5 py-4 sm:px-6 text-center">
                             <div className="flex justify-center items-center">
@@ -160,18 +139,18 @@ const Select_Sold_To = ({
                                 name="check"
                                 box_size={18}
                                 icon_size={12}
-                                checked={selected_customer?.id === data.id}
-                                on_change={() => set_selected_customer(data)}
+                                checked={selected_branch?.id === data.id}
+                                on_change={() => set_selected_branch(data)}
                               />
                             </div>
                           </td>
                           <td className="px-5 py-4 sm:px-6">
                             <div className="block font-medium text-gray-800">
                               <span className="block text-gray-500 text-[12px]">
-                                {data.customer_code}
+                                {data.city_code}
                               </span>
                               <span className="block text-gray-800 text-sm">
-                                {data.customer_desc}
+                                {data.city_desc}
                               </span>
                             </div>
                           </td>
@@ -205,9 +184,9 @@ const Select_Sold_To = ({
             <div className="flex justify-center sm:justify-end gap-2 w-full">
               <Button
                 variant="primary"
-                on_click={handle_select_sold_to}
+                on_click={handle_select_branch}
                 class_name="w-full md:w-[100px]"
-                disabled={!selected_customer}
+                disabled={!selected_branch}
               >
                 Proceed
               </Button>
@@ -227,4 +206,4 @@ const Select_Sold_To = ({
   ) : null;
 };
 
-export default Select_Sold_To;
+export default Select_City;

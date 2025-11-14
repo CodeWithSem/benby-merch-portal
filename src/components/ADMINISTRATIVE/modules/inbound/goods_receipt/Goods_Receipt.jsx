@@ -11,6 +11,7 @@ import {
   SlidersHorizontal,
   FileUp,
   FileInput,
+  Database,
 } from "lucide-react";
 import Icon_Field from "assets/elements/Icon_Field";
 import Select_Field from "assets/elements/Select_Field";
@@ -21,8 +22,11 @@ import Date_Range_Field from "assets/elements/Date_Range_Field";
 import Select_PO from "./modals/select_po/Select_PO";
 import Create_New_GR from "./create_new_gr/Create_New_GR";
 import Edit_GR from "./edit_gr/Edit_GR";
-import Post_View_GR from "./modals/post_view_gr/Post_View_GR";
+import { format_date_1 } from "assets/scripts/format";
 import { company_list, po_type_list } from "./GR_DATA_MAP";
+import Date_Field from "assets/elements/Date_Field";
+import Delete_GR from "./modals/delete_gr/Delete_GR";
+import Post_View_GR from "./post_view_gr/Post_View_GR";
 
 const Goods_Receipt = () => {
   const filter_ref = useRef(null);
@@ -30,6 +34,13 @@ const Goods_Receipt = () => {
   const [page, set_page] = useState("main");
   const [display_modal, set_display_modal] = useState("");
   const [for_posting, set_for_posting] = useState(false);
+
+  const today = format_date_1(new Date());
+
+  const [start_date, set_start_date] = useState(today);
+  const [end_date, set_end_date] = useState(today);
+
+  const [show_load_data_button, set_show_load_data_button] = useState(false);
 
   // Close dropdown on outside click
   const { show_toast } = useToast();
@@ -188,12 +199,12 @@ const Goods_Receipt = () => {
 
   const handle_view_gr = () => {
     set_for_posting(false);
-    set_display_modal("view_gr");
+    set_page("post_view_gr");
   };
 
   const handle_post_gr = () => {
     set_for_posting(true);
-    set_display_modal("post_gr");
+    set_page("post_view_gr");
   };
 
   const handle_edit_gr = (id) => {
@@ -201,8 +212,22 @@ const Goods_Receipt = () => {
     set_page("edit_gr");
   };
 
-  const handle_delete_po = () => {
-    set_display_modal("delete_po");
+  const handle_delete_gr = () => {
+    set_display_modal("delete_gr");
+  };
+
+  const handle_change_start_date = (value) => {
+    set_start_date(format_date_1(value));
+    set_show_load_data_button(true);
+  };
+
+  const handle_change_end_date = (value) => {
+    set_end_date(format_date_1(value));
+    set_show_load_data_button(true);
+  };
+
+  const handle_load_data = () => {
+    set_show_load_data_button(false);
   };
 
   // RETURN ORIGIN
@@ -257,6 +282,32 @@ const Goods_Receipt = () => {
                 </div>
               </div>
 
+              <div className="p-5 sm:p-6 border-t">
+                <div className="grid grid-cols-1 gap-5 md:w-[250px]">
+                  <Date_Field
+                    label="Start Date"
+                    value={start_date}
+                    on_change={(e) => handle_change_start_date(e.target.value)}
+                    placeholder="Select Date"
+                  />
+                  <Date_Field
+                    label="End Date"
+                    value={end_date}
+                    on_change={(e) => handle_change_end_date(e.target.value)}
+                    placeholder="Select Date"
+                  />
+                  {show_load_data_button && (
+                    <Button
+                      variant="primary"
+                      icon={Database}
+                      icon_position="left"
+                      on_click={handle_load_data}
+                    >
+                      Load Data
+                    </Button>
+                  )}
+                </div>
+              </div>
               <div className="p-5 sm:p-6 border-t">
                 <div className="w-full border rounded-lg">
                   <div className="w-full md:flex md:justify-between p-4 gap-4">
@@ -470,7 +521,7 @@ const Goods_Receipt = () => {
                                     <div className="relative group flex jusity-center items-center">
                                       <button
                                         className="text-gray-500 hover:text-red-600 text-[12px] mb-[1px] outline-none"
-                                        onClick={() => handle_delete_po(row.id)}
+                                        onClick={() => handle_delete_gr(row.id)}
                                       >
                                         <Trash size={19} />
                                       </button>
@@ -528,6 +579,9 @@ const Goods_Receipt = () => {
       )}
       {page === "gr_creation" && <Create_New_GR set_page={set_page} />}
       {page === "edit_gr" && <Edit_GR set_page={set_page} />}
+      {page === "post_view_gr" && (
+        <Post_View_GR set_page={set_page} for_posting={for_posting} />
+      )}
       <Select_PO
         is_open={display_modal === "select_po"}
         on_close={() => set_display_modal("")}
@@ -537,9 +591,14 @@ const Goods_Receipt = () => {
         company_list={company_list}
         po_type_list={po_type_list}
       />
-      <Post_View_GR
+      {/* <Post_View_GR
         is_open={display_modal === "view_gr" || display_modal === "post_gr"}
         for_posting={for_posting}
+        on_close={() => set_display_modal("")}
+        width="max-w-[1280px]"
+      /> */}
+      <Delete_GR
+        is_open={display_modal === "delete_gr"}
         on_close={() => set_display_modal("")}
         width="max-w-[1280px]"
       />

@@ -11,8 +11,16 @@ const Select_Item = ({
   on_close,
   width = "max-w-[700px]",
   height = "h-[500px]",
-  item_list,
 }) => {
+  const item_list = [
+    {
+      id: 1,
+      item_code: "ITM-00000001",
+      item_desc: "Item Description",
+      unit_price: 0,
+      creation_date: "06-05-2025",
+    },
+  ];
   // --- States ---
   const [filtered_item, set_filtered_item] = useState([]);
   const [current_page, set_current_page] = useState(1);

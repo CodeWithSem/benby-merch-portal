@@ -10,17 +10,8 @@ const Select_Trans_Plan = ({
   on_close,
   width = "max-w-[700px]",
   height = "h-[500px]",
+  trans_plan_list,
 }) => {
-  // --- Mock Data (replace later with API call if needed)
-  const [trans_plan_list, set_trans_plan_list] = useState([
-    {
-      id: 1,
-      trans_plan_code: "TP-001",
-      trans_plan_desc: "Transport Plan Description 1",
-      creation_date: "MM-DD-YYYY",
-    },
-  ]);
-
   // --- States ---
   const [filtered_trans_plan_list, set_filtered_trans_plan_list] = useState([]);
   const [current_page, set_current_page] = useState(1);

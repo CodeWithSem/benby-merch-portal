@@ -4,19 +4,6 @@ import Text_Field from "assets/elements/Text_Field";
 import Select_Field from "assets/elements/Select_Field";
 
 const Approval = () => {
-  // + For Select Incoterms
-  const [selected_app_matrix, set_selected_app_matrix] = useState("");
-  const handle_select_app_matrix = (e) => {
-    const selected = e.target.value;
-    set_selected_app_matrix(selected);
-  };
-
-  const app_matrix_option = [
-    { label: "Approval Matrix A", value: "A" },
-    { label: "Approval Matrix B", value: "B" },
-    { label: "Approval Matrix C", value: "C" },
-  ];
-  // - For Select Incoterms
   return (
     <React.Fragment>
       <div className="rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6 dark:border-gray-800 dark:bg-gray-900">
@@ -24,11 +11,10 @@ const Approval = () => {
           <div>
             <Select_Field
               label="Approval Matrix"
-              name="approval_matrix"
-              value={selected_app_matrix}
-              on_change={handle_select_app_matrix}
-              options={app_matrix_option}
-              placeholder="Select Payment Terms"
+              // value={selected_data}
+              // on_change={(e) => handle_data_change(e.target.value)}
+              // options={options}
+              placeholder="Select Option"
             />
           </div>
           <div>

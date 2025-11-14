@@ -106,26 +106,20 @@ const Edit_Batch = ({ set_page }) => {
                 show_search_button={false}
                 disabled
               />
-              <div className="grid grid-cols-1 gap-5 lg:grid-cols-4">
-                <div className="w-full">
-                  <Text_Field
-                    label="Batch Code"
-                    type={"text"}
-                    // on_change={handle_text_change}
-                    pattern="[A-Za-z]{1,}"
-                    disabled
-                  />
-                </div>
-                <div className="w-full lg:col-span-3">
-                  <Text_Field
-                    label="Batch Description"
-                    type={"text"}
-                    placeholder={"Enter batch description"}
-                    // on_change={handle_text_change}
-                    pattern="[A-Za-z]{1,}"
-                  />
-                </div>
-              </div>
+              <Text_Field
+                label="Batch Code"
+                type={"text"}
+                // on_change={handle_text_change}
+                pattern="[A-Za-z]{1,}"
+                disabled
+              />
+              <Text_Field
+                label="Batch Description"
+                type={"text"}
+                placeholder={"Enter batch description"}
+                // on_change={handle_text_change}
+                pattern="[A-Za-z]{1,}"
+              />
             </div>
           </div>
           <div className="p-5 sm:p-6 border-t">

@@ -11,6 +11,7 @@ import {
   SlidersHorizontal,
   FileUp,
   FileInput,
+  Database,
 } from "lucide-react";
 import Icon_Field from "assets/elements/Icon_Field";
 import Select_Field from "assets/elements/Select_Field";
@@ -21,6 +22,20 @@ import Date_Range_Field from "assets/elements/Date_Range_Field";
 import Checkbox_Field from "assets/elements/Checkbox_Field";
 import Select_SO_Type from "./modals/select_so_type/Select_SO_Type";
 import Create_New_SO from "./create_new_so/Create_New_SO";
+import { format_date_1 } from "assets/scripts/format";
+import Date_Field from "assets/elements/Date_Field";
+import {
+  customer_list,
+  customer_sh_list,
+  dist_channel_list,
+  plant_list,
+  sales_org_list,
+  sloc_list,
+  so_type_list,
+} from "./SO_DATA_MAP";
+import Edit_SO from "./edit_so/Edit_SO";
+import Post_View_SO from "./modals/post_view_so/Post_View_SO";
+import Delete_SO from "./modals/delete_so/Delete_SO";
 
 const Sales_Order = () => {
   const filter_ref = useRef(null);
@@ -28,6 +43,11 @@ const Sales_Order = () => {
   const [page, set_page] = useState("main");
   const [display_modal, set_display_modal] = useState("");
   const [for_posting, set_for_posting] = useState(false);
+
+  const today = format_date_1(new Date());
+  const [start_date, set_start_date] = useState(today);
+  const [end_date, set_end_date] = useState(today);
+  const [show_load_data_button, set_show_load_data_button] = useState(false);
 
   // Close dropdown on outside click
   const { show_toast } = useToast();
@@ -177,26 +197,40 @@ const Sales_Order = () => {
     set_display_modal("select_so_type");
   };
 
-  const handle_upload_po = () => {
+  const handle_upload_so = () => {
     alert("Under Maintenance");
   };
 
-  const handle_view_po = () => {
+  const handle_view_so = () => {
     set_for_posting(false);
-    set_display_modal("view_po");
+    set_display_modal("view_so");
   };
 
-  const handle_post_po = () => {
+  const handle_post_so = () => {
     set_for_posting(true);
-    set_display_modal("post_po");
+    set_display_modal("post_so");
   };
 
-  const handle_edit_po = () => {
-    set_page("edit_po");
+  const handle_edit_so = () => {
+    set_page("edit_so");
   };
 
-  const handle_delete_po = () => {
-    set_display_modal("delete_po");
+  const handle_delete_so = () => {
+    set_display_modal("delete_so");
+  };
+
+  const handle_change_start_date = (value) => {
+    set_start_date(format_date_1(value));
+    set_show_load_data_button(true);
+  };
+
+  const handle_change_end_date = (value) => {
+    set_end_date(format_date_1(value));
+    set_show_load_data_button(true);
+  };
+
+  const handle_load_data = () => {
+    set_show_load_data_button(false);
   };
 
   // RETURN ORIGIN
@@ -244,13 +278,38 @@ const Sales_Order = () => {
                     variant="primary"
                     icon={FileUp}
                     icon_position="left"
-                    on_click={handle_upload_po}
+                    on_click={handle_upload_so}
                   >
                     Upload
                   </Button>
                 </div>
               </div>
-
+              <div className="p-5 sm:p-6 border-t">
+                <div className="grid grid-cols-1 gap-5 md:w-[250px]">
+                  <Date_Field
+                    label="Start Date"
+                    value={start_date}
+                    on_change={(e) => handle_change_start_date(e.target.value)}
+                    placeholder="Select Date"
+                  />
+                  <Date_Field
+                    label="End Date"
+                    value={end_date}
+                    on_change={(e) => handle_change_end_date(e.target.value)}
+                    placeholder="Select Date"
+                  />
+                  {show_load_data_button && (
+                    <Button
+                      variant="primary"
+                      icon={Database}
+                      icon_position="left"
+                      on_click={handle_load_data}
+                    >
+                      Load Data
+                    </Button>
+                  )}
+                </div>
+              </div>
               <div className="p-5 sm:p-6 border-t">
                 <div className="w-full border rounded-lg">
                   <div className="w-full md:flex md:justify-between p-4 gap-4">
@@ -435,7 +494,7 @@ const Sales_Order = () => {
                                     <div className="relative group flex jusity-center items-center">
                                       <button
                                         className="text-gray-500 hover:text-sky-600 text-[12px] outline-none"
-                                        onClick={() => handle_view_po(row.id)}
+                                        onClick={() => handle_view_so(row.id)}
                                       >
                                         <View size={19} />
                                       </button>
@@ -446,7 +505,7 @@ const Sales_Order = () => {
                                     <div className="relative group flex jusity-center items-center">
                                       <button
                                         className="text-gray-500 hover:text-sky-600 text-[12px] outline-none"
-                                        onClick={() => handle_post_po(row.id)}
+                                        onClick={() => handle_post_so(row.id)}
                                       >
                                         <FileInput size={19} />
                                       </button>
@@ -457,7 +516,7 @@ const Sales_Order = () => {
                                     <div className="relative group flex jusity-center items-center">
                                       <button
                                         className="text-gray-500 hover:text-sky-600 text-[12px] outline-none"
-                                        onClick={() => handle_edit_po(row.id)}
+                                        onClick={() => handle_edit_so(row.id)}
                                       >
                                         <Edit size={19} />
                                       </button>
@@ -468,7 +527,7 @@ const Sales_Order = () => {
                                     <div className="relative group flex jusity-center items-center">
                                       <button
                                         className="text-gray-500 hover:text-red-600 text-[12px] mb-[1px] outline-none"
-                                        onClick={() => handle_delete_po(row.id)}
+                                        onClick={() => handle_delete_so(row.id)}
                                       >
                                         <Trash size={19} />
                                       </button>
@@ -525,7 +584,24 @@ const Sales_Order = () => {
           </div>
         </React.Fragment>
       )}
-      {page === "so_creation" && <Create_New_SO set_page={set_page} />}
+      {page === "so_creation" && (
+        <Create_New_SO
+          set_page={set_page}
+          customer_list={customer_list}
+          customer_sh_list={customer_sh_list}
+          plant_list={plant_list}
+          sloc_list={sloc_list}
+        />
+      )}
+      {page === "edit_so" && (
+        <Edit_SO
+          set_page={set_page}
+          customer_list={customer_list}
+          customer_sh_list={customer_sh_list}
+          plant_list={plant_list}
+          sloc_list={sloc_list}
+        />
+      )}
 
       <Select_SO_Type
         is_open={display_modal === "select_so_type"}
@@ -533,26 +609,23 @@ const Sales_Order = () => {
         width="max-w-[1280px]"
         height="max-h-[700px]"
         set_page={set_page}
+        sales_org_list={sales_org_list}
+        dist_channel_list={dist_channel_list}
+        so_type_list={so_type_list}
       />
 
-      {/* <Select_PO_Type
-        is_open={display_modal === "select_so_type"}
-        on_close={() => set_display_modal("")}
-        width="max-w-[1280px]"
-        height="max-h-[700px]"
-        set_page={set_page}
-      />
-      <Post_View_PO
-        is_open={display_modal === "view_po" || display_modal === "post_po"}
+      <Post_View_SO
+        is_open={display_modal === "view_so" || display_modal === "post_so"}
         for_posting={for_posting}
         on_close={() => set_display_modal("")}
         width="max-w-[1280px]"
       />
-      <Delete_PO
-        is_open={display_modal === "delete_po"}
+
+      <Delete_SO
+        is_open={display_modal === "delete_so"}
         on_close={() => set_display_modal("")}
         width="max-w-[1280px]"
-      /> */}
+      />
     </React.Fragment>
   );
 };

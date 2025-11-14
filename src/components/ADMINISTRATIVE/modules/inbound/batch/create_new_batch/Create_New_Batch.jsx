@@ -107,33 +107,27 @@ const Create_New_Batch = ({ set_page }) => {
                 show_search_button={false}
                 disabled
               />
-              <div className="grid grid-cols-1 gap-5 lg:grid-cols-4">
-                <div className="w-full">
-                  <Verify_Field
-                    label="Batch Code"
-                    name="verify_code"
-                    placeholder="Enter batch code"
-                    // value={text_verify}
-                    // on_change={(e) => {
-                    //   set_text_verify(e.target.value);
-                    //   setVerifyStatus("");
-                    // }}
-                    // on_find={handleFind}
-                    // on_verify={handleVerify}
-                    // verify_status={verifyStatus}
-                    show_find_button={false}
-                  />
-                </div>
-                <div className="w-full lg:col-span-3">
-                  <Text_Field
-                    label="Batch Description"
-                    type={"text"}
-                    placeholder={"Enter batch description"}
-                    // on_change={handle_text_change}
-                    pattern="[A-Za-z]{1,}"
-                  />
-                </div>
-              </div>
+              <Verify_Field
+                label="Batch Code"
+                name="verify_code"
+                placeholder="Enter batch code"
+                // value={text_verify}
+                // on_change={(e) => {
+                //   set_text_verify(e.target.value);
+                //   setVerifyStatus("");
+                // }}
+                // on_find={handleFind}
+                // on_verify={handleVerify}
+                // verify_status={verifyStatus}
+                show_find_button={false}
+              />
+              <Text_Field
+                label="Batch Description"
+                type={"text"}
+                placeholder={"Enter batch description"}
+                // on_change={handle_text_change}
+                pattern="[A-Za-z]{1,}"
+              />
             </div>
           </div>
           <div className="p-5 sm:p-6 border-t">

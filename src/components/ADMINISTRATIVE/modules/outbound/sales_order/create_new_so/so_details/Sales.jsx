@@ -11,8 +11,7 @@ const Sales = () => {
         <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
           <div>
             <Date_Field
-              label="Date Field"
-              name="date_field"
+              label="Required Delivery Date"
               // value={selected_data}
               on_change={(e) => alert(e.target.value)}
               placeholder="Select Date"
@@ -22,7 +21,6 @@ const Sales = () => {
             <div>
               <Checkbox_Field
                 label="Blocked for Delivery"
-                name="checkbox_field"
                 box_size={24}
                 icon_size={14}
                 //   checked={check}

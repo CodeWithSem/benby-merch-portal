@@ -10,41 +10,8 @@ const Select_Plant = ({
   on_close,
   width = "max-w-[700px]",
   height = "h-[500px]",
+  plant_list,
 }) => {
-  // --- Mock Data (replace later with API call if needed)
-  const [all_plant_dc, set_all_plant_dc] = useState([
-    {
-      id: "PL-0001",
-      description: "Plant/DC Description 1",
-      creation_date: "10/08/2025 12:00:00",
-    },
-    {
-      id: "PL-0002",
-      description: "Plant/DC Description 2",
-      creation_date: "10/08/2025 12:00:00",
-    },
-    {
-      id: "PL-0003",
-      description: "Plant/DC Description 3",
-      creation_date: "10/09/2025 12:00:00",
-    },
-    {
-      id: "PL-0004",
-      description: "Plant/DC Description 4",
-      creation_date: "10/09/2025 12:00:00",
-    },
-    {
-      id: "PL-0005",
-      description: "Plant/DC Description 5",
-      creation_date: "10/10/2025 12:00:00",
-    },
-    {
-      id: "PL-0006",
-      description: "Plant/DC Description 6",
-      creation_date: "10/11/2025 12:00:00",
-    },
-  ]);
-
   // --- States ---
   const [filtered_plant_dc, set_filtered_plant_dc] = useState([]);
   const [current_page, set_current_page] = useState(1);
@@ -54,27 +21,27 @@ const Select_Plant = ({
 
   // --- Pagination + Filtering Logic ---
   useEffect(() => {
-    let data = [...all_plant_dc];
+    let data = [...plant_list];
 
     if (search_query.trim() !== "") {
       const q = search_query.toLowerCase();
       data = data.filter(
-        (plant) =>
-          plant.id.toLowerCase().includes(q) ||
-          plant.description.toLowerCase().includes(q)
+        (data) =>
+          data.plant_code.toLowerCase().includes(q) ||
+          data.plant_desc.toLowerCase().includes(q)
       );
     }
 
     const start_idx = (current_page - 1) * rows_per_page;
     const end_idx = start_idx + rows_per_page;
     set_filtered_plant_dc(data.slice(start_idx, end_idx));
-  }, [all_plant_dc, search_query, current_page, rows_per_page]);
+  }, [plant_list, search_query, current_page, rows_per_page]);
 
   const total_pages = Math.ceil(
-    all_plant_dc.filter(
-      (plant) =>
-        plant.id.toLowerCase().includes(search_query.toLowerCase()) ||
-        plant.description.toLowerCase().includes(search_query.toLowerCase())
+    plant_list.filter(
+      (data) =>
+        data.plant_code.toLowerCase().includes(search_query.toLowerCase()) ||
+        data.plant_desc.toLowerCase().includes(search_query.toLowerCase())
     ).length / rows_per_page
   );
 
@@ -158,13 +125,13 @@ const Select_Plant = ({
                         </td>
                       </tr>
                     ) : (
-                      filtered_plant_dc.map((plant) => (
+                      filtered_plant_dc.map((data) => (
                         <tr
-                          key={plant.id}
+                          key={data.id}
                           className={`hover:bg-sky-50/50 cursor-pointer text-[12px] ${
-                            selected_plant?.id === plant.id ? "bg-sky-50" : ""
+                            selected_plant?.id === data.id ? "bg-sky-50" : ""
                           }`}
-                          onClick={() => set_selected_plant(plant)}
+                          onClick={() => set_selected_plant(data)}
                         >
                           <td className="px-5 py-4 sm:px-6">
                             <div className="flex justify-center items-center">
@@ -172,23 +139,23 @@ const Select_Plant = ({
                                 name="check"
                                 box_size={18}
                                 icon_size={12}
-                                checked={selected_plant?.id === plant.id}
-                                on_change={() => set_selected_plant(plant)}
+                                checked={selected_plant?.id === data.id}
+                                on_change={() => set_selected_plant(data)}
                               />
                             </div>
                           </td>
                           <td className="px-5 py-4 sm:px-6">
                             <div className="block font-medium text-gray-800">
                               <span className="block text-gray-500 text-[10px]">
-                                {plant.id}
+                                {data.plant_code}
                               </span>
                               <span className="block text-gray-800 text-sm">
-                                {plant.description}
+                                {data.plant_desc}
                               </span>
                             </div>
                           </td>
                           <td className="px-6 py-3 text-gray-700 tracking-wide">
-                            {plant.creation_date}
+                            {data.creation_date}
                           </td>
                         </tr>
                       ))

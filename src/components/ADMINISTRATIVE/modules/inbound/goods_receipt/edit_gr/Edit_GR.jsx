@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import Text_Field from "assets/elements/Text_Field";
 import Button from "assets/elements/Button";
-import { ChevronLeft, Save } from "lucide-react";
+import { ChevronLeft, RefreshCcwDot, Save } from "lucide-react";
 import GR_Items from "./gr_items/GR_Items";
+import { format_date_1, get_date_now } from "assets/scripts/format";
 
 const Edit_GR = ({ set_page }) => {
   const [display_modal, set_display_modal] = useState("");
@@ -74,7 +75,7 @@ const Edit_GR = ({ set_page }) => {
             </div>
 
             <div className="flex gap-2 text-gray-500 text-sm tracking-wider">
-              10/30/2025
+              {format_date_1(get_date_now())}
             </div>
           </div>
 
@@ -90,8 +91,7 @@ const Edit_GR = ({ set_page }) => {
                       <Text_Field
                         label="PO Number"
                         type="text"
-                        value="PO-0000001"
-                        bg_color="slate-50"
+                        value="PO-XXXXXXXXX"
                         disabled
                       />
                     </div>
@@ -101,8 +101,7 @@ const Edit_GR = ({ set_page }) => {
                       <Text_Field
                         label="GR Number"
                         type="text"
-                        value="GR-0000001"
-                        bg_color="slate-50"
+                        value="GR-XXXXXXXXX"
                         disabled
                       />
                     </div>
@@ -118,8 +117,7 @@ const Edit_GR = ({ set_page }) => {
                       <Text_Field
                         label="Creation Date"
                         type="text"
-                        value="10/30/2025"
-                        bg_color="slate-50"
+                        value="MM-DD-YYYY"
                         disabled
                       />
                     </div>
@@ -137,11 +135,19 @@ const Edit_GR = ({ set_page }) => {
               <Button
                 variant="primary"
                 size="lg"
-                icon={Save}
+                icon={RefreshCcwDot}
                 icon_position="left"
                 on_click={handle_save}
               >
-                Save
+                Update
+              </Button>
+              <Button
+                variant="white"
+                size="lg"
+                // width="w-[100px]"
+                on_click={() => set_page("main")}
+              >
+                Cancel
               </Button>
             </div>
           </div>

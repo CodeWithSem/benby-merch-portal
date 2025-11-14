@@ -13,6 +13,7 @@ import {
   FileInput,
   Truck,
   FileText,
+  Database,
 } from "lucide-react";
 import Icon_Field from "assets/elements/Icon_Field";
 import Select_Field from "assets/elements/Select_Field";
@@ -21,6 +22,14 @@ import Button from "assets/elements/Button";
 import { useToast } from "../../../layout/Toast_Provider";
 import Date_Range_Field from "assets/elements/Date_Range_Field";
 import Create_New_SH from "./create_new_SH/Create_New_SH";
+import Date_Field from "assets/elements/Date_Field";
+import { format_date_1 } from "assets/scripts/format";
+import {
+  forward_agent_list,
+  plate_no_list,
+  sh_type_list,
+  trans_plan_list,
+} from "./SH_DATA_MAP";
 
 const Shipment = () => {
   const filter_ref = useRef(null);
@@ -28,6 +37,11 @@ const Shipment = () => {
   const [page, set_page] = useState("main");
   const [display_modal, set_display_modal] = useState("");
   const [for_posting, set_for_posting] = useState(false);
+
+  const today = format_date_1(new Date());
+  const [start_date, set_start_date] = useState(today);
+  const [end_date, set_end_date] = useState(today);
+  const [show_load_data_button, set_show_load_data_button] = useState(false);
 
   const { show_toast } = useToast();
 
@@ -179,6 +193,21 @@ const Shipment = () => {
     set_display_modal("delete_so");
   };
 
+  const handle_change_start_date = (value) => {
+    set_start_date(format_date_1(value));
+    set_show_load_data_button(true);
+  };
+
+  const handle_change_end_date = (value) => {
+    set_end_date(format_date_1(value));
+    set_show_load_data_button(true);
+  };
+
+  const handle_load_data = () => {
+    set_show_load_data_button(false);
+  };
+
+  // RETURN ORIGIN
   return (
     <React.Fragment>
       {page === "main" && (
@@ -210,7 +239,7 @@ const Shipment = () => {
             <div className="w-full bg-white rounded-lg border">
               <div className="flex flex-wrap items-center justify-between gap-3 p-5">
                 <h1 className="text-lg">Shipment</h1>
-                <div className="flex gap-2 grid grid-cols-1 lg:grid-cols-3">
+                <div className="grid grid-cols-1 gap-2 lg:grid-cols-3">
                   <Button
                     variant="success"
                     icon={FileText}
@@ -245,7 +274,32 @@ const Shipment = () => {
                   </Button> */}
                 </div>
               </div>
-
+              <div className="p-5 sm:p-6 border-t">
+                <div className="grid grid-cols-1 gap-5 md:w-[250px]">
+                  <Date_Field
+                    label="Start Date"
+                    value={start_date}
+                    on_change={(e) => handle_change_start_date(e.target.value)}
+                    placeholder="Select Date"
+                  />
+                  <Date_Field
+                    label="End Date"
+                    value={end_date}
+                    on_change={(e) => handle_change_end_date(e.target.value)}
+                    placeholder="Select Date"
+                  />
+                  {show_load_data_button && (
+                    <Button
+                      variant="primary"
+                      icon={Database}
+                      icon_position="left"
+                      on_click={handle_load_data}
+                    >
+                      Load Data
+                    </Button>
+                  )}
+                </div>
+              </div>
               <div className="p-5 sm:p-6 border-t">
                 <div className="w-full border rounded-lg">
                   <div className="w-full md:flex md:justify-between p-4 gap-4">
@@ -499,7 +553,15 @@ const Shipment = () => {
           </div>
         </React.Fragment>
       )}
-      {page === "shipment_creation" && <Create_New_SH set_page={set_page} />}
+      {page === "shipment_creation" && (
+        <Create_New_SH
+          set_page={set_page}
+          sh_type_list={sh_type_list}
+          plate_no_list={plate_no_list}
+          trans_plan_list={trans_plan_list}
+          forward_agent_list={forward_agent_list}
+        />
+      )}
       {/* {page === "gi_creation" && <Create_New_GI set_page={set_page} />}
       {page === "edit_gi" && <Edit_GI set_page={set_page} />}
       <Select_SO

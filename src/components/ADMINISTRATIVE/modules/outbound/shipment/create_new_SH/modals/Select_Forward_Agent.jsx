@@ -10,17 +10,8 @@ const Select_Forward_Agent = ({
   on_close,
   width = "max-w-[700px]",
   height = "h-[500px]",
+  forward_agent_list,
 }) => {
-  // --- Mock Data (replace later with API call if needed)
-  const [forward_agent_list, set_forward_agent_list] = useState([
-    {
-      id: 1,
-      forward_agent_code: "FA-001",
-      forward_agent_desc: "Forward Agent Description 1",
-      creation_date: "MM-DD-YYYY",
-    },
-  ]);
-
   // --- States ---
   const [filtered_forward_agent_list, set_filtered_forward_agent_list] =
     useState([]);

@@ -56,6 +56,15 @@ export const plant_list = [
     creation_date: "06-05-2025",
   },
 ];
+export const sloc_list = [
+  {
+    id: 1,
+    sloc_code: "SLOC-0001",
+    sloc_desc: "SLOC Description 1",
+    creation_date: "06-05-2025",
+  },
+];
+
 export const item_list = [
   {
     id: 1,

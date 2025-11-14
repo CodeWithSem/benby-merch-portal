@@ -5,68 +5,43 @@ import Checkbox_Field from "assets/elements/Checkbox_Field";
 import Button from "assets/elements/Button";
 import Pagination_Modal from "assets/elements/Pagination_Modal";
 
-const Select_Ship_To = ({
+const Select_Sold_To = ({
   is_open,
   on_close,
   width = "max-w-[700px]",
   height = "h-[500px]",
+  customer_list,
 }) => {
-  // --- Mock Data (replace later with API call if needed)
-  const [customer_sh_list, set_customer_sh_list] = useState([
-    {
-      id: 1,
-      customer_sh_code: "CS-SH-0001",
-      customer_sh_desc: "Customer Shipping Description 1",
-      creation_date: "10-08-2025",
-    },
-    {
-      id: 2,
-      customer_sh_code: "CS-SH-0002",
-      customer_sh_desc: "Customer Shipping Description 2",
-      creation_date: "10-08-2025",
-    },
-    {
-      id: 3,
-      customer_sh_code: "CS-SH-0003",
-      customer_sh_desc: "Customer Shipping Description 3",
-      creation_date: "10-08-2025",
-    },
-  ]);
-
   // --- States ---
-  const [filtered_customer_sh_list, set_filtered_customer_sh_list] = useState(
-    []
-  );
+  const [filtered_customer_list, set_filtered_customer_list] = useState([]);
   const [current_page, set_current_page] = useState(1);
   const [rows_per_page, set_rows_per_page] = useState(5);
   const [search_query, set_search_query] = useState("");
-  const [selected_customer_sh, set_selected_customer_sh] = useState(null);
+  const [selected_customer, set_selected_customer] = useState(null);
 
   // --- Pagination + Filtering Logic ---
   useEffect(() => {
-    let data = [...customer_sh_list];
+    let data = [...customer_list];
 
     if (search_query.trim() !== "") {
       const q = search_query.toLowerCase();
       data = data.filter(
         (customer) =>
-          customer.customer_sh_code.toLowerCase().includes(q) ||
-          customer.customer_sh_desc.toLowerCase().includes(q)
+          customer.customer_code.toLowerCase().includes(q) ||
+          customer.customer_desc.toLowerCase().includes(q)
       );
     }
 
     const start_idx = (current_page - 1) * rows_per_page;
     const end_idx = start_idx + rows_per_page;
-    set_filtered_customer_sh_list(data.slice(start_idx, end_idx));
-  }, [customer_sh_list, search_query, current_page, rows_per_page]);
+    set_filtered_customer_list(data.slice(start_idx, end_idx));
+  }, [customer_list, search_query, current_page, rows_per_page]);
 
   const total_pages = Math.ceil(
-    customer_sh_list.filter(
+    customer_list.filter(
       (data) =>
-        data.customer_sh_code
-          .toLowerCase()
-          .includes(search_query.toLowerCase()) ||
-        data.customer_sh_desc.toLowerCase().includes(search_query.toLowerCase())
+        data.customer_code.toLowerCase().includes(search_query.toLowerCase()) ||
+        data.customer_desc.toLowerCase().includes(search_query.toLowerCase())
     ).length / rows_per_page
   );
 
@@ -74,11 +49,11 @@ const Select_Ship_To = ({
   const handle_page_change = (page) => set_current_page(page);
 
   const handle_select_sold_to = () => {
-    if (!selected_customer_sh) {
+    if (!selected_customer) {
       alert("Please select a branch before proceeding.");
       return;
     }
-    alert(`Selected: ${selected_customer_sh.customer_sh_desc}`);
+    alert(`Selected: ${selected_customer.customer_desc}`);
   };
 
   return is_open ? (
@@ -140,7 +115,7 @@ const Select_Ship_To = ({
                   </thead>
 
                   <tbody className="divide-y divide-gray-100">
-                    {filtered_customer_sh_list.length === 0 ? (
+                    {filtered_customer_list.length === 0 ? (
                       <tr>
                         <td
                           colSpan={3}
@@ -150,15 +125,13 @@ const Select_Ship_To = ({
                         </td>
                       </tr>
                     ) : (
-                      filtered_customer_sh_list.map((data) => (
+                      filtered_customer_list.map((data) => (
                         <tr
                           key={data.id}
                           className={`hover:bg-sky-50/50 cursor-pointer text-[12px] ${
-                            selected_customer_sh?.id === data.id
-                              ? "bg-sky-50"
-                              : ""
+                            selected_customer?.id === data.id ? "bg-sky-50" : ""
                           }`}
-                          onClick={() => set_selected_customer_sh(data)}
+                          onClick={() => set_selected_customer(data)}
                         >
                           <td className="px-5 py-4 sm:px-6 text-center">
                             <div className="flex justify-center items-center">
@@ -166,18 +139,18 @@ const Select_Ship_To = ({
                                 name="check"
                                 box_size={18}
                                 icon_size={12}
-                                checked={selected_customer_sh?.id === data.id}
-                                on_change={() => set_selected_customer_sh(data)}
+                                checked={selected_customer?.id === data.id}
+                                on_change={() => set_selected_customer(data)}
                               />
                             </div>
                           </td>
                           <td className="px-5 py-4 sm:px-6">
                             <div className="block font-medium text-gray-800">
                               <span className="block text-gray-500 text-[12px]">
-                                {data.customer_sh_code}
+                                {data.customer_code}
                               </span>
                               <span className="block text-gray-800 text-sm">
-                                {data.customer_sh_desc}
+                                {data.customer_desc}
                               </span>
                             </div>
                           </td>
@@ -213,7 +186,7 @@ const Select_Ship_To = ({
                 variant="primary"
                 on_click={handle_select_sold_to}
                 class_name="w-full md:w-[100px]"
-                disabled={!selected_customer_sh}
+                disabled={!selected_customer}
               >
                 Proceed
               </Button>
@@ -233,4 +206,4 @@ const Select_Ship_To = ({
   ) : null;
 };
 
-export default Select_Ship_To;
+export default Select_Sold_To;

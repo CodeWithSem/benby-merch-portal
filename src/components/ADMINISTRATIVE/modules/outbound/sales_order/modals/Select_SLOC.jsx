@@ -10,83 +10,50 @@ const Select_SLOC = ({
   on_close,
   width = "max-w-[700px]",
   height = "h-[500px]",
+  sloc_list,
 }) => {
-  // --- Mock Data (replace later with API call if needed)
-  const [all_sloc, set_all_sloc] = useState([
-    {
-      id: "SLOC-0001",
-      description: "SLOC Description 1",
-      creation_date: "10/08/2025 12:00:00",
-    },
-    {
-      id: "SLOC-0002",
-      description: "SLOC Description 2",
-      creation_date: "10/08/2025 12:00:00",
-    },
-    {
-      id: "SLOC-0003",
-      description: "SLOC Description 3",
-      creation_date: "10/09/2025 12:00:00",
-    },
-    {
-      id: "SLOC-0004",
-      description: "SLOC Description 4",
-      creation_date: "10/09/2025 12:00:00",
-    },
-    {
-      id: "SLOC-0005",
-      description: "SLOC Description 5",
-      creation_date: "10/10/2025 12:00:00",
-    },
-    {
-      id: "SLOC-0006",
-      description: "SLOC Description 6",
-      creation_date: "10/11/2025 12:00:00",
-    },
-  ]);
-
   // --- States ---
-  const [filtered_sloc, set_filtered_sloc] = useState([]);
+  const [filtered_sloc_list, set_filtered_sloc_list] = useState([]);
   const [current_page, set_current_page] = useState(1);
   const [rows_per_page, set_rows_per_page] = useState(5);
   const [search_query, set_search_query] = useState("");
-  const [selected_sloc, set_selected_sloc] = useState(null);
+  const [selected_plant, set_selected_plant] = useState(null);
 
   // --- Pagination + Filtering Logic ---
   useEffect(() => {
-    let data = [...all_sloc];
+    let data = [...sloc_list];
 
     if (search_query.trim() !== "") {
       const q = search_query.toLowerCase();
       data = data.filter(
-        (sloc) =>
-          sloc.id.toLowerCase().includes(q) ||
-          sloc.description.toLowerCase().includes(q)
+        (data) =>
+          data.sloc_code.toLowerCase().includes(q) ||
+          data.sloc_desc.toLowerCase().includes(q)
       );
     }
 
     const start_idx = (current_page - 1) * rows_per_page;
     const end_idx = start_idx + rows_per_page;
-    set_filtered_sloc(data.slice(start_idx, end_idx));
-  }, [all_sloc, search_query, current_page, rows_per_page]);
+    set_filtered_sloc_list(data.slice(start_idx, end_idx));
+  }, [sloc_list, search_query, current_page, rows_per_page]);
 
   const total_pages = Math.ceil(
-    all_sloc.filter(
-      (sloc) =>
-        sloc.id.toLowerCase().includes(search_query.toLowerCase()) ||
-        sloc.description.toLowerCase().includes(search_query.toLowerCase())
+    sloc_list.filter(
+      (data) =>
+        data.sloc_code.toLowerCase().includes(search_query.toLowerCase()) ||
+        data.sloc_desc.toLowerCase().includes(search_query.toLowerCase())
     ).length / rows_per_page
   );
 
   // --- Handlers ---
   const handle_page_change = (page) => set_current_page(page);
 
-  const handle_select_sloc = () => {
-    if (!selected_sloc) {
-      alert("Please select a sloc before proceeding.");
+  const handle_select_plant = () => {
+    if (!selected_plant) {
+      alert("Please select a plant before proceeding.");
       return;
     }
-    alert(`Selected: ${selected_sloc.description}`);
+    alert(`Selected: ${selected_plant.sloc_desc}`);
   };
 
   return is_open ? (
@@ -148,7 +115,7 @@ const Select_SLOC = ({
                   </thead>
 
                   <tbody className="divide-y divide-gray-100">
-                    {filtered_sloc.length === 0 ? (
+                    {filtered_sloc_list.length === 0 ? (
                       <tr>
                         <td
                           colSpan={3}
@@ -158,37 +125,37 @@ const Select_SLOC = ({
                         </td>
                       </tr>
                     ) : (
-                      filtered_sloc.map((sloc) => (
+                      filtered_sloc_list.map((data) => (
                         <tr
-                          key={sloc.id}
+                          key={data.id}
                           className={`hover:bg-sky-50/50 cursor-pointer text-[12px] ${
-                            selected_sloc?.id === sloc.id ? "bg-sky-50" : ""
+                            selected_plant?.id === data.id ? "bg-sky-50" : ""
                           }`}
-                          onClick={() => set_selected_sloc(sloc)}
+                          onClick={() => set_selected_plant(data)}
                         >
-                          <td className="px-5 py-4 sm:px-6 text-center">
+                          <td className="px-5 py-4 sm:px-6">
                             <div className="flex justify-center items-center">
                               <Checkbox_Field
                                 name="check"
                                 box_size={18}
                                 icon_size={12}
-                                checked={selected_sloc?.id === sloc.id}
-                                on_change={() => set_selected_sloc(sloc)}
+                                checked={selected_plant?.id === data.id}
+                                on_change={() => set_selected_plant(data)}
                               />
                             </div>
                           </td>
                           <td className="px-5 py-4 sm:px-6">
                             <div className="block font-medium text-gray-800">
                               <span className="block text-gray-500 text-[10px]">
-                                {sloc.id}
+                                {data.sloc_code}
                               </span>
                               <span className="block text-gray-800 text-sm">
-                                {sloc.description}
+                                {data.sloc_desc}
                               </span>
                             </div>
                           </td>
                           <td className="px-6 py-3 text-gray-700 tracking-wide">
-                            {sloc.creation_date}
+                            {data.creation_date}
                           </td>
                         </tr>
                       ))
@@ -217,9 +184,9 @@ const Select_SLOC = ({
             <div className="flex justify-center sm:justify-end gap-2 w-full">
               <Button
                 variant="primary"
-                on_click={handle_select_sloc}
+                on_click={handle_select_plant}
                 class_name="w-full md:w-[100px]"
-                disabled={!selected_sloc}
+                disabled={!selected_plant}
               >
                 Proceed
               </Button>

@@ -10,7 +10,6 @@ import {
   RefreshCw,
   SlidersHorizontal,
   FileUp,
-  FileInput,
 } from "lucide-react";
 import Icon_Field from "assets/elements/Icon_Field";
 import Select_Field from "assets/elements/Select_Field";
@@ -22,6 +21,14 @@ import Create_New_Vendor from "./create_new_vendor/Create_New_Vendor";
 import View_Vendor from "./modals/view_vendor/View_Vendor";
 import Edit_Vendor from "./edit_vendor/Edit_Vendor";
 import Delete_Vendor from "./modals/delete_vendor/Delete_Vendor";
+import {
+  city_list,
+  company_list,
+  da_com_porg_pgroup_list,
+  purc_group_list,
+  purc_org_list,
+  trans_zone_list,
+} from "./VENDOR_DATA_MAP";
 
 const Vendor = () => {
   const filter_ref = useRef(null);
@@ -441,7 +448,17 @@ const Vendor = () => {
           </div>
         </React.Fragment>
       )}
-      {page === "vendor_creation" && <Create_New_Vendor set_page={set_page} />}
+      {page === "vendor_creation" && (
+        <Create_New_Vendor
+          set_page={set_page}
+          city_list={city_list}
+          company_list={company_list}
+          da_com_porg_pgroup_list={da_com_porg_pgroup_list}
+          purc_group_list={purc_group_list}
+          purc_org_list={purc_org_list}
+          trans_zone_list={trans_zone_list}
+        />
+      )}
       {page === "edit_vendor" && <Edit_Vendor set_page={set_page} />}
       <View_Vendor
         is_open={display_modal === "view_vendor"}

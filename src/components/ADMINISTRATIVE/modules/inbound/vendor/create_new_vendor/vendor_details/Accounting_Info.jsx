@@ -4,7 +4,7 @@ import Text_Code_Field from "assets/elements/Text_Code_Field";
 import Text_Field from "assets/elements/Text_Field";
 import React from "react";
 
-const Accounting_Info = () => {
+const Accounting_Info = ({ set_display_modal }) => {
   return (
     <React.Fragment>
       <div className="rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6 dark:border-gray-800 dark:bg-gray-900 whitespace-nowrap">
@@ -17,7 +17,7 @@ const Accounting_Info = () => {
               //    on_code_change={(e) => handle_code_change(e.target.value)}
               //    text_value={text_data}
               //    on_text_change={(e) => handle_text_change(e.target.value)}
-              //    on_click={handle_text_code_click}
+              on_click={() => set_display_modal("select_company")}
               show_search_button={true}
               disabled
             />

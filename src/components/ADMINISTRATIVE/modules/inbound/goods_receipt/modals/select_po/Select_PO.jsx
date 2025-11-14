@@ -166,7 +166,7 @@ const Select_PO = ({
 
         {/* Header */}
         <div className="text-lg md:text-xl font-bold mb-5 px-7">
-          PO Selection
+          Purchase Order Selection
         </div>
 
         {/* Body */}
