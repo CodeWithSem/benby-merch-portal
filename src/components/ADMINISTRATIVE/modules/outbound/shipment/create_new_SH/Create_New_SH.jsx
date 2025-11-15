@@ -4,16 +4,16 @@ import Text_Code_Field from "assets/elements/Text_Code_Field";
 import Text_Field from "assets/elements/Text_Field";
 import { ChevronLeft, Eye, Save, SaveAll } from "lucide-react";
 import React, { useState } from "react";
-import Truck from "./SH_details/Truck";
-import Partner from "./SH_details/Partner";
-import Shipment from "./SH_details/Shipment";
-import Instruction from "./SH_details/Instruction";
-import Administrative from "./SH_details/Administrative";
-import Select_SH_Type from "./modals/Select_SH_Type";
-import Select_Plate_No from "./modals/Select_Plate_No";
-import Select_Trans_Plan from "./modals/Select_Trans_Plan";
-import Select_Forward_Agent from "./modals/Select_Forward_Agent";
-import SH_Delivery_Order from "./SH_delivery_order/SH_Delivery_Order";
+import Truck from "./sh_details/Truck";
+import Partner from "./sh_details/Partner";
+import Shipment from "./sh_details/Shipment";
+import Instruction from "./sh_details/Instruction";
+import Administrative from "./sh_details/Administrative";
+import Select_SH_Type from "../modals/Select_SH_Type";
+import Select_Plate_No from "../modals/Select_Plate_No";
+import Select_Trans_Plan from "../modals/Select_Trans_Plan";
+import Select_Forward_Agent from "../modals/Select_Forward_Agent";
+import SH_Delivery_Order from "./sh_delivery_order/SH_Delivery_Order";
 
 const Create_New_SH = ({
   set_page,

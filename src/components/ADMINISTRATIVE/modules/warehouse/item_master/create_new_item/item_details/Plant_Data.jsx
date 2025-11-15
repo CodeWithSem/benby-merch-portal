@@ -51,7 +51,7 @@ const Plant_Data = () => {
           </div>
           <div>
             <Text_Field
-              label="Base Unit of Measure"
+              label="Base Unit of Measure (UoM)"
               type={"text"}
               pattern="[0-9]{1,}"
               disabled

@@ -22,10 +22,10 @@ import Date_Range_Field from "assets/elements/Date_Range_Field";
 import Select_SO from "./modals/select_so/Select_SO";
 import Create_New_GI from "./create_new_gi/Create_New_GI";
 import Edit_GI from "./edit_gi/Edit_GI";
-import Post_View_GI from "./modals/post_view_gi/Post_View_GI";
 import Delete_GI from "./modals/delete_gi/Delete_GI";
 import { format_date_1 } from "assets/scripts/format";
 import Date_Field from "assets/elements/Date_Field";
+import Post_View_GI from "./post_view_gi/Post_View_GI";
 
 const Goods_Issue = () => {
   const filter_ref = useRef(null);
@@ -44,8 +44,8 @@ const Goods_Issue = () => {
   const { show_toast } = useToast();
 
   const company_list = [
-    { id: 1, company_code: "20001", company_desc: "Company 1" },
-    { id: 2, company_code: "20002", company_desc: "Company 2" },
+    { id: 1, company_code: "COM-001", company_desc: "Company 1" },
+    { id: 2, company_code: "COM-002", company_desc: "Company 2" },
   ];
 
   const columns = [
@@ -64,8 +64,8 @@ const Goods_Issue = () => {
       so_number: "SO-0000001",
       do_number: "DO-0000001",
       so_type: "LF-SO",
-      company_code: "20001",
-      creation_date: "MM-DD-YYYY 12:00:00",
+      company_code: "COM-001",
+      creation_date: "MM-DD-YYYY",
       status: "Pending",
     },
   ]);
@@ -175,16 +175,15 @@ const Goods_Issue = () => {
 
   const handle_view_gi = () => {
     set_for_posting(false);
-    set_display_modal("view_gi");
+    set_page("post_view_gi");
   };
 
   const handle_post_gi = () => {
     set_for_posting(true);
-    set_display_modal("post_gi");
+    set_page("post_view_gi");
   };
 
   const handle_edit_gi = (id) => {
-    alert(`GI ID : ${id}`);
     set_page("edit_gi");
   };
 
@@ -538,18 +537,15 @@ const Goods_Issue = () => {
       )}
       {page === "gi_creation" && <Create_New_GI set_page={set_page} />}
       {page === "edit_gi" && <Edit_GI set_page={set_page} />}
+      {page === "post_view_gi" && (
+        <Post_View_GI set_page={set_page} for_posting={for_posting} />
+      )}
       <Select_SO
         is_open={display_modal === "select_so"}
         on_close={() => set_display_modal("")}
         width="max-w-[1280px]"
         height="max-h-[700px]"
         set_page={set_page}
-      />
-      <Post_View_GI
-        is_open={display_modal === "view_gi" || display_modal === "post_gi"}
-        for_posting={for_posting}
-        on_close={() => set_display_modal("")}
-        width="max-w-[1280px]"
       />
       <Delete_GI
         is_open={display_modal === "delete_gi"}

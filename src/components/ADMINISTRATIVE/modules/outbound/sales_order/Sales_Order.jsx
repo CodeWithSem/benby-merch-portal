@@ -34,8 +34,8 @@ import {
   so_type_list,
 } from "./SO_DATA_MAP";
 import Edit_SO from "./edit_so/Edit_SO";
-import Post_View_SO from "./modals/post_view_so/Post_View_SO";
 import Delete_SO from "./modals/delete_so/Delete_SO";
+import Post_View_SO from "./post_view_so/Post_View_SO";
 
 const Sales_Order = () => {
   const filter_ref = useRef(null);
@@ -62,12 +62,13 @@ const Sales_Order = () => {
   ];
 
   // --- State ---
-  const [all_data, set_all_data] = useState([
+  const [so_list, set_so_list] = useState([
     {
+      id: 1,
       so_number: "SO-000000001",
       so_type: "LFSO",
       customer: "QS IT Services",
-      creation_date: "11-05-2025 04:04:23",
+      creation_date: "MM-DD-YYYY",
       status: "Pending",
     },
   ]);
@@ -104,8 +105,8 @@ const Sales_Order = () => {
   // --- Load all users once ---
   //   const load_data = async () => {
   //     set_loading(true);
-  //     const data = await fetch_all_data();
-  //     set_all_data(data);
+  //     const data = await fetch_so_list();
+  //     set_so_list(data);
   //     set_loading(false);
   //   };
 
@@ -115,7 +116,7 @@ const Sales_Order = () => {
 
   // + Client-side Filtering
   useEffect(() => {
-    let temp = [...all_data];
+    let temp = [...so_list];
 
     // + Column Filter
     if (debounced_query.trim() !== "") {
@@ -150,7 +151,7 @@ const Sales_Order = () => {
     // - Pagination Function
     set_filtered_data(temp.slice(start_idx, end_idx));
   }, [
-    all_data,
+    so_list,
     debounced_query,
     sort_by,
     sort_order,
@@ -162,7 +163,7 @@ const Sales_Order = () => {
   // + Total page of Pagination
   const total_pages = Math.ceil(
     (debounced_query
-      ? all_data.filter((u) =>
+      ? so_list.filter((u) =>
           columns.some((col) => {
             if (col.key === "actions") return false;
             const val = u[col.key];
@@ -172,7 +173,7 @@ const Sales_Order = () => {
               .includes(debounced_query.toLowerCase());
           })
         ).length
-      : all_data.length) / select_option
+      : so_list.length) / select_option
   );
   // - Total page of Pagination
 
@@ -203,12 +204,12 @@ const Sales_Order = () => {
 
   const handle_view_so = () => {
     set_for_posting(false);
-    set_display_modal("view_so");
+    set_page("post_view_so");
   };
 
   const handle_post_so = () => {
     set_for_posting(true);
-    set_display_modal("post_so");
+    set_page("post_view_so");
   };
 
   const handle_edit_so = () => {
@@ -412,8 +413,7 @@ const Sales_Order = () => {
                       </div>
                     </div>
                   </div>
-
-                  {/* Table */}
+                  {/* + List of SO */}
                   <div className="overflow-x-auto">
                     {loading ? (
                       <div className="p-6 text-center text-gray-500 text-sm">
@@ -569,7 +569,8 @@ const Sales_Order = () => {
                       </table>
                     )}
                   </div>
-
+                  {/* - List of SO */}
+                  {/* + Pagination */}
                   {total_pages > 0 && (
                     <Pagination
                       current_page={current_page}
@@ -578,12 +579,14 @@ const Sales_Order = () => {
                       variant="compact"
                     />
                   )}
+                  {/* - Pagination */}
                 </div>
               </div>
             </div>
           </div>
         </React.Fragment>
       )}
+      {/* + Pages */}
       {page === "so_creation" && (
         <Create_New_SO
           set_page={set_page}
@@ -602,7 +605,11 @@ const Sales_Order = () => {
           sloc_list={sloc_list}
         />
       )}
-
+      {page === "post_view_so" && (
+        <Post_View_SO set_page={set_page} for_posting={for_posting} />
+      )}
+      {/* - Pages */}
+      {/* + Modals */}
       <Select_SO_Type
         is_open={display_modal === "select_so_type"}
         on_close={() => set_display_modal("")}
@@ -614,18 +621,12 @@ const Sales_Order = () => {
         so_type_list={so_type_list}
       />
 
-      <Post_View_SO
-        is_open={display_modal === "view_so" || display_modal === "post_so"}
-        for_posting={for_posting}
-        on_close={() => set_display_modal("")}
-        width="max-w-[1280px]"
-      />
-
       <Delete_SO
         is_open={display_modal === "delete_so"}
         on_close={() => set_display_modal("")}
         width="max-w-[1280px]"
       />
+      {/* - Modals */}
     </React.Fragment>
   );
 };

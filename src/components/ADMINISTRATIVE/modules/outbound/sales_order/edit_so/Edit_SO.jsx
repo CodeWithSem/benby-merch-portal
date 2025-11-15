@@ -12,19 +12,8 @@ import Instructions from "./so_details/Instructions";
 import References from "./so_details/References";
 import Customer from "./so_details/Customer";
 import SO_Items from "./so_items/SO_Items";
-import Select_Sold_To from "../modals/Select_Sold_To";
-import Select_Ship_To from "../modals/Select_Ship_To";
-import Select_Plant from "../modals/Select_Plant";
-import Select_SLOC from "../modals/Select_SLOC";
-import Select_Item from "../modals/Select_Item";
 
-const Edit_SO = ({
-  set_page,
-  customer_list,
-  customer_sh_list,
-  plant_list,
-  sloc_list,
-}) => {
+const Edit_SO = ({ set_page }) => {
   const [active_tab, set_active_tab] = useState("sales");
   const [display_modal, set_display_modal] = useState("");
 
@@ -290,40 +279,13 @@ const Edit_SO = ({
           </div>
         </div>
       </div>
-      <Select_Sold_To
+      {/* <Select_Sold_To
         is_open={display_modal === "select_sold_to"}
         on_close={() => set_display_modal("")}
         width="max-w-[1000px]"
         height="max-h-[700px]"
         customer_list={customer_list}
-      />
-      <Select_Ship_To
-        is_open={display_modal === "select_ship_to"}
-        on_close={() => set_display_modal("")}
-        width="max-w-[1000px]"
-        height="max-h-[700px]"
-        customer_sh_list={customer_sh_list}
-      />
-      <Select_Plant
-        is_open={display_modal === "select_plant"}
-        on_close={() => set_display_modal("")}
-        width="max-w-[1000px]"
-        height="max-h-[700px]"
-        plant_list={plant_list}
-      />
-      <Select_SLOC
-        is_open={display_modal === "select_sloc"}
-        on_close={() => set_display_modal("")}
-        width="max-w-[1000px]"
-        height="max-h-[700px]"
-        sloc_list={sloc_list}
-      />
-      <Select_Item
-        is_open={display_modal === "select_item"}
-        on_close={() => set_display_modal("")}
-        width="max-w-[1000px]"
-        height="max-h-[700px]"
-      />
+      /> */}
     </React.Fragment>
   );
 };

@@ -19,14 +19,15 @@ import { useToast } from "../../../layout/Toast_Provider";
 import Date_Range_Field from "assets/elements/Date_Range_Field";
 import Create_New_Item from "./create_new_item/Create_New_Item";
 import Edit_Item from "./edit_item/Edit_Item";
-import View_Item from "./modals/view_item/View_Item";
+import View_Item from "./view_item/View_Item";
+import Delete_Item from "./modals/delete_item/Delete_Item";
 
 const Item_Master = () => {
   const filter_ref = useRef(null);
   const [show_filter, set_show_filter] = useState(false);
   const [page, set_page] = useState("main");
   const [display_modal, set_display_modal] = useState("");
-  const [for_posting, set_for_posting] = useState(false);
+  const [for_itemsting, set_for_itemsting] = useState(false);
 
   // Close dropdown on outside click
   const { show_toast } = useToast();
@@ -218,16 +219,16 @@ const Item_Master = () => {
     alert("Under Maintenance");
   };
 
-  const handle_view_item = () => {
-    set_display_modal("view_item");
+  const handle_view_item = (id) => {
+    set_page("view_item");
   };
 
   const handle_edit_item = () => {
     set_page("edit_item");
   };
 
-  const handle_delete_po = () => {
-    set_display_modal("delete_po");
+  const handle_delete_item = () => {
+    set_display_modal("delete_item");
   };
 
   // RETURN ORIGIN
@@ -237,7 +238,7 @@ const Item_Master = () => {
         <React.Fragment>
           <div className="w-full">
             <div className="flex flex-wrap items-center justify-between gap-3 py-5">
-              <h1 className="text-xl">Inbound</h1>
+              <h1 className="text-xl">Warehouse</h1>
               <nav>
                 <ol className="flex flex-wrap items-center gap-1.5">
                   <li>
@@ -248,7 +249,7 @@ const Item_Master = () => {
                   <li className="flex items-center gap-1.5 text-sm text-gray-500">
                     <span>/</span>
                     <a className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-sky-500 cursor-pointer">
-                      Inbound
+                      Warehouse
                     </a>
                   </li>
                   <li className="flex items-center gap-1.5 text-sm text-gray-500">
@@ -266,7 +267,7 @@ const Item_Master = () => {
                   <Button
                     variant="primary"
                     icon={PlusCircle}
-                    icon_position="left"
+                    icon_itemsition="left"
                     on_click={handle_create_new_item}
                   >
                     Create New Item
@@ -274,7 +275,7 @@ const Item_Master = () => {
                   <Button
                     variant="primary"
                     icon={FileUp}
-                    icon_position="left"
+                    icon_itemsition="left"
                     on_click={handle_upload_item}
                   >
                     Upload
@@ -306,7 +307,7 @@ const Item_Master = () => {
                       <Button
                         variant="white"
                         icon={RefreshCw}
-                        icon_position="left"
+                        icon_itemsition="left"
                         //   on_click={() => load_data()}
                       ></Button>
                     </div>
@@ -318,7 +319,7 @@ const Item_Master = () => {
                             name="search"
                             placeholder="Search..."
                             icon={Search}
-                            icon_position="left"
+                            icon_itemsition="left"
                             value={search_query}
                             on_change={(e) => set_search_query(e.target.value)}
                           />
@@ -328,7 +329,7 @@ const Item_Master = () => {
                             variant="white"
                             width="w-[100px]"
                             icon={SlidersHorizontal}
-                            icon_position="left"
+                            icon_itemsition="left"
                             // loading
                             on_click={() => set_show_filter((prev) => !prev)}
                           >
@@ -472,7 +473,9 @@ const Item_Master = () => {
                                     <div className="relative group flex jusity-center items-center">
                                       <button
                                         className="text-gray-500 hover:text-red-600 text-[12px] mb-[1px] outline-none"
-                                        onClick={() => handle_delete_po(row.id)}
+                                        onClick={() =>
+                                          handle_delete_item(row.id)
+                                        }
                                       >
                                         <Trash size={19} />
                                       </button>
@@ -531,9 +534,9 @@ const Item_Master = () => {
       )}
       {page === "item_creation" && <Create_New_Item set_page={set_page} />}
       {page === "edit_item" && <Edit_Item set_page={set_page} />}
-
-      <View_Item
-        is_open={display_modal === "view_item"}
+      {page === "view_item" && <View_Item set_page={set_page} />}
+      <Delete_Item
+        is_open={display_modal === "delete_item"}
         on_close={() => set_display_modal("")}
         width="max-w-[1280px]"
       />

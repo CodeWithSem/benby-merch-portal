@@ -18,7 +18,6 @@ import Button from "assets/elements/Button";
 import { useToast } from "../../../layout/Toast_Provider";
 import Date_Range_Field from "assets/elements/Date_Range_Field";
 import Create_New_Vendor from "./create_new_vendor/Create_New_Vendor";
-import View_Vendor from "./modals/view_vendor/View_Vendor";
 import Edit_Vendor from "./edit_vendor/Edit_Vendor";
 import Delete_Vendor from "./modals/delete_vendor/Delete_Vendor";
 import {
@@ -29,6 +28,7 @@ import {
   purc_org_list,
   trans_zone_list,
 } from "./VENDOR_DATA_MAP";
+import View_Vendor from "./view_vendor/View_Vendor";
 
 const Vendor = () => {
   const filter_ref = useRef(null);
@@ -158,12 +158,11 @@ const Vendor = () => {
     alert("Under Maintenance");
   };
 
-  const handle_view_vendor = () => {
-    set_display_modal("view_vendor");
+  const handle_view_vendor = (id) => {
+    set_page("view_vendor");
   };
 
   const handle_edit_vendor = (id) => {
-    alert(`VENDOR ID : ${id}`);
     set_page("edit_vendor");
   };
 
@@ -460,11 +459,7 @@ const Vendor = () => {
         />
       )}
       {page === "edit_vendor" && <Edit_Vendor set_page={set_page} />}
-      <View_Vendor
-        is_open={display_modal === "view_vendor"}
-        on_close={() => set_display_modal("")}
-        width="max-w-[1280px]"
-      />
+      {page === "view_vendor" && <View_Vendor set_page={set_page} />}
       <Delete_Vendor
         is_open={display_modal === "delete_vendor"}
         on_close={() => set_display_modal("")}

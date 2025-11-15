@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Text_Field from "assets/elements/Text_Field";
 import Button from "assets/elements/Button";
-import { ChevronLeft, Eye, Save, SaveAll } from "lucide-react";
+import { ChevronLeft, CirclePlus, Eye, Save, SaveAll } from "lucide-react";
 import Verify_Field from "assets/elements/Verify_Field";
 import Standard_Data from "./item_details/Standard_Data";
 import Purchasing from "./item_details/Purchasing";
@@ -167,11 +167,19 @@ const Create_New_Item = ({ set_page }) => {
                 variant="primary"
                 size="lg"
                 // width="w-[100px]"
-                icon={Save}
+                icon={CirclePlus}
                 icon_position="left"
                 on_click={handle_save}
               >
-                Save
+                Create
+              </Button>
+              <Button
+                variant="white"
+                size="lg"
+                // width="w-[100px]"
+                on_click={() => set_page("main")}
+              >
+                Cancel
               </Button>
             </div>
           </div>

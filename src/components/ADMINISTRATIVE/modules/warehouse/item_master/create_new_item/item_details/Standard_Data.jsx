@@ -36,7 +36,7 @@ const Standard_Data = () => {
             <Select_Field
               label="Item Group"
               name="item_group"
-              // value={selected_data}
+              // value={""}
               // // on_change={handle_option_change}
               // // options={options}
               placeholder="Select Option"
@@ -92,7 +92,7 @@ const Standard_Data = () => {
           </div>
           <div>
             <Select_Field
-              label="Base Unit of Measure"
+              label="Base Unit of Measure (UoM)"
               name="base_uom"
               // value={selected_data}
               // // on_change={handle_option_change}

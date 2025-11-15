@@ -19,6 +19,9 @@ import Button from "assets/elements/Button";
 import { useToast } from "../../../layout/Toast_Provider";
 import Date_Range_Field from "assets/elements/Date_Range_Field";
 import Create_New_Truck from "./create_new_truck/Create_New_Truck";
+import Edit_Truck from "./edit_truck/Edit_Truck";
+import View_Truck from "./view_truck/View_Truck";
+import Delete_Truck from "./modals/delete_truck/Delete_Truck";
 // import Create_New_Truck from "./create_new_truck/Create_New_Truck";
 
 const Truck = () => {
@@ -150,17 +153,15 @@ const Truck = () => {
     alert("Under Maintenance");
   };
 
-  const handle_view_truck = () => {
-    set_for_posting(false);
-    set_display_modal("view_truck");
+  const handle_view_truck = (id) => {
+    set_page("view_truck");
   };
 
   const handle_edit_truck = (id) => {
-    alert(`CUSTOMER ID : ${id}`);
     set_page("edit_truck");
   };
 
-  const handle_delete_truck = () => {
+  const handle_delete_truck = (id) => {
     set_display_modal("delete_truck");
   };
 
@@ -372,9 +373,9 @@ const Truck = () => {
                                     <div className="relative group flex jusity-center items-center">
                                       <button
                                         className="text-gray-500 hover:text-sky-600 text-[12px] outline-none"
-                                        // onClick={() =>
-                                        //   handle_edit_truck(row.id)
-                                        // }
+                                        onClick={() =>
+                                          handle_edit_truck(row.id)
+                                        }
                                       >
                                         <Edit size={19} />
                                       </button>
@@ -442,6 +443,13 @@ const Truck = () => {
         </React.Fragment>
       )}
       {page === "truck_creation" && <Create_New_Truck set_page={set_page} />}
+      {page === "edit_truck" && <Edit_Truck set_page={set_page} />}
+      {page === "view_truck" && <View_Truck set_page={set_page} />}
+      <Delete_Truck
+        is_open={display_modal === "delete_truck"}
+        on_close={() => set_display_modal("")}
+        width="max-w-[1280px]"
+      />
     </React.Fragment>
   );
 };

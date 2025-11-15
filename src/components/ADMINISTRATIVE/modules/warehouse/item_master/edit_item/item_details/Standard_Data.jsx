@@ -92,7 +92,7 @@ const Standard_Data = () => {
           </div>
           <div>
             <Select_Field
-              label="Base Unit of Measure"
+              label="Base Unit of Measure (UoM)"
               name="base_uom"
               // value={selected_data}
               // // on_change={handle_option_change}

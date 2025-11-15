@@ -13,18 +13,19 @@ import {
   FileInput,
   Database,
 } from "lucide-react";
+import { useToast } from "../../../layout/Toast_Provider";
+import { format_date_1 } from "assets/scripts/format";
 import Icon_Field from "assets/elements/Icon_Field";
 import Select_Field from "assets/elements/Select_Field";
 import Pagination from "assets/elements/Pagination";
 import Button from "assets/elements/Button";
-import { useToast } from "../../../layout/Toast_Provider";
 import Checkbox_Field from "assets/elements/Checkbox_Field";
+import Date_Field from "assets/elements/Date_Field";
 import Create_New_PO from "./create_new_po/Create_New_PO";
 import Edit_PO from "./edit_po/Edit_PO";
-import Delete_PO from "./modals/delete_po/Delete_PO";
+import Post_View_PO from "./post_view_po/Post_View_PO";
 import Select_PO_Type from "./modals/select_po_type/Select_PO_Type";
-import Date_Field from "assets/elements/Date_Field";
-import { format_date_1 } from "assets/scripts/format";
+import Delete_PO from "./modals/delete_po/Delete_PO";
 import {
   company_list,
   purc_org_list,
@@ -33,32 +34,23 @@ import {
   vendor_list,
   branch_list,
   plant_list,
-  item_list,
   sloc_list,
 } from "./PO_DATA_MAP";
-import Post_View_PO from "./post_view_po/Post_View_PO";
 
 const Purchase_Order = () => {
-  // + Data Map
-
-  // - Data Map
-
-  const filter_ref = useRef(null);
+  const { show_toast } = useToast();
+  // + Variables
   const [show_filter, set_show_filter] = useState(false);
   const [page, set_page] = useState("main");
   const [display_modal, set_display_modal] = useState("");
   const [for_posting, set_for_posting] = useState(false);
-
   const today = format_date_1(new Date());
-
   const [start_date, set_start_date] = useState(today);
   const [end_date, set_end_date] = useState(today);
-
   const [show_load_data_button, set_show_load_data_button] = useState(false);
+  // - Variables
 
-  // Close dropdown on outside click
-  const { show_toast } = useToast();
-
+  // + PO List Columns
   const columns = [
     { key: "po_number", label: "PO Number", sortable: true },
     { key: "po_type", label: "PO Type", sortable: true },
@@ -67,27 +59,29 @@ const Purchase_Order = () => {
     { key: "status", label: "Status", sortable: true },
     { key: "actions", label: "", sortable: false },
   ];
+  // - PO List Columns
 
-  // --- State ---
-  const [all_data, set_all_data] = useState([
+  // + PO list client-side filtering
+  const [po_list, set_po_list] = useState([
     {
+      id: 1,
       po_number: "PO-XXXXXXXXX",
       po_type: "QSPO",
       company: "QS IT Services",
-      creation_date: "11-05-2025 04:04:23",
+      creation_date: "MM-DD-YYYY",
+      creation_time: "HH:MM:SS",
       status: "Pending",
     },
   ]);
-  const [filtered_data, set_filtered_data] = useState([]);
+  const [filtered_po_list, set_filtered_po_list] = useState([]);
   const [loading, set_loading] = useState(false);
-  const [select_option, set_select_option] = useState(5);
+  const [show_entries, set_show_entries] = useState(5);
   const [current_page, set_current_page] = useState(1);
   const [sort_by, set_sort_by] = useState("timestamp");
   const [sort_order, set_sort_order] = useState("asc");
   const [search_query, set_search_query] = useState("");
   const [debounced_query, set_debounced_query] = useState("");
 
-  // --- Debounce search ---
   useEffect(() => {
     const timer = setTimeout(() => {
       set_debounced_query(search_query);
@@ -96,23 +90,11 @@ const Purchase_Order = () => {
     return () => clearTimeout(timer);
   }, [search_query]);
 
-  // --- Close dropdown outside click ---
-  useEffect(() => {
-    const handle_click_outside = (event) => {
-      if (filter_ref.current && !filter_ref.current.contains(event.target)) {
-        // optional: close filter
-      }
-    };
-    document.addEventListener("mousedown", handle_click_outside);
-    return () =>
-      document.removeEventListener("mousedown", handle_click_outside);
-  }, []);
-
   // --- Load all users once ---
   //   const load_data = async () => {
   //     set_loading(true);
-  //     const data = await fetch_all_data();
-  //     set_all_data(data);
+  //     const data = await fetch_po_list();
+  //     set_po_list(data);
   //     set_loading(false);
   //   };
 
@@ -122,9 +104,8 @@ const Purchase_Order = () => {
 
   // + Client-side Filtering
   useEffect(() => {
-    let temp = [...all_data];
+    let temp = [...po_list];
 
-    // + Column Filter
     if (debounced_query.trim() !== "") {
       const q = debounced_query.toLowerCase();
       temp = temp.filter((u) =>
@@ -135,41 +116,32 @@ const Purchase_Order = () => {
         })
       );
     }
-    // - Column Filter
 
-    // + Sort Function
     temp.sort((a, b) => {
       const val_a = a[sort_by];
       const val_b = b[sort_by];
-
       if (val_a == null) return 1;
       if (val_b == null) return -1;
-
       if (val_a < val_b) return sort_order === "asc" ? -1 : 1;
       if (val_a > val_b) return sort_order === "asc" ? 1 : -1;
       return 0;
     });
-    // - Sort Function
 
-    // + Pagination Function
-    const start_idx = (current_page - 1) * select_option;
-    const end_idx = start_idx + select_option;
-    // - Pagination Function
-    set_filtered_data(temp.slice(start_idx, end_idx));
+    const start_idx = (current_page - 1) * show_entries;
+    const end_idx = start_idx + show_entries;
+    set_filtered_po_list(temp.slice(start_idx, end_idx));
   }, [
-    all_data,
+    po_list,
     debounced_query,
     sort_by,
     sort_order,
     current_page,
-    select_option,
+    show_entries,
   ]);
-  // - Client-side Filtering
 
-  // + Total page of Pagination
   const total_pages = Math.ceil(
     (debounced_query
-      ? all_data.filter((u) =>
+      ? po_list.filter((u) =>
           columns.some((col) => {
             if (col.key === "actions") return false;
             const val = u[col.key];
@@ -179,11 +151,9 @@ const Purchase_Order = () => {
               .includes(debounced_query.toLowerCase());
           })
         ).length
-      : all_data.length) / select_option
+      : po_list.length) / show_entries
   );
-  // - Total page of Pagination
 
-  // + Sort Filtering
   const handle_sort = (column) => {
     if (sort_by === column)
       set_sort_order(sort_order === "asc" ? "desc" : "asc");
@@ -193,20 +163,16 @@ const Purchase_Order = () => {
     }
     set_current_page(1);
   };
-  // - Sort Filtering
-  const handle_page_change = (page) => set_current_page(page);
 
-  // + For Date Range Field
-  const date_range_ref = useRef(null);
-  // - For Date Range Field
+  const handle_page_change = (page) => set_current_page(page);
+  // - PO list client-side filtering
 
   const handle_create_new_po = () => {
     set_display_modal("select_po_type");
   };
 
   const handle_upload_po = () => {
-    // alert("Under Maintenance");
-    alert(`Start : ${start_date}\nEnd : ${end_date}`);
+    alert("Under Maintenance");
   };
 
   const handle_view_po = () => {
@@ -249,6 +215,7 @@ const Purchase_Order = () => {
           <div className="w-full">
             <div className="flex flex-wrap items-center justify-between gap-3 py-5">
               <h1 className="text-xl">Inbound</h1>
+              {/* + Breadcrumbs */}
               <nav>
                 <ol className="flex flex-wrap items-center gap-1.5">
                   <li>
@@ -268,9 +235,10 @@ const Purchase_Order = () => {
                   </li>
                 </ol>
               </nav>
+              {/* - Breadcrumbs */}
             </div>
-
             <div className="w-full bg-white rounded-lg border">
+              {/* + Header */}
               <div className="flex flex-wrap items-center justify-between gap-3 p-5">
                 <h1 className="text-lg">Purchase Order</h1>
                 <div className="flex gap-2">
@@ -292,7 +260,10 @@ const Purchase_Order = () => {
                   </Button>
                 </div>
               </div>
+              {/* - Header */}
+              {/* + Section 1 */}
               <div className="p-5 sm:p-6 border-t">
+                {/* + Date Range Filter */}
                 <div className="grid grid-cols-1 gap-5 md:w-[250px]">
                   <Date_Field
                     label="Start Date"
@@ -317,8 +288,12 @@ const Purchase_Order = () => {
                     </Button>
                   )}
                 </div>
+                {/* - Date Range Filter */}
               </div>
+              {/* - Section 1 */}
+              {/* + Section 2 */}
               <div className="p-5 sm:p-6 border-t">
+                {/* + PO List */}
                 <div className="w-full border rounded-lg">
                   <div className="w-full md:flex md:justify-between p-4 gap-4">
                     <div className="flex items-center text-sm gap-2">
@@ -326,9 +301,9 @@ const Purchase_Order = () => {
                       <div className="w-[90px]">
                         <Select_Field
                           name="option"
-                          value={select_option}
+                          value={show_entries}
                           on_change={(e) => {
-                            set_select_option(Number(e.target.value));
+                            set_show_entries(Number(e.target.value));
                             set_current_page(1);
                           }}
                           options={[
@@ -358,7 +333,8 @@ const Purchase_Order = () => {
                             on_change={(e) => set_search_query(e.target.value)}
                           />
                         </div>
-                        <div className="relative" ref={filter_ref}>
+                        {/* + PO Filter */}
+                        <div className="relative">
                           <Button
                             variant="white"
                             width="w-[100px]"
@@ -369,21 +345,14 @@ const Purchase_Order = () => {
                           >
                             Filter
                           </Button>
-
-                          {/* Filter Popover */}
+                          {/* + Filter Dropdown */}
                           {show_filter && (
                             <React.Fragment>
                               <div
                                 className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40"
-                                // onClick={() => set_show_filter(false)}
+                                onClick={() => set_show_filter(false)}
                               ></div>
                               <div className="absolute top-full mt-2 right-0 z-50 bg-white border rounded-lg shadow-md p-4 w-[260px]">
-                                {/* <div>
-                                  <Date_Range_Field
-                                    label="Date Range"
-                                    ref={date_range_ref}
-                                  />
-                                </div> */}
                                 <div className="mt-2 grid grid-cols-1 gap-3">
                                   <Checkbox_Field
                                     label="Posted"
@@ -433,18 +402,20 @@ const Purchase_Order = () => {
                               </div>
                             </React.Fragment>
                           )}
+                          {/* - Filter Dropdown */}
                         </div>
+                        {/* - PO Filter */}
                       </div>
                     </div>
                   </div>
 
-                  {/* Table */}
+                  {/* + PO Table */}
                   <div className="overflow-x-auto">
                     {loading ? (
                       <div className="p-6 text-center text-gray-500 text-sm">
                         Loading...
                       </div>
-                    ) : filtered_data.length === 0 ? (
+                    ) : filtered_po_list.length === 0 ? (
                       <div className="p-6 text-center text-gray-500 text-sm">
                         No data found
                       </div>
@@ -496,7 +467,7 @@ const Purchase_Order = () => {
                           </tr>
                         </thead>
                         <tbody className="bg-white">
-                          {filtered_data.map((row, idx) => {
+                          {filtered_po_list.map((row, idx) => {
                             // + Cell Renderer
                             const render_cell = (col, row) => {
                               const value = row[col.key];
@@ -594,7 +565,8 @@ const Purchase_Order = () => {
                       </table>
                     )}
                   </div>
-
+                  {/* - PO Table */}
+                  {/* + PO Pagination */}
                   {total_pages > 0 && (
                     <Pagination
                       current_page={current_page}
@@ -603,12 +575,16 @@ const Purchase_Order = () => {
                       variant="compact"
                     />
                   )}
+                  {/* - PO Pagination */}
                 </div>
+                {/* - PO List */}
               </div>
+              {/* - Section 2 */}
             </div>
           </div>
         </React.Fragment>
       )}
+      {/* + Pages */}
       {page === "po_creation" && (
         <Create_New_PO
           set_page={set_page}
@@ -630,6 +606,8 @@ const Purchase_Order = () => {
       {page === "post_view_po" && (
         <Post_View_PO set_page={set_page} for_posting={for_posting} />
       )}
+      {/* - Pages */}
+      {/* + Modals */}
       <Select_PO_Type
         is_open={display_modal === "select_po_type"}
         on_close={() => set_display_modal("")}
@@ -646,6 +624,7 @@ const Purchase_Order = () => {
         on_close={() => set_display_modal("")}
         width="max-w-[1280px]"
       />
+      {/* - Modals */}
     </React.Fragment>
   );
 };

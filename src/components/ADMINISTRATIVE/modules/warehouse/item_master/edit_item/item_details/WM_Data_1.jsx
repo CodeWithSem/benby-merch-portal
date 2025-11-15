@@ -30,7 +30,7 @@ const WM_Data_1 = () => {
         <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
           <div>
             <Text_Field
-              label="Base Unit of Measure"
+              label="Base Unit of Measure (UoM)"
               type={"text"}
               pattern="[0-9]{1,}"
               disabled

@@ -151,6 +151,14 @@ const Create_New_Vendor = ({
               >
                 Create
               </Button>
+              <Button
+                variant="white"
+                size="lg"
+                // width="w-[100px]"
+                on_click={() => set_page("main")}
+              >
+                Cancel
+              </Button>
             </div>
           </div>
         </div>

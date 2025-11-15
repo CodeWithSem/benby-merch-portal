@@ -18,16 +18,14 @@ import Pagination from "assets/elements/Pagination";
 import Button from "assets/elements/Button";
 import { useToast } from "../../../layout/Toast_Provider";
 import Date_Range_Field from "assets/elements/Date_Range_Field";
-import Checkbox_Field from "assets/elements/Checkbox_Field";
 import Create_New_Customer from "./create_new_customer/Create_New_Customer";
-// import Select_SO from "./modals/select_so/Select_SO";
-// import Create_New_GI from "./create_new_customer/Create_New_GI";
-// import Edit_GI from "./edit_customer/Edit_GI";
-// import Post_View_GI from "./modals/post_view_customer/Post_View_GI";
+import Edit_Customer from "./edit_customer/Edit_Customer";
+import View_Customer from "./view_customer/View_Customer";
+import Delete_Customer from "./modals/delete_customer/Delete_Customer";
 
 const Customer = () => {
   const filter_ref = useRef(null);
-  const [show_filter, set_show_filter] = useState(false);
+  const [show_filter, set_customerow_filter] = useState(false);
   const [page, set_page] = useState("main");
   const [display_modal, set_display_modal] = useState("");
   const [for_posting, set_for_posting] = useState(false);
@@ -47,15 +45,15 @@ const Customer = () => {
       id: 1,
       customer_code: "CS-0001",
       customer_name_1: "Customer Name 1",
-      creation_date: "MM-DD-YYYY 12:00:00",
+      creation_date: "MM-DD-YYYY",
     },
   ]);
   const [filtered_data, set_filtered_data] = useState([]);
   const [loading, set_loading] = useState(false);
   const [select_option, set_select_option] = useState(5);
   const [current_page, set_current_page] = useState(1);
-  const [sort_by, set_sort_by] = useState("timestamp");
-  const [sort_order, set_sort_order] = useState("asc");
+  const [sort_by, set_customerrt_by] = useState("timestamp");
+  const [sort_order, set_customerrt_order] = useState("asc");
   const [search_query, set_search_query] = useState("");
   const [debounced_query, set_debounced_query] = useState("");
 
@@ -132,12 +130,12 @@ const Customer = () => {
       : customer_list.length) / select_option
   );
 
-  const handle_sort = (column) => {
+  const handle_customerrt = (column) => {
     if (sort_by === column)
-      set_sort_order(sort_order === "asc" ? "desc" : "asc");
+      set_customerrt_order(sort_order === "asc" ? "desc" : "asc");
     else {
-      set_sort_by(column);
-      set_sort_order("asc");
+      set_customerrt_by(column);
+      set_customerrt_order("asc");
     }
     set_current_page(1);
   };
@@ -154,18 +152,16 @@ const Customer = () => {
     alert("Under Maintenance");
   };
 
-  const handle_view_customer = () => {
-    set_for_posting(false);
-    set_display_modal("view_customer");
+  const handle_view_customer = (id) => {
+    set_page("view_customer");
   };
 
   const handle_edit_customer = (id) => {
-    alert(`CUSTOMER ID : ${id}`);
     set_page("edit_customer");
   };
 
-  const handle_delete_so = () => {
-    set_display_modal("delete_so");
+  const handle_delete_customer = (id) => {
+    set_display_modal("delete_customer");
   };
 
   return (
@@ -264,7 +260,9 @@ const Customer = () => {
                             width="w-[100px]"
                             icon={SlidersHorizontal}
                             icon_position="left"
-                            on_click={() => set_show_filter((prev) => !prev)}
+                            on_click={() =>
+                              set_customerow_filter((prev) => !prev)
+                            }
                           >
                             Filter
                           </Button>
@@ -283,14 +281,18 @@ const Customer = () => {
                                   <Button
                                     size="sm"
                                     variant="primary"
-                                    on_click={() => set_show_filter(false)}
+                                    on_click={() =>
+                                      set_customerow_filter(false)
+                                    }
                                   >
                                     Apply
                                   </Button>
                                   <Button
                                     size="sm"
                                     variant="secondary"
-                                    on_click={() => set_show_filter(false)}
+                                    on_click={() =>
+                                      set_customerow_filter(false)
+                                    }
                                   >
                                     Cancel
                                   </Button>
@@ -317,12 +319,12 @@ const Customer = () => {
                         <thead className="bg-gray-100">
                           <tr className="whitespace-nowrap">
                             {columns.map((col, i) => {
-                              const is_sorted = sort_by === col.key;
+                              const is_customerrted = sort_by === col.key;
                               return (
                                 <th
                                   key={col.key}
                                   onClick={() =>
-                                    col.sortable && handle_sort(col.key)
+                                    col.sortable && handle_customerrt(col.key)
                                   }
                                   className={`border px-4 py-3 text-left text-[12px] font-medium text-gray-700 ${
                                     col.sortable
@@ -335,7 +337,7 @@ const Customer = () => {
                                   <div className="flex items-center justify-between w-full">
                                     <span>{col.label}</span>
                                     {col.sortable &&
-                                      is_sorted &&
+                                      is_customerrted &&
                                       (sort_order === "asc" ? (
                                         <ChevronUp
                                           size={14}
@@ -376,9 +378,9 @@ const Customer = () => {
                                     <div className="relative group flex jusity-center items-center">
                                       <button
                                         className="text-gray-500 hover:text-sky-600 text-[12px] outline-none"
-                                        // onClick={() =>
-                                        //   handle_edit_customer(row.id)
-                                        // }
+                                        onClick={() =>
+                                          handle_edit_customer(row.id)
+                                        }
                                       >
                                         <Edit size={19} />
                                       </button>
@@ -389,7 +391,9 @@ const Customer = () => {
                                     <div className="relative group flex jusity-center items-center">
                                       <button
                                         className="text-gray-500 hover:text-red-600 text-[12px] mb-[1px] outline-none"
-                                        onClick={() => handle_delete_so(row.id)}
+                                        onClick={() =>
+                                          handle_delete_customer(row.id)
+                                        }
                                       >
                                         <Trash size={19} />
                                       </button>
@@ -446,21 +450,13 @@ const Customer = () => {
       {page === "customer_creation" && (
         <Create_New_Customer set_page={set_page} />
       )}
-      {/* {page === "gi_creation" && <Create_New_GI set_page={set_page} />}
-      {page === "edit_customer" && <Edit_GI set_page={set_page} />}
-      <Select_SO
-        is_open={display_modal === "select_so"}
+      {page === "edit_customer" && <Edit_Customer set_page={set_page} />}
+      {page === "view_customer" && <View_Customer set_page={set_page} />}
+      <Delete_Customer
+        is_open={display_modal === "delete_customer"}
         on_close={() => set_display_modal("")}
         width="max-w-[1280px]"
-        height="max-h-[700px]"
-        set_page={set_page}
       />
-      <Post_View_GI
-        is_open={display_modal === "view_customer" || display_modal === "post_customer"}
-        for_posting={for_posting}
-        on_close={() => set_display_modal("")}
-        width="max-w-[1280px]"
-      /> */}
     </React.Fragment>
   );
 };

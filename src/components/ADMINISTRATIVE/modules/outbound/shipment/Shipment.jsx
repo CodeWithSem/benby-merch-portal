@@ -21,7 +21,7 @@ import Pagination from "assets/elements/Pagination";
 import Button from "assets/elements/Button";
 import { useToast } from "../../../layout/Toast_Provider";
 import Date_Range_Field from "assets/elements/Date_Range_Field";
-import Create_New_SH from "./create_new_SH/Create_New_SH";
+import Create_New_SH from "./create_new_sh/Create_New_SH";
 import Date_Field from "assets/elements/Date_Field";
 import { format_date_1 } from "assets/scripts/format";
 import {
@@ -30,6 +30,9 @@ import {
   sh_type_list,
   trans_plan_list,
 } from "./SH_DATA_MAP";
+import Edit_SH from "./edit_sh/Edit_SH";
+import Post_View_SH from "./post_view_sh/Post_View_SH";
+import Delete_SH from "./modals/delete_sh/Delete_SH";
 
 const Shipment = () => {
   const filter_ref = useRef(null);
@@ -74,8 +77,8 @@ const Shipment = () => {
   const [loading, set_loading] = useState(false);
   const [select_option, set_select_option] = useState(5);
   const [current_page, set_current_page] = useState(1);
-  const [sort_by, set_sort_by] = useState("timestamp");
-  const [sort_order, set_sort_order] = useState("asc");
+  const [sort_by, set_shrt_by] = useState("timestamp");
+  const [sort_order, set_shrt_order] = useState("asc");
   const [search_query, set_search_query] = useState("");
   const [debounced_query, set_debounced_query] = useState("");
 
@@ -152,12 +155,12 @@ const Shipment = () => {
       : shipment_list.length) / select_option
   );
 
-  const handle_sort = (column) => {
+  const handle_shrt = (column) => {
     if (sort_by === column)
-      set_sort_order(sort_order === "asc" ? "desc" : "asc");
+      set_shrt_order(sort_order === "asc" ? "desc" : "asc");
     else {
-      set_sort_by(column);
-      set_sort_order("asc");
+      set_shrt_by(column);
+      set_shrt_order("asc");
     }
     set_current_page(1);
   };
@@ -174,23 +177,22 @@ const Shipment = () => {
     alert("Under Maintenance");
   };
 
-  const handle_view_gi = () => {
+  const handle_view_sh = () => {
     set_for_posting(false);
-    set_display_modal("view_gi");
+    set_page("post_view_sh");
   };
 
-  const handle_post_gi = () => {
+  const handle_post_sh = () => {
     set_for_posting(true);
-    set_display_modal("post_gi");
+    set_page("post_view_sh");
   };
 
-  const handle_edit_gi = (id) => {
-    alert(`GI ID : ${id}`);
-    set_page("edit_gi");
+  const handle_edit_sh = (id) => {
+    set_page("edit_sh");
   };
 
-  const handle_delete_so = () => {
-    set_display_modal("delete_so");
+  const handle_delete_sh = () => {
+    set_display_modal("delete_sh");
   };
 
   const handle_change_start_date = (value) => {
@@ -398,12 +400,12 @@ const Shipment = () => {
                         <thead className="bg-gray-100">
                           <tr className="whitespace-nowrap">
                             {columns.map((col, i) => {
-                              const is_sorted = sort_by === col.key;
+                              const is_shrted = sort_by === col.key;
                               return (
                                 <th
                                   key={col.key}
                                   onClick={() =>
-                                    col.sortable && handle_sort(col.key)
+                                    col.sortable && handle_shrt(col.key)
                                   }
                                   className={`border px-4 py-3 text-left text-[12px] font-medium text-gray-700 ${
                                     col.sortable
@@ -416,7 +418,7 @@ const Shipment = () => {
                                   <div className="flex items-center justify-between w-full">
                                     <span>{col.label}</span>
                                     {col.sortable &&
-                                      is_sorted &&
+                                      is_shrted &&
                                       (sort_order === "asc" ? (
                                         <ChevronUp
                                           size={14}
@@ -466,7 +468,7 @@ const Shipment = () => {
                                     <div className="relative group flex jusity-center items-center">
                                       <button
                                         className="text-gray-500 hover:text-sky-600 text-[12px] outline-none"
-                                        onClick={() => handle_view_gi(row.id)}
+                                        onClick={() => handle_view_sh(row.id)}
                                       >
                                         <View size={19} />
                                       </button>
@@ -477,7 +479,7 @@ const Shipment = () => {
                                     <div className="relative group flex jusity-center items-center">
                                       <button
                                         className="text-gray-500 hover:text-sky-600 text-[12px] outline-none"
-                                        onClick={() => handle_post_gi(row.id)}
+                                        onClick={() => handle_post_sh(row.id)}
                                       >
                                         <FileInput size={19} />
                                       </button>
@@ -488,7 +490,7 @@ const Shipment = () => {
                                     <div className="relative group flex jusity-center items-center">
                                       <button
                                         className="text-gray-500 hover:text-sky-600 text-[12px] outline-none"
-                                        onClick={() => handle_edit_gi(row.id)}
+                                        onClick={() => handle_edit_sh(row.id)}
                                       >
                                         <Edit size={19} />
                                       </button>
@@ -499,7 +501,7 @@ const Shipment = () => {
                                     <div className="relative group flex jusity-center items-center">
                                       <button
                                         className="text-gray-500 hover:text-red-600 text-[12px] mb-[1px] outline-none"
-                                        onClick={() => handle_delete_so(row.id)}
+                                        onClick={() => handle_delete_sh(row.id)}
                                       >
                                         <Trash size={19} />
                                       </button>
@@ -562,21 +564,23 @@ const Shipment = () => {
           forward_agent_list={forward_agent_list}
         />
       )}
-      {/* {page === "gi_creation" && <Create_New_GI set_page={set_page} />}
-      {page === "edit_gi" && <Edit_GI set_page={set_page} />}
-      <Select_SO
-        is_open={display_modal === "select_so"}
+      {page === "edit_sh" && (
+        <Edit_SH
+          set_page={set_page}
+          sh_type_list={sh_type_list}
+          plate_no_list={plate_no_list}
+          trans_plan_list={trans_plan_list}
+          forward_agent_list={forward_agent_list}
+        />
+      )}
+      {page === "post_view_sh" && (
+        <Post_View_SH set_page={set_page} for_posting={for_posting} />
+      )}
+      <Delete_SH
+        is_open={display_modal === "delete_sh"}
         on_close={() => set_display_modal("")}
         width="max-w-[1280px]"
-        height="max-h-[700px]"
-        set_page={set_page}
       />
-      <Post_View_GI
-        is_open={display_modal === "view_gi" || display_modal === "post_gi"}
-        for_posting={for_posting}
-        on_close={() => set_display_modal("")}
-        width="max-w-[1280px]"
-      /> */}
     </React.Fragment>
   );
 };

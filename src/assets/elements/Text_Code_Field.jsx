@@ -1,4 +1,4 @@
-import { Search } from "lucide-react";
+import { Search, X } from "lucide-react";
 import React from "react";
 
 const Text_Code_Field = ({
@@ -18,6 +18,8 @@ const Text_Code_Field = ({
   code_width = "150px",
   required = false,
   show_search_button = true,
+  has_clear_button = false,
+  on_clear,
   min,
   max,
 }) => {
@@ -56,6 +58,7 @@ const Text_Code_Field = ({
 
   const button_wrapper_class = `flex-shrink-0 p-1`; // Prevent shrinking, preserve spacing
   const button_class = `inline-flex items-center justify-center px-2 h-full bg-sky-600 text-white hover:bg-sky-700 transition-colors rounded-[5px] outline-none`;
+  const clear_button_class = `inline-flex items-center justify-center px-2 h-full text-red-500 bg-red-100 hover:bg-red-200 transition-colors rounded-[5px] outline-none`;
 
   return (
     <label className="block">
@@ -99,6 +102,18 @@ const Text_Code_Field = ({
             autoComplete="off"
             spellCheck={false}
           />
+          {has_clear_button && (
+            <div className={button_wrapper_class}>
+              <button
+                type="button"
+                title="Search"
+                className={clear_button_class}
+                onClick={on_clear}
+              >
+                <X size={18} />
+              </button>
+            </div>
+          )}
           {show_search_button && (
             <div className={button_wrapper_class}>
               <button

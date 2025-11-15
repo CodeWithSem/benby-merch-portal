@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import Text_Field from "assets/elements/Text_Field";
 import Button from "assets/elements/Button";
-import { ChevronLeft, Save } from "lucide-react";
+import { ChevronLeft, CirclePlus, Save } from "lucide-react";
 import GI_Items from "./gi_items/GI_Items";
 import Select_Batch from "./modals/Select_Batch";
 
@@ -76,7 +76,7 @@ const Create_New_GI = ({ set_page }) => {
             </div>
 
             <div className="flex gap-2 text-gray-500 text-sm tracking-wider">
-              11/11/2025
+              MM-DD-YYYY
             </div>
           </div>
 
@@ -92,7 +92,7 @@ const Create_New_GI = ({ set_page }) => {
                       <Text_Field
                         label="SO Number"
                         type="text"
-                        value="SO-0000001"
+                        value="SO-XXXXXXXXX"
                         bg_color="slate-50"
                         disabled
                       />
@@ -120,7 +120,7 @@ const Create_New_GI = ({ set_page }) => {
                       <Text_Field
                         label="Creation Date"
                         type="text"
-                        value="11/11/2025"
+                        value="MM-DD-YYYY"
                         bg_color="slate-50"
                         disabled
                       />
@@ -131,21 +131,18 @@ const Create_New_GI = ({ set_page }) => {
               </div>
             </div>
           </div>
-
-          {/* === GI ITEMS TABLE === */}
           <GI_Items />
-
           {/* === ACTION BUTTONS === */}
           <div className="p-4 sm:p-8 border-t">
             <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
               <Button
                 variant="primary"
                 size="lg"
-                icon={Save}
+                icon={CirclePlus}
                 icon_position="left"
                 on_click={handle_save}
               >
-                Save
+                Create
               </Button>
             </div>
           </div>

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import Text_Field from "assets/elements/Text_Field";
 import Button from "assets/elements/Button";
-import { ChevronLeft, Save } from "lucide-react";
+import { ChevronLeft, RefreshCcwDot, Save } from "lucide-react";
 import GI_Items from "./gi_items/GI_Items";
 
 const Edit_GI = ({ set_page }) => {
@@ -90,8 +90,7 @@ const Edit_GI = ({ set_page }) => {
                       <Text_Field
                         label="SO Number"
                         type="text"
-                        value="SO-0000001"
-                        bg_color="slate-50"
+                        value="SO-XXXXXXXXX"
                         disabled
                       />
                     </div>
@@ -99,10 +98,9 @@ const Edit_GI = ({ set_page }) => {
                     {/* + GI Number */}
                     <div className="col-span-full">
                       <Text_Field
-                        label="GI Number"
+                        label="DO Number"
                         type="text"
-                        value="GI-0000001"
-                        bg_color="slate-50"
+                        value="DO-XXXXXXXXX"
                         disabled
                       />
                     </div>
@@ -119,7 +117,6 @@ const Edit_GI = ({ set_page }) => {
                         label="Creation Date"
                         type="text"
                         value="MM-DD-YYYY"
-                        bg_color="slate-50"
                         disabled
                       />
                     </div>
@@ -137,11 +134,11 @@ const Edit_GI = ({ set_page }) => {
               <Button
                 variant="primary"
                 size="lg"
-                icon={Save}
+                icon={RefreshCcwDot}
                 icon_position="left"
                 on_click={handle_save}
               >
-                Save
+                Update
               </Button>
             </div>
           </div>

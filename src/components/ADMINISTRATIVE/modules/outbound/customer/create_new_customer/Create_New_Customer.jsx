@@ -24,7 +24,7 @@ const Create_New_Customer = ({ set_page }) => {
     <React.Fragment>
       <div className="w-full">
         <div className="flex flex-wrap items-center justify-between gap-3 py-5">
-          <h1 className="text-xl">Inbound</h1>
+          <h1 className="text-xl">Outbound</h1>
           <nav>
             <ol className="flex flex-wrap items-center gap-1.5">
               <li>
@@ -38,7 +38,7 @@ const Create_New_Customer = ({ set_page }) => {
                   className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-sky-500 cursor-pointer"
                   onClick={() => set_page("main")}
                 >
-                  Inbound
+                  Outbound
                 </a>
               </li>
               <li className="flex items-center gap-1.5 text-sm text-gray-500">

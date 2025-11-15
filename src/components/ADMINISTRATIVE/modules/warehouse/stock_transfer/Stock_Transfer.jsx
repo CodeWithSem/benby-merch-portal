@@ -10,6 +10,7 @@ import {
   RefreshCw,
   SlidersHorizontal,
   FileInput,
+  Database,
 } from "lucide-react";
 import { useToast } from "../../../layout/Toast_Provider";
 import Button from "assets/elements/Button";
@@ -18,6 +19,8 @@ import Select_Field from "assets/elements/Select_Field";
 import Date_Range_Field from "assets/elements/Date_Range_Field";
 import Pagination from "assets/elements/Pagination";
 import Transfer_Process from "./transfer_process/Transfer_Process";
+import Date_Field from "assets/elements/Date_Field";
+import { format_date_1 } from "assets/scripts/format";
 
 const Stock_Transfer = () => {
   const filter_ref = useRef(null);
@@ -25,6 +28,11 @@ const Stock_Transfer = () => {
   const [page, set_page] = useState("main");
   const [display_modal, set_display_modal] = useState("");
   const date_range_ref = useRef(null);
+
+  const today = format_date_1(new Date());
+  const [start_date, set_start_date] = useState(today);
+  const [end_date, set_end_date] = useState(today);
+  const [show_load_data_button, set_show_load_data_button] = useState(false);
 
   // Close dropdown on outside click
   const { show_toast } = useToast();
@@ -210,6 +218,20 @@ const Stock_Transfer = () => {
   const handle_transfer_process = () => {
     set_page("transfer_process");
   };
+
+  const handle_change_start_date = (value) => {
+    set_start_date(format_date_1(value));
+    set_show_load_data_button(true);
+  };
+
+  const handle_change_end_date = (value) => {
+    set_end_date(format_date_1(value));
+    set_show_load_data_button(true);
+  };
+
+  const handle_load_data = () => {
+    set_show_load_data_button(false);
+  };
   // RETURN ORIGIN
   return (
     <React.Fragment>
@@ -260,6 +282,32 @@ const Stock_Transfer = () => {
               {/* - Title */}
               {/* + Content */}
               <div className="p-5 sm:p-6 border-t">
+                <div className="grid grid-cols-1 gap-5 md:w-[250px]">
+                  <Date_Field
+                    label="Start Date"
+                    value={start_date}
+                    on_change={(e) => handle_change_start_date(e.target.value)}
+                    placeholder="Select Date"
+                  />
+                  <Date_Field
+                    label="End Date"
+                    value={end_date}
+                    on_change={(e) => handle_change_end_date(e.target.value)}
+                    placeholder="Select Date"
+                  />
+                  {show_load_data_button && (
+                    <Button
+                      variant="primary"
+                      icon={Database}
+                      icon_position="left"
+                      on_click={handle_load_data}
+                    >
+                      Load Data
+                    </Button>
+                  )}
+                </div>
+              </div>
+              <div className="p-5 sm:p-6 border-t">
                 <div className="w-full border rounded-lg">
                   <div className="w-full md:flex md:justify-between p-4 gap-4">
                     <div className="flex items-center text-sm gap-2">
@@ -287,7 +335,6 @@ const Stock_Transfer = () => {
                         //   on_click={() => load_data()}
                       ></Button>
                     </div>
-
                     <div className="w-full mt-4 md:mt-0 md:w-[600px]">
                       <div className="w-full flex items-center gap-2">
                         <div className="w-full">

@@ -11,6 +11,7 @@ import {
   SlidersHorizontal,
   FileInput,
   FileUp,
+  Database,
 } from "lucide-react";
 import { useToast } from "../../../layout/Toast_Provider";
 import Button from "assets/elements/Button";
@@ -29,6 +30,7 @@ const Inventory_Master = () => {
   const [page, set_page] = useState("main");
   const [display_modal, set_display_modal] = useState("");
   const date_range_ref = useRef(null);
+  const [show_load_data_button, set_show_load_data_button] = useState(true);
 
   // Close dropdown on outside click
   const { show_toast } = useToast();
@@ -267,6 +269,8 @@ const Inventory_Master = () => {
                 code_width="150px"
                 show_search_button={true}
                 on_click={handle_select_branch}
+                has_clear_button={true}
+                on_clear={() => alert("Clear Branch")}
                 disabled
               />
               <Text_Code_Field
@@ -274,6 +278,8 @@ const Inventory_Master = () => {
                 code_width="150px"
                 show_search_button={true}
                 on_click={handle_select_plant}
+                has_clear_button={true}
+                on_clear={() => alert("Clear Plant")}
                 disabled
               />
               <Text_Code_Field
@@ -281,8 +287,23 @@ const Inventory_Master = () => {
                 code_width="150px"
                 show_search_button={true}
                 on_click={handle_select_sloc}
+                has_clear_button={true}
+                on_clear={() => alert("Clear SLOC")}
                 disabled
               />
+              {show_load_data_button && (
+                <div className="flex md:justify-end">
+                  <Button
+                    variant="primary"
+                    icon={Database}
+                    icon_position="left"
+                    class_name="w-full md:w-auto"
+                    // on_click={handle_load_data}
+                  >
+                    Load Data
+                  </Button>
+                </div>
+              )}
             </div>
           </div>
           {/* - Branch > Plant > SLOC Selection */}
@@ -328,7 +349,7 @@ const Inventory_Master = () => {
                         on_change={(e) => set_search_query(e.target.value)}
                       />
                     </div>
-                    <div className="relative" ref={filter_ref}>
+                    {/* <div className="relative" ref={filter_ref}>
                       <Button
                         variant="white"
                         width="w-[100px]"
@@ -340,12 +361,10 @@ const Inventory_Master = () => {
                         Filter
                       </Button>
 
-                      {/* Filter Popover */}
                       {show_filter && (
                         <React.Fragment>
                           <div
                             className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40"
-                            // onClick={() => set_show_filter(false)}
                           ></div>
                           <div className="absolute top-full mt-2 right-0 z-50 bg-white border rounded-lg shadow-md p-4 w-[260px]">
                             <div>
@@ -373,7 +392,7 @@ const Inventory_Master = () => {
                           </div>
                         </React.Fragment>
                       )}
-                    </div>
+                    </div> */}
                   </div>
                 </div>
               </div>

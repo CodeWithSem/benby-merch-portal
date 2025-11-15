@@ -1,7 +1,7 @@
 import Button from "assets/elements/Button";
 import Text_Field from "assets/elements/Text_Field";
 import { format_date_1, get_date_now } from "assets/scripts/format";
-import { ChevronLeft, Save, UserPlus } from "lucide-react";
+import { ChevronLeft, RefreshCcwDot, Save, UserPlus } from "lucide-react";
 import React, { useState } from "react";
 import Account from "./vendor_details/Account";
 import Address from "./vendor_details/Address";
@@ -129,11 +129,19 @@ const Edit_Vendor = ({ set_page }) => {
                 variant="primary"
                 size="lg"
                 // width="w-[100px]"
-                icon={UserPlus}
+                icon={RefreshCcwDot}
                 icon_position="left"
                 // on_click={handle_save}
               >
-                Create
+                Update
+              </Button>
+              <Button
+                variant="white"
+                size="lg"
+                // width="w-[100px]"
+                on_click={() => set_page("main")}
+              >
+                Cancel
               </Button>
             </div>
           </div>

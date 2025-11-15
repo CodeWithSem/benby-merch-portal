@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import Text_Field from "assets/elements/Text_Field";
 import Button from "assets/elements/Button";
-import { ChevronLeft, Save } from "lucide-react";
+import { ChevronLeft, CirclePlus, Save } from "lucide-react";
 import GR_Items from "./gr_items/GR_Items";
 
 const Create_New_GR = ({ set_page }) => {
@@ -128,11 +128,20 @@ const Create_New_GR = ({ set_page }) => {
               <Button
                 variant="primary"
                 size="lg"
-                icon={Save}
+                // width="w-[100px]"
+                icon={CirclePlus}
                 icon_position="left"
                 on_click={handle_save}
               >
-                Save
+                Create
+              </Button>
+              <Button
+                variant="white"
+                size="lg"
+                // width="w-[100px]"
+                on_click={() => set_page("main")}
+              >
+                Cancel
               </Button>
             </div>
           </div>

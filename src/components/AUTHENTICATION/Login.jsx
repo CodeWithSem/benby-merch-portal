@@ -53,16 +53,16 @@ const Login = () => {
 
   return (
     <React.Fragment>
-      <div className="relative z-1 bg-white p-6 sm:p-0 dark:bg-gray-900">
-        <div className="relative flex h-screen w-full flex-col justify-center sm:p-0 lg:flex-row dark:bg-gray-900">
+      <div className="relative z-1 bg-white p-6 sm:p-0">
+        <div className="relative flex h-screen w-full flex-col justify-center sm:p-0 lg:flex-row">
           {/* Left side - Form */}
           <div className="flex w-full flex-1 flex-col lg:w-1/2">
             <div className="mx-auto flex w-full max-w-md flex-1 flex-col justify-center">
               <div className="mb-5 sm:mb-8">
-                <h1 className="text-3xl md:text-4xl mb-2 font-semibold text-gray-800 dark:text-white/90">
+                <h1 className="text-3xl md:text-4xl mb-2 font-semibold text-gray-800">
                   Sign In
                 </h1>
-                <p className="text-sm text-gray-500 dark:text-gray-400">
+                <p className="text-sm text-gray-500">
                   Enter your username and password to sign in!
                 </p>
               </div>
@@ -71,7 +71,7 @@ const Login = () => {
                 <div className="space-y-5">
                   {/* Username */}
                   <div>
-                    <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                    <label className="mb-1.5 block text-sm font-medium text-gray-700">
                       Username <span className="text-red-500">*</span>
                     </label>
                     <input
@@ -86,7 +86,7 @@ const Login = () => {
 
                   {/* Password */}
                   <div>
-                    <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                    <label className="mb-1.5 block text-sm font-medium text-gray-700">
                       Password <span className="text-red-500">*</span>
                     </label>
                     <div className="relative rounded-md shadow-sm border text-sm border-gray-300 focus-within:ring-1 focus-within:ring-sky-500 focus-within:border-sky-500">
@@ -99,7 +99,7 @@ const Login = () => {
                         required
                       />
                       <span
-                        className="absolute top-1/2 right-4 z-30 -translate-y-1/2 cursor-pointer text-gray-500 dark:text-gray-400"
+                        className="absolute top-1/2 right-4 z-30 -translate-y-1/2 cursor-pointer text-gray-500"
                         onClick={toggle_password_visibility}
                       >
                         {show_password ? (
@@ -135,10 +135,10 @@ const Login = () => {
 
               {/* Sign up link */}
               <div className="mt-5">
-                <p className="text-center text-sm font-normal text-gray-700 sm:text-start dark:text-gray-400">
+                <p className="text-center text-sm font-normal text-gray-700 sm:text-start">
                   Don't have an account?
                   <span
-                    className="text-sky-600 hover:text-sky-700 dark:text-sky-400 ml-2 cursor-pointer"
+                    className="text-sky-600 hover:text-sky-700 ml-2 cursor-pointer"
                     onClick={() => set_page("sign_up")}
                   >
                     Sign Up
@@ -149,7 +149,7 @@ const Login = () => {
           </div>
 
           {/* Right side - Branding */}
-          <div className="bg-sky-800 relative hidden h-full w-full items-center lg:grid lg:w-1/2 dark:bg-white/5">
+          <div className="bg-sky-800 relative hidden h-full w-full items-center lg:grid lg:w-1/2">
             <div className="z-1 flex items-center justify-center">
               <div className="flex max-w-xs flex-col items-center">
                 <a className="mb-4 block">
@@ -167,7 +167,7 @@ const Login = () => {
                     <img src={auth_img} alt="Logo" />
                   </div>
                 </div>
-                <p className="text-center text-sm text-gray-300 dark:text-white/60">
+                <p className="text-center text-sm text-gray-300">
                   Empowering businesses to run smarter, faster, and together —
                   all your operations, one platform.
                 </p>

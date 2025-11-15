@@ -46,7 +46,7 @@ const Edit_Item = ({ set_page }) => {
     <React.Fragment>
       <div className="w-full">
         <div className="flex flex-wrap items-center justify-between gap-3 py-5">
-          <h1 className="text-xl">Inbound</h1>
+          <h1 className="text-xl">Warehouse</h1>
           <nav>
             <ol className="flex flex-wrap items-center gap-1.5">
               <li>
