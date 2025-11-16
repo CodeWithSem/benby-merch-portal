@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import Text_Field from "assets/elements/Text_Field";
 import Button from "assets/elements/Button";
-import { ChevronLeft, CirclePlus, Eye, Save, SaveAll } from "lucide-react";
+import { ChevronLeft, CirclePlus, Eye, Save } from "lucide-react";
 import Text_Code_Field from "assets/elements/Text_Code_Field";
 import Delivery from "./po_details/Delivery";
 import Address from "./po_details/Address";
@@ -53,6 +53,7 @@ const Create_New_PO = ({
       <div className="w-full">
         <div className="flex flex-wrap items-center justify-between gap-3 py-5">
           <h1 className="text-xl">Inbound</h1>
+          {/* + Breadcrumbs */}
           <nav>
             <ol className="flex flex-wrap items-center gap-1.5">
               <li>
@@ -84,9 +85,11 @@ const Create_New_PO = ({
               </li>
             </ol>
           </nav>
+          {/* - Breadcrumbs */}
         </div>
 
         <div className="w-full bg-white rounded-lg border">
+          {/* + Header */}
           <div className="flex flex-wrap items-center justify-between gap-3 p-5">
             <div className="flex items-center gap-3">
               <Button
@@ -96,118 +99,90 @@ const Create_New_PO = ({
                 width="w-[20px]"
                 on_click={() => set_page("main")}
               ></Button>
-              {/* <ChevronLeft className="text-gray-500" size={24} /> */}
               <h1 className="text-lg">Purchase Order Creation</h1>
             </div>
-
             <div className="flex gap-2">
               <div className="text-gray-500 text-sm tracking-wider">
                 {format_date_1(get_date_now())}
               </div>
-              {/* <Button
-                variant="primary"
-                icon={Save}
-                icon_position="left"
-                // on_click={handle_create_new_po}
-              >
-                Save
-              </Button>
-              <Button
-                variant="primary"
-                icon={SaveAll}
-                icon_position="left"
-                //   on_click={() => set_display_modal("add_admin")}
-              >
-                Save as Draft
-              </Button> */}
             </div>
           </div>
-
+          {/* - Header */}
+          {/* + Section 1 */}
           <div className="p-5 sm:p-6 border-t">
             <div className="w-full">
-              <div className="space-y-6">
-                <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
-                  <div className="col-span-full">
-                    <Text_Field
-                      label="PO Number"
-                      type={"text"}
-                      value={"AUTO GENERATED"}
-                      // on_change={handle_text_change}
-                      pattern="[A-Za-z]{1,}"
-                      disabled
-                    />
-                  </div>
-                  <div className="col-span-full">
-                    <Text_Code_Field
-                      label="PO Type"
-                      // code_value={search_value}
-                      // on_code_change={handle_change}
-                      // text_value={search_value}
-                      // on_text_change={handle_change}
-                      code_width="150px"
-                      show_search_button={false}
-                      disabled
-                    />
-                  </div>
-                  <div className="col-span-full">
-                    <Text_Code_Field
-                      label="Vendor"
-                      // code_value={search_value}
-                      // on_code_change={handle_change}
-                      // text_value={search_value}
-                      // on_text_change={handle_change}
-                      code_width="150px"
-                      show_search_button={true}
-                      on_click={() => set_display_modal("select_vendor")}
-                      disabled
-                    />
-                  </div>
-                  <div className="col-span-full">
-                    <Text_Code_Field
-                      label="Branch"
-                      // code_value={search_value}
-                      // on_code_change={handle_change}
-                      // text_value={search_value}
-                      // on_text_change={handle_change}
-                      code_width="150px"
-                      show_search_button={true}
-                      on_click={() => set_display_modal("select_branch")}
-                      disabled
-                    />
-                  </div>
-                  <div className="col-span-full">
-                    <Text_Code_Field
-                      label="Plant / DC"
-                      // code_value={search_value}
-                      // on_code_change={handle_change}
-                      // text_value={search_value}
-                      // on_text_change={handle_change}
-                      code_width="150px"
-                      show_search_button={true}
-                      on_click={() => set_display_modal("select_plant")}
-                      disabled
-                    />
-                  </div>
-                  <div className="col-span-full">
-                    <Text_Code_Field
-                      label="SLOC"
-                      // code_value={search_value}
-                      // on_code_change={handle_change}
-                      // text_value={search_value}
-                      // on_text_change={handle_change}
-                      code_width="150px"
-                      show_search_button={true}
-                      on_click={() => set_display_modal("select_sloc")}
-                      disabled
-                    />
-                  </div>
+              <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+                <div className="col-span-full">
+                  <Text_Field
+                    label="PO Number"
+                    type={"text"}
+                    value={"AUTO GENERATED"}
+                    disabled
+                  />
+                </div>
+                <div className="col-span-full">
+                  <Text_Code_Field
+                    label="PO Type"
+                    // code_value={search_value}
+                    // text_value={search_value}
+                    code_width="150px"
+                    show_search_button={false}
+                    disabled
+                  />
+                </div>
+                <div className="col-span-full">
+                  <Text_Code_Field
+                    label="Vendor"
+                    // code_value={search_value}
+                    // text_value={search_value}
+                    code_width="150px"
+                    show_search_button={true}
+                    on_click={() => set_display_modal("select_vendor")}
+                    disabled
+                  />
+                </div>
+                <div className="col-span-full">
+                  <Text_Code_Field
+                    label="Branch"
+                    // code_value={search_value}
+                    // text_value={search_value}
+                    code_width="150px"
+                    show_search_button={true}
+                    on_click={() => set_display_modal("select_branch")}
+                    disabled
+                  />
+                </div>
+                <div className="col-span-full">
+                  <Text_Code_Field
+                    label="Plant / DC"
+                    // code_value={search_value}
+                    // text_value={search_value}
+                    code_width="150px"
+                    show_search_button={true}
+                    on_click={() => set_display_modal("select_plant")}
+                    disabled
+                  />
+                </div>
+                <div className="col-span-full">
+                  <Text_Code_Field
+                    label="SLOC"
+                    // code_value={search_value}
+                    // text_value={search_value}
+                    code_width="150px"
+                    show_search_button={true}
+                    on_click={() => set_display_modal("select_sloc")}
+                    disabled
+                  />
                 </div>
               </div>
             </div>
           </div>
+          {/* - Section 1 */}
+          {/* + Section 2 */}
           <div className="p-5 sm:p-6 border-t">
             <div className="w-full bg-white rounded-lg border">
-              <div className="w-full border-b p-2">
+              {/* + Tab Navigation */}
+              <div className="w-full border-b p-2 select-none">
                 <nav className="flex overflow-x-auto rounded-lg bg-gray-100 p-1 dark:bg-gray-900 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-200 dark:[&::-webkit-scrollbar-thumb]:bg-gray-600 [&::-webkit-scrollbar-track]:bg-white dark:[&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar]:h-1.5">
                   {tabs.map((tab) => (
                     <button
@@ -224,7 +199,7 @@ const Create_New_PO = ({
                   ))}
                 </nav>
               </div>
-
+              {/* - Tab Navigation */}
               {/* + Tab Content */}
               <div className="p-6">
                 {active_tab === "delivery" && <Delivery />}
@@ -237,13 +212,16 @@ const Create_New_PO = ({
               {/* - Tab Content */}
             </div>
           </div>
+          {/* - Section 2 */}
+          {/* + Section 3 */}
           <PO_Items set_display_modal={set_display_modal} />
+          {/* - Section 3 */}
+          {/* + Section 4 */}
           <div className="p-4 sm:p-8 border-t">
             <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
               <Button
                 variant="white"
                 size="lg"
-                // width="w-[100px]"
                 icon={Eye}
                 icon_position="left"
                 on_click={handle_preview}
@@ -253,7 +231,6 @@ const Create_New_PO = ({
               <Button
                 variant="primary"
                 size="lg"
-                // width="w-[100px]"
                 icon={Save}
                 icon_position="left"
                 on_click={handle_save_as_draft}
@@ -263,7 +240,6 @@ const Create_New_PO = ({
               <Button
                 variant="primary"
                 size="lg"
-                // width="w-[100px]"
                 icon={CirclePlus}
                 icon_position="left"
                 on_click={handle_save}
@@ -280,8 +256,10 @@ const Create_New_PO = ({
               </Button>
             </div>
           </div>
+          {/* - Section 4 */}
         </div>
       </div>
+      {/* + Modals */}
       <Select_Vendor
         is_open={display_modal === "select_vendor"}
         on_close={() => set_display_modal("")}
@@ -316,6 +294,7 @@ const Create_New_PO = ({
         width="max-w-[1000px]"
         height="max-h-[700px]"
       />
+      {/* - Modals */}
     </React.Fragment>
   );
 };

@@ -5,6 +5,7 @@ import Checkbox_Field from "assets/elements/Checkbox_Field";
 const PO_Status = () => {
   return (
     <React.Fragment>
+      {/* + Section 1 */}
       <div className="rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6 dark:border-gray-800 dark:bg-gray-900">
         <h1 className="mb-5 font-semibold text-sky-700">
           Purchase Order Status
@@ -14,9 +15,7 @@ const PO_Status = () => {
             <Text_Code_Field
               label="Ordered"
               // code_value={search_value}
-              // on_code_change={handle_change}
               // text_value={search_value}
-              // on_text_change={handle_change}
               code_width="150px"
               show_search_button={false}
               disabled
@@ -26,9 +25,7 @@ const PO_Status = () => {
             <Text_Code_Field
               label="Still to Deliver"
               // code_value={search_value}
-              // on_code_change={handle_change}
               // text_value={search_value}
-              // on_text_change={handle_change}
               code_width="150px"
               show_search_button={false}
               disabled
@@ -38,9 +35,7 @@ const PO_Status = () => {
             <Text_Code_Field
               label="Delivered"
               // code_value={search_value}
-              // on_code_change={handle_change}
               // text_value={search_value}
-              // on_text_change={handle_change}
               code_width="150px"
               show_search_button={false}
               disabled
@@ -50,9 +45,7 @@ const PO_Status = () => {
             <Text_Code_Field
               label="Still Invoice"
               // code_value={search_value}
-              // on_code_change={handle_change}
               // text_value={search_value}
-              // on_text_change={handle_change}
               code_width="150px"
               show_search_button={false}
               disabled
@@ -62,9 +55,7 @@ const PO_Status = () => {
             <Text_Code_Field
               label="Invoiced"
               // code_value={search_value}
-              // on_code_change={handle_change}
               // text_value={search_value}
-              // on_text_change={handle_change}
               code_width="150px"
               show_search_button={false}
               disabled
@@ -72,6 +63,8 @@ const PO_Status = () => {
           </div>
         </div>
       </div>
+      {/* - Section 1 */}
+      {/* + Section 2 */}
       <div className="mt-5 rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6 dark:border-gray-800 dark:bg-gray-900">
         <h1 className="mb-5 font-semibold text-sky-700">Action</h1>
         <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
@@ -88,6 +81,7 @@ const PO_Status = () => {
           </div>
         </div>
       </div>
+      {/* - Section 2 */}
     </React.Fragment>
   );
 };

@@ -11,6 +11,7 @@ const Shipment = () => {
   };
   return (
     <React.Fragment>
+      {/* + Section 1 */}
       <div className="rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6 dark:border-gray-800 dark:bg-gray-900">
         <h1 className="mb-5 font-semibold text-sky-700">Customer Data</h1>
         <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
@@ -29,7 +30,6 @@ const Shipment = () => {
               placeholder="Enter container size"
               // value={}
               // on_change={handle_text_change}
-              pattern="[A-Za-z]{1,}"
             />
           </div>
           <div>
@@ -39,7 +39,6 @@ const Shipment = () => {
               placeholder="Enter shipping line"
               // value={}
               // on_change={handle_text_change}
-              pattern="[A-Za-z]{1,}"
             />
           </div>
           <div>
@@ -49,11 +48,12 @@ const Shipment = () => {
               placeholder="Enter container number"
               // value={}
               // on_change={handle_text_change}
-              pattern="[A-Za-z]{1,}"
             />
           </div>
         </div>
       </div>
+      {/* - Section 1 */}
+      {/* + Section 2 */}
       <div className="mt-5 rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6 dark:border-gray-800 dark:bg-gray-900">
         <h1 className="mb-5 font-semibold text-sky-700">Stopo Details</h1>
         <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
@@ -64,7 +64,6 @@ const Shipment = () => {
               placeholder="Enter virtual stopo"
               // value={}
               // on_change={handle_text_change}
-              pattern="[A-Za-z]{1,}"
             />
           </div>
           <div className="col-span-full">
@@ -74,11 +73,11 @@ const Shipment = () => {
               placeholder="Enter branch group"
               // value={}
               // on_change={handle_text_change}
-              pattern="[A-Za-z]{1,}"
             />
           </div>
         </div>
       </div>
+      {/* - Section 2 */}
     </React.Fragment>
   );
 };

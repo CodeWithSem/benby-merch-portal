@@ -24,36 +24,36 @@ const PO_Items = ({ set_display_modal }) => {
   const items = [
     {
       id: 1,
-      item_code: "00000001",
-      name: 'Macbook Pro 13"',
-      quantity: 5,
-      unit_price: 100000,
-      discount: 0,
-      total: 500000,
+      item_code: "ITM-000000001",
+      item_desc: 'Macbook Pro 13"',
+      quantity: "5",
+      unit_price: "100000",
+      discount: "0",
+      total: "500000",
     },
     {
       id: 2,
-      item_code: "00000002",
-      name: "iPhone 15 Pro Max",
-      quantity: 1,
-      unit_price: 60000,
-      discount: 0,
-      total: 60000,
+      item_code: "ITM-000000002",
+      item_desc: "iPhone 15 Pro Max",
+      quantity: "1",
+      unit_price: "60000",
+      discount: "0",
+      total: "60000",
     },
   ];
   const handle_add_item = () => {
-    alert("Under Maintenance");
+    alert("Add Item");
   };
   const handle_show_details = () => {
     set_display_item_modal("show_details");
   };
-  const handle_edit_item = () => {
+  const handle_edit_item = (item) => {
+    console.log(item);
     set_display_item_modal("edit_item");
   };
   // RETURN ORIGIN
   return (
     <React.Fragment>
-      {/* + Item Section */}
       <div className="flex flex-col gap-5 border-t p-5 sm:p-6">
         <div className="overflow-hidden rounded-lg border border-gray-200 bg-white pt-4 dark:border-gray-800 dark:bg-white/[0.03]">
           <div className="flex flex-col gap-5 px-6 md:pl-6 md:pr-3 mb-4 sm:flex-row sm:items-center sm:justify-between">
@@ -65,7 +65,7 @@ const PO_Items = ({ set_display_modal }) => {
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center md:w-[500px]">
               <div className="w-full">
                 <Icon_Field
-                  name="search"
+                  item_desc="search"
                   placeholder="Search..."
                   icon={Search}
                   icon_position="left"
@@ -105,7 +105,7 @@ const PO_Items = ({ set_display_modal }) => {
                       {index + 1}
                     </td>
                     <td className="px-5 py-4 font-medium whitespace-nowrap text-gray-800 dark:text-white/90">
-                      {item.name}
+                      {item.item_desc}
                     </td>
                     <td className="px-5 py-4 whitespace-nowrap text-gray-500 dark:text-gray-400">
                       {item.quantity}
@@ -222,7 +222,7 @@ const PO_Items = ({ set_display_modal }) => {
                 variant="primary"
                 width="w-full"
                 icon={CirclePlus}
-                onClick={handle_add_item}
+                on_click={handle_add_item}
               >
                 Add Item
               </Button>
@@ -270,7 +270,7 @@ const PO_Items = ({ set_display_modal }) => {
           </div>
         </div>
       </div>
-      {/* - Item Section */}
+      {/* + Modals */}
       <Show_Item_Details
         is_open={display_item_modal === "show_details"}
         on_close={() => set_display_item_modal("")}
@@ -281,6 +281,7 @@ const PO_Items = ({ set_display_modal }) => {
         on_close={() => set_display_item_modal("")}
         width="max-w-[1280px]"
       />
+      {/* - Modals */}
     </React.Fragment>
   );
 };

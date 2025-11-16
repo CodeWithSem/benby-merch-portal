@@ -47,9 +47,7 @@ const Edit_Item = ({ is_open, on_close, width = "max-w-[700px]" }) => {
                 <div className="w-full lg:col-span-9">
                   <Find_Field
                     label="Item Name"
-                    name="item_name"
                     // value={search_value}
-                    // on_change={handle_change}
                     on_click={() => set_display_item_modal("select_item")}
                     disabled
                   />
@@ -59,7 +57,6 @@ const Edit_Item = ({ is_open, on_close, width = "max-w-[700px]" }) => {
                     label="Unit Price"
                     type={"text"}
                     // value={text}
-                    // on_change={handle_text_change}
                     disabled
                   />
                 </div>
@@ -68,7 +65,6 @@ const Edit_Item = ({ is_open, on_close, width = "max-w-[700px]" }) => {
                     label="Unit"
                     type={"text"}
                     // value={text}
-                    // on_change={handle_text_change}
                     disabled
                   />
                 </div>
@@ -98,11 +94,7 @@ const Edit_Item = ({ is_open, on_close, width = "max-w-[700px]" }) => {
           {/* - Modal Body */}
           {/* + Modal Footer */}
           <div className="flex justify-end gap-2 mt-5">
-            <Button
-              width="w-[100px]"
-              variant="primary"
-              // on_click={() => set_is_confirm_modal_open(true)}
-            >
+            <Button width="w-[100px]" variant="primary">
               Proceed
             </Button>
             <Button width="w-[100px]" variant="white" on_click={on_close}>

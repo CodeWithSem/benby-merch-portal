@@ -4,6 +4,7 @@ import Text_Field from "assets/elements/Text_Field";
 const Address = () => {
   return (
     <React.Fragment>
+      {/* + Section 1 */}
       <div className="rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6 dark:border-gray-800 dark:bg-gray-900">
         <h1 className="mb-5 font-semibold text-sky-700">Address Information</h1>
         <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
@@ -12,8 +13,7 @@ const Address = () => {
               label="House # / Street Address"
               type={"text"}
               // value={}
-              // on_change={handle_text_change}
-              pattern="[A-Za-z]{1,}"
+              disabled
             />
           </div>
           <div>
@@ -21,8 +21,7 @@ const Address = () => {
               label="City"
               type={"text"}
               // value={}
-              // on_change={handle_text_change}
-              pattern="[A-Za-z]{1,}"
+              disabled
             />
           </div>
           <div>
@@ -30,8 +29,7 @@ const Address = () => {
               label="Postal Code"
               type={"text"}
               // value={}
-              // on_change={handle_text_change}
-              pattern="[A-Za-z]{1,}"
+              disabled
             />
           </div>
           <div>
@@ -39,8 +37,7 @@ const Address = () => {
               label="District"
               type={"text"}
               // value={}
-              // on_change={handle_text_change}
-              pattern="[A-Za-z]{1,}"
+              disabled
             />
           </div>
           <div>
@@ -48,8 +45,7 @@ const Address = () => {
               label="Region"
               type={"text"}
               // value={}
-              // on_change={handle_text_change}
-              pattern="[A-Za-z]{1,}"
+              disabled
             />
           </div>
           <div>
@@ -57,12 +53,13 @@ const Address = () => {
               label="Country"
               type={"text"}
               // value={}
-              // on_change={handle_text_change}
-              pattern="[A-Za-z]{1,}"
+              disabled
             />
           </div>
         </div>
       </div>
+      {/* - Section 1 */}
+      {/* + Section 2 */}
       <div className="mt-5 rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6 dark:border-gray-800 dark:bg-gray-900">
         <h1 className="mb-5 font-semibold text-sky-700">
           Communication Details
@@ -73,8 +70,7 @@ const Address = () => {
               label="Language"
               type={"text"}
               // value={}
-              // on_change={handle_text_change}
-              pattern="[A-Za-z]{1,}"
+              disabled
             />
           </div>
           <div>
@@ -82,8 +78,7 @@ const Address = () => {
               label="Telephone"
               type={"number"}
               // value={}
-              // on_change={handle_text_change}
-              pattern="[A-Za-z]{1,}"
+              disabled
             />
           </div>
           <div>
@@ -91,8 +86,7 @@ const Address = () => {
               label="Fax"
               type={"text"}
               // value={}
-              // on_change={handle_text_change}
-              pattern="[A-Za-z]{1,}"
+              disabled
             />
           </div>
           <div>
@@ -100,8 +94,7 @@ const Address = () => {
               label="Mobile"
               type={"number"}
               // value={}
-              // on_change={handle_text_change}
-              pattern="[A-Za-z]{1,}"
+              disabled
             />
           </div>
           <div className="col-span-full">
@@ -109,12 +102,12 @@ const Address = () => {
               label="Email"
               type={"text"}
               // value={}
-              // on_change={handle_text_change}
-              pattern="[A-Za-z]{1,}"
+              disabled
             />
           </div>
         </div>
       </div>
+      {/* - Section 2 */}
     </React.Fragment>
   );
 };
