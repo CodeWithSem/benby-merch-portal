@@ -36,6 +36,7 @@ import {
   plant_list,
   sloc_list,
 } from "./PO_DATA_MAP";
+import Button_Action from "assets/elements/Button_Action";
 
 const Purchase_Order = () => {
   const { show_toast } = useToast();
@@ -50,7 +51,7 @@ const Purchase_Order = () => {
   const [show_load_data_button, set_show_load_data_button] = useState(false);
   // - Variables
 
-  // + PO List Columns
+  // + Columns
   const columns = [
     { key: "po_number", label: "PO Number", sortable: true },
     { key: "po_type", label: "PO Type", sortable: true },
@@ -59,9 +60,8 @@ const Purchase_Order = () => {
     { key: "status", label: "Status", sortable: true },
     { key: "actions", label: "", sortable: false },
   ];
-  // - PO List Columns
+  // - Columns
 
-  // + PO list client-side filtering
   const [po_list, set_po_list] = useState([
     {
       id: 1,
@@ -73,6 +73,8 @@ const Purchase_Order = () => {
       status: "Pending",
     },
   ]);
+
+  // + Client-Side Filtering
   const [filtered_po_list, set_filtered_po_list] = useState([]);
   const [loading, set_loading] = useState(false);
   const [show_entries, set_show_entries] = useState(5);
@@ -102,7 +104,6 @@ const Purchase_Order = () => {
   //     load_data();
   //   }, []);
 
-  // + Client-side Filtering
   useEffect(() => {
     let temp = [...po_list];
 
@@ -165,7 +166,7 @@ const Purchase_Order = () => {
   };
 
   const handle_page_change = (page) => set_current_page(page);
-  // - PO list client-side filtering
+  // - Client-Side Filtering
 
   const handle_create_new_po = () => {
     set_display_modal("select_po_type");
@@ -333,19 +334,18 @@ const Purchase_Order = () => {
                             on_change={(e) => set_search_query(e.target.value)}
                           />
                         </div>
-                        {/* + PO Filter */}
+                        {/* + Dropdown Filter */}
                         <div className="relative">
                           <Button
                             variant="white"
                             width="w-[100px]"
                             icon={SlidersHorizontal}
                             icon_position="left"
-                            // loading
                             on_click={() => set_show_filter((prev) => !prev)}
                           >
                             Filter
                           </Button>
-                          {/* + Filter Dropdown */}
+                          {/* + Dropdown Content */}
                           {show_filter && (
                             <React.Fragment>
                               <div
@@ -353,44 +353,42 @@ const Purchase_Order = () => {
                                 onClick={() => set_show_filter(false)}
                               ></div>
                               <div className="absolute top-full mt-2 right-0 z-50 bg-white border rounded-lg shadow-md p-4 w-[260px]">
-                                <div className="mt-2 grid grid-cols-1 gap-3">
-                                  <Checkbox_Field
-                                    label="Posted"
-                                    name="terms"
-                                    box_size={20}
-                                    icon_size={12}
-                                    //   checked={check}
-                                    //   on_change={(e) => set_check(e.target.checked)}
-                                    on_change={(e) => alert("Is Draft")}
-                                  />
-                                  <Checkbox_Field
-                                    label="Pending"
-                                    name="terms"
-                                    box_size={20}
-                                    icon_size={12}
-                                    //   checked={check}
-                                    //   on_change={(e) => set_check(e.target.checked)}
-                                    on_change={(e) => alert("Is Draft")}
-                                  />
-                                  <Checkbox_Field
-                                    label="Draft"
-                                    name="terms"
-                                    box_size={20}
-                                    icon_size={12}
-                                    //   checked={check}
-                                    //   on_change={(e) => set_check(e.target.checked)}
-                                    on_change={(e) => alert("Is Draft")}
-                                  />
+                                <div className="mt-2">
+                                  <h1 className="mb-3 text-gray-600 text-sm">
+                                    PO Status
+                                  </h1>
+                                  <div className="grid grid-cols-1 gap-3">
+                                    <Checkbox_Field
+                                      label="Posted"
+                                      box_size={24}
+                                      icon_size={14}
+                                      checked={false}
+                                      on_change={(e) => alert(e.target.checked)}
+                                    />
+                                    <Checkbox_Field
+                                      label="Pending"
+                                      box_size={24}
+                                      icon_size={14}
+                                      checked={false}
+                                      on_change={(e) => alert(e.target.checked)}
+                                    />
+                                    <Checkbox_Field
+                                      label="Draft"
+                                      box_size={24}
+                                      icon_size={14}
+                                      checked={false}
+                                      on_change={(e) => alert(e.target.checked)}
+                                    />
+                                  </div>
                                 </div>
-
-                                <div className="flex justify-end gap-2 mt-4">
-                                  {/* <Button
+                                <div className="flex justify-end gap-2 mt-5">
+                                  <Button
                                     size="sm"
                                     variant="primary"
                                     on_click={() => set_show_filter(false)}
                                   >
                                     Apply
-                                  </Button> */}
+                                  </Button>
                                   <Button
                                     size="sm"
                                     variant="secondary"
@@ -402,14 +400,13 @@ const Purchase_Order = () => {
                               </div>
                             </React.Fragment>
                           )}
-                          {/* - Filter Dropdown */}
+                          {/* - Dropdown Content */}
                         </div>
-                        {/* - PO Filter */}
+                        {/* - Dropdown Filter */}
                       </div>
                     </div>
                   </div>
-
-                  {/* + PO Table */}
+                  {/* + Table */}
                   <div className="overflow-x-auto">
                     {loading ? (
                       <div className="p-6 text-center text-gray-500 text-sm">
@@ -488,48 +485,36 @@ const Purchase_Order = () => {
                                 return (
                                   <div className="flex gap-2">
                                     <div className="relative group flex jusity-center items-center">
-                                      <button
-                                        className="text-gray-500 hover:text-sky-600 text-[12px] outline-none"
-                                        onClick={() => handle_view_po(row.id)}
-                                      >
-                                        <View size={19} />
-                                      </button>
-                                      <span className="absolute bottom-full mb-1 left-1/2 transform -translate-x-1/2 px-2 py-1 text-xs text-white bg-sky-600 rounded opacity-0 group-hover:opacity-100 transition-opacity">
-                                        View Record
-                                      </span>
+                                      <Button_Action
+                                        icon={View}
+                                        tooltip="View Record"
+                                        on_click={() => handle_view_po(row.id)}
+                                      />
                                     </div>
                                     <div className="relative group flex jusity-center items-center">
-                                      <button
-                                        className="text-gray-500 hover:text-sky-600 text-[12px] outline-none"
-                                        onClick={() => handle_post_po(row.id)}
-                                      >
-                                        <FileInput size={19} />
-                                      </button>
-                                      <span className="absolute bottom-full mb-1 left-1/2 transform -translate-x-1/2 px-2 py-1 text-xs text-white bg-sky-600 rounded opacity-0 group-hover:opacity-100 transition-opacity">
-                                        Post Record
-                                      </span>
+                                      <Button_Action
+                                        icon={FileInput}
+                                        tooltip="Post Record"
+                                        on_click={() => handle_post_po(row.id)}
+                                      />
                                     </div>
                                     <div className="relative group flex jusity-center items-center">
-                                      <button
-                                        className="text-gray-500 hover:text-sky-600 text-[12px] outline-none"
-                                        onClick={() => handle_edit_po(row.id)}
-                                      >
-                                        <Edit size={19} />
-                                      </button>
-                                      <span className="absolute bottom-full mb-1 left-1/2 transform -translate-x-1/2 px-2 py-1 text-xs text-white bg-sky-600 rounded opacity-0 group-hover:opacity-100 transition-opacity">
-                                        Edit Record
-                                      </span>
+                                      <Button_Action
+                                        icon={Edit}
+                                        tooltip="Edit Record"
+                                        on_click={() => handle_edit_po(row.id)}
+                                      />
                                     </div>
                                     <div className="relative group flex jusity-center items-center">
-                                      <button
-                                        className="text-gray-500 hover:text-red-600 text-[12px] mb-[1px] outline-none"
-                                        onClick={() => handle_delete_po(row.id)}
-                                      >
-                                        <Trash size={19} />
-                                      </button>
-                                      <span className="absolute bottom-full mb-1 left-1/2 transform -translate-x-1/2 px-2 py-1 text-xs text-white bg-red-600 rounded opacity-0 group-hover:opacity-100 transition-opacity">
-                                        Delete Record
-                                      </span>
+                                      <Button_Action
+                                        class_name="mb-[1px]"
+                                        icon={Trash}
+                                        variant="danger"
+                                        tooltip="Delete Record"
+                                        on_click={() =>
+                                          handle_delete_po(row.id)
+                                        }
+                                      />
                                     </div>
                                   </div>
                                 );
@@ -565,8 +550,8 @@ const Purchase_Order = () => {
                       </table>
                     )}
                   </div>
-                  {/* - PO Table */}
-                  {/* + PO Pagination */}
+                  {/* - Table */}
+                  {/* + Pagination */}
                   {total_pages > 0 && (
                     <Pagination
                       current_page={current_page}
@@ -575,7 +560,7 @@ const Purchase_Order = () => {
                       variant="compact"
                     />
                   )}
-                  {/* - PO Pagination */}
+                  {/* - Pagination */}
                 </div>
                 {/* - PO List */}
               </div>

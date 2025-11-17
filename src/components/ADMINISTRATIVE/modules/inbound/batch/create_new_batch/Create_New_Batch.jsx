@@ -1,7 +1,8 @@
 import React, { useState } from "react";
-import { ChevronLeft, Save } from "lucide-react";
-import Button from "assets/elements/Button";
+import { ChevronLeft, CirclePlus } from "lucide-react";
+import { format_date_1, get_date_now } from "assets/scripts/format";
 import { useToast } from "../../../../layout/Toast_Provider";
+import Button from "assets/elements/Button";
 import Text_Code_Field from "assets/elements/Text_Code_Field";
 import Text_Field from "assets/elements/Text_Field";
 import Verify_Field from "assets/elements/Verify_Field";
@@ -11,11 +12,17 @@ const Create_New_Batch = ({ set_page }) => {
   const { show_toast } = useToast();
   const [active_tab, set_active_tab] = useState("batch_details");
 
+  const handle_go_back = () => {
+    set_page("main");
+  };
+
+  // RETURN ORIGIN
   return (
     <React.Fragment>
       <div className="w-full">
         <div className="flex flex-wrap items-center justify-between gap-3 py-5">
           <h1 className="text-xl">Inbound</h1>
+          {/* + Breadcrumbs */}
           <nav>
             <ol className="flex flex-wrap items-center gap-1.5">
               <li>
@@ -23,13 +30,19 @@ const Create_New_Batch = ({ set_page }) => {
                   Home
                 </a>
               </li>
-              <li className="flex items-center gap-1.5 text-sm text-gray-500">
+              <li
+                className="flex items-center gap-1.5 text-sm text-gray-500"
+                onClick={handle_go_back}
+              >
                 <span>/</span>
                 <a className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-sky-500 cursor-pointer">
                   Inbound
                 </a>
               </li>
-              <li className="flex items-center gap-1.5 text-sm text-gray-500">
+              <li
+                className="flex items-center gap-1.5 text-sm text-gray-500"
+                onClick={handle_go_back}
+              >
                 <span>/</span>
                 <a className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-sky-500 cursor-pointer">
                   Batch
@@ -41,9 +54,10 @@ const Create_New_Batch = ({ set_page }) => {
               </li>
             </ol>
           </nav>
+          {/* - Breadcrumbs */}
         </div>
-
         <div className="w-full bg-white rounded-lg border">
+          {/* + Header */}
           <div className="flex flex-wrap items-center justify-between gap-3 p-5">
             <div className="flex items-center gap-3">
               <Button
@@ -51,36 +65,19 @@ const Create_New_Batch = ({ set_page }) => {
                 icon={ChevronLeft}
                 icon_position="left"
                 width="w-[20px]"
-                on_click={() => set_page("main")}
+                on_click={handle_go_back}
               ></Button>
-              {/* <ChevronLeft className="text-gray-500" size={24} /> */}
               <h1 className="text-lg">Batch Creation</h1>
             </div>
 
             <div className="flex gap-2">
               <div className="text-gray-500 text-sm tracking-wider">
-                10/30/2025
+                {format_date_1(get_date_now())}
               </div>
-              {/* <Button
-                variant="primary"
-                icon={Save}
-                icon_position="left"
-                // on_click={handle_create_new_po}
-              >
-                Save
-              </Button>
-              <Button
-                variant="primary"
-                icon={SaveAll}
-                icon_position="left"
-                //   on_click={() => set_display_modal("add_admin")}
-              >
-                Save as Draft
-              </Button> */}
             </div>
           </div>
-
-          {/* Filter fields */}
+          {/* - Header */}
+          {/* + Section 1 */}
           <div className="p-5 sm:p-6 border-t">
             <div className="grid grid-cols-1 gap-5">
               <Text_Code_Field
@@ -114,24 +111,26 @@ const Create_New_Batch = ({ set_page }) => {
                 // value={text_verify}
                 // on_change={(e) => {
                 //   set_text_verify(e.target.value);
-                //   setVerifyStatus("");
+                //   set_verify_status("");
                 // }}
-                // on_find={handleFind}
-                // on_verify={handleVerify}
-                // verify_status={verifyStatus}
+                // on_verify={handle_verify}
+                // verify_status={verify_status}
                 show_find_button={false}
               />
               <Text_Field
                 label="Batch Description"
                 type={"text"}
                 placeholder={"Enter batch description"}
+                // value={}
                 // on_change={handle_text_change}
-                pattern="[A-Za-z]{1,}"
               />
             </div>
           </div>
+          {/* - Section 1 */}
+          {/* + Section 2 */}
           <div className="p-5 sm:p-6 border-t">
             <div className="w-full bg-white rounded-lg border">
+              {/* + Tab Navigation */}
               <div className="w-full border-b p-2">
                 <nav className="flex overflow-x-auto rounded-lg bg-gray-100 p-1 dark:bg-gray-900 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-200 dark:[&::-webkit-scrollbar-thumb]:bg-gray-600 [&::-webkit-scrollbar-track]:bg-white dark:[&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar]:h-1.5">
                   <button
@@ -146,34 +145,32 @@ const Create_New_Batch = ({ set_page }) => {
                   </button>
                 </nav>
               </div>
-
+              {/* - Tab Navigation */}
               {/* + Tab Content */}
               <div className="p-6">
                 {active_tab === "batch_details" && <Batch_Details />}
-                {/* {active_tab === "delivery" && <Delivery />}
-                {active_tab === "address" && <Address />}
-                {active_tab === "org_data" && <Org_Data />}
-                {active_tab === "po_status" && <PO_Status />}
-                {active_tab === "shipment" && <Shipment />}
-                {active_tab === "approval" && <Approval />} */}
               </div>
               {/* - Tab Content */}
             </div>
           </div>
+          {/* - Section 2 */}
+          {/* + Section 3 */}
           <div className="p-4 sm:p-8 border-t">
             <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
               <Button
                 variant="primary"
                 size="lg"
-                // width="w-[100px]"
-                icon={Save}
+                icon={CirclePlus}
                 icon_position="left"
-                // on_click={handle_save}
               >
-                Save
+                Create
+              </Button>
+              <Button variant="white" size="lg" on_click={handle_go_back}>
+                Cancel
               </Button>
             </div>
           </div>
+          {/* - Section 3 */}
         </div>
       </div>
     </React.Fragment>

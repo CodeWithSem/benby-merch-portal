@@ -16,18 +16,14 @@ const Select_PO_Type = ({
   purc_group_list,
   po_type_list,
 }) => {
-  // --- States ---
-  const [filtered_po_type, set_filtered_po_type] = useState([]);
+  // + Client-Side Filtering
+  const [filtered_po_type_list, set_filtered_po_type_list] = useState([]);
   const [current_page, set_current_page] = useState(1);
   const [rows_per_page, set_rows_per_page] = useState(5);
-
-  // 🔍 search input (immediate value)
   const [search_query, set_search_query] = useState("");
-  // 🔍 debounced search value
   const [debounced_query, set_debounced_query] = useState("");
   const [selected_po_type, set_selected_po_type] = useState(null);
 
-  // --- Debounce search ---
   useEffect(() => {
     const timer = setTimeout(() => {
       set_debounced_query(search_query);
@@ -36,7 +32,6 @@ const Select_PO_Type = ({
     return () => clearTimeout(timer);
   }, [search_query]);
 
-  // --- Create lookup maps once (outside render / effect) ---
   const company_map = Object.fromEntries(
     company_list.map((c) => [c.company_code, c])
   );
@@ -47,7 +42,6 @@ const Select_PO_Type = ({
     purc_group_list.map((g) => [g.purc_group_code, g])
   );
 
-  // --- Filtering + Pagination ---
   useEffect(() => {
     let data = [...po_type_list];
 
@@ -55,12 +49,10 @@ const Select_PO_Type = ({
       const q = debounced_query.toLowerCase();
 
       data = data.filter((po_type) => {
-        // lookup related records
         const company = company_map[po_type.company_code];
         const purc_org = purc_org_map[po_type.purc_org_code];
         const purc_group = purc_group_map[po_type.purc_group_code];
 
-        // create one searchable string
         const combined = [
           po_type.po_type_code,
           po_type.po_type_desc,
@@ -81,7 +73,7 @@ const Select_PO_Type = ({
 
     const start_idx = (current_page - 1) * rows_per_page;
     const end_idx = start_idx + rows_per_page;
-    set_filtered_po_type(data.slice(start_idx, end_idx));
+    set_filtered_po_type_list(data.slice(start_idx, end_idx));
   }, [po_type_list, debounced_query, current_page, rows_per_page]);
 
   const total_pages = Math.ceil(
@@ -90,8 +82,8 @@ const Select_PO_Type = ({
     ).length / rows_per_page
   );
 
-  // --- Handlers ---
   const handle_page_change = (page) => set_current_page(page);
+  // - Client-Side Filtering
 
   const handle_proceed = () => {
     console.log(selected_po_type);
@@ -100,9 +92,9 @@ const Select_PO_Type = ({
     on_close();
   };
 
-  // --- Render ---
   if (!is_open) return null;
 
+  // RETURN ORIGIN
   return (
     <div className="fixed inset-0 flex items-center justify-center z-[97] px-4">
       {/* + Blur */}
@@ -113,7 +105,6 @@ const Select_PO_Type = ({
       <div
         className={`relative bg-white rounded-lg shadow-xl ${width} w-full py-7 m-5 z-[99]`}
       >
-        {/* Close button */}
         <button
           className="absolute top-5 right-5 p-2 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-400 hover:text-gray-500"
           onClick={on_close}
@@ -121,12 +112,12 @@ const Select_PO_Type = ({
           <X size={20} />
         </button>
 
-        {/* Header */}
+        {/* + Modal Header */}
         <div className="text-lg md:text-xl font-bold mb-5 px-7">
           PO Type Selection
         </div>
-
-        {/* Body */}
+        {/* - Modal Header */}
+        {/* + Modal Body */}
         <div className={`w-full overflow-y-auto ${height} scrollbar-custom`}>
           <div className="overflow-hidden border border-gray-200 bg-white pt-4">
             <div className="flex flex-col gap-5 px-6 mb-4 sm:flex-row sm:items-center sm:justify-between">
@@ -141,8 +132,7 @@ const Select_PO_Type = ({
                 />
               </div>
             </div>
-
-            {/* Table */}
+            {/* + Table */}
             <div className="max-w-full overflow-x-auto custom-scrollbar">
               <table className="min-w-full whitespace-nowrap">
                 <thead className="border-gray-100 border-y bg-gray-50">
@@ -162,9 +152,8 @@ const Select_PO_Type = ({
                     </th>
                   </tr>
                 </thead>
-
                 <tbody className="divide-y divide-gray-100">
-                  {filtered_po_type.length === 0 ? (
+                  {filtered_po_type_list.length === 0 ? (
                     <tr>
                       <td
                         colSpan={5}
@@ -174,7 +163,7 @@ const Select_PO_Type = ({
                       </td>
                     </tr>
                   ) : (
-                    filtered_po_type.map((po_type) => {
+                    filtered_po_type_list.map((po_type) => {
                       const company = company_list.find(
                         (c) => c.company_code === po_type.company_code
                       );
@@ -255,12 +244,13 @@ const Select_PO_Type = ({
                 </tbody>
               </table>
             </div>
+            {/* - Table */}
           </div>
         </div>
-
-        {/* Footer */}
+        {/* - Modal Body */}
+        {/* + Modal Footer */}
         <div className="flex flex-col items-center sm:flex-row sm:justify-between gap-3 mt-5 px-7">
-          {/* Pagination */}
+          {/* + Pagination */}
           {total_pages > 0 && (
             <div className="w-full sm:w-auto">
               <Pagination_Modal
@@ -270,8 +260,8 @@ const Select_PO_Type = ({
               />
             </div>
           )}
-
-          {/* Buttons */}
+          {/* - Pagination */}
+          {/* + Buttons */}
           <div className="flex justify-center sm:justify-end gap-2 w-full">
             <Button
               variant="primary"
@@ -289,8 +279,11 @@ const Select_PO_Type = ({
               Close
             </Button>
           </div>
+          {/* - Buttons */}
         </div>
+        {/* - Modal Footer */}
       </div>
+      {/* - Modal Content */}
     </div>
   );
 };

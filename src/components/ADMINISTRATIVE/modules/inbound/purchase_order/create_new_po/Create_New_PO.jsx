@@ -1,7 +1,8 @@
 import React, { useState } from "react";
+import { get_date_now, format_date_1 } from "assets/scripts/format";
+import { ChevronLeft, CirclePlus, Eye, Save } from "lucide-react";
 import Text_Field from "assets/elements/Text_Field";
 import Button from "assets/elements/Button";
-import { ChevronLeft, CirclePlus, Eye, Save } from "lucide-react";
 import Text_Code_Field from "assets/elements/Text_Code_Field";
 import Delivery from "./po_details/Delivery";
 import Address from "./po_details/Address";
@@ -15,7 +16,6 @@ import Select_Branch from "../modals/Select_Branch";
 import Select_Plant from "../modals/Select_Plant";
 import Select_SLOC from "../modals/Select_SLOC";
 import Select_Item from "../modals/Select_Item";
-import { get_date_now, format_date_1 } from "assets/scripts/format";
 
 const Create_New_PO = ({
   set_page,
@@ -47,6 +47,10 @@ const Create_New_PO = ({
   const handle_save = () => {
     alert("Under Maintenance");
   };
+
+  const handle_go_back = () => {
+    set_page("main");
+  };
   // RETURN ORIGIN
   return (
     <React.Fragment>
@@ -65,7 +69,7 @@ const Create_New_PO = ({
                 <span>/</span>
                 <a
                   className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-sky-500 cursor-pointer"
-                  onClick={() => set_page("main")}
+                  onClick={handle_go_back}
                 >
                   Inbound
                 </a>
@@ -74,7 +78,7 @@ const Create_New_PO = ({
                 <span>/</span>
                 <a
                   className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-sky-500 cursor-pointer"
-                  onClick={() => set_page("main")}
+                  onClick={handle_go_back}
                 >
                   Purchase Order
                 </a>
@@ -87,7 +91,6 @@ const Create_New_PO = ({
           </nav>
           {/* - Breadcrumbs */}
         </div>
-
         <div className="w-full bg-white rounded-lg border">
           {/* + Header */}
           <div className="flex flex-wrap items-center justify-between gap-3 p-5">
@@ -97,7 +100,7 @@ const Create_New_PO = ({
                 icon={ChevronLeft}
                 icon_position="left"
                 width="w-[20px]"
-                on_click={() => set_page("main")}
+                on_click={handle_go_back}
               ></Button>
               <h1 className="text-lg">Purchase Order Creation</h1>
             </div>
@@ -246,12 +249,7 @@ const Create_New_PO = ({
               >
                 Create
               </Button>
-              <Button
-                variant="white"
-                size="lg"
-                // width="w-[100px]"
-                on_click={() => set_page("main")}
-              >
+              <Button variant="white" size="lg" on_click={handle_go_back}>
                 Cancel
               </Button>
             </div>

@@ -4,11 +4,11 @@ import Button from "assets/elements/Button";
 import { X } from "lucide-react";
 import Text_Code_Field from "assets/elements/Text_Code_Field";
 
-const Delete_PO = ({ is_open, on_close, width = "max-w-[700px]" }) => {
+const Delete_Batch = ({ is_open, on_close, width = "max-w-[700px]" }) => {
   const [is_confirm_modal_open, set_is_confirm_modal_open] = useState(false);
 
-  const handle_delete_po = () => {
-    alert("Delete PO");
+  const handle_delete_batch = () => {
+    alert("Delete Batch");
   };
 
   const Confirm_Modal = () => {
@@ -24,15 +24,14 @@ const Delete_PO = ({ is_open, on_close, width = "max-w-[700px]" }) => {
           >
             {/* Modal Body */}
             <div className="w-full flex justify-center items-center text-lg md:text-xl font-bold mb-4">
-              Delete Purchase Order
+              Delete Batch
             </div>
             <p className="w-full text-center text-sm leading-6 text-gray-500 dark:text-gray-400 pt-4">
-              You are about to delete this Purchase Order.
+              You are about to delete this Batch.
             </p>
             <p className="w-full text-center text-sm leading-6 text-gray-500 dark:text-gray-400 pt-4">
               This action is permanent and cannot be undone. All related data
-              such as item details, amounts, and supplier information will also
-              be removed from the system.
+              will also be removed from the system.
             </p>
             <p className="w-full text-center text-sm leading-6 text-gray-500 dark:text-gray-400 py-4">
               Are you sure you want to continue?
@@ -41,7 +40,7 @@ const Delete_PO = ({ is_open, on_close, width = "max-w-[700px]" }) => {
               <Button
                 width="w-[100px]"
                 variant="danger"
-                on_click={handle_delete_po}
+                on_click={handle_delete_batch}
               >
                 Yes
               </Button>
@@ -77,16 +76,15 @@ const Delete_PO = ({ is_open, on_close, width = "max-w-[700px]" }) => {
             <X size={20} />
           </button>
           {/* + Modal Label */}
-          <div className="text-lg md:text-xl font-bold mb-5">
-            Delete Purchase Order
-          </div>
+          <div className="text-lg md:text-xl font-bold mb-5">Delete Batch</div>
           {/* - Modal Label */}
           {/* + Modal Body */}
           <div className="w-full pl-1 p-4 overflow-y-auto max-h-[500px] scrollbar-custom">
             <div className="w-full">
               <div className="w-full bg-white rounded-lg border">
                 <div className="flex flex-wrap items-center justify-between gap-3 p-5">
-                  <h1 className="text-lg">Purchase Order Details</h1>
+                  <h1 className="text-lg">Batch Details</h1>
+
                   <div className="flex gap-2">
                     <div className="text-gray-500 text-sm tracking-wider">
                       MM-DD-YYYY
@@ -97,62 +95,28 @@ const Delete_PO = ({ is_open, on_close, width = "max-w-[700px]" }) => {
                 <div className="p-5 sm:p-6 border-t">
                   <div className="w-full">
                     <div className="space-y-6">
-                      <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
-                        <div className="col-span-full">
+                      <div className="grid grid-cols-1 gap-5">
+                        <div>
+                          <Text_Code_Field
+                            label="Item"
+                            // code_value={search_value}
+                            // text_value={search_value}
+                            code_width="150px"
+                            show_search_button={false}
+                            disabled
+                          />
+                        </div>
+                        <div>
                           <Text_Field
-                            label="PO Number"
+                            label="Batch Code"
                             type={"text"}
-                            // value={""}
                             disabled
                           />
                         </div>
-                        <div className="col-span-full">
-                          <Text_Code_Field
-                            label="PO Type"
-                            // code_value={search_value}
-                            // text_value={search_value}
-                            code_width="150px"
-                            show_search_button={false}
-                            disabled
-                          />
-                        </div>
-                        <div className="col-span-full">
-                          <Text_Code_Field
-                            label="Vendor"
-                            // code_value={search_value}
-                            // text_value={search_value}
-                            code_width="150px"
-                            show_search_button={false}
-                            disabled
-                          />
-                        </div>
-                        <div className="col-span-full">
-                          <Text_Code_Field
-                            label="Branch"
-                            // code_value={search_value}
-                            // text_value={search_value}
-                            code_width="150px"
-                            show_search_button={false}
-                            disabled
-                          />
-                        </div>
-                        <div className="col-span-full">
-                          <Text_Code_Field
-                            label="Plant / DC"
-                            // code_value={search_value}
-                            // text_value={search_value}
-                            code_width="150px"
-                            show_search_button={false}
-                            disabled
-                          />
-                        </div>
-                        <div className="col-span-full">
-                          <Text_Code_Field
-                            label="SLOC"
-                            // code_value={search_value}
-                            // text_value={search_value}
-                            code_width="150px"
-                            show_search_button={false}
+                        <div>
+                          <Text_Field
+                            label="Batch Description"
+                            type={"text"}
                             disabled
                           />
                         </div>
@@ -187,4 +151,4 @@ const Delete_PO = ({ is_open, on_close, width = "max-w-[700px]" }) => {
   ) : null;
 };
 
-export default Delete_PO;
+export default Delete_Batch;

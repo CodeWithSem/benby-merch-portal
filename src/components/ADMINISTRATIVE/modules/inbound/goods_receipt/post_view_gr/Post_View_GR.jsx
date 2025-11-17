@@ -164,7 +164,7 @@ const Post_View_GR = ({ set_page, for_posting }) => {
                       <Text_Field
                         label="Creation Date"
                         type="text"
-                        value="06-05-2025"
+                        value="MM-DD-YYYY"
                         disabled
                       />
                     </div>
@@ -181,19 +181,13 @@ const Post_View_GR = ({ set_page, for_posting }) => {
                 <Button
                   variant="primary"
                   size="lg"
-                  // width="w-[100px]"
                   icon={FileInput}
                   icon_position="left"
                   on_click={() => set_is_confirm_modal_open(true)}
                 >
                   Post GR
                 </Button>
-                <Button
-                  variant="white"
-                  size="lg"
-                  // width="w-[100px]"
-                  on_click={handle_go_back}
-                >
+                <Button variant="white" size="lg" on_click={handle_go_back}>
                   Cancel
                 </Button>
               </div>

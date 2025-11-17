@@ -1,13 +1,11 @@
-import React, { useState } from "react";
+import React from "react";
+import { ChevronLeft, RefreshCcwDot } from "lucide-react";
+import { format_date_1, get_date_now } from "assets/scripts/format";
 import Text_Field from "assets/elements/Text_Field";
 import Button from "assets/elements/Button";
-import { ChevronLeft, RefreshCcwDot, Save } from "lucide-react";
 import GR_Items from "./gr_items/GR_Items";
-import { format_date_1, get_date_now } from "assets/scripts/format";
 
 const Edit_GR = ({ set_page }) => {
-  const [display_modal, set_display_modal] = useState("");
-
   const handle_preview = () => {
     alert("Under Maintenance");
   };
@@ -20,12 +18,17 @@ const Edit_GR = ({ set_page }) => {
     alert("Under Maintenance");
   };
 
+  const handle_go_back = () => {
+    set_page("main");
+  };
+
+  // RETURN ORIGIN
   return (
     <React.Fragment>
       <div className="w-full">
-        {/* === HEADER & BREADCRUMBS === */}
         <div className="flex flex-wrap items-center justify-between gap-3 py-5">
           <h1 className="text-xl">Inbound</h1>
+          {/* + Breadcrumbs */}
           <nav>
             <ol className="flex flex-wrap items-center gap-1.5">
               <li>
@@ -37,7 +40,7 @@ const Edit_GR = ({ set_page }) => {
                 <span>/</span>
                 <a
                   className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-sky-500 cursor-pointer"
-                  onClick={() => set_page("main")}
+                  onClick={handle_go_back}
                 >
                   Inbound
                 </a>
@@ -46,7 +49,7 @@ const Edit_GR = ({ set_page }) => {
                 <span>/</span>
                 <a
                   className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-sky-500 cursor-pointer"
-                  onClick={() => set_page("main")}
+                  onClick={handle_go_back}
                 >
                   Goods Receipt
                 </a>
@@ -57,11 +60,10 @@ const Edit_GR = ({ set_page }) => {
               </li>
             </ol>
           </nav>
+          {/* - Breadcrumbs */}
         </div>
-
-        {/* === MAIN CARD === */}
         <div className="w-full bg-white rounded-lg border">
-          {/* === HEADER BAR === */}
+          {/* + Header */}
           <div className="flex flex-wrap items-center justify-between gap-3 p-5">
             <div className="flex items-center gap-3">
               <Button
@@ -69,7 +71,7 @@ const Edit_GR = ({ set_page }) => {
                 icon={ChevronLeft}
                 icon_position="left"
                 width="w-[20px]"
-                on_click={() => set_page("main")}
+                on_click={handle_go_back}
               ></Button>
               <h1 className="text-lg">Edit Goods Receipt</h1>
             </div>
@@ -78,15 +80,13 @@ const Edit_GR = ({ set_page }) => {
               {format_date_1(get_date_now())}
             </div>
           </div>
-
-          {/* === FORM FIELDS === */}
+          {/* - Header */}
+          {/* + Section 1 */}
           <div className="p-5 sm:p-6 border-t">
             <div className="w-full">
               <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
-                {/* LEFT SECTION */}
-                <div className="space-y-6 md:col-span-2 w-full">
+                <div className="md:col-span-2 w-full">
                   <div className="grid grid-cols-1 gap-5">
-                    {/* + PO Number */}
                     <div className="col-span-full">
                       <Text_Field
                         label="PO Number"
@@ -95,8 +95,6 @@ const Edit_GR = ({ set_page }) => {
                         disabled
                       />
                     </div>
-                    {/* - PO Number */}
-                    {/* + GR Number */}
                     <div className="col-span-full">
                       <Text_Field
                         label="GR Number"
@@ -105,14 +103,10 @@ const Edit_GR = ({ set_page }) => {
                         disabled
                       />
                     </div>
-                    {/* - GR Number */}
                   </div>
                 </div>
-
-                {/* RIGHT SECTION */}
-                <div className="space-y-6 w-full">
+                <div className="w-full">
                   <div className="grid grid-cols-1 gap-5">
-                    {/* + Creation Date */}
                     <div className="col-span-full">
                       <Text_Field
                         label="Creation Date"
@@ -121,15 +115,16 @@ const Edit_GR = ({ set_page }) => {
                         disabled
                       />
                     </div>
-                    {/* Creation Date */}
                   </div>
                 </div>
               </div>
             </div>
           </div>
+          {/* - Section 1 */}
+          {/* + Section 2 */}
           <GR_Items />
-
-          {/* === ACTION BUTTONS === */}
+          {/* - Section 2 */}
+          {/* + Section 3 */}
           <div className="p-4 sm:p-8 border-t">
             <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
               <Button
@@ -141,16 +136,12 @@ const Edit_GR = ({ set_page }) => {
               >
                 Update
               </Button>
-              <Button
-                variant="white"
-                size="lg"
-                // width="w-[100px]"
-                on_click={() => set_page("main")}
-              >
+              <Button variant="white" size="lg" on_click={handle_go_back}>
                 Cancel
               </Button>
             </div>
           </div>
+          {/* - Section 3 */}
         </div>
       </div>
     </React.Fragment>

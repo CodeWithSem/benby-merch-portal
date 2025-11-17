@@ -1,4 +1,7 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useToast } from "../../../layout/Toast_Provider";
+import { format_date_1 } from "assets/scripts/format";
+import { company_list, po_type_list } from "./GR_DATA_MAP";
 import {
   Search,
   ChevronDown,
@@ -13,37 +16,29 @@ import {
   FileInput,
   Database,
 } from "lucide-react";
-import Icon_Field from "assets/elements/Icon_Field";
 import Select_Field from "assets/elements/Select_Field";
-import Pagination from "assets/elements/Pagination";
+import Icon_Field from "assets/elements/Icon_Field";
 import Button from "assets/elements/Button";
-import { useToast } from "../../../layout/Toast_Provider";
-import Date_Range_Field from "assets/elements/Date_Range_Field";
-import Select_PO from "./modals/select_po/Select_PO";
+import Date_Field from "assets/elements/Date_Field";
+import Checkbox_Field from "assets/elements/Checkbox_Field";
+import Pagination from "assets/elements/Pagination";
 import Create_New_GR from "./create_new_gr/Create_New_GR";
 import Edit_GR from "./edit_gr/Edit_GR";
-import { format_date_1 } from "assets/scripts/format";
-import { company_list, po_type_list } from "./GR_DATA_MAP";
-import Date_Field from "assets/elements/Date_Field";
-import Delete_GR from "./modals/delete_gr/Delete_GR";
 import Post_View_GR from "./post_view_gr/Post_View_GR";
+import Select_PO from "./modals/select_po/Select_PO";
+import Delete_GR from "./modals/delete_gr/Delete_GR";
+import Button_Action from "assets/elements/Button_Action";
 
 const Goods_Receipt = () => {
-  const filter_ref = useRef(null);
+  const { show_toast } = useToast();
   const [show_filter, set_show_filter] = useState(false);
   const [page, set_page] = useState("main");
   const [display_modal, set_display_modal] = useState("");
   const [for_posting, set_for_posting] = useState(false);
-
   const today = format_date_1(new Date());
-
   const [start_date, set_start_date] = useState(today);
   const [end_date, set_end_date] = useState(today);
-
   const [show_load_data_button, set_show_load_data_button] = useState(false);
-
-  // Close dropdown on outside click
-  const { show_toast } = useToast();
 
   const columns = [
     { key: "po_number", label: "PO Number", sortable: true },
@@ -55,7 +50,6 @@ const Goods_Receipt = () => {
     { key: "actions", label: "", sortable: false },
   ];
 
-  // --- State ---
   const [gr_list, set_gr_list] = useState([
     {
       id: 1,
@@ -67,7 +61,9 @@ const Goods_Receipt = () => {
       status: "Pending",
     },
   ]);
-  const [filtered_data, set_filtered_data] = useState([]);
+
+  // + Client-Side Filtering
+  const [filtered_gr_list, set_filtered_gr_list] = useState([]);
   const [loading, set_loading] = useState(false);
   const [select_option, set_select_option] = useState(5);
   const [current_page, set_current_page] = useState(1);
@@ -76,7 +72,6 @@ const Goods_Receipt = () => {
   const [search_query, set_search_query] = useState("");
   const [debounced_query, set_debounced_query] = useState("");
 
-  // --- Debounce search ---
   useEffect(() => {
     const timer = setTimeout(() => {
       set_debounced_query(search_query);
@@ -84,18 +79,6 @@ const Goods_Receipt = () => {
     }, 300);
     return () => clearTimeout(timer);
   }, [search_query]);
-
-  // --- Close dropdown outside click ---
-  useEffect(() => {
-    const handle_click_outside = (event) => {
-      if (filter_ref.current && !filter_ref.current.contains(event.target)) {
-        // optional: close filter
-      }
-    };
-    document.addEventListener("mousedown", handle_click_outside);
-    return () =>
-      document.removeEventListener("mousedown", handle_click_outside);
-  }, []);
 
   // --- Load all users once ---
   //   const load_data = async () => {
@@ -109,11 +92,9 @@ const Goods_Receipt = () => {
   //     load_data();
   //   }, []);
 
-  // + Client-side Filtering
   useEffect(() => {
     let temp = [...gr_list];
 
-    // + Column Filter
     if (debounced_query.trim() !== "") {
       const q = debounced_query.toLowerCase();
       temp = temp.filter((u) =>
@@ -124,9 +105,7 @@ const Goods_Receipt = () => {
         })
       );
     }
-    // - Column Filter
 
-    // + Sort Function
     temp.sort((a, b) => {
       const val_a = a[sort_by];
       const val_b = b[sort_by];
@@ -138,13 +117,10 @@ const Goods_Receipt = () => {
       if (val_a > val_b) return sort_order === "asc" ? 1 : -1;
       return 0;
     });
-    // - Sort Function
 
-    // + Pagination Function
     const start_idx = (current_page - 1) * select_option;
     const end_idx = start_idx + select_option;
-    // - Pagination Function
-    set_filtered_data(temp.slice(start_idx, end_idx));
+    set_filtered_gr_list(temp.slice(start_idx, end_idx));
   }, [
     gr_list,
     debounced_query,
@@ -153,9 +129,7 @@ const Goods_Receipt = () => {
     current_page,
     select_option,
   ]);
-  // - Client-side Filtering
 
-  // + Total page of Pagination
   const total_pages = Math.ceil(
     (debounced_query
       ? gr_list.filter((u) =>
@@ -170,9 +144,7 @@ const Goods_Receipt = () => {
         ).length
       : gr_list.length) / select_option
   );
-  // - Total page of Pagination
 
-  // + Sort Filtering
   const handle_sort = (column) => {
     if (sort_by === column)
       set_sort_order(sort_order === "asc" ? "desc" : "asc");
@@ -182,12 +154,9 @@ const Goods_Receipt = () => {
     }
     set_current_page(1);
   };
-  // - Sort Filtering
-  const handle_page_change = (page) => set_current_page(page);
 
-  // + For Date Range Field
-  const date_range_ref = useRef(null);
-  // - For Date Range Field
+  const handle_page_change = (page) => set_current_page(page);
+  // - Client-Side Filtering
 
   const handle_create_new_gr = () => {
     set_display_modal("select_po");
@@ -208,7 +177,6 @@ const Goods_Receipt = () => {
   };
 
   const handle_edit_gr = (id) => {
-    alert(`GR ID : ${id}`);
     set_page("edit_gr");
   };
 
@@ -238,6 +206,7 @@ const Goods_Receipt = () => {
           <div className="w-full">
             <div className="flex flex-wrap items-center justify-between gap-3 py-5">
               <h1 className="text-xl">Inbound</h1>
+              {/* + Breadcrumbs */}
               <nav>
                 <ol className="flex flex-wrap items-center gap-1.5">
                   <li>
@@ -257,9 +226,10 @@ const Goods_Receipt = () => {
                   </li>
                 </ol>
               </nav>
+              {/* - Breadcrumbs */}
             </div>
-
             <div className="w-full bg-white rounded-lg border">
+              {/* + Header */}
               <div className="flex flex-wrap items-center justify-between gap-3 p-5">
                 <h1 className="text-lg">Goods Receipt</h1>
                 <div className="flex gap-2">
@@ -281,7 +251,8 @@ const Goods_Receipt = () => {
                   </Button>
                 </div>
               </div>
-
+              {/* - Header */}
+              {/* + Section 1 */}
               <div className="p-5 sm:p-6 border-t">
                 <div className="grid grid-cols-1 gap-5 md:w-[250px]">
                   <Date_Field
@@ -308,7 +279,10 @@ const Goods_Receipt = () => {
                   )}
                 </div>
               </div>
+              {/* - Section 1 */}
+              {/* + Section 2 */}
               <div className="p-5 sm:p-6 border-t">
+                {/* + GR List */}
                 <div className="w-full border rounded-lg">
                   <div className="w-full md:flex md:justify-between p-4 gap-4">
                     <div className="flex items-center text-sm gap-2">
@@ -333,15 +307,12 @@ const Goods_Receipt = () => {
                         variant="white"
                         icon={RefreshCw}
                         icon_position="left"
-                        //   on_click={() => load_data()}
                       ></Button>
                     </div>
-
                     <div className="w-full mt-4 md:mt-0 md:w-[600px]">
                       <div className="w-full flex items-center gap-2">
                         <div className="w-full">
                           <Icon_Field
-                            //   name="search"
                             placeholder="Search..."
                             icon={Search}
                             icon_position="left"
@@ -349,33 +320,54 @@ const Goods_Receipt = () => {
                             on_change={(e) => set_search_query(e.target.value)}
                           />
                         </div>
-                        <div className="relative" ref={filter_ref}>
+                        {/* + Dropdown Filter */}
+                        <div className="relative">
                           <Button
                             variant="white"
                             width="w-[100px]"
                             icon={SlidersHorizontal}
                             icon_position="left"
-                            // loading
                             on_click={() => set_show_filter((prev) => !prev)}
                           >
                             Filter
                           </Button>
-
-                          {/* Filter Popover */}
+                          {/* + Dropdown Content */}
                           {show_filter && (
                             <React.Fragment>
                               <div
                                 className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40"
-                                // onClick={() => set_show_filter(false)}
+                                onClick={() => set_show_filter(false)}
                               ></div>
                               <div className="absolute top-full mt-2 right-0 z-50 bg-white border rounded-lg shadow-md p-4 w-[260px]">
-                                <div>
-                                  <Date_Range_Field
-                                    label="Date Range"
-                                    ref={date_range_ref}
-                                  />
+                                <div className="mt-2">
+                                  <h1 className="mb-3 text-gray-600 text-sm">
+                                    GR Status
+                                  </h1>
+                                  <div className="grid grid-cols-1 gap-3">
+                                    <Checkbox_Field
+                                      label="Posted"
+                                      box_size={24}
+                                      icon_size={14}
+                                      checked={false}
+                                      on_change={(e) => alert(e.target.checked)}
+                                    />
+                                    <Checkbox_Field
+                                      label="Pending"
+                                      box_size={24}
+                                      icon_size={14}
+                                      checked={false}
+                                      on_change={(e) => alert(e.target.checked)}
+                                    />
+                                    <Checkbox_Field
+                                      label="Draft"
+                                      box_size={24}
+                                      icon_size={14}
+                                      checked={false}
+                                      on_change={(e) => alert(e.target.checked)}
+                                    />
+                                  </div>
                                 </div>
-                                <div className="flex justify-end gap-2 mt-4">
+                                <div className="flex justify-end gap-2 mt-5">
                                   <Button
                                     size="sm"
                                     variant="primary"
@@ -388,24 +380,25 @@ const Goods_Receipt = () => {
                                     variant="secondary"
                                     on_click={() => set_show_filter(false)}
                                   >
-                                    Cancel
+                                    Close
                                   </Button>
                                 </div>
                               </div>
                             </React.Fragment>
                           )}
+                          {/* - Dropdown Content */}
                         </div>
+                        {/* - Dropdown Filter */}
                       </div>
                     </div>
                   </div>
-
-                  {/* Table */}
+                  {/* + Table */}
                   <div className="overflow-x-auto">
                     {loading ? (
                       <div className="p-6 text-center text-gray-500 text-sm">
                         Loading...
                       </div>
-                    ) : filtered_data.length === 0 ? (
+                    ) : filtered_gr_list.length === 0 ? (
                       <div className="p-6 text-center text-gray-500 text-sm">
                         No data found
                       </div>
@@ -457,18 +450,20 @@ const Goods_Receipt = () => {
                           </tr>
                         </thead>
                         <tbody className="bg-white">
-                          {filtered_data.map((row, idx) => {
+                          {filtered_gr_list.map((row, idx) => {
                             const company = company_list.find(
                               (c) => c.company_code === row.company_code
                             );
-                            // + Cell Renderer
                             const render_cell = (col, row) => {
                               const value = row[col.key];
+                              // + Company
                               if (col.key === "company") {
                                 return (
                                   <div>{company?.company_desc || "-"}</div>
                                 );
                               }
+                              // - Company
+                              // + Status
                               if (col.key === "status") {
                                 return (
                                   <span
@@ -482,60 +477,51 @@ const Goods_Receipt = () => {
                                   </span>
                                 );
                               }
+                              // - Status
+                              // + Actions
                               if (col.key === "actions") {
                                 return (
                                   <div className="flex gap-2">
                                     <div className="relative group flex jusity-center items-center">
-                                      <button
-                                        className="text-gray-500 hover:text-sky-600 text-[12px] outline-none"
-                                        onClick={() => handle_view_gr(row.id)}
-                                      >
-                                        <View size={19} />
-                                      </button>
-                                      <span className="absolute bottom-full mb-1 left-1/2 transform -translate-x-1/2 px-2 py-1 text-xs text-white bg-sky-600 rounded opacity-0 group-hover:opacity-100 transition-opacity">
-                                        View Record
-                                      </span>
+                                      <Button_Action
+                                        icon={View}
+                                        tooltip="View Record"
+                                        on_click={() => handle_view_gr(row.id)}
+                                      />
                                     </div>
                                     <div className="relative group flex jusity-center items-center">
-                                      <button
-                                        className="text-gray-500 hover:text-sky-600 text-[12px] outline-none"
-                                        onClick={() => handle_post_gr(row.id)}
-                                      >
-                                        <FileInput size={19} />
-                                      </button>
-                                      <span className="absolute bottom-full mb-1 left-1/2 transform -translate-x-1/2 px-2 py-1 text-xs text-white bg-sky-600 rounded opacity-0 group-hover:opacity-100 transition-opacity">
-                                        Post Record
-                                      </span>
+                                      <Button_Action
+                                        icon={FileInput}
+                                        tooltip="Post Record"
+                                        on_click={() => handle_post_gr(row.id)}
+                                      />
                                     </div>
                                     <div className="relative group flex jusity-center items-center">
-                                      <button
-                                        className="text-gray-500 hover:text-sky-600 text-[12px] outline-none"
-                                        onClick={() => handle_edit_gr(row.id)}
-                                      >
-                                        <Edit size={19} />
-                                      </button>
-                                      <span className="absolute bottom-full mb-1 left-1/2 transform -translate-x-1/2 px-2 py-1 text-xs text-white bg-sky-600 rounded opacity-0 group-hover:opacity-100 transition-opacity">
-                                        Edit Record
-                                      </span>
+                                      <Button_Action
+                                        icon={Edit}
+                                        tooltip="Edit Record"
+                                        on_click={() => handle_edit_gr(row.id)}
+                                      />
                                     </div>
                                     <div className="relative group flex jusity-center items-center">
-                                      <button
-                                        className="text-gray-500 hover:text-red-600 text-[12px] mb-[1px] outline-none"
-                                        onClick={() => handle_delete_gr(row.id)}
-                                      >
-                                        <Trash size={19} />
-                                      </button>
-                                      <span className="absolute bottom-full mb-1 left-1/2 transform -translate-x-1/2 px-2 py-1 text-xs text-white bg-red-600 rounded opacity-0 group-hover:opacity-100 transition-opacity">
-                                        Delete Record
-                                      </span>
+                                      <Button_Action
+                                        class_name="mb-[1px]"
+                                        icon={Trash}
+                                        variant="danger"
+                                        tooltip="Delete Record"
+                                        on_click={() =>
+                                          handle_delete_gr(row.id)
+                                        }
+                                      />
                                     </div>
                                   </div>
                                 );
                               }
-
-                              return value; // Default render for all other fields
+                              // - Actions
+                              // + Default
+                              return value;
+                              // - Default
                             };
-                            // - Cell Renderer
 
                             return (
                               <tr
@@ -563,6 +549,8 @@ const Goods_Receipt = () => {
                       </table>
                     )}
                   </div>
+                  {/* - Table */}
+                  {/* + Pagination */}
                   {total_pages > 0 && (
                     <Pagination
                       current_page={current_page}
@@ -571,17 +559,23 @@ const Goods_Receipt = () => {
                       variant="compact"
                     />
                   )}
+                  {/* - Pagination */}
                 </div>
+                {/* - GR List */}
               </div>
+              {/* - Section 2 */}
             </div>
           </div>
         </React.Fragment>
       )}
+      {/* + Pages */}
       {page === "gr_creation" && <Create_New_GR set_page={set_page} />}
       {page === "edit_gr" && <Edit_GR set_page={set_page} />}
       {page === "post_view_gr" && (
         <Post_View_GR set_page={set_page} for_posting={for_posting} />
       )}
+      {/* - Pages */}
+      {/* + Modals */}
       <Select_PO
         is_open={display_modal === "select_po"}
         on_close={() => set_display_modal("")}
@@ -591,17 +585,12 @@ const Goods_Receipt = () => {
         company_list={company_list}
         po_type_list={po_type_list}
       />
-      {/* <Post_View_GR
-        is_open={display_modal === "view_gr" || display_modal === "post_gr"}
-        for_posting={for_posting}
-        on_close={() => set_display_modal("")}
-        width="max-w-[1280px]"
-      /> */}
       <Delete_GR
         is_open={display_modal === "delete_gr"}
         on_close={() => set_display_modal("")}
         width="max-w-[1280px]"
       />
+      {/* - Modals */}
     </React.Fragment>
   );
 };

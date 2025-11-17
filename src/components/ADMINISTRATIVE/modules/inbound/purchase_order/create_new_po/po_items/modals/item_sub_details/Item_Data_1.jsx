@@ -1,6 +1,5 @@
-import React, { useState } from "react";
+import React from "react";
 import Text_Field from "assets/elements/Text_Field";
-import Select_Field from "assets/elements/Select_Field";
 import Checkbox_Field from "assets/elements/Checkbox_Field";
 
 const Item_Data_1 = () => {
@@ -20,12 +19,7 @@ const Item_Data_1 = () => {
               />
             </div>
             <div>
-              <Text_Field
-                label="Stock Type"
-                type={"text"}
-                pattern="[0-9]{1,}"
-                disabled
-              />
+              <Text_Field label="Stock Type" type={"text"} disabled />
             </div>
             <div>
               <Text_Field

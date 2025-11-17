@@ -58,20 +58,16 @@ const Show_Item_Details = ({ is_open, on_close, width = "max-w-[700px]" }) => {
                         <div className="w-full lg:col-span-3">
                           <Text_Field
                             label="Item Code"
-                            type={"number"}
+                            type={"text"}
                             // value={text}
-                            // on_change={handle_text_change}
-                            pattern="[A-Za-z]{1,}"
                             disabled
                           />
                         </div>
                         <div className="w-full lg:col-span-9">
                           <Text_Field
-                            label="Item Name"
-                            type={"number"}
+                            label="Item Description"
+                            type={"text"}
                             // value={text}
-                            // on_change={handle_text_change}
-                            pattern="[A-Za-z]{1,}"
                             disabled
                           />
                         </div>

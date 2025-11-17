@@ -12,14 +12,13 @@ const Select_Plant = ({
   height = "h-[500px]",
   plant_list,
 }) => {
-  // --- States ---
-  const [filtered_plant_dc, set_filtered_plant_dc] = useState([]);
+  // + Client-Side Filtering
+  const [filtered_plant_list, set_filtered_plant_list] = useState([]);
   const [current_page, set_current_page] = useState(1);
   const [rows_per_page, set_rows_per_page] = useState(5);
   const [search_query, set_search_query] = useState("");
   const [selected_plant, set_selected_plant] = useState(null);
 
-  // --- Pagination + Filtering Logic ---
   useEffect(() => {
     let data = [...plant_list];
 
@@ -34,7 +33,7 @@ const Select_Plant = ({
 
     const start_idx = (current_page - 1) * rows_per_page;
     const end_idx = start_idx + rows_per_page;
-    set_filtered_plant_dc(data.slice(start_idx, end_idx));
+    set_filtered_plant_list(data.slice(start_idx, end_idx));
   }, [plant_list, search_query, current_page, rows_per_page]);
 
   const total_pages = Math.ceil(
@@ -45,24 +44,24 @@ const Select_Plant = ({
     ).length / rows_per_page
   );
 
-  // --- Handlers ---
   const handle_page_change = (page) => set_current_page(page);
+  // - Client-Side Filtering
 
   const handle_select_plant = () => {
     if (!selected_plant) {
       alert("Please select a plant before proceeding.");
       return;
     }
-    alert(`Selected: ${selected_plant.description}`);
+    alert(`Selected: ${selected_plant.plant_desc}`);
   };
 
+  /// RETURN ORIGIN
   return is_open ? (
     <React.Fragment>
       <div className="fixed inset-0 flex items-center justify-center z-[97] px-4">
         {/* + Blur */}
         <div className="absolute inset-0 bg-black/50 backdrop-blur-sm z-[98]"></div>
         {/* - Blur */}
-
         {/* + Modal Content */}
         <div
           className={`relative bg-white rounded-lg shadow-xl ${width} w-full py-7 m-5 z-[99]`}
@@ -73,13 +72,11 @@ const Select_Plant = ({
           >
             <X size={20} />
           </button>
-
           {/* + Modal Label */}
           <div className="text-lg md:text-xl font-bold mb-5 px-7">
             Plant / DC Selection
           </div>
           {/* - Modal Label */}
-
           {/* + Modal Body */}
           <div className={`w-full overflow-y-auto ${height} scrollbar-custom`}>
             <div className="overflow-hidden border border-gray-200 bg-white pt-4">
@@ -98,8 +95,7 @@ const Select_Plant = ({
                   />
                 </div>
               </div>
-
-              {/* Table */}
+              {/* + Table */}
               <div className="max-w-full overflow-x-auto custom-scrollbar">
                 <table className="min-w-full whitespace-nowrap">
                   <thead className="border-gray-100 border-y bg-gray-50">
@@ -115,7 +111,7 @@ const Select_Plant = ({
                   </thead>
 
                   <tbody className="divide-y divide-gray-100">
-                    {filtered_plant_dc.length === 0 ? (
+                    {filtered_plant_list.length === 0 ? (
                       <tr>
                         <td
                           colSpan={3}
@@ -125,7 +121,7 @@ const Select_Plant = ({
                         </td>
                       </tr>
                     ) : (
-                      filtered_plant_dc.map((data) => (
+                      filtered_plant_list.map((data) => (
                         <tr
                           key={data.id}
                           className={`hover:bg-sky-50/50 cursor-pointer text-[12px] ${
@@ -163,13 +159,13 @@ const Select_Plant = ({
                   </tbody>
                 </table>
               </div>
+              {/* - Table */}
             </div>
           </div>
           {/* - Modal Body */}
-
           {/* + Modal Footer */}
           <div className="flex flex-col items-center sm:flex-row sm:justify-between gap-3 mt-5 px-7">
-            {/* Pagination */}
+            {/* + Pagination */}
             {total_pages > 0 && (
               <div className="w-full sm:w-auto">
                 <Pagination_Modal
@@ -179,8 +175,8 @@ const Select_Plant = ({
                 />
               </div>
             )}
-
-            {/* Buttons */}
+            {/* - Pagination */}
+            {/* + Buttons */}
             <div className="flex justify-center sm:justify-end gap-2 w-full">
               <Button
                 variant="primary"
@@ -198,6 +194,7 @@ const Select_Plant = ({
                 Close
               </Button>
             </div>
+            {/* - Buttons */}
           </div>
           {/* - Modal Footer */}
         </div>

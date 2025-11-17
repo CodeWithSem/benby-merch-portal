@@ -2,8 +2,10 @@ import React from "react";
 import Text_Field from "assets/elements/Text_Field";
 
 const Org_Data = () => {
+  // RETURN ORIGIN
   return (
     <React.Fragment>
+      {/* + Section 1 */}
       <div className="rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6 dark:border-gray-800 dark:bg-gray-900">
         <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
           <div>
@@ -11,8 +13,6 @@ const Org_Data = () => {
               label="Company"
               type={"text"}
               // value={}
-              // on_change={handle_text_change}
-              pattern="[A-Za-z]{1,}"
               disabled
             />
           </div>
@@ -21,8 +21,6 @@ const Org_Data = () => {
               label="Common Reference"
               type={"text"}
               // value={}
-              // on_change={handle_text_change}
-              pattern="[A-Za-z]{1,}"
               disabled
             />
           </div>
@@ -31,8 +29,6 @@ const Org_Data = () => {
               label="Purchasing Organization"
               type={"text"}
               // value={}
-              // on_change={handle_text_change}
-              pattern="[A-Za-z]{1,}"
               disabled
             />
           </div>
@@ -41,8 +37,6 @@ const Org_Data = () => {
               label="Other Reference"
               type={"text"}
               // value={}
-              // on_change={handle_text_change}
-              pattern="[A-Za-z]{1,}"
               disabled
             />
           </div>
@@ -51,13 +45,12 @@ const Org_Data = () => {
               label="Purchasing Group"
               type={"text"}
               // value={}
-              // on_change={handle_text_change}
-              pattern="[A-Za-z]{1,}"
               disabled
             />
           </div>
         </div>
       </div>
+      {/* - Section 1 */}
     </React.Fragment>
   );
 };

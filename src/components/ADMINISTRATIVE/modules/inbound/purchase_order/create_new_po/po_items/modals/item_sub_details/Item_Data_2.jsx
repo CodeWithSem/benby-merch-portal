@@ -16,7 +16,7 @@ const Item_Data_2 = () => {
             <div>
               <Text_Field_Adorn
                 label="PO Quantity in KG"
-                // value={1000}
+                // value={}
                 adornment="KG"
                 adornment_position="right"
                 disabled
@@ -25,7 +25,7 @@ const Item_Data_2 = () => {
             <div>
               <Text_Field_Adorn
                 label="PO Quantity in PC"
-                // value={1000}
+                // value={}
                 adornment="PC"
                 adornment_position="right"
                 disabled

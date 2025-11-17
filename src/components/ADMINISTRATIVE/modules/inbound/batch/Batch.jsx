@@ -10,28 +10,26 @@ import {
   RefreshCw,
   FileUp,
 } from "lucide-react";
+import { useToast } from "../../../layout/Toast_Provider";
+import { branch_list, plant_list, sloc_list } from "./BATCH_DATA_MAP";
 import Icon_Field from "assets/elements/Icon_Field";
 import Select_Field from "assets/elements/Select_Field";
-import Pagination from "assets/elements/Pagination";
 import Button from "assets/elements/Button";
-import { useToast } from "../../../layout/Toast_Provider";
 import Text_Code_Field from "assets/elements/Text_Code_Field";
+import Pagination from "assets/elements/Pagination";
+import Create_New_Batch from "./create_new_batch/Create_New_Batch";
+import Edit_Batch from "./edit_batch/Edit_Batch";
 import Select_Branch from "./modals/Select_Branch";
 import Select_Plant from "./modals/Select_Plant";
 import Select_SLOC from "./modals/Select_SLOC";
 import Select_Item from "./modals/Select_Item";
-import Create_New_Batch from "./create_new_batch/Create_New_Batch";
-import View_Batch from "./modals/view_batch/View_Batch";
-import Edit_Batch from "./edit_batch/Edit_Batch";
-import { branch_list, plant_list, sloc_list } from "./BATCH_DATA_MAP";
+import VIew_Batch from "./view_batch/VIew_Batch";
+import Delete_Batch from "./modals/delete_batch/Delete_Batch";
 
 const Batch = () => {
+  const { show_toast } = useToast();
   const [page, set_page] = useState("main");
   const [display_modal, set_display_modal] = useState("");
-
-  const { show_toast } = useToast();
-
-  // --- Filter selections ---
   const [selected_branch, set_selected_branch] = useState({
     branch_code: "BR-0001",
   });
@@ -39,12 +37,9 @@ const Batch = () => {
     plant_code: "PL-0001",
   });
   const [selected_sloc, set_selected_sloc] = useState({ sloc_code: "SL-0001" });
-  const [selected_item, set_selected_item] = useState({ item_code: "0001" });
-
-  const company_list = [
-    { id: 1, company_code: "20001", company_desc: "Company 1" },
-    { id: 2, company_code: "20002", company_desc: "Company 2" },
-  ];
+  const [selected_item, set_selected_item] = useState({
+    item_code: "ITM-000000001",
+  });
 
   const columns = [
     { key: "batch_code", label: "Batch Code", sortable: true },
@@ -53,30 +48,31 @@ const Batch = () => {
     { key: "actions", label: "", sortable: false },
   ];
 
-  const [all_data, set_all_data] = useState([
+  const [batch_list, set_batch_list] = useState([
     {
       id: 1,
-      batch_code: "0001-B-001",
+      batch_code: "000000001-B-001",
       batch_desc: "Batch Description 1",
       branch_code: "BR-0001",
       plant_code: "PL-0001",
       sloc_code: "SL-0001",
-      item_code: "0001",
-      creation_date: "11/03/2025 12:00:00 AM",
+      item_code: "ITM-000000001",
+      creation_date: "MM-DD-YYYY",
     },
     {
       id: 2,
-      batch_code: "0002-B-002",
+      batch_code: "000000002-B-002",
       batch_desc: "Batch Description 2",
       branch_code: "BR-0002",
       plant_code: "PL-0002",
       sloc_code: "SL-0002",
-      item_code: "0002",
-      creation_date: "11/04/2025 12:00:00 AM",
+      item_code: "ITM-000000002",
+      creation_date: "MM-DD-YYYY",
     },
   ]);
 
-  const [filtered_data, set_filtered_data] = useState([]);
+  // + Client-Side Filtering
+  const [filtered_batch_list, set_filtered_batch_list] = useState([]);
   const [loading, set_loading] = useState(false);
   const [select_option, set_select_option] = useState(5);
   const [current_page, set_current_page] = useState(1);
@@ -85,7 +81,6 @@ const Batch = () => {
   const [search_query, set_search_query] = useState("");
   const [debounced_query, set_debounced_query] = useState("");
 
-  // --- Debounce search ---
   useEffect(() => {
     const timer = setTimeout(() => {
       set_debounced_query(search_query);
@@ -94,26 +89,23 @@ const Batch = () => {
     return () => clearTimeout(timer);
   }, [search_query]);
 
-  // --- Filtering function ---
-  const get_filtered_batches = () => {
-    return all_data.filter((row) => {
-      if (selected_branch && row.branch_code !== selected_branch.branch_code)
+  const get_filtered_batch_list = () => {
+    return batch_list.filter((data) => {
+      if (selected_branch && data.branch_code !== selected_branch.branch_code)
         return false;
-      if (selected_plant && row.plant_code !== selected_plant.plant_code)
+      if (selected_plant && data.plant_code !== selected_plant.plant_code)
         return false;
-      if (selected_sloc && row.sloc_code !== selected_sloc.sloc_code)
+      if (selected_sloc && data.sloc_code !== selected_sloc.sloc_code)
         return false;
-      if (selected_item && row.item_code !== selected_item.item_code)
+      if (selected_item && data.item_code !== selected_item.item_code)
         return false;
       return true;
     });
   };
 
-  // --- Apply filtering, search, sort, pagination ---
   useEffect(() => {
-    let temp = get_filtered_batches();
+    let temp = get_filtered_batch_list();
 
-    // Search filter
     if (debounced_query.trim() !== "") {
       const q = debounced_query.toLowerCase();
       temp = temp.filter((u) =>
@@ -125,7 +117,6 @@ const Batch = () => {
       );
     }
 
-    // Sort
     temp.sort((a, b) => {
       const val_a = a[sort_by];
       const val_b = b[sort_by];
@@ -136,12 +127,11 @@ const Batch = () => {
       return 0;
     });
 
-    // Pagination
     const start_idx = (current_page - 1) * select_option;
     const end_idx = start_idx + select_option;
-    set_filtered_data(temp.slice(start_idx, end_idx));
+    set_filtered_batch_list(temp.slice(start_idx, end_idx));
   }, [
-    all_data,
+    batch_list,
     selected_branch,
     selected_plant,
     selected_sloc,
@@ -155,7 +145,7 @@ const Batch = () => {
 
   const total_pages = Math.ceil(
     (debounced_query
-      ? get_filtered_batches().filter((u) =>
+      ? get_filtered_batch_list().filter((u) =>
           columns.some((col) => {
             if (col.key === "actions") return false;
             const val = u[col.key];
@@ -165,7 +155,7 @@ const Batch = () => {
               .includes(debounced_query.toLowerCase());
           })
         ).length
-      : get_filtered_batches().length) / select_option
+      : get_filtered_batch_list().length) / select_option
   );
 
   const handle_sort = (column) => {
@@ -179,22 +169,28 @@ const Batch = () => {
   };
 
   const handle_page_change = (page) => set_current_page(page);
+  // - Client-Side Filtering
 
   const handle_create_new_batch = () => set_page("batch_creation");
+
   const handle_upload_batch = () => alert("Under Maintenance");
-  const handle_view_batch = (id) => set_display_modal("view_batch");
+
+  const handle_view_batch = (id) => set_page("view_batch");
+
   const handle_edit_batch = (id) => {
-    alert(`Batch ID : ${id}`);
     set_page("edit_batch");
   };
-  const handle_delete_batch = (id) => set_display_modal("delete_po");
 
+  const handle_delete_batch = (id) => set_display_modal("delete_batch");
+
+  // RETURN ORIGIN
   return (
     <React.Fragment>
       {page === "main" && (
         <div className="w-full">
           <div className="flex flex-wrap items-center justify-between gap-3 py-5">
             <h1 className="text-xl">Inbound</h1>
+            {/* + Breadcrumbs */}
             <nav>
               <ol className="flex flex-wrap items-center gap-1.5">
                 <li>
@@ -214,9 +210,10 @@ const Batch = () => {
                 </li>
               </ol>
             </nav>
+            {/* - Breadcrumbs */}
           </div>
-
           <div className="w-full bg-white rounded-lg border">
+            {/* + Header */}
             <div className="flex flex-wrap items-center justify-between gap-3 p-5">
               <h1 className="text-lg">Batch</h1>
               <div className="flex gap-2">
@@ -225,7 +222,6 @@ const Batch = () => {
                   icon={PlusCircle}
                   icon_position="left"
                   on_click={handle_create_new_batch}
-                  //   disabled
                 >
                   Create New Batch
                 </Button>
@@ -239,8 +235,8 @@ const Batch = () => {
                 </Button>
               </div>
             </div>
-
-            {/* Filter fields */}
+            {/* - Header */}
+            {/* + Section 1 */}
             <div className="p-5 sm:p-6 border-t">
               <div className="grid grid-cols-1 gap-5">
                 <Text_Code_Field
@@ -273,9 +269,10 @@ const Batch = () => {
                 />
               </div>
             </div>
-
-            {/* Table */}
+            {/* - Section 1 */}
+            {/* + Section 2 */}
             <div className="p-5 sm:p-6 border-t">
+              {/* + Batch List */}
               <div className="w-full border rounded-lg">
                 <div className="w-full md:flex md:justify-between p-4 gap-4">
                   <div className="flex items-center text-sm gap-2">
@@ -302,7 +299,6 @@ const Batch = () => {
                       icon_position="left"
                     />
                   </div>
-
                   <div className="w-full mt-4 md:mt-0 md:w-[600px]">
                     <div className="w-full flex items-center gap-2">
                       <div className="w-full">
@@ -317,13 +313,12 @@ const Batch = () => {
                     </div>
                   </div>
                 </div>
-
                 <div className="overflow-x-auto">
                   {loading ? (
                     <div className="p-6 text-center text-gray-500 text-sm">
                       Loading...
                     </div>
-                  ) : filtered_data.length === 0 ? (
+                  ) : filtered_batch_list.length === 0 ? (
                     <div className="p-6 text-center text-gray-500 text-sm">
                       No data found
                     </div>
@@ -369,7 +364,7 @@ const Batch = () => {
                         </tr>
                       </thead>
                       <tbody className="bg-white">
-                        {filtered_data.map((row, idx) => {
+                        {filtered_batch_list.map((row, idx) => {
                           const render_cell = (col, row) => {
                             const value = row[col.key];
                             if (col.key === "actions") {
@@ -422,6 +417,7 @@ const Batch = () => {
                     </table>
                   )}
                 </div>
+                {/* + Pagination */}
                 {total_pages > 0 && (
                   <Pagination
                     current_page={current_page}
@@ -430,13 +426,20 @@ const Batch = () => {
                     variant="compact"
                   />
                 )}
+                {/* - Pagination */}
               </div>
+              {/* - Batch List */}
             </div>
+            {/* - Section 2 */}
           </div>
         </div>
       )}
+      {/* + Pages */}
       {page === "batch_creation" && <Create_New_Batch set_page={set_page} />}
       {page === "edit_batch" && <Edit_Batch set_page={set_page} />}
+      {page === "view_batch" && <VIew_Batch set_page={set_page} />}
+      {/* - Pages */}
+      {/* + Modals */}
       <Select_Branch
         is_open={display_modal === "select_branch"}
         on_close={() => set_display_modal("")}
@@ -464,12 +467,13 @@ const Batch = () => {
         width="max-w-[1000px]"
         height="max-h-[700px]"
       />
-      <View_Batch
-        is_open={display_modal === "view_batch"}
+      <Delete_Batch
+        is_open={display_modal === "delete_batch"}
         on_close={() => set_display_modal("")}
-        width="max-w-[1280px]"
+        width="max-w-[1000px]"
         height="max-h-[700px]"
       />
+      {/* - Modals */}
     </React.Fragment>
   );
 };

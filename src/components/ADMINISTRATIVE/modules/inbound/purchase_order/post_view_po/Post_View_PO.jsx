@@ -88,6 +88,7 @@ const Post_View_PO = ({ set_page, for_posting }) => {
       <div className="w-full">
         <div className="flex flex-wrap items-center justify-between gap-3 py-5">
           <h1 className="text-xl">Inbound</h1>
+          {/* + Breadcrumbs */}
           <nav>
             <ol className="flex flex-wrap items-center gap-1.5">
               <li>
@@ -121,8 +122,10 @@ const Post_View_PO = ({ set_page, for_posting }) => {
               </li>
             </ol>
           </nav>
+          {/* - Breadcrumbs */}
         </div>
         <div className="w-full bg-white rounded-lg border">
+          {/* + Header */}
           <div className="flex flex-wrap items-center justify-between gap-3 p-5">
             <div className="flex items-center gap-3">
               <Button
@@ -132,7 +135,6 @@ const Post_View_PO = ({ set_page, for_posting }) => {
                 width="w-[20px]"
                 on_click={handle_go_back}
               ></Button>
-              {/* <ChevronLeft className="text-gray-500" size={24} /> */}
               <h1 className="text-lg">
                 {for_posting ? "Post Purchase Order" : "View Purchase Order"}
               </h1>
@@ -144,6 +146,8 @@ const Post_View_PO = ({ set_page, for_posting }) => {
               </div>
             </div>
           </div>
+          {/* - Header */}
+          {/* + Section 1 */}
           <div className="p-5 sm:p-6 border-t">
             <div className="w-full">
               <div className="space-y-6">
@@ -152,10 +156,7 @@ const Post_View_PO = ({ set_page, for_posting }) => {
                     <Text_Field
                       label="PO Number"
                       type={"text"}
-                      // value={"AUTO GENERATED"}
-                      // on_change={handle_text_change}
-                      pattern="[A-Za-z]{1,}"
-                      bg_color="slate-50"
+                      // value={""}
                       disabled
                     />
                   </div>
@@ -163,9 +164,7 @@ const Post_View_PO = ({ set_page, for_posting }) => {
                     <Text_Code_Field
                       label="PO Type"
                       // code_value={search_value}
-                      // on_code_change={handle_change}
                       // text_value={search_value}
-                      // on_text_change={handle_change}
                       code_width="150px"
                       show_search_button={false}
                       disabled
@@ -175,9 +174,7 @@ const Post_View_PO = ({ set_page, for_posting }) => {
                     <Text_Code_Field
                       label="Vendor"
                       // code_value={search_value}
-                      // on_code_change={handle_change}
                       // text_value={search_value}
-                      // on_text_change={handle_change}
                       code_width="150px"
                       show_search_button={false}
                       disabled
@@ -187,9 +184,7 @@ const Post_View_PO = ({ set_page, for_posting }) => {
                     <Text_Code_Field
                       label="Branch"
                       // code_value={search_value}
-                      // on_code_change={handle_change}
                       // text_value={search_value}
-                      // on_text_change={handle_change}
                       code_width="150px"
                       show_search_button={false}
                       disabled
@@ -199,9 +194,7 @@ const Post_View_PO = ({ set_page, for_posting }) => {
                     <Text_Code_Field
                       label="Plant / DC"
                       // code_value={search_value}
-                      // on_code_change={handle_change}
                       // text_value={search_value}
-                      // on_text_change={handle_change}
                       code_width="150px"
                       show_search_button={false}
                       disabled
@@ -211,9 +204,7 @@ const Post_View_PO = ({ set_page, for_posting }) => {
                     <Text_Code_Field
                       label="SLOC"
                       // code_value={search_value}
-                      // on_code_change={handle_change}
                       // text_value={search_value}
-                      // on_text_change={handle_change}
                       code_width="150px"
                       show_search_button={false}
                       disabled
@@ -223,7 +214,10 @@ const Post_View_PO = ({ set_page, for_posting }) => {
               </div>
             </div>
           </div>
+          {/* - Section 1 */}
+          {/* + Section 2 */}
           <div className="p-5 sm:p-6 border-t">
+            {/* + Tab Navigation */}
             <div className="w-full bg-white rounded-lg border">
               <div className="w-full border-b p-2">
                 <nav className="flex overflow-x-auto rounded-lg bg-gray-100 p-1 dark:bg-gray-900 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-200 dark:[&::-webkit-scrollbar-thumb]:bg-gray-600 [&::-webkit-scrollbar-track]:bg-white dark:[&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar]:h-1.5">
@@ -242,7 +236,7 @@ const Post_View_PO = ({ set_page, for_posting }) => {
                   ))}
                 </nav>
               </div>
-
+              {/* - Tab Navigation */}
               {/* + Tab Content */}
               <div className="p-6">
                 {active_tab === "delivery" && <Delivery />}
@@ -255,31 +249,30 @@ const Post_View_PO = ({ set_page, for_posting }) => {
               {/* - Tab Content */}
             </div>
           </div>
+          {/* - Section 2 */}
+          {/* + Section 3 */}
           <PO_Items />
+          {/* - Section 3 */}
+          {/* + Section 4 */}
           {for_posting && (
             <div className="p-4 sm:p-8 border-t">
               <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
                 <Button
                   variant="primary"
                   size="lg"
-                  // width="w-[100px]"
                   icon={FileInput}
                   icon_position="left"
                   on_click={() => set_is_confirm_modal_open(true)}
                 >
                   Post PO
                 </Button>
-                <Button
-                  variant="white"
-                  size="lg"
-                  // width="w-[100px]"
-                  on_click={handle_go_back}
-                >
+                <Button variant="white" size="lg" on_click={handle_go_back}>
                   Cancel
                 </Button>
               </div>
             </div>
           )}
+          {/* - Section 4 */}
         </div>
       </div>
       {is_confirm_modal_open && <Confirm_Modal />}

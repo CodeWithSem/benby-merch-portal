@@ -12,50 +12,50 @@ const Select_Branch = ({
   height = "h-[500px]",
   branch_list,
 }) => {
-  // --- States ---
-  const [filtered_branches, set_filtered_branches] = useState([]);
+  // + Client-Side Filtering
+  const [filtered_branch_list, set_filtered_branch_list] = useState([]);
   const [current_page, set_current_page] = useState(1);
   const [rows_per_page, set_rows_per_page] = useState(5);
   const [search_query, set_search_query] = useState("");
   const [selected_branch, set_selected_branch] = useState(null);
 
-  // --- Pagination + Filtering Logic ---
   useEffect(() => {
     let data = [...branch_list];
 
     if (search_query.trim() !== "") {
       const q = search_query.toLowerCase();
       data = data.filter(
-        (branch) =>
-          branch.branch_code.toLowerCase().includes(q) ||
-          branch.branch_desc.toLowerCase().includes(q)
+        (data) =>
+          data.branch_code.toLowerCase().includes(q) ||
+          data.branch_desc.toLowerCase().includes(q)
       );
     }
 
     const start_idx = (current_page - 1) * rows_per_page;
     const end_idx = start_idx + rows_per_page;
-    set_filtered_branches(data.slice(start_idx, end_idx));
+    set_filtered_branch_list(data.slice(start_idx, end_idx));
   }, [branch_list, search_query, current_page, rows_per_page]);
 
   const total_pages = Math.ceil(
     branch_list.filter(
-      (branch) =>
-        branch.branch_code.toLowerCase().includes(search_query.toLowerCase()) ||
-        branch.branch_desc.toLowerCase().includes(search_query.toLowerCase())
+      (data) =>
+        data.branch_code.toLowerCase().includes(search_query.toLowerCase()) ||
+        data.branch_desc.toLowerCase().includes(search_query.toLowerCase())
     ).length / rows_per_page
   );
 
-  // --- Handlers ---
   const handle_page_change = (page) => set_current_page(page);
+  // - Client-Side Filtering
 
   const handle_select_branch = () => {
     if (!selected_branch) {
       alert("Please select a branch before proceeding.");
       return;
     }
-    alert(`Selected: ${selected_branch.description}`);
+    alert(`Selected: ${selected_branch.branch_desc}`);
   };
 
+  // RETURN ORIGIN
   return is_open ? (
     <React.Fragment>
       <div className="fixed inset-0 flex items-center justify-center z-[97] px-4">
@@ -79,7 +79,6 @@ const Select_Branch = ({
             Branch Selection
           </div>
           {/* - Modal Label */}
-
           {/* + Modal Body */}
           <div className={`w-full overflow-y-auto ${height} scrollbar-custom`}>
             <div className="overflow-hidden border border-gray-200 bg-white pt-4">
@@ -98,8 +97,7 @@ const Select_Branch = ({
                   />
                 </div>
               </div>
-
-              {/* Table */}
+              {/* + Table */}
               <div className="max-w-full overflow-x-auto custom-scrollbar">
                 <table className="min-w-full whitespace-nowrap">
                   <thead className="border-gray-100 border-y bg-gray-50">
@@ -115,7 +113,7 @@ const Select_Branch = ({
                   </thead>
 
                   <tbody className="divide-y divide-gray-100">
-                    {filtered_branches.length === 0 ? (
+                    {filtered_branch_list.length === 0 ? (
                       <tr>
                         <td
                           colSpan={3}
@@ -125,7 +123,7 @@ const Select_Branch = ({
                         </td>
                       </tr>
                     ) : (
-                      filtered_branches.map((data) => (
+                      filtered_branch_list.map((data) => (
                         <tr
                           key={data.id}
                           className={`hover:bg-sky-50/50 cursor-pointer text-[12px] ${
@@ -163,13 +161,14 @@ const Select_Branch = ({
                   </tbody>
                 </table>
               </div>
+              {/* - Table */}
             </div>
           </div>
           {/* - Modal Body */}
 
           {/* + Modal Footer */}
           <div className="flex flex-col items-center sm:flex-row sm:justify-between gap-3 mt-5 px-7">
-            {/* Pagination */}
+            {/* + Pagination */}
             {total_pages > 0 && (
               <div className="w-full sm:w-auto">
                 <Pagination_Modal
@@ -179,8 +178,8 @@ const Select_Branch = ({
                 />
               </div>
             )}
-
-            {/* Buttons */}
+            {/* - Pagination */}
+            {/* + Buttons */}
             <div className="flex justify-center sm:justify-end gap-2 w-full">
               <Button
                 variant="primary"
@@ -198,6 +197,7 @@ const Select_Branch = ({
                 Close
               </Button>
             </div>
+            {/* - Buttons */}
           </div>
           {/* - Modal Footer */}
         </div>

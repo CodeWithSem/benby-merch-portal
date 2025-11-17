@@ -38,16 +38,16 @@ const Edit_Item = ({ is_open, on_close, width = "max-w-[700px]" }) => {
                 <div className="w-full lg:col-span-3">
                   <Text_Field
                     label="Item Code"
-                    type={"number"}
-                    // value={text}
-                    // on_change={handle_text_change}
+                    type={"text"}
+                    // value={}
                     disabled
                   />
                 </div>
                 <div className="w-full lg:col-span-9">
                   <Find_Field
-                    label="Item Name"
-                    // value={search_value}
+                    label="Item Description"
+                    name="item_name"
+                    // value={}
                     on_click={() => set_display_item_modal("select_item")}
                     disabled
                   />
@@ -56,7 +56,7 @@ const Edit_Item = ({ is_open, on_close, width = "max-w-[700px]" }) => {
                   <Text_Field
                     label="Unit Price"
                     type={"text"}
-                    // value={text}
+                    // value={}
                     disabled
                   />
                 </div>
@@ -64,7 +64,7 @@ const Edit_Item = ({ is_open, on_close, width = "max-w-[700px]" }) => {
                   <Text_Field
                     label="Unit"
                     type={"text"}
-                    // value={text}
+                    // value={}
                     disabled
                   />
                 </div>

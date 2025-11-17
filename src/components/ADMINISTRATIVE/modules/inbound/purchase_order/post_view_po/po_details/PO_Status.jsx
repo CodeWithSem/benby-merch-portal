@@ -3,6 +3,7 @@ import Text_Code_Field from "assets/elements/Text_Code_Field";
 import Checkbox_Field from "assets/elements/Checkbox_Field";
 
 const PO_Status = () => {
+  // RETURN ORIGIN
   return (
     <React.Fragment>
       <div className="rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6 dark:border-gray-800 dark:bg-gray-900">
@@ -14,9 +15,7 @@ const PO_Status = () => {
             <Text_Code_Field
               label="Ordered"
               // code_value={search_value}
-              // on_code_change={handle_change}
               // text_value={search_value}
-              // on_text_change={handle_change}
               code_width="150px"
               show_search_button={false}
               disabled
@@ -26,9 +25,7 @@ const PO_Status = () => {
             <Text_Code_Field
               label="Still to Deliver"
               // code_value={search_value}
-              // on_code_change={handle_change}
               // text_value={search_value}
-              // on_text_change={handle_change}
               code_width="150px"
               show_search_button={false}
               disabled
@@ -38,9 +35,7 @@ const PO_Status = () => {
             <Text_Code_Field
               label="Delivered"
               // code_value={search_value}
-              // on_code_change={handle_change}
               // text_value={search_value}
-              // on_text_change={handle_change}
               code_width="150px"
               show_search_button={false}
               disabled
@@ -50,9 +45,7 @@ const PO_Status = () => {
             <Text_Code_Field
               label="Still Invoice"
               // code_value={search_value}
-              // on_code_change={handle_change}
               // text_value={search_value}
-              // on_text_change={handle_change}
               code_width="150px"
               show_search_button={false}
               disabled
@@ -62,9 +55,7 @@ const PO_Status = () => {
             <Text_Code_Field
               label="Invoiced"
               // code_value={search_value}
-              // on_code_change={handle_change}
               // text_value={search_value}
-              // on_text_change={handle_change}
               code_width="150px"
               show_search_button={false}
               disabled
@@ -81,8 +72,7 @@ const PO_Status = () => {
               name="terms"
               box_size={24}
               icon_size={14}
-              // checked={check}
-              // on_change={(e) => set_check(e.target.checked)}
+              checked={false}
               disabled
             />
           </div>

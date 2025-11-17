@@ -1,14 +1,32 @@
-import React, { useState } from "react";
+import React from "react";
 import { Search } from "lucide-react";
 import Icon_Field from "assets/elements/Icon_Field";
+import { format_currency, format_percentage } from "assets/scripts/format";
 
 const PO_Items = () => {
-  // + For Quantity Field
-  const [quantity, set_quantity] = useState(1);
-  // - For Quantity Field
+  const item_list = [
+    {
+      id: 1,
+      item_code: "ITM-000000001",
+      item_desc: 'Macbook Pro 13"',
+      quantity: "5",
+      unit_price: "100000",
+      discount: "0",
+      total: "500000",
+    },
+    {
+      id: 2,
+      item_code: "ITM-000000002",
+      item_desc: "iPhone 15 Pro Max",
+      quantity: "1",
+      unit_price: "60000",
+      discount: "0",
+      total: "60000",
+    },
+  ];
+  // RETURN ORIGIN
   return (
     <React.Fragment>
-      {/* + Item Section */}
       <div className="flex flex-col gap-5 border-t p-5 sm:p-6">
         <div className="overflow-hidden rounded-lg border border-gray-200 bg-white pt-4 dark:border-gray-800 dark:bg-white/[0.03]">
           <div className="flex flex-col gap-5 px-6 md:pl-6 md:pr-3 mb-4 sm:flex-row sm:items-center sm:justify-between">
@@ -28,6 +46,7 @@ const PO_Items = () => {
               </div>
             </div>
           </div>
+          {/* + Item List */}
           <div className="max-w-full overflow-x-auto custom-scrollbar">
             <table className="min-w-full text-left text-sm text-gray-700 dark:border-gray-800">
               <thead className="bg-gray-50 dark:bg-gray-900">
@@ -53,50 +72,34 @@ const PO_Items = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100 bg-white dark:divide-gray-800 dark:bg-white/[0.03]">
-                <tr className="text-sm">
-                  <td className="px-5 py-4 whitespace-nowrap text-gray-500 dark:text-gray-400">
-                    1
-                  </td>
-                  <td className="px-5 py-4 font-medium whitespace-nowrap text-gray-800 dark:text-white/90">
-                    Macbook pro 13"
-                  </td>
-                  <td className="px-5 py-4 whitespace-nowrap text-gray-500 dark:text-gray-400">
-                    5
-                  </td>
-                  <td className="px-5 py-4 whitespace-nowrap text-gray-500 dark:text-gray-400">
-                    P 100,000.00
-                  </td>
-                  <td className="px-5 py-4 whitespace-nowrap text-gray-500 dark:text-gray-400">
-                    0%
-                  </td>
-                  <td className="px-5 py-4 whitespace-nowrap text-gray-500 dark:text-gray-400">
-                    P 500,000.00
-                  </td>
-                </tr>
-                <tr className="text-sm">
-                  <td className="px-5 py-4 whitespace-nowrap text-gray-500 dark:text-gray-400">
-                    2
-                  </td>
-                  <td className="px-5 py-4 font-medium whitespace-nowrap text-gray-800 dark:text-white/90">
-                    iPhone 15 Pro max
-                  </td>
-                  <td className="px-5 py-4 whitespace-nowrap text-gray-500 dark:text-gray-400">
-                    1
-                  </td>
-                  <td className="px-5 py-4 whitespace-nowrap text-gray-500 dark:text-gray-400">
-                    P 60,000.00
-                  </td>
-                  <td className="px-5 py-4 whitespace-nowrap text-gray-500 dark:text-gray-400">
-                    0%
-                  </td>
-                  <td className="px-5 py-4 whitespace-nowrap text-gray-500 dark:text-gray-400">
-                    P 60,000.00
-                  </td>
-                </tr>
+                {item_list.map((item, index) => (
+                  <tr key={item.id} className="text-sm hover:bg-gray-50/50">
+                    <td className="px-5 py-4 whitespace-nowrap text-gray-500 dark:text-gray-400">
+                      {index + 1}
+                    </td>
+                    <td className="px-5 py-4 font-medium whitespace-nowrap text-gray-800 dark:text-white/90">
+                      {item.item_desc}
+                    </td>
+                    <td className="px-5 py-4 whitespace-nowrap text-gray-500 dark:text-gray-400">
+                      {item.quantity}
+                    </td>
+                    <td className="px-5 py-4 whitespace-nowrap text-gray-500 dark:text-gray-400">
+                      {format_currency(item.unit_price, 2, true)}
+                    </td>
+                    <td className="px-5 py-4 whitespace-nowrap text-gray-500 dark:text-gray-400">
+                      {format_percentage(item.discount, 0)}
+                    </td>
+                    <td className="px-5 py-4 whitespace-nowrap text-gray-500 dark:text-gray-400">
+                      {format_currency(item.total, 2, true)}
+                    </td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>
+          {/* - Item List */}
         </div>
+        {/* + Order Summary */}
         <div className="flex flex-wrap justify-between sm:justify-end">
           <div className="mt-2 mr-2 w-full space-y-1 text-right sm:w-[270px]">
             <p className="mb-4 text-left text-sm font-medium text-gray-800 dark:text-white/90">
@@ -108,7 +111,7 @@ const PO_Items = () => {
                   Sub Total
                 </span>
                 <span className="text-sm font-medium text-gray-700 dark:text-gray-400">
-                  492,800.00
+                  {format_currency(0, 2, true)}
                 </span>
               </li>
               <li className="flex justify-between gap-5">
@@ -116,7 +119,7 @@ const PO_Items = () => {
                   Vat (12%)
                 </span>
                 <span className="text-sm font-medium text-gray-700 dark:text-gray-400">
-                  67,200.00
+                  {format_currency(0, 2, true)}
                 </span>
               </li>
               <li className="flex justify-between gap-5">
@@ -124,14 +127,14 @@ const PO_Items = () => {
                   Total
                 </span>
                 <span className="text-lg font-semibold text-gray-800 dark:text-white/90">
-                  560,000.00
+                  {format_currency(0, 2, true)}
                 </span>
               </li>
             </ul>
           </div>
         </div>
+        {/* - Order Summary */}
       </div>
-      {/* - Item Section */}
     </React.Fragment>
   );
 };

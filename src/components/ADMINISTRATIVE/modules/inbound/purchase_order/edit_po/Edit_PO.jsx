@@ -1,7 +1,8 @@
 import React, { useState } from "react";
+import { format_date_1, get_date_now } from "assets/scripts/format";
+import { ChevronLeft, RefreshCcwDot } from "lucide-react";
 import Text_Field from "assets/elements/Text_Field";
 import Button from "assets/elements/Button";
-import { ChevronLeft, Eye, RefreshCcwDot, Save, SaveAll } from "lucide-react";
 import Text_Code_Field from "assets/elements/Text_Code_Field";
 import Delivery from "./po_details/Delivery";
 import Address from "./po_details/Address";
@@ -15,7 +16,6 @@ import Select_Branch from "../modals/Select_Branch";
 import Select_Plant from "../modals/Select_Plant";
 import Select_SLOC from "../modals/Select_SLOC";
 import Select_Item from "../modals/Select_Item";
-import { format_date_1, get_date_now } from "assets/scripts/format";
 
 const Edit_PO = ({
   set_page,
@@ -36,6 +36,10 @@ const Edit_PO = ({
     { key: "approval", title: "Approval" },
   ];
 
+  const handle_go_back = () => {
+    set_page("main");
+  };
+
   // RETURN ORIGIN
   return (
     <React.Fragment>
@@ -54,7 +58,7 @@ const Edit_PO = ({
                 <span>/</span>
                 <a
                   className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-sky-500 cursor-pointer"
-                  onClick={() => set_page("main")}
+                  onClick={handle_go_back}
                 >
                   Inbound
                 </a>
@@ -63,7 +67,7 @@ const Edit_PO = ({
                 <span>/</span>
                 <a
                   className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-sky-500 cursor-pointer"
-                  onClick={() => set_page("main")}
+                  onClick={handle_go_back}
                 >
                   Purchase Order
                 </a>
@@ -85,7 +89,7 @@ const Edit_PO = ({
                 icon={ChevronLeft}
                 icon_position="left"
                 width="w-[20px]"
-                on_click={() => set_page("main")}
+                on_click={handle_go_back}
               ></Button>
               <h1 className="text-lg">Edit Purchase Order</h1>
             </div>
@@ -106,9 +110,6 @@ const Edit_PO = ({
                     label="PO Number"
                     type={"text"}
                     // value={""}
-                    // on_change={handle_text_change}
-                    pattern="[A-Za-z]{1,}"
-                    bg_color="slate-50"
                     disabled
                   />
                 </div>
@@ -219,11 +220,7 @@ const Edit_PO = ({
               >
                 Update
               </Button>
-              <Button
-                variant="white"
-                size="lg"
-                on_click={() => set_page("main")}
-              >
+              <Button variant="white" size="lg" on_click={handle_go_back}>
                 Cancel
               </Button>
             </div>

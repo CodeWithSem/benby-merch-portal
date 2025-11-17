@@ -5,7 +5,7 @@ import { format_date_1 } from "assets/scripts/format";
 
 const Shipment = () => {
   const [orig_date, set_orig_date] = useState("");
-  const handle_orig_date_change = (e) => {
+  const handle_change_orig_date = (e) => {
     const formatted_date = format_date_1(e.target.value);
     set_orig_date(formatted_date);
   };
@@ -20,7 +20,7 @@ const Shipment = () => {
               label="Original Date"
               placeholder="MM-DD-YYYY"
               value={orig_date}
-              on_change={handle_orig_date_change}
+              on_change={handle_change_orig_date}
             />
           </div>
           <div>

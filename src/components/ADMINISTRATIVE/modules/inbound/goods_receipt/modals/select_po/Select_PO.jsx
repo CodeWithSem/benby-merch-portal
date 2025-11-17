@@ -16,8 +16,7 @@ const Select_PO = ({
   company_list,
   po_type_list,
 }) => {
-  // --- Mock PO Data ---
-  const [po_list] = useState([
+  const [po_list, set_po_list] = useState([
     {
       id: 1,
       po_number: "PO-0000001",
@@ -35,21 +34,18 @@ const Select_PO = ({
   ]);
 
   const today = format_date_1(new Date());
-
   const [start_date, set_start_date] = useState(today);
   const [end_date, set_end_date] = useState(today);
-
   const [show_load_data_button, set_show_load_data_button] = useState(false);
 
-  // --- States ---
-  const [filtered_po, set_filtered_po] = useState([]);
+  // + Client-Side Filtering
+  const [filtered_po_list, set_filtered_po_list] = useState([]);
   const [current_page, set_current_page] = useState(1);
   const [rows_per_page, set_rows_per_page] = useState(5);
   const [search_query, set_search_query] = useState("");
   const [debounced_query, set_debounced_query] = useState("");
   const [selected_po, set_selected_po] = useState(null);
 
-  // --- Lookup Maps for faster access ---
   const company_map = useMemo(
     () =>
       Object.fromEntries(
@@ -65,7 +61,6 @@ const Select_PO = ({
     [po_type_list]
   );
 
-  // --- Debounce search query ---
   useEffect(() => {
     const timer = setTimeout(() => {
       set_debounced_query(search_query);
@@ -74,7 +69,6 @@ const Select_PO = ({
     return () => clearTimeout(timer);
   }, [search_query]);
 
-  // --- Filtering + Pagination ---
   useEffect(() => {
     let data = [...po_list];
 
@@ -82,7 +76,6 @@ const Select_PO = ({
       const q = debounced_query.toLowerCase();
 
       data = data.filter((po) => {
-        // lookup related records
         const po_type = po_type_list.find(
           (p) => p.po_type_code === po.po_type_code
         );
@@ -90,7 +83,6 @@ const Select_PO = ({
           (c) => c.company_code === po.company_code
         );
 
-        // create one searchable string
         const combined = [
           po.po_number,
           po.po_type_code,
@@ -108,10 +100,9 @@ const Select_PO = ({
 
     const start_idx = (current_page - 1) * rows_per_page;
     const end_idx = start_idx + rows_per_page;
-    set_filtered_po(data.slice(start_idx, end_idx));
+    set_filtered_po_list(data.slice(start_idx, end_idx));
   }, [po_list, debounced_query, current_page, rows_per_page]);
 
-  // --- Total Pages ---
   const total_pages = Math.ceil(
     po_list.filter((po) => {
       const po_type_desc = po_type_map[po.po_type_code] || "";
@@ -125,8 +116,9 @@ const Select_PO = ({
     }).length / rows_per_page
   );
 
-  // --- Handlers ---
   const handle_page_change = (page) => set_current_page(page);
+  // - Client-Side Filtering
+
   const handle_proceed = () => {
     console.log(selected_po);
     set_page("gr_creation");
@@ -153,7 +145,10 @@ const Select_PO = ({
   // RETURN ORIGIN
   return (
     <div className="fixed inset-0 flex items-center justify-center z-[97] px-4">
-      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm z-[98]" />
+      {/* + Blur */}
+      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm z-[98]"></div>
+      {/* - Blur */}
+      {/* + Modal Content */}
       <div
         className={`relative bg-white rounded-lg shadow-xl ${width} w-full py-7 m-5 z-[99]`}
       >
@@ -163,13 +158,12 @@ const Select_PO = ({
         >
           <X size={20} />
         </button>
-
-        {/* Header */}
+        {/* + Modal Label */}
         <div className="text-lg md:text-xl font-bold mb-5 px-7">
           Purchase Order Selection
         </div>
-
-        {/* Body */}
+        {/* - Modal Label */}
+        {/* + Modal Body */}
         <div className={`w-full overflow-y-auto ${height} scrollbar-custom`}>
           <div className="overflow-hidden border border-gray-200 bg-white pt-4">
             <div className="px-6 mb-5 grid grid-cols-1 gap-5 md:w-[800px] md:grid-cols-3">
@@ -198,7 +192,6 @@ const Select_PO = ({
                 )}
               </div>
             </div>
-            {/* Search */}
             <div className="flex flex-col gap-5 px-6 mb-4 sm:flex-row sm:items-center sm:justify-between">
               <div className="w-full">
                 <Icon_Field
@@ -211,8 +204,7 @@ const Select_PO = ({
                 />
               </div>
             </div>
-
-            {/* Table */}
+            {/* + Table */}
             <div className="max-w-full overflow-x-auto custom-scrollbar">
               <table className="min-w-full whitespace-nowrap">
                 <thead className="border-gray-100 border-y bg-gray-50">
@@ -233,7 +225,7 @@ const Select_PO = ({
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
-                  {filtered_po.length === 0 ? (
+                  {filtered_po_list.length === 0 ? (
                     <tr>
                       <td
                         colSpan={5}
@@ -243,7 +235,7 @@ const Select_PO = ({
                       </td>
                     </tr>
                   ) : (
-                    filtered_po.map((po) => {
+                    filtered_po_list.map((po) => {
                       const po_type = po_type_list.find(
                         (p) => p.po_type_code === po.po_type_code
                       );
@@ -309,11 +301,13 @@ const Select_PO = ({
                 </tbody>
               </table>
             </div>
+            {/* - Table */}
           </div>
         </div>
-
-        {/* Footer */}
+        {/* - Modal Body */}
+        {/* + Modal Footer */}
         <div className="flex flex-col items-center sm:flex-row sm:justify-between gap-3 mt-5 px-7">
+          {/* + Pagination */}
           {total_pages > 0 && (
             <div className="w-full sm:w-auto">
               <Pagination_Modal
@@ -323,6 +317,8 @@ const Select_PO = ({
               />
             </div>
           )}
+          {/* - Pagination */}
+          {/* + Action Buttons */}
           <div className="flex justify-center sm:justify-end gap-2 w-full">
             <Button
               variant="primary"
@@ -340,8 +336,11 @@ const Select_PO = ({
               Close
             </Button>
           </div>
+          {/*  Action Buttons */}
         </div>
+        {/* - Modal Footer */}
       </div>
+      {/* - Modal Content */}
     </div>
   );
 };

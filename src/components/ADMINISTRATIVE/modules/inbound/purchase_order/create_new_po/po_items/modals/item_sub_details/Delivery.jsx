@@ -39,8 +39,7 @@ const Delivery = () => {
             <div>
               <Text_Field_Adorn
                 label="Net Value"
-                // value={1000}
-                // on_change={(e) => setPrice(e.target.value)}
+                // value={}
                 adornment="PHP"
                 adornment_position="right"
                 disabled
@@ -108,11 +107,11 @@ const Delivery = () => {
         <div className="col-span-full rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6 dark:border-gray-800 dark:bg-gray-900 text-xs md:text-sm text-gray-700 whitespace-nowrap">
           <div className="flex flex-col md:flex-row">
             <div className="font-medium w-[200px]">Sub-Total :</div>
-            <div className="font-bold">500.00 PHP</div>
+            <div className="font-bold">0.00 PHP</div>
           </div>
           <div className="mt-4 flex flex-col md:flex-row">
             <div className="font-medium w-[200px]">Total Landed Cost :</div>
-            <div className="font-bold">500.00 PHP</div>
+            <div className="font-bold">0.00 PHP</div>
           </div>
         </div>
         {/* - Section 4 */}

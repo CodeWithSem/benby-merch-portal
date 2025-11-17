@@ -1,7 +1,7 @@
 import React, { useState } from "react";
+import { X } from "lucide-react";
 import Text_Field from "assets/elements/Text_Field";
 import Button from "assets/elements/Button";
-import { X } from "lucide-react";
 import Text_Code_Field from "assets/elements/Text_Code_Field";
 
 const Delete_GR = ({ is_open, on_close, width = "max-w-[700px]" }) => {
@@ -60,6 +60,7 @@ const Delete_GR = ({ is_open, on_close, width = "max-w-[700px]" }) => {
     );
   };
 
+  // RETURN ORIGIN
   return is_open ? (
     <React.Fragment>
       <div className="fixed inset-0 flex items-center justify-center z-[97] px-4">
@@ -104,9 +105,6 @@ const Delete_GR = ({ is_open, on_close, width = "max-w-[700px]" }) => {
                             label="PO Number"
                             type={"text"}
                             value={"PO-XXXXXXXXX"}
-                            // on_change={handle_text_change}
-                            pattern="[A-Za-z]{1,}"
-                            bg_color="slate-50"
                             disabled
                           />
                         </div>
@@ -115,9 +113,6 @@ const Delete_GR = ({ is_open, on_close, width = "max-w-[700px]" }) => {
                             label="GR Number"
                             type={"text"}
                             value={"GR-XXXXXXXXX"}
-                            // on_change={handle_text_change}
-                            pattern="[A-Za-z]{1,}"
-                            bg_color="slate-50"
                             disabled
                           />
                         </div>
@@ -125,9 +120,7 @@ const Delete_GR = ({ is_open, on_close, width = "max-w-[700px]" }) => {
                           <Text_Code_Field
                             label="PO Type"
                             // code_value={search_value}
-                            // on_code_change={handle_change}
                             // text_value={search_value}
-                            // on_text_change={handle_change}
                             code_width="150px"
                             show_search_button={false}
                             disabled
@@ -137,10 +130,7 @@ const Delete_GR = ({ is_open, on_close, width = "max-w-[700px]" }) => {
                           <Text_Field
                             label="Company"
                             type={"text"}
-                            // value={"AUTO GENERATED"}
-                            // on_change={handle_text_change}
-                            pattern="[A-Za-z]{1,}"
-                            bg_color="slate-50"
+                            // value={""}
                             disabled
                           />
                         </div>

@@ -1,47 +1,47 @@
 import React, { useState } from "react";
-import Text_Field from "assets/elements/Text_Field";
 import { Info, PackageSearch, Search } from "lucide-react";
+import Text_Field from "assets/elements/Text_Field";
 import Icon_Field from "assets/elements/Icon_Field";
-import Select_Batch from "../modals/Select_Batch";
+import Select_Batch from "../../modals/Select_Batch";
 
-const GR_Items = ({ set_display_modal }) => {
+const GR_Items = () => {
   const [selected_item_id, set_selected_item_id] = useState(null);
   const [display_item_modal, set_display_item_modal] = useState("");
-  const [items, set_items] = useState([
+  const [item_list, set_item_list] = useState([
     {
       id: 1,
-      description: 'Macbook Pro 13"',
+      item_code: "ITM-000000001",
+      item_desc: 'Macbook Pro 13"',
       open_quantity: 5,
       unit: "PC",
     },
     {
       id: 2,
-      description: "iPhone 15 Pro Max",
+      item_code: "ITM-000000002",
+      item_desc: "iPhone 15 Pro Max",
       open_quantity: 2,
       unit: "PC",
     },
   ]);
 
-  // Update delivered quantity
-  const handle_quantity_change = (e, id) => {
+  const handle_change_qty = (e, id) => {
     const new_value = e.target.value;
-    set_items((prev) =>
+    set_item_list((prev) =>
       prev.map((item) =>
         item.id === id ? { ...item, delivered_quantity: new_value } : item
       )
     );
   };
 
-  // Open batch modal
-  const handle_open_batch = (item) => {
+  const handle_select_batch = (item) => {
     set_display_item_modal("select_batch");
   };
 
+  // RETURN ORIGIN
   return (
     <React.Fragment>
-      {/* + Item Section */}
       <div className="flex flex-col gap-5 border-t p-5 sm:p-6">
-        {/* === TABLE HEADER === */}
+        {/* + Item List */}
         <div className="overflow-hidden rounded-lg border border-gray-200 bg-white pt-4">
           <div className="flex flex-col gap-5 px-6 mb-4 sm:flex-row sm:items-center sm:justify-between">
             <h1 className="font-semibold text-gray-600 whitespace-nowrap">
@@ -56,8 +56,7 @@ const GR_Items = ({ set_display_modal }) => {
               />
             </div>
           </div>
-
-          {/* === TABLE === */}
+          {/* + Table */}
           <div className="max-w-full overflow-x-auto custom-scrollbar">
             <table className="min-w-full text-left text-sm text-gray-700 whitespace-nowrap">
               <thead className="bg-gray-50">
@@ -75,53 +74,43 @@ const GR_Items = ({ set_display_modal }) => {
                 </tr>
               </thead>
               <tbody className="divide-y bg-white">
-                {items.map((item, index) => (
+                {item_list.map((data, index) => (
                   <tr
-                    key={item.id}
+                    key={data.id}
                     className={`text-sm cursor-pointer ${
-                      selected_item_id === item.id
+                      selected_item_id === data.id
                         ? "bg-sky-50"
-                        : "hover:bg-gray-50"
+                        : "hover:bg-gray-50/50"
                     }`}
-                    onClick={() => set_selected_item_id(item.id)}
+                    onClick={() => set_selected_item_id(data.id)}
                   >
                     <td className="px-5 py-4 text-gray-500 border-r">
                       {index + 1}
                     </td>
                     <td className="px-5 py-4 font-medium text-gray-800 whitespace-normal break-words border-r">
-                      {item.description}
+                      {data.item_desc}
                     </td>
                     <td className="px-5 py-4 text-gray-600 border-r">
-                      {item.open_quantity}
+                      {data.open_quantity}
                     </td>
                     <td className="px-5 py-4 text-gray-600 border-r">
-                      {item.unit}
+                      {data.unit}
                     </td>
-
-                    {/* === Delivered Quantity === */}
                     <td className="px-5 py-4 text-gray-600 w-[160px] border-r">
                       <Text_Field
-                        type="number"
-                        value={item.delivered_quantity}
-                        on_change={(e) => handle_quantity_change(e, item.id)}
+                        type={"number"}
+                        value={data.delivered_quantity}
+                        on_change={(e) => handle_change_qty(e, data.id)}
                         placeholder={"0"}
-                        pattern="\d*"
-                        // min={0}
-                        max={item.open_quantity}
                         int_only={true}
                       />
                     </td>
-
-                    {/* === Batch Button === */}
                     <td className="px-5 py-4 text-gray-600 w-[200px]">
                       <div className="flex items-center justify-between">
-                        <span className="block truncate w-[150px]">
-                          {/* Responsive width text ;asldk;asldklksdjlaskdjl */}
-                          --
-                        </span>
+                        <span className="block truncate w-[150px]">--</span>
                         <button
                           className="text-gray-500 hover:text-sky-600 text-[12px] mb-[1px] outline-none ml-2"
-                          onClick={() => handle_open_batch(item)}
+                          onClick={() => handle_select_batch(data)}
                         >
                           <PackageSearch size={24} />
                         </button>
@@ -132,25 +121,27 @@ const GR_Items = ({ set_display_modal }) => {
               </tbody>
             </table>
           </div>
+          {/* - Table */}
         </div>
-
-        {/* === FOOTER INFO === */}
+        {/* - Item List */}
+        {/* + Footer */}
         <div className="mt-5 flex items-center gap-2 text-gray-500">
           <Info size={18} />
           <p className="text-sm">
-            Please verify all delivered quantities before saving this Goods
+            Please verify all delivered quantities before creating this Goods
             Receipt.
           </p>
         </div>
+        {/* - Footer */}
       </div>
-
-      {/* === MODALS === */}
+      {/* + Modals */}
       <Select_Batch
         is_open={display_item_modal === "select_batch"}
         on_close={() => set_display_item_modal("")}
         width="max-w-[1200px]"
         height="max-h-[700px]"
       />
+      {/* - Modals */}
     </React.Fragment>
   );
 };

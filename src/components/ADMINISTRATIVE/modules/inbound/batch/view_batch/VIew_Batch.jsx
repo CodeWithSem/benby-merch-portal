@@ -1,14 +1,12 @@
 import React, { useState } from "react";
-import { ChevronLeft, CirclePlus, RefreshCcwDot } from "lucide-react";
-import { format_date_1, get_date_now } from "assets/scripts/format";
+import { ChevronLeft, CirclePlus } from "lucide-react";
 import { useToast } from "../../../../layout/Toast_Provider";
 import Button from "assets/elements/Button";
 import Text_Code_Field from "assets/elements/Text_Code_Field";
 import Text_Field from "assets/elements/Text_Field";
-import Verify_Field from "assets/elements/Verify_Field";
 import Batch_Details from "./batch_details/Batch_Details";
 
-const Create_New_Batch = ({ set_page }) => {
+const VIew_Batch = ({ set_page }) => {
   const { show_toast } = useToast();
   const [active_tab, set_active_tab] = useState("batch_details");
 
@@ -50,7 +48,7 @@ const Create_New_Batch = ({ set_page }) => {
               </li>
               <li className="flex items-center gap-1.5 text-sm text-gray-500">
                 <span>/</span>
-                <span className="text-gray-800">Create New Batch</span>
+                <span className="text-gray-800">View Batch</span>
               </li>
             </ol>
           </nav>
@@ -67,12 +65,12 @@ const Create_New_Batch = ({ set_page }) => {
                 width="w-[20px]"
                 on_click={handle_go_back}
               ></Button>
-              <h1 className="text-lg">Batch Creation</h1>
+              <h1 className="text-lg">View Batch</h1>
             </div>
 
             <div className="flex gap-2">
               <div className="text-gray-500 text-sm tracking-wider">
-                {format_date_1(get_date_now())}
+                MM-DD-YYYY
               </div>
             </div>
           </div>
@@ -108,15 +106,13 @@ const Create_New_Batch = ({ set_page }) => {
                 label="Batch Code"
                 type={"text"}
                 // value={}
-                // on_change={handle_text_change}
                 disabled
               />
               <Text_Field
                 label="Batch Description"
                 type={"text"}
-                placeholder={"Enter batch description"}
                 // value={}
-                // on_change={handle_text_change}
+                disabled
               />
             </div>
           </div>
@@ -148,27 +144,10 @@ const Create_New_Batch = ({ set_page }) => {
             </div>
           </div>
           {/* - Section 2 */}
-          {/* + Section 3 */}
-          <div className="p-4 sm:p-8 border-t">
-            <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
-              <Button
-                variant="primary"
-                size="lg"
-                icon={RefreshCcwDot}
-                icon_position="left"
-              >
-                Update
-              </Button>
-              <Button variant="white" size="lg" on_click={handle_go_back}>
-                Cancel
-              </Button>
-            </div>
-          </div>
-          {/* - Section 3 */}
         </div>
       </div>
     </React.Fragment>
   );
 };
 
-export default Create_New_Batch;
+export default VIew_Batch;

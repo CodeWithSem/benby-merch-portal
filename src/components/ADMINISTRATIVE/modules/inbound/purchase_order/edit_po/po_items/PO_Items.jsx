@@ -15,13 +15,14 @@ import Show_Item_Details from "./modals/Show_Item_Details";
 import { format_currency, format_percentage } from "assets/scripts/format";
 import Edit_Item from "./modals/Edit_Item";
 import Button from "assets/elements/Button";
+import Remove_Item from "./modals/Remove_Item";
 
 const PO_Items = ({ set_display_modal }) => {
   const [display_item_modal, set_display_item_modal] = useState("");
   // + For Quantity Field
   const [quantity, set_quantity] = useState(1);
   // - For Quantity Field
-  const items = [
+  const item_list = [
     {
       id: 1,
       item_code: "ITM-000000001",
@@ -41,20 +42,27 @@ const PO_Items = ({ set_display_modal }) => {
       total: "60000",
     },
   ];
+
   const handle_add_item = () => {
     alert("Add Item");
   };
+
   const handle_show_details = () => {
     set_display_item_modal("show_details");
   };
+
   const handle_edit_item = (item) => {
-    console.log(item);
     set_display_item_modal("edit_item");
+  };
+
+  const handle_remove_item = (item) => {
+    set_display_item_modal("remove_item");
   };
   // RETURN ORIGIN
   return (
     <React.Fragment>
       <div className="flex flex-col gap-5 border-t p-5 sm:p-6">
+        {/* + Item List */}
         <div className="overflow-hidden rounded-lg border border-gray-200 bg-white pt-4 dark:border-gray-800 dark:bg-white/[0.03]">
           <div className="flex flex-col gap-5 px-6 md:pl-6 md:pr-3 mb-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
@@ -69,10 +77,13 @@ const PO_Items = ({ set_display_modal }) => {
                   placeholder="Search..."
                   icon={Search}
                   icon_position="left"
+                  // value={}
+                  // on_change={}
                 />
               </div>
             </div>
           </div>
+          {/* + Table */}
           <div className="max-w-full overflow-x-auto custom-scrollbar">
             <table className="min-w-full text-left text-sm text-gray-700 dark:border-gray-800">
               <thead className="bg-gray-50 dark:bg-gray-900">
@@ -99,8 +110,8 @@ const PO_Items = ({ set_display_modal }) => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100 bg-white dark:divide-gray-800 dark:bg-white/[0.03]">
-                {items.map((item, index) => (
-                  <tr key={item.id} className="text-sm">
+                {item_list.map((item, index) => (
+                  <tr key={item.id} className="text-sm hover:bg-gray-50/50">
                     <td className="px-5 py-4 whitespace-nowrap text-gray-500 dark:text-gray-400">
                       {index + 1}
                     </td>
@@ -146,7 +157,7 @@ const PO_Items = ({ set_display_modal }) => {
                         <div className="relative group flex justify-center items-center">
                           <button
                             className="text-gray-500 hover:text-red-600 text-[12px] mb-[1px] outline-none"
-                            // onClick={() => handleDeleteItem(item)}
+                            onClick={() => handle_remove_item(item)}
                           >
                             <Trash2 size={20} />
                           </button>
@@ -161,7 +172,10 @@ const PO_Items = ({ set_display_modal }) => {
               </tbody>
             </table>
           </div>
+          {/* - Table */}
         </div>
+        {/* - Item List */}
+        {/* + Add Item */}
         <div className="mt-5 rounded-lg border border-gray-100 bg-gray-50 p-4 sm:p-6 dark:border-gray-800 dark:bg-gray-900">
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 lg:grid-cols-12">
             <div className="w-full lg:col-span-3">
@@ -169,16 +183,13 @@ const PO_Items = ({ set_display_modal }) => {
                 label="Item Code"
                 type={"number"}
                 // value={text}
-                // on_change={handle_text_change}
-                pattern="[A-Za-z]{1,}"
                 disabled
               />
             </div>
             <div className="w-full lg:col-span-9">
               <Find_Field
                 label="Item Description"
-                // value={search_value}
-                // on_change={handle_change}
+                // value={}
                 on_click={() => set_display_modal("select_item")}
                 disabled
               />
@@ -188,8 +199,6 @@ const PO_Items = ({ set_display_modal }) => {
                 label="Unit Price"
                 type={"text"}
                 // value={text}
-                // on_change={handle_text_change}
-                pattern="[A-Za-z]{1,}"
                 disabled
               />
             </div>
@@ -198,8 +207,6 @@ const PO_Items = ({ set_display_modal }) => {
                 label="Unit"
                 type={"text"}
                 // value={text}
-                // on_change={handle_text_change}
-                pattern="[A-Za-z]{1,}"
                 disabled
               />
             </div>
@@ -236,6 +243,8 @@ const PO_Items = ({ set_display_modal }) => {
             </p>
           </div>
         </div>
+        {/* - Add Item */}
+        {/* + Order Summary */}
         <div className="flex flex-wrap justify-between sm:justify-end">
           <div className="mt-6 w-full space-y-1 text-right sm:w-[270px]">
             <p className="mb-4 text-left text-sm font-medium text-gray-800 dark:text-white/90">
@@ -247,7 +256,7 @@ const PO_Items = ({ set_display_modal }) => {
                   Sub Total
                 </span>
                 <span className="text-sm font-medium text-gray-700 dark:text-gray-400">
-                  492,800.00
+                  {format_currency(0, 2, true)}
                 </span>
               </li>
               <li className="flex justify-between gap-5">
@@ -255,7 +264,7 @@ const PO_Items = ({ set_display_modal }) => {
                   Vat (12%)
                 </span>
                 <span className="text-sm font-medium text-gray-700 dark:text-gray-400">
-                  67,200.00
+                  {format_currency(0, 2, true)}
                 </span>
               </li>
               <li className="flex justify-between gap-5">
@@ -263,12 +272,13 @@ const PO_Items = ({ set_display_modal }) => {
                   Total
                 </span>
                 <span className="text-lg font-semibold text-gray-800 dark:text-white/90">
-                  560,000.00
+                  {format_currency(0, 2, true)}
                 </span>
               </li>
             </ul>
           </div>
         </div>
+        {/* - Order Summary */}
       </div>
       {/* + Modals */}
       <Show_Item_Details
@@ -280,6 +290,11 @@ const PO_Items = ({ set_display_modal }) => {
         is_open={display_item_modal === "edit_item"}
         on_close={() => set_display_item_modal("")}
         width="max-w-[1280px]"
+      />
+      <Remove_Item
+        is_open={display_item_modal === "remove_item"}
+        on_close={() => set_display_item_modal("")}
+        width="max-w-[920px]"
       />
       {/* - Modals */}
     </React.Fragment>
