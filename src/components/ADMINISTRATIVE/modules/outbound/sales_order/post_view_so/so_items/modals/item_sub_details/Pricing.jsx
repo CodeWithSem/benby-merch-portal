@@ -1,5 +1,4 @@
 import React from "react";
-import Date_Field from "assets/elements/Date_Field";
 import Text_Field from "assets/elements/Text_Field";
 import Text_Field_Adorn from "assets/elements/Text_Field_Adorn";
 
@@ -63,12 +62,7 @@ const Pricing = () => {
             />
           </div>
           <div>
-            <Date_Field
-              label="Pricing Date"
-              // value={selected_data}
-              on_change={(e) => alert(e.target.value)}
-              placeholder="Select Date"
-            />
+            <Text_Field label="Pricing Date" type={"text"} disabled />
           </div>
           <div>
             <Text_Field_Adorn

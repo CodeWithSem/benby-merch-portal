@@ -16,7 +16,6 @@ const Select_SO = ({
   height = "h-[500px]",
   set_page,
 }) => {
-  // --- Reference Lists ---
   const company_list = [
     { id: 1, company_code: "COM-0001", company_desc: "Company Description 1" },
     { id: 2, company_code: "COM-0002", company_desc: "Company Description 2" },
@@ -26,40 +25,36 @@ const Select_SO = ({
     { id: 2, so_type_code: "ST-0002", so_type_desc: "SO Type Description 2" },
   ];
 
-  // --- Mock SO Data ---
-  const [so_list] = useState([
+  const [so_list, set_so_list] = useState([
     {
       id: 1,
       so_number: "SO-0000001",
       so_type_code: "ST-0001",
       company_code: "COM-0001",
-      creation_date: "11/02/2025 09:00:00 PM",
+      creation_date: "MM-DD-YYYY",
     },
     {
       id: 2,
       so_number: "SO-0000002",
       so_type_code: "ST-0002",
       company_code: "COM-0002",
-      creation_date: "11/02/2025 09:00:00 PM",
+      creation_date: "MM-DD-YYYY",
     },
   ]);
 
   const today = format_date_1(new Date());
-
   const [start_date, set_start_date] = useState(today);
   const [end_date, set_end_date] = useState(today);
-
   const [show_load_data_button, set_show_load_data_button] = useState(false);
 
-  // --- States ---
-  const [filtered_so, set_filtered_so] = useState([]);
+  // + Client-Side Filtering
+  const [filtered_so_list, set_filtered_so_list] = useState([]);
   const [current_page, set_current_page] = useState(1);
   const [rows_per_page, set_rows_per_page] = useState(5);
   const [search_query, set_search_query] = useState("");
   const [debounced_query, set_debounced_query] = useState("");
   const [selected_so, set_selected_so] = useState(null);
 
-  // --- Lookup Maps for faster access ---
   const company_map = useMemo(
     () =>
       Object.fromEntries(
@@ -75,7 +70,6 @@ const Select_SO = ({
     [so_type_list]
   );
 
-  // --- Debounce search query ---
   useEffect(() => {
     const timer = setTimeout(() => {
       set_debounced_query(search_query);
@@ -84,7 +78,6 @@ const Select_SO = ({
     return () => clearTimeout(timer);
   }, [search_query]);
 
-  // --- Filtering + Pagination ---
   useEffect(() => {
     let data = [...so_list];
 
@@ -92,7 +85,6 @@ const Select_SO = ({
       const q = debounced_query.toLowerCase();
 
       data = data.filter((so) => {
-        // lookup related records
         const so_type = so_type_list.find(
           (s) => s.so_type_code === so.so_type_code
         );
@@ -100,7 +92,6 @@ const Select_SO = ({
           (c) => c.company_code === so.company_code
         );
 
-        // create one searchable string
         const combined = [
           so.so_number,
           so.so_type_code,
@@ -118,10 +109,9 @@ const Select_SO = ({
 
     const start_idx = (current_page - 1) * rows_per_page;
     const end_idx = start_idx + rows_per_page;
-    set_filtered_so(data.slice(start_idx, end_idx));
+    set_filtered_so_list(data.slice(start_idx, end_idx));
   }, [so_list, debounced_query, current_page, rows_per_page]);
 
-  // --- Total Pages ---
   const total_pages = Math.ceil(
     so_list.filter((so) => {
       const so_type_desc = so_type_map[so.so_type_code] || "";
@@ -135,11 +125,12 @@ const Select_SO = ({
     }).length / rows_per_page
   );
 
-  // --- Handlers ---
   const handle_page_change = (page) => set_current_page(page);
+  // - Client-Side Filtering
+
   const handle_proceed = () => {
     console.log(selected_so);
-    set_page("gi_creation"); // Changed from GR (Goods Receipt) to GI (Goods Issue)
+    set_page("gi_creation");
     set_selected_so(null);
     on_close();
   };
@@ -158,11 +149,13 @@ const Select_SO = ({
     set_show_load_data_button(false);
   };
 
-  if (!is_open) return null;
-
-  return (
+  // RETURN ORIGIN
+  return is_open ? (
     <div className="fixed inset-0 flex items-center justify-center z-[97] px-4">
-      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm z-[98]" />
+      {/* + Blur */}
+      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm z-[98]"></div>
+      {/* - Blur */}
+      {/* + Modal Content */}
       <div
         className={`relative bg-white rounded-lg shadow-xl ${width} w-full py-7 m-5 z-[99]`}
       >
@@ -172,13 +165,10 @@ const Select_SO = ({
         >
           <X size={20} />
         </button>
-
-        {/* Header */}
         <div className="text-lg md:text-xl font-bold mb-5 px-7">
           Sales Order Selection
         </div>
-
-        {/* Body */}
+        {/* + Modal Body */}
         <div className={`w-full overflow-y-auto ${height} scrollbar-custom`}>
           <div className="overflow-hidden border border-gray-200 bg-white pt-4">
             <div className="px-6 mb-5 grid grid-cols-1 gap-5 md:w-[800px] md:grid-cols-3">
@@ -207,7 +197,6 @@ const Select_SO = ({
                 )}
               </div>
             </div>
-            {/* Search */}
             <div className="flex flex-col gap-5 px-6 mb-4 sm:flex-row sm:items-center sm:justify-between">
               <div className="w-full">
                 <Icon_Field
@@ -220,8 +209,7 @@ const Select_SO = ({
                 />
               </div>
             </div>
-
-            {/* Table */}
+            {/* + Table */}
             <div className="max-w-full overflow-x-auto custom-scrollbar">
               <table className="min-w-full whitespace-nowrap">
                 <thead className="border-gray-100 border-y bg-gray-50">
@@ -242,7 +230,7 @@ const Select_SO = ({
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
-                  {filtered_so.length === 0 ? (
+                  {filtered_so_list.length === 0 ? (
                     <tr>
                       <td
                         colSpan={4}
@@ -252,7 +240,7 @@ const Select_SO = ({
                       </td>
                     </tr>
                   ) : (
-                    filtered_so.map((so) => {
+                    filtered_so_list.map((so) => {
                       const so_type = so_type_list.find(
                         (s) => s.so_type_code === so.so_type_code
                       );
@@ -318,11 +306,13 @@ const Select_SO = ({
                 </tbody>
               </table>
             </div>
+            {/* - Table */}
           </div>
         </div>
-
-        {/* Footer */}
+        {/* - Modal Body */}
+        {/* + Modal Footer */}
         <div className="flex flex-col items-center sm:flex-row sm:justify-between gap-3 mt-5 px-7">
+          {/* + Pagination */}
           {total_pages > 0 && (
             <div className="w-full sm:w-auto">
               <Pagination_Modal
@@ -332,6 +322,8 @@ const Select_SO = ({
               />
             </div>
           )}
+          {/* - Pagination */}
+          {/* + Action Buttons */}
           <div className="flex justify-center sm:justify-end gap-2 w-full">
             <Button
               variant="primary"
@@ -349,10 +341,13 @@ const Select_SO = ({
               Close
             </Button>
           </div>
+          {/* - Action Buttons */}
         </div>
+        {/* - Modal Footer */}
       </div>
+      {/* - Modal Content */}
     </div>
-  );
+  ) : null;
 };
 
 export default Select_SO;

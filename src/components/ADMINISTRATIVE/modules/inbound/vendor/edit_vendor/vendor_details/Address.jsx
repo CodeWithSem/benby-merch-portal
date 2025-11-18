@@ -1,10 +1,12 @@
+import React from "react";
 import Find_Field from "assets/elements/Find_Field";
 import Text_Field from "assets/elements/Text_Field";
-import React from "react";
 
-const Address = () => {
+const Address = ({ set_display_modal }) => {
+  // RETURN ORIGIN
   return (
     <React.Fragment>
+      {/* + Section 1 */}
       <div className="rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6 dark:border-gray-800 dark:bg-gray-900">
         <h1 className="mb-5 font-semibold text-sky-700">Address Information</h1>
         <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
@@ -15,15 +17,13 @@ const Address = () => {
               placeholder={"Enter house no. / street address"}
               // value={}
               // on_change={handle_text_change}
-              pattern="[A-Za-z]{1,}"
             />
           </div>
           <div>
             <Find_Field
               label="City"
               // value={data}
-              // on_change={(e) => handle_data_change(e.target.value)}
-              // on_click={handle_find_click}
+              on_click={() => set_display_modal("select_city")}
               disabled
             />
           </div>
@@ -32,8 +32,6 @@ const Address = () => {
               label="Postal Code"
               type={"text"}
               // value={}
-              // on_change={handle_text_change}
-              pattern="[A-Za-z]{1,}"
               disabled
             />
           </div>
@@ -42,8 +40,6 @@ const Address = () => {
               label="District"
               type={"text"}
               // value={}
-              // on_change={handle_text_change}
-              pattern="[A-Za-z]{1,}"
               disabled
             />
           </div>
@@ -53,7 +49,6 @@ const Address = () => {
               type={"text"}
               // value={}
               // on_change={handle_text_change}
-              pattern="[A-Za-z]{1,}"
               disabled
             />
           </div>
@@ -62,22 +57,21 @@ const Address = () => {
               label="Country"
               type={"text"}
               // value={}
-              // on_change={handle_text_change}
-              pattern="[A-Za-z]{1,}"
               disabled
             />
           </div>
           <div>
             <Find_Field
               label="Transportation Zone"
-              //  value={data}
-              //  on_change={(e) => handle_data_change(e.target.value)}
-              //  on_click={handle_find_click}
+              // value={}
+              on_click={() => set_display_modal("select_trans_zone")}
               disabled
             />
           </div>
         </div>
       </div>
+      {/* - Section 1 */}
+      {/* + Section 2 */}
       <div className="mt-5 rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6 dark:border-gray-800 dark:bg-gray-900">
         <h1 className="mb-5 font-semibold text-sky-700">
           Communication Details
@@ -90,7 +84,6 @@ const Address = () => {
               placeholder={"Enter language"}
               // value={}
               // on_change={handle_text_change}
-              pattern="[A-Za-z]{1,}"
             />
           </div>
           <div>
@@ -100,7 +93,6 @@ const Address = () => {
               placeholder={"Enter telephone"}
               // value={}
               // on_change={handle_text_change}
-              pattern="[A-Za-z]{1,}"
             />
           </div>
           <div>
@@ -110,7 +102,6 @@ const Address = () => {
               placeholder={"Enter fax"}
               // value={}
               // on_change={handle_text_change}
-              pattern="[A-Za-z]{1,}"
             />
           </div>
           <div>
@@ -120,7 +111,6 @@ const Address = () => {
               placeholder={"Enter mobile"}
               // value={}
               // on_change={handle_text_change}
-              pattern="[A-Za-z]{1,}"
             />
           </div>
           <div className="col-span-full">
@@ -130,11 +120,11 @@ const Address = () => {
               placeholder={"Enter email"}
               // value={}
               // on_change={handle_text_change}
-              pattern="[A-Za-z]{1,}"
             />
           </div>
         </div>
       </div>
+      {/* - Section 2 */}
     </React.Fragment>
   );
 };

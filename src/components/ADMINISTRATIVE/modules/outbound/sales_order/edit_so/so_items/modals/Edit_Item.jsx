@@ -1,17 +1,18 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
+import { Info, X } from "lucide-react";
 import Text_Field from "assets/elements/Text_Field";
 import Button from "assets/elements/Button";
-import { Info, X } from "lucide-react";
 import Find_Field from "assets/elements/Find_Field";
-import Select_Field from "assets/elements/Select_Field";
 import Quantity_Field from "assets/elements/Quantity_Field";
 import Select_Item from "../../../modals/Select_Item";
 
 const Edit_Item = ({ is_open, on_close, width = "max-w-[700px]" }) => {
   const [display_item_modal, set_display_item_modal] = useState("");
-  // + For Quantity Field
   const [quantity, set_quantity] = useState(1);
-  // - For Quantity Field
+
+  const handle_proceed_edit = () => {
+    alert("Edit Item");
+  };
   // RETURN ORIGIN
   return is_open ? (
     <React.Fragment>
@@ -39,19 +40,15 @@ const Edit_Item = ({ is_open, on_close, width = "max-w-[700px]" }) => {
                 <div className="w-full lg:col-span-3">
                   <Text_Field
                     label="Item Code"
-                    type={"number"}
+                    type={"text"}
                     // value={text}
-                    // on_change={handle_text_change}
-                    pattern="[A-Za-z]{1,}"
                     disabled
                   />
                 </div>
                 <div className="w-full lg:col-span-9">
                   <Find_Field
                     label="Item Name"
-                    name="item_name"
                     // value={search_value}
-                    // on_change={handle_change}
                     on_find={() => set_display_item_modal("select_item")}
                     disabled
                   />
@@ -61,8 +58,6 @@ const Edit_Item = ({ is_open, on_close, width = "max-w-[700px]" }) => {
                     label="Unit Price"
                     type={"text"}
                     // value={text}
-                    // on_change={handle_text_change}
-                    pattern="[A-Za-z]{1,}"
                     disabled
                   />
                 </div>
@@ -71,8 +66,6 @@ const Edit_Item = ({ is_open, on_close, width = "max-w-[700px]" }) => {
                     label="Unit"
                     type={"text"}
                     // value={text}
-                    // on_change={handle_text_change}
-                    pattern="[A-Za-z]{1,}"
                     disabled
                   />
                 </div>
@@ -86,11 +79,7 @@ const Edit_Item = ({ is_open, on_close, width = "max-w-[700px]" }) => {
                   />
                 </div>
                 <div className="flex w-full items-end lg:col-span-2">
-                  <Button
-                    variant="white"
-                    width="w-full"
-                    // icon={SlidersHorizontal}
-                  >
+                  <Button variant="white" width="w-full">
                     Discount
                   </Button>
                 </div>
@@ -109,7 +98,7 @@ const Edit_Item = ({ is_open, on_close, width = "max-w-[700px]" }) => {
             <Button
               width="w-[100px]"
               variant="primary"
-              // on_click={() => set_is_confirm_modal_open(true)}
+              on_click={() => handle_proceed_edit()}
             >
               Proceed
             </Button>
@@ -121,12 +110,14 @@ const Edit_Item = ({ is_open, on_close, width = "max-w-[700px]" }) => {
         </div>
         {/* - Modal Content */}
       </div>
+      {/* + Modals */}
       <Select_Item
         is_open={display_item_modal === "select_item"}
         on_close={() => set_display_item_modal("")}
         width="max-w-[1000px]"
         height="max-h-[700px]"
       />
+      {/* - Modals */}
     </React.Fragment>
   ) : null;
 };

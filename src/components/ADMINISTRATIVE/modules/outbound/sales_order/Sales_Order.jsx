@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import { useToast } from "../../../layout/Toast_Provider";
 import {
   Search,
   ChevronDown,
@@ -13,17 +14,7 @@ import {
   FileInput,
   Database,
 } from "lucide-react";
-import Icon_Field from "assets/elements/Icon_Field";
-import Select_Field from "assets/elements/Select_Field";
-import Pagination from "assets/elements/Pagination";
-import Button from "assets/elements/Button";
-import { useToast } from "../../../layout/Toast_Provider";
-import Date_Range_Field from "assets/elements/Date_Range_Field";
-import Checkbox_Field from "assets/elements/Checkbox_Field";
-import Select_SO_Type from "./modals/select_so_type/Select_SO_Type";
-import Create_New_SO from "./create_new_so/Create_New_SO";
 import { format_date_1 } from "assets/scripts/format";
-import Date_Field from "assets/elements/Date_Field";
 import {
   customer_list,
   customer_sh_list,
@@ -33,24 +24,29 @@ import {
   sloc_list,
   so_type_list,
 } from "./SO_DATA_MAP";
+import Icon_Field from "assets/elements/Icon_Field";
+import Select_Field from "assets/elements/Select_Field";
+import Button from "assets/elements/Button";
+import Button_Action from "assets/elements/Button_Action";
+import Checkbox_Field from "assets/elements/Checkbox_Field";
+import Date_Field from "assets/elements/Date_Field";
+import Pagination from "assets/elements/Pagination";
+import Create_New_SO from "./create_new_so/Create_New_SO";
 import Edit_SO from "./edit_so/Edit_SO";
-import Delete_SO from "./modals/delete_so/Delete_SO";
 import Post_View_SO from "./post_view_so/Post_View_SO";
+import Select_SO_Type from "./modals/select_so_type/Select_SO_Type";
+import Delete_SO from "./modals/delete_so/Delete_SO";
 
 const Sales_Order = () => {
-  const filter_ref = useRef(null);
+  const { show_toast } = useToast();
   const [show_filter, set_show_filter] = useState(false);
   const [page, set_page] = useState("main");
   const [display_modal, set_display_modal] = useState("");
   const [for_posting, set_for_posting] = useState(false);
-
   const today = format_date_1(new Date());
   const [start_date, set_start_date] = useState(today);
   const [end_date, set_end_date] = useState(today);
   const [show_load_data_button, set_show_load_data_button] = useState(false);
-
-  // Close dropdown on outside click
-  const { show_toast } = useToast();
 
   const columns = [
     { key: "so_number", label: "SO Number", sortable: true },
@@ -61,18 +57,19 @@ const Sales_Order = () => {
     { key: "actions", label: "", sortable: false },
   ];
 
-  // --- State ---
   const [so_list, set_so_list] = useState([
     {
       id: 1,
-      so_number: "SO-000000001",
+      so_number: "SO-XXXXXXXXX",
       so_type: "LFSO",
       customer: "QS IT Services",
       creation_date: "MM-DD-YYYY",
       status: "Pending",
     },
   ]);
-  const [filtered_data, set_filtered_data] = useState([]);
+
+  // + Client-Side Filtering
+  const [filtered_so_list, set_filtered_so_list] = useState([]);
   const [loading, set_loading] = useState(false);
   const [select_option, set_select_option] = useState(5);
   const [current_page, set_current_page] = useState(1);
@@ -81,7 +78,6 @@ const Sales_Order = () => {
   const [search_query, set_search_query] = useState("");
   const [debounced_query, set_debounced_query] = useState("");
 
-  // --- Debounce search ---
   useEffect(() => {
     const timer = setTimeout(() => {
       set_debounced_query(search_query);
@@ -89,18 +85,6 @@ const Sales_Order = () => {
     }, 300);
     return () => clearTimeout(timer);
   }, [search_query]);
-
-  // --- Close dropdown outside click ---
-  useEffect(() => {
-    const handle_click_outside = (event) => {
-      if (filter_ref.current && !filter_ref.current.contains(event.target)) {
-        // optional: close filter
-      }
-    };
-    document.addEventListener("mousedown", handle_click_outside);
-    return () =>
-      document.removeEventListener("mousedown", handle_click_outside);
-  }, []);
 
   // --- Load all users once ---
   //   const load_data = async () => {
@@ -114,7 +98,6 @@ const Sales_Order = () => {
   //     load_data();
   //   }, []);
 
-  // + Client-side Filtering
   useEffect(() => {
     let temp = [...so_list];
 
@@ -129,9 +112,7 @@ const Sales_Order = () => {
         })
       );
     }
-    // - Column Filter
 
-    // + Sort Function
     temp.sort((a, b) => {
       const val_a = a[sort_by];
       const val_b = b[sort_by];
@@ -143,13 +124,10 @@ const Sales_Order = () => {
       if (val_a > val_b) return sort_order === "asc" ? 1 : -1;
       return 0;
     });
-    // - Sort Function
 
-    // + Pagination Function
     const start_idx = (current_page - 1) * select_option;
     const end_idx = start_idx + select_option;
-    // - Pagination Function
-    set_filtered_data(temp.slice(start_idx, end_idx));
+    set_filtered_so_list(temp.slice(start_idx, end_idx));
   }, [
     so_list,
     debounced_query,
@@ -160,7 +138,6 @@ const Sales_Order = () => {
   ]);
   // - Client-side Filtering
 
-  // + Total page of Pagination
   const total_pages = Math.ceil(
     (debounced_query
       ? so_list.filter((u) =>
@@ -175,9 +152,7 @@ const Sales_Order = () => {
         ).length
       : so_list.length) / select_option
   );
-  // - Total page of Pagination
 
-  // + Sort Filtering
   const handle_sort = (column) => {
     if (sort_by === column)
       set_sort_order(sort_order === "asc" ? "desc" : "asc");
@@ -187,12 +162,9 @@ const Sales_Order = () => {
     }
     set_current_page(1);
   };
-  // - Sort Filtering
-  const handle_page_change = (page) => set_current_page(page);
 
-  // + For Date Range Field
-  const date_range_ref = useRef(null);
-  // - For Date Range Field
+  const handle_page_change = (page) => set_current_page(page);
+  // - Client-Side Filtering
 
   const handle_create_new_so = () => {
     set_display_modal("select_so_type");
@@ -242,6 +214,7 @@ const Sales_Order = () => {
           <div className="w-full">
             <div className="flex flex-wrap items-center justify-between gap-3 py-5">
               <h1 className="text-xl">Outbound</h1>
+              {/* + Breadcrumbs */}
               <nav>
                 <ol className="flex flex-wrap items-center gap-1.5">
                   <li>
@@ -261,9 +234,10 @@ const Sales_Order = () => {
                   </li>
                 </ol>
               </nav>
+              {/* - Breadcrumbs */}
             </div>
-
             <div className="w-full bg-white rounded-lg border">
+              {/* + Header */}
               <div className="flex flex-wrap items-center justify-between gap-3 p-5">
                 <h1 className="text-lg">Sales Order</h1>
                 <div className="flex gap-2">
@@ -285,6 +259,8 @@ const Sales_Order = () => {
                   </Button>
                 </div>
               </div>
+              {/* - Header */}
+              {/* + Section 1 */}
               <div className="p-5 sm:p-6 border-t">
                 <div className="grid grid-cols-1 gap-5 md:w-[250px]">
                   <Date_Field
@@ -311,6 +287,8 @@ const Sales_Order = () => {
                   )}
                 </div>
               </div>
+              {/* - Section 1 */}
+              {/* + Section 2 */}
               <div className="p-5 sm:p-6 border-t">
                 <div className="w-full border rounded-lg">
                   <div className="w-full md:flex md:justify-between p-4 gap-4">
@@ -352,7 +330,8 @@ const Sales_Order = () => {
                             on_change={(e) => set_search_query(e.target.value)}
                           />
                         </div>
-                        <div className="relative" ref={filter_ref}>
+                        {/* + Dropdown Filter */}
+                        <div className="relative">
                           <Button
                             variant="white"
                             width="w-[100px]"
@@ -363,30 +342,22 @@ const Sales_Order = () => {
                           >
                             Filter
                           </Button>
-
-                          {/* Filter Popover */}
+                          {/* + Dropdown Content */}
                           {show_filter && (
                             <React.Fragment>
                               <div
                                 className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40"
-                                // onClick={() => set_show_filter(false)}
+                                onClick={() => set_show_filter(false)}
                               ></div>
                               <div className="absolute top-full mt-2 right-0 z-50 bg-white border rounded-lg shadow-md p-4 w-[260px]">
-                                <div>
-                                  <Date_Range_Field
-                                    label="Date Range"
-                                    ref={date_range_ref}
-                                  />
-                                </div>
                                 <div className="mt-4">
                                   <Checkbox_Field
                                     label="Is Draft?"
                                     name="terms"
                                     box_size={20}
                                     icon_size={12}
-                                    //   checked={check}
-                                    //   on_change={(e) => set_check(e.target.checked)}
-                                    on_change={(e) => alert("Is Draft")}
+                                    checked={false}
+                                    on_change={(e) => alert(e.target.checked)}
                                   />
                                 </div>
 
@@ -409,17 +380,19 @@ const Sales_Order = () => {
                               </div>
                             </React.Fragment>
                           )}
+                          {/* - Dropdown Content */}
                         </div>
+                        {/* - Dropdown Filter */}
                       </div>
                     </div>
                   </div>
-                  {/* + List of SO */}
+                  {/* + Table */}
                   <div className="overflow-x-auto">
                     {loading ? (
                       <div className="p-6 text-center text-gray-500 text-sm">
                         Loading...
                       </div>
-                    ) : filtered_data.length === 0 ? (
+                    ) : filtered_so_list.length === 0 ? (
                       <div className="p-6 text-center text-gray-500 text-sm">
                         No data found
                       </div>
@@ -471,8 +444,7 @@ const Sales_Order = () => {
                           </tr>
                         </thead>
                         <tbody className="bg-white">
-                          {filtered_data.map((row, idx) => {
-                            // + Cell Renderer
+                          {filtered_so_list.map((row, idx) => {
                             const render_cell = (col, row) => {
                               const value = row[col.key];
                               if (col.key === "status") {
@@ -492,56 +464,43 @@ const Sales_Order = () => {
                                 return (
                                   <div className="flex gap-2">
                                     <div className="relative group flex jusity-center items-center">
-                                      <button
-                                        className="text-gray-500 hover:text-sky-600 text-[12px] outline-none"
-                                        onClick={() => handle_view_so(row.id)}
-                                      >
-                                        <View size={19} />
-                                      </button>
-                                      <span className="absolute bottom-full mb-1 left-1/2 transform -translate-x-1/2 px-2 py-1 text-xs text-white bg-sky-600 rounded opacity-0 group-hover:opacity-100 transition-opacity">
-                                        View Record
-                                      </span>
+                                      <Button_Action
+                                        icon={View}
+                                        tooltip="View Record"
+                                        on_click={() => handle_view_so(row.id)}
+                                      />
                                     </div>
                                     <div className="relative group flex jusity-center items-center">
-                                      <button
-                                        className="text-gray-500 hover:text-sky-600 text-[12px] outline-none"
-                                        onClick={() => handle_post_so(row.id)}
-                                      >
-                                        <FileInput size={19} />
-                                      </button>
-                                      <span className="absolute bottom-full mb-1 left-1/2 transform -translate-x-1/2 px-2 py-1 text-xs text-white bg-sky-600 rounded opacity-0 group-hover:opacity-100 transition-opacity">
-                                        Post Record
-                                      </span>
+                                      <Button_Action
+                                        icon={FileInput}
+                                        tooltip="Post Record"
+                                        on_click={() => handle_post_so(row.id)}
+                                      />
                                     </div>
                                     <div className="relative group flex jusity-center items-center">
-                                      <button
-                                        className="text-gray-500 hover:text-sky-600 text-[12px] outline-none"
-                                        onClick={() => handle_edit_so(row.id)}
-                                      >
-                                        <Edit size={19} />
-                                      </button>
-                                      <span className="absolute bottom-full mb-1 left-1/2 transform -translate-x-1/2 px-2 py-1 text-xs text-white bg-sky-600 rounded opacity-0 group-hover:opacity-100 transition-opacity">
-                                        Edit Record
-                                      </span>
+                                      <Button_Action
+                                        icon={Edit}
+                                        tooltip="Edit Record"
+                                        on_click={() => handle_edit_so(row.id)}
+                                      />
                                     </div>
                                     <div className="relative group flex jusity-center items-center">
-                                      <button
-                                        className="text-gray-500 hover:text-red-600 text-[12px] mb-[1px] outline-none"
-                                        onClick={() => handle_delete_so(row.id)}
-                                      >
-                                        <Trash size={19} />
-                                      </button>
-                                      <span className="absolute bottom-full mb-1 left-1/2 transform -translate-x-1/2 px-2 py-1 text-xs text-white bg-red-600 rounded opacity-0 group-hover:opacity-100 transition-opacity">
-                                        Delete Record
-                                      </span>
+                                      <Button_Action
+                                        class_name="mb-[1px]"
+                                        icon={Trash}
+                                        variant="danger"
+                                        tooltip="Delete Record"
+                                        on_click={() =>
+                                          handle_delete_so(row.id)
+                                        }
+                                      />
                                     </div>
                                   </div>
                                 );
                               }
 
-                              return value; // Default render for all other fields
+                              return value;
                             };
-                            // - Cell Renderer
 
                             return (
                               <tr
@@ -569,7 +528,7 @@ const Sales_Order = () => {
                       </table>
                     )}
                   </div>
-                  {/* - List of SO */}
+                  {/* - Table */}
                   {/* + Pagination */}
                   {total_pages > 0 && (
                     <Pagination
@@ -582,6 +541,7 @@ const Sales_Order = () => {
                   {/* - Pagination */}
                 </div>
               </div>
+              {/* - Section 2 */}
             </div>
           </div>
         </React.Fragment>

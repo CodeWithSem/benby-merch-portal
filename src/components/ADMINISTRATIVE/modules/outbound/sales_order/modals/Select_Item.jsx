@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { Search, X } from "lucide-react";
+import { format_currency } from "assets/scripts/format";
 import Icon_Field from "assets/elements/Icon_Field";
 import Checkbox_Field from "assets/elements/Checkbox_Field";
 import Button from "assets/elements/Button";
 import Pagination_Modal from "assets/elements/Pagination_Modal";
-import { format_currency, format_percentage } from "assets/scripts/format";
 
 const Select_Item = ({
   is_open,
@@ -12,7 +12,6 @@ const Select_Item = ({
   width = "max-w-[700px]",
   height = "h-[500px]",
 }) => {
-  // --- Mock Data (replace later with API call if needed)
   const [item_list, set_item_list] = useState([
     {
       id: 1,
@@ -23,14 +22,13 @@ const Select_Item = ({
     },
   ]);
 
-  // --- States ---
+  // + Client-Side Filtering
   const [filtered_item_list, set_filtered_item_list] = useState([]);
   const [current_page, set_current_page] = useState(1);
   const [rows_per_page, set_rows_per_page] = useState(5);
   const [search_query, set_search_query] = useState("");
   const [selected_item, set_selected_item] = useState(null);
 
-  // --- Pagination + Filtering Logic ---
   useEffect(() => {
     let data = [...item_list];
 
@@ -56,8 +54,8 @@ const Select_Item = ({
     ).length / rows_per_page
   );
 
-  // --- Handlers ---
   const handle_page_change = (page) => set_current_page(page);
+  // - Client-Side Filtering
 
   const handle_select_item = () => {
     if (!selected_item) {
@@ -67,13 +65,13 @@ const Select_Item = ({
     alert(`Selected: ${selected_item.item_desc}`);
   };
 
+  // RETURN ORIGIN
   return is_open ? (
     <React.Fragment>
       <div className="fixed inset-0 flex items-center justify-center z-[97] px-4">
         {/* + Blur */}
         <div className="absolute inset-0 bg-black/50 backdrop-blur-sm z-[98]"></div>
         {/* - Blur */}
-
         {/* + Modal Content */}
         <div
           className={`relative bg-white rounded-lg shadow-xl ${width} w-full py-7 m-5 z-[99]`}
@@ -84,13 +82,9 @@ const Select_Item = ({
           >
             <X size={20} />
           </button>
-
-          {/* + Modal Label */}
           <div className="text-lg md:text-xl font-bold mb-5 px-7">
             Item Selection
           </div>
-          {/* - Modal Label */}
-
           {/* + Modal Body */}
           <div className={`w-full overflow-y-auto ${height} scrollbar-custom`}>
             <div className="overflow-hidden border border-gray-200 bg-white pt-4">
@@ -109,8 +103,7 @@ const Select_Item = ({
                   />
                 </div>
               </div>
-
-              {/* Table */}
+              {/* + Table */}
               <div className="max-w-full overflow-x-auto custom-scrollbar">
                 <table className="min-w-full whitespace-nowrap">
                   <thead className="border-gray-100 border-y bg-gray-50">
@@ -180,13 +173,13 @@ const Select_Item = ({
                   </tbody>
                 </table>
               </div>
+              {/* - Table */}
             </div>
           </div>
           {/* - Modal Body */}
-
           {/* + Modal Footer */}
           <div className="flex flex-col items-center sm:flex-row sm:justify-between gap-3 mt-5 px-7">
-            {/* Pagination */}
+            {/* + Pagination */}
             {total_pages > 0 && (
               <div className="w-full sm:w-auto">
                 <Pagination_Modal
@@ -196,8 +189,8 @@ const Select_Item = ({
                 />
               </div>
             )}
-
-            {/* Buttons */}
+            {/* + Pagination */}
+            {/* + Action Buttons */}
             <div className="flex justify-center sm:justify-end gap-2 w-full">
               <Button
                 variant="primary"
@@ -215,6 +208,7 @@ const Select_Item = ({
                 Close
               </Button>
             </div>
+            {/* - Action Buttons */}
           </div>
           {/* - Modal Footer */}
         </div>

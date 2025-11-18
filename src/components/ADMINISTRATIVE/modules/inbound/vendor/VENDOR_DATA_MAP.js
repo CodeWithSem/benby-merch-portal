@@ -36,7 +36,7 @@ export const purc_group_list = [
   },
 ];
 
-export const da_com_porg_pgroup_list = [
+export const com_porg_pgroup_list = [
   {
     id: 1,
     company_code: "COM-0001",

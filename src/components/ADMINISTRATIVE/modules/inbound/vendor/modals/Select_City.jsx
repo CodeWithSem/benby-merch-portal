@@ -12,14 +12,13 @@ const Select_City = ({
   height = "h-[500px]",
   city_list,
 }) => {
-  // --- States ---
-  const [filtered_cities, set_filtered_cities] = useState([]);
+  // + Client-Side Filtering
+  const [filtered_city_list, set_filtered_city_list] = useState([]);
   const [current_page, set_current_page] = useState(1);
   const [rows_per_page, set_rows_per_page] = useState(5);
   const [search_query, set_search_query] = useState("");
   const [selected_branch, set_selected_branch] = useState(null);
 
-  // --- Pagination + Filtering Logic ---
   useEffect(() => {
     let data = [...city_list];
 
@@ -34,7 +33,7 @@ const Select_City = ({
 
     const start_idx = (current_page - 1) * rows_per_page;
     const end_idx = start_idx + rows_per_page;
-    set_filtered_cities(data.slice(start_idx, end_idx));
+    set_filtered_city_list(data.slice(start_idx, end_idx));
   }, [city_list, search_query, current_page, rows_per_page]);
 
   const total_pages = Math.ceil(
@@ -45,8 +44,8 @@ const Select_City = ({
     ).length / rows_per_page
   );
 
-  // --- Handlers ---
   const handle_page_change = (page) => set_current_page(page);
+  // - Client-Side Filtering
 
   const handle_select_branch = () => {
     if (!selected_branch) {
@@ -56,6 +55,7 @@ const Select_City = ({
     alert(`Selected: ${selected_branch.description}`);
   };
 
+  // RETURN ORIGIN
   return is_open ? (
     <React.Fragment>
       <div className="fixed inset-0 flex items-center justify-center z-[97] px-4">
@@ -73,13 +73,11 @@ const Select_City = ({
           >
             <X size={20} />
           </button>
-
           {/* + Modal Label */}
           <div className="text-lg md:text-xl font-bold mb-5 px-7">
             City Selection
           </div>
           {/* - Modal Label */}
-
           {/* + Modal Body */}
           <div className={`w-full overflow-y-auto ${height} scrollbar-custom`}>
             <div className="overflow-hidden border border-gray-200 bg-white pt-4">
@@ -98,8 +96,7 @@ const Select_City = ({
                   />
                 </div>
               </div>
-
-              {/* Table */}
+              {/* + Table */}
               <div className="max-w-full overflow-x-auto custom-scrollbar">
                 <table className="min-w-full whitespace-nowrap">
                   <thead className="border-gray-100 border-y bg-gray-50">
@@ -115,7 +112,7 @@ const Select_City = ({
                   </thead>
 
                   <tbody className="divide-y divide-gray-100">
-                    {filtered_cities.length === 0 ? (
+                    {filtered_city_list.length === 0 ? (
                       <tr>
                         <td
                           colSpan={3}
@@ -125,7 +122,7 @@ const Select_City = ({
                         </td>
                       </tr>
                     ) : (
-                      filtered_cities.map((data) => (
+                      filtered_city_list.map((data) => (
                         <tr
                           key={data.id}
                           className={`hover:bg-sky-50/50 cursor-pointer text-[12px] ${
@@ -163,13 +160,13 @@ const Select_City = ({
                   </tbody>
                 </table>
               </div>
+              {/* - Table */}
             </div>
           </div>
           {/* - Modal Body */}
-
           {/* + Modal Footer */}
           <div className="flex flex-col items-center sm:flex-row sm:justify-between gap-3 mt-5 px-7">
-            {/* Pagination */}
+            {/* + Pagination */}
             {total_pages > 0 && (
               <div className="w-full sm:w-auto">
                 <Pagination_Modal
@@ -179,8 +176,8 @@ const Select_City = ({
                 />
               </div>
             )}
-
-            {/* Buttons */}
+            {/* - Pagination */}
+            {/* + Action Buttons */}
             <div className="flex justify-center sm:justify-end gap-2 w-full">
               <Button
                 variant="primary"
@@ -198,6 +195,7 @@ const Select_City = ({
                 Close
               </Button>
             </div>
+            {/* - Action Buttons */}
           </div>
           {/* - Modal Footer */}
         </div>

@@ -1,4 +1,6 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useToast } from "../../../layout/Toast_Provider";
+import { format_date_1 } from "assets/scripts/format";
 import {
   Search,
   ChevronDown,
@@ -17,31 +19,24 @@ import Icon_Field from "assets/elements/Icon_Field";
 import Select_Field from "assets/elements/Select_Field";
 import Pagination from "assets/elements/Pagination";
 import Button from "assets/elements/Button";
-import { useToast } from "../../../layout/Toast_Provider";
-import Date_Range_Field from "assets/elements/Date_Range_Field";
-import Select_SO from "./modals/select_so/Select_SO";
+import Button_Action from "assets/elements/Button_Action";
+import Date_Field from "assets/elements/Date_Field";
 import Create_New_GI from "./create_new_gi/Create_New_GI";
 import Edit_GI from "./edit_gi/Edit_GI";
-import Delete_GI from "./modals/delete_gi/Delete_GI";
-import { format_date_1 } from "assets/scripts/format";
-import Date_Field from "assets/elements/Date_Field";
 import Post_View_GI from "./post_view_gi/Post_View_GI";
+import Select_SO from "./modals/select_so/Select_SO";
+import Delete_GI from "./modals/delete_gi/Delete_GI";
 
 const Goods_Issue = () => {
-  const filter_ref = useRef(null);
+  const { show_toast } = useToast();
   const [show_filter, set_show_filter] = useState(false);
   const [page, set_page] = useState("main");
   const [display_modal, set_display_modal] = useState("");
   const [for_posting, set_for_posting] = useState(false);
-
   const today = format_date_1(new Date());
-
   const [start_date, set_start_date] = useState(today);
   const [end_date, set_end_date] = useState(today);
-
   const [show_load_data_button, set_show_load_data_button] = useState(false);
-
-  const { show_toast } = useToast();
 
   const company_list = [
     { id: 1, company_code: "COM-001", company_desc: "Company 1" },
@@ -61,15 +56,17 @@ const Goods_Issue = () => {
   const [gi_list, set_gi_list] = useState([
     {
       id: 1,
-      so_number: "SO-0000001",
-      do_number: "DO-0000001",
+      so_number: "SO-XXXXXXXXX",
+      do_number: "DO-XXXXXXXXX",
       so_type: "LF-SO",
       company_code: "COM-001",
       creation_date: "MM-DD-YYYY",
       status: "Pending",
     },
   ]);
-  const [filtered_data, set_filtered_data] = useState([]);
+
+  // + Client-Side Filtering
+  const [filtered_gi_list, set_filtered_gi_list] = useState([]);
   const [loading, set_loading] = useState(false);
   const [select_option, set_select_option] = useState(5);
   const [current_page, set_current_page] = useState(1);
@@ -85,17 +82,6 @@ const Goods_Issue = () => {
     }, 300);
     return () => clearTimeout(timer);
   }, [search_query]);
-
-  useEffect(() => {
-    const handle_click_outside = (event) => {
-      if (filter_ref.current && !filter_ref.current.contains(event.target)) {
-        // optional: close filter
-      }
-    };
-    document.addEventListener("mousedown", handle_click_outside);
-    return () =>
-      document.removeEventListener("mousedown", handle_click_outside);
-  }, []);
 
   useEffect(() => {
     let temp = [...gi_list];
@@ -126,7 +112,7 @@ const Goods_Issue = () => {
     const start_idx = (current_page - 1) * select_option;
     const end_idx = start_idx + select_option;
 
-    set_filtered_data(temp.slice(start_idx, end_idx));
+    set_filtered_gi_list(temp.slice(start_idx, end_idx));
   }, [
     gi_list,
     debounced_query,
@@ -162,8 +148,7 @@ const Goods_Issue = () => {
   };
 
   const handle_page_change = (page) => set_current_page(page);
-
-  const date_range_ref = useRef(null);
+  // - Client-Side Filtering
 
   const handle_create_new_gi = () => {
     set_display_modal("select_so");
@@ -213,6 +198,7 @@ const Goods_Issue = () => {
           <div className="w-full">
             <div className="flex flex-wrap items-center justify-between gap-3 py-5">
               <h1 className="text-xl">Outbound</h1>
+              {/* + Breadcrumbs */}
               <nav>
                 <ol className="flex flex-wrap items-center gap-1.5">
                   <li>
@@ -232,9 +218,10 @@ const Goods_Issue = () => {
                   </li>
                 </ol>
               </nav>
+              {/* - Breadcrumbs */}
             </div>
-
             <div className="w-full bg-white rounded-lg border">
+              {/* + Header */}
               <div className="flex flex-wrap items-center justify-between gap-3 p-5">
                 <h1 className="text-lg">Goods Issue</h1>
                 <div className="flex gap-2">
@@ -256,6 +243,8 @@ const Goods_Issue = () => {
                   </Button>
                 </div>
               </div>
+              {/* - Header */}
+              {/* + Section 1 */}
               <div className="p-5 sm:p-6 border-t">
                 <div className="grid grid-cols-1 gap-5 md:w-[250px]">
                   <Date_Field
@@ -282,6 +271,8 @@ const Goods_Issue = () => {
                   )}
                 </div>
               </div>
+              {/* - Section 1 */}
+              {/* + Section 2 */}
               <div className="p-5 sm:p-6 border-t">
                 <div className="w-full border rounded-lg">
                   <div className="w-full md:flex md:justify-between p-4 gap-4">
@@ -321,7 +312,8 @@ const Goods_Issue = () => {
                             on_change={(e) => set_search_query(e.target.value)}
                           />
                         </div>
-                        <div className="relative" ref={filter_ref}>
+                        {/* + Dropdown Filter */}
+                        <div className="relative">
                           <Button
                             variant="white"
                             width="w-[100px]"
@@ -331,17 +323,11 @@ const Goods_Issue = () => {
                           >
                             Filter
                           </Button>
-
+                          {/* + Dropdown Content */}
                           {show_filter && (
                             <React.Fragment>
                               <div className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40"></div>
                               <div className="absolute top-full mt-2 right-0 z-50 bg-white border rounded-lg shadow-md p-4 w-[260px]">
-                                <div>
-                                  <Date_Range_Field
-                                    label="Date Range"
-                                    ref={date_range_ref}
-                                  />
-                                </div>
                                 <div className="flex justify-end gap-2 mt-4">
                                   <Button
                                     size="sm"
@@ -361,17 +347,19 @@ const Goods_Issue = () => {
                               </div>
                             </React.Fragment>
                           )}
+                          {/* - Dropdown Content */}
                         </div>
+                        {/* - Dropdown Filter */}
                       </div>
                     </div>
                   </div>
-
+                  {/* + Table */}
                   <div className="overflow-x-auto">
                     {loading ? (
                       <div className="p-6 text-center text-gray-500 text-sm">
                         Loading...
                       </div>
-                    ) : filtered_data.length === 0 ? (
+                    ) : filtered_gi_list.length === 0 ? (
                       <div className="p-6 text-center text-gray-500 text-sm">
                         No data found
                       </div>
@@ -417,7 +405,7 @@ const Goods_Issue = () => {
                           </tr>
                         </thead>
                         <tbody className="bg-white">
-                          {filtered_data.map((row, idx) => {
+                          {filtered_gi_list.map((row, idx) => {
                             const company = company_list.find(
                               (c) => c.company_code === row.company_code
                             );
@@ -446,48 +434,36 @@ const Goods_Issue = () => {
                                 return (
                                   <div className="flex gap-2">
                                     <div className="relative group flex jusity-center items-center">
-                                      <button
-                                        className="text-gray-500 hover:text-sky-600 text-[12px] outline-none"
-                                        onClick={() => handle_view_gi(row.id)}
-                                      >
-                                        <View size={19} />
-                                      </button>
-                                      <span className="absolute bottom-full mb-1 left-1/2 transform -translate-x-1/2 px-2 py-1 text-xs text-white bg-sky-600 rounded opacity-0 group-hover:opacity-100 transition-opacity">
-                                        View Record
-                                      </span>
+                                      <Button_Action
+                                        icon={View}
+                                        tooltip="View Record"
+                                        on_click={() => handle_view_gi(row.id)}
+                                      />
                                     </div>
                                     <div className="relative group flex jusity-center items-center">
-                                      <button
-                                        className="text-gray-500 hover:text-sky-600 text-[12px] outline-none"
-                                        onClick={() => handle_post_gi(row.id)}
-                                      >
-                                        <FileInput size={19} />
-                                      </button>
-                                      <span className="absolute bottom-full mb-1 left-1/2 transform -translate-x-1/2 px-2 py-1 text-xs text-white bg-sky-600 rounded opacity-0 group-hover:opacity-100 transition-opacity">
-                                        Post Record
-                                      </span>
+                                      <Button_Action
+                                        icon={FileInput}
+                                        tooltip="Post Record"
+                                        on_click={() => handle_post_gi(row.id)}
+                                      />
                                     </div>
                                     <div className="relative group flex jusity-center items-center">
-                                      <button
-                                        className="text-gray-500 hover:text-sky-600 text-[12px] outline-none"
-                                        onClick={() => handle_edit_gi(row.id)}
-                                      >
-                                        <Edit size={19} />
-                                      </button>
-                                      <span className="absolute bottom-full mb-1 left-1/2 transform -translate-x-1/2 px-2 py-1 text-xs text-white bg-sky-600 rounded opacity-0 group-hover:opacity-100 transition-opacity">
-                                        Edit Record
-                                      </span>
+                                      <Button_Action
+                                        icon={Edit}
+                                        tooltip="Edit Record"
+                                        on_click={() => handle_edit_gi(row.id)}
+                                      />
                                     </div>
                                     <div className="relative group flex jusity-center items-center">
-                                      <button
-                                        className="text-gray-500 hover:text-red-600 text-[12px] mb-[1px] outline-none"
-                                        onClick={() => handle_delete_gi(row.id)}
-                                      >
-                                        <Trash size={19} />
-                                      </button>
-                                      <span className="absolute bottom-full mb-1 left-1/2 transform -translate-x-1/2 px-2 py-1 text-xs text-white bg-red-600 rounded opacity-0 group-hover:opacity-100 transition-opacity">
-                                        Delete Record
-                                      </span>
+                                      <Button_Action
+                                        class_name="mb-[1px]"
+                                        icon={Trash}
+                                        variant="danger"
+                                        tooltip="Delete Record"
+                                        on_click={() =>
+                                          handle_delete_gi(row.id)
+                                        }
+                                      />
                                     </div>
                                   </div>
                                 );
@@ -521,6 +497,8 @@ const Goods_Issue = () => {
                       </table>
                     )}
                   </div>
+                  {/* - Table */}
+                  {/* + Pagination */}
                   {total_pages > 0 && (
                     <Pagination
                       current_page={current_page}
@@ -529,17 +507,22 @@ const Goods_Issue = () => {
                       variant="compact"
                     />
                   )}
+                  {/* - Pagination */}
                 </div>
               </div>
+              {/* - Section 2 */}
             </div>
           </div>
         </React.Fragment>
       )}
+      {/* + Pages */}
       {page === "gi_creation" && <Create_New_GI set_page={set_page} />}
       {page === "edit_gi" && <Edit_GI set_page={set_page} />}
       {page === "post_view_gi" && (
         <Post_View_GI set_page={set_page} for_posting={for_posting} />
       )}
+      {/* - Pages */}
+      {/* + Modals */}
       <Select_SO
         is_open={display_modal === "select_so"}
         on_close={() => set_display_modal("")}
@@ -552,6 +535,7 @@ const Goods_Issue = () => {
         on_close={() => set_display_modal("")}
         width="max-w-[1280px]"
       />
+      {/* - Modals */}
     </React.Fragment>
   );
 };

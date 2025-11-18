@@ -25,6 +25,7 @@ import Select_SLOC from "./modals/Select_SLOC";
 import Select_Item from "./modals/Select_Item";
 import VIew_Batch from "./view_batch/VIew_Batch";
 import Delete_Batch from "./modals/delete_batch/Delete_Batch";
+import Button_Action from "assets/elements/Button_Action";
 
 const Batch = () => {
   const { show_toast } = useToast();
@@ -370,24 +371,31 @@ const Batch = () => {
                             if (col.key === "actions") {
                               return (
                                 <div className="flex gap-2">
-                                  <button
-                                    className="text-gray-500 hover:text-sky-600 text-[12px] outline-none"
-                                    onClick={() => handle_view_batch(row.id)}
-                                  >
-                                    <View size={19} />
-                                  </button>
-                                  <button
-                                    className="text-gray-500 hover:text-sky-600 text-[12px] outline-none"
-                                    onClick={() => handle_edit_batch(row.id)}
-                                  >
-                                    <Edit size={19} />
-                                  </button>
-                                  <button
-                                    className="text-gray-500 hover:text-red-600 text-[12px] mb-[1px] outline-none"
-                                    onClick={() => handle_delete_batch(row.id)}
-                                  >
-                                    <Trash size={19} />
-                                  </button>
+                                  <div className="relative group flex jusity-center items-center">
+                                    <Button_Action
+                                      icon={View}
+                                      tooltip="View Record"
+                                      on_click={() => handle_view_batch(row.id)}
+                                    />
+                                  </div>
+                                  <div className="relative group flex jusity-center items-center">
+                                    <Button_Action
+                                      icon={Edit}
+                                      tooltip="Edit Record"
+                                      on_click={() => handle_edit_batch(row.id)}
+                                    />
+                                  </div>
+                                  <div className="relative group flex jusity-center items-center">
+                                    <Button_Action
+                                      class_name="mb-[1px]"
+                                      icon={Trash}
+                                      variant="danger"
+                                      tooltip="Delete Record"
+                                      on_click={() =>
+                                        handle_delete_batch(row.id)
+                                      }
+                                    />
+                                  </div>
                                 </div>
                               );
                             }

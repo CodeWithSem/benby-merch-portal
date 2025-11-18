@@ -1,13 +1,24 @@
 import Button from "assets/elements/Button";
 import Text_Field from "assets/elements/Text_Field";
 import { format_date_1, get_date_now } from "assets/scripts/format";
-import { ChevronLeft, RefreshCcwDot, Save, UserPlus } from "lucide-react";
+import { ChevronLeft, RefreshCcwDot } from "lucide-react";
 import React, { useState } from "react";
 import Account from "./vendor_details/Account";
 import Address from "./vendor_details/Address";
 import Accounting_Info from "./vendor_details/Accounting_Info";
+import Select_City from "../modals/Select_City";
+import Select_Trans_Zone from "../modals/Select_Trans_Zone";
+import Select_Company from "../modals/Select_Company";
 
-const Edit_Vendor = ({ set_page }) => {
+const Edit_Vendor = ({
+  set_page,
+  city_list,
+  company_list,
+  com_porg_pgroup_list,
+  purc_group_list,
+  purc_org_list,
+  trans_zone_list,
+}) => {
   const [active_tab, set_active_tab] = useState("address");
   const [display_modal, set_display_modal] = useState("");
 
@@ -17,12 +28,17 @@ const Edit_Vendor = ({ set_page }) => {
     { key: "accounting_info", title: "Accounting Information" },
   ];
 
+  const handle_go_back = () => {
+    set_page("main");
+  };
+
   // RETURN ORIGIN
   return (
     <React.Fragment>
       <div className="w-full">
         <div className="flex flex-wrap items-center justify-between gap-3 py-5">
           <h1 className="text-xl">Inbound</h1>
+          {/* + Breadcrumbs */}
           <nav>
             <ol className="flex flex-wrap items-center gap-1.5">
               <li>
@@ -34,7 +50,7 @@ const Edit_Vendor = ({ set_page }) => {
                 <span>/</span>
                 <a
                   className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-sky-500 cursor-pointer"
-                  onClick={() => set_page("main")}
+                  onClick={handle_go_back}
                 >
                   Inbound
                 </a>
@@ -43,7 +59,7 @@ const Edit_Vendor = ({ set_page }) => {
                 <span>/</span>
                 <a
                   className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-sky-500 cursor-pointer"
-                  onClick={() => set_page("main")}
+                  onClick={handle_go_back}
                 >
                   Vendor
                 </a>
@@ -54,9 +70,10 @@ const Edit_Vendor = ({ set_page }) => {
               </li>
             </ol>
           </nav>
+          {/* - Breadcrumbs */}
         </div>
-
         <div className="w-full bg-white rounded-lg border">
+          {/* + Header */}
           <div className="flex flex-wrap items-center justify-between gap-3 p-5">
             <div className="flex items-center gap-3">
               <Button
@@ -64,7 +81,7 @@ const Edit_Vendor = ({ set_page }) => {
                 icon={ChevronLeft}
                 icon_position="left"
                 width="w-[20px]"
-                on_click={() => set_page("main")}
+                on_click={handle_go_back}
               ></Button>
               <h1 className="text-lg">Edit Vendor</h1>
             </div>
@@ -75,13 +92,15 @@ const Edit_Vendor = ({ set_page }) => {
               </div>
             </div>
           </div>
+          {/* - Header */}
+          {/* + Section 1 */}
           <div className="p-5 sm:p-6 border-t">
             <div className="grid grid-cols-1 gap-5 lg:grid-cols-3">
               <div className="w-full">
                 <Text_Field
                   label="Vendor Code"
                   type={"text"}
-                  pattern="[0-9]{1,}"
+                  value={"VN-XXXX"}
                   disabled
                 />
               </div>
@@ -90,13 +109,17 @@ const Edit_Vendor = ({ set_page }) => {
                   label="Vendor Description"
                   type={"text"}
                   placeholder={"Enter description"}
-                  pattern="[0-9]{1,}"
+                  // value={}
+                  // on_change={}
                 />
               </div>
             </div>
           </div>
+          {/* - Section 1 */}
+          {/* + Section 2 */}
           <div className="p-5 sm:p-6 border-t">
             <div className="w-full bg-white rounded-lg border">
+              {/* + Tab Navigation */}
               <div className="w-full border-b p-2">
                 <nav className="flex overflow-x-auto rounded-lg bg-gray-100 p-1 dark:bg-gray-900 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-200 dark:[&::-webkit-scrollbar-thumb]:bg-gray-600 [&::-webkit-scrollbar-track]:bg-white dark:[&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar]:h-1.5">
                   {tabs.map((tab) => (
@@ -114,39 +137,66 @@ const Edit_Vendor = ({ set_page }) => {
                   ))}
                 </nav>
               </div>
+              {/* - Tab Navigation */}
               {/* + Tab Content */}
               <div className="p-6">
-                {active_tab === "address" && <Address />}
+                {active_tab === "address" && (
+                  <Address set_display_modal={set_display_modal} />
+                )}
                 {active_tab === "account" && <Account />}
-                {active_tab === "accounting_info" && <Accounting_Info />}
+                {active_tab === "accounting_info" && (
+                  <Accounting_Info set_display_modal={set_display_modal} />
+                )}
               </div>
               {/* - Tab Content */}
             </div>
           </div>
+          {/* - Section 2 */}
+          {/* + Section 3 */}
           <div className="p-4 sm:p-8 border-t">
             <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
               <Button
                 variant="primary"
                 size="lg"
-                // width="w-[100px]"
                 icon={RefreshCcwDot}
                 icon_position="left"
-                // on_click={handle_save}
               >
                 Update
               </Button>
-              <Button
-                variant="white"
-                size="lg"
-                // width="w-[100px]"
-                on_click={() => set_page("main")}
-              >
+              <Button variant="white" size="lg" on_click={handle_go_back}>
                 Cancel
               </Button>
             </div>
           </div>
+          {/* - Section 3 */}
         </div>
       </div>
+      {/* + Modals */}
+      <Select_City
+        is_open={display_modal === "select_city"}
+        on_close={() => set_display_modal("")}
+        width="max-w-[1000px]"
+        height="max-h-[700px]"
+        city_list={city_list}
+      />
+      <Select_Trans_Zone
+        is_open={display_modal === "select_trans_zone"}
+        on_close={() => set_display_modal("")}
+        width="max-w-[1000px]"
+        height="max-h-[700px]"
+        trans_zone_list={trans_zone_list}
+      />
+      <Select_Company
+        is_open={display_modal === "select_company"}
+        on_close={() => set_display_modal("")}
+        width="max-w-[1280px]"
+        height="max-h-[700px]"
+        company_list={company_list}
+        purc_org_list={purc_org_list}
+        purc_group_list={purc_group_list}
+        com_porg_pgroup_list={com_porg_pgroup_list}
+      />
+      {/* - Modals */}
     </React.Fragment>
   );
 };

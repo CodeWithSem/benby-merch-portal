@@ -60,6 +60,7 @@ const Delete_SO = ({ is_open, on_close, width = "max-w-[700px]" }) => {
     );
   };
 
+  // RETURN ORIGIN
   return is_open ? (
     <React.Fragment>
       <div className="fixed inset-0 flex items-center justify-center z-[97] px-4">
@@ -76,11 +77,9 @@ const Delete_SO = ({ is_open, on_close, width = "max-w-[700px]" }) => {
           >
             <X size={20} />
           </button>
-          {/* + Modal Label */}
           <div className="text-lg md:text-xl font-bold mb-5">
             Delete Sales Order
           </div>
-          {/* - Modal Label */}
           {/* + Modal Body */}
           <div className="w-full pl-1 p-4 overflow-y-auto h-[500px] scrollbar-custom">
             <div className="w-full">
@@ -94,7 +93,6 @@ const Delete_SO = ({ is_open, on_close, width = "max-w-[700px]" }) => {
                     </div>
                   </div>
                 </div>
-
                 <div className="p-5 sm:p-6 border-t">
                   <div className="w-full">
                     <div className="space-y-6">
@@ -103,9 +101,7 @@ const Delete_SO = ({ is_open, on_close, width = "max-w-[700px]" }) => {
                           <Text_Field
                             label="SO Number"
                             type={"text"}
-                            // value={"AUTO GENERATED"}
-                            // on_change={handle_text_change}
-                            pattern="[A-Za-z]{1,}"
+                            // value={""}
                             disabled
                           />
                         </div>
@@ -113,9 +109,7 @@ const Delete_SO = ({ is_open, on_close, width = "max-w-[700px]" }) => {
                           <Text_Field
                             label="PO Number"
                             type={"text"}
-                            // value={"AUTO GENERATED"}
-                            // on_change={handle_text_change}
-                            pattern="[A-Za-z]{1,}"
+                            // value={""}
                             disabled
                           />
                         </div>
@@ -123,9 +117,7 @@ const Delete_SO = ({ is_open, on_close, width = "max-w-[700px]" }) => {
                           <Text_Code_Field
                             label="SO Type"
                             // code_value={search_value}
-                            // on_code_change={handle_change}
                             // text_value={search_value}
-                            // on_text_change={handle_change}
                             code_width="150px"
                             show_search_button={false}
                             disabled
@@ -135,9 +127,7 @@ const Delete_SO = ({ is_open, on_close, width = "max-w-[700px]" }) => {
                           <Text_Code_Field
                             label="Sales Organization"
                             // code_value={search_value}
-                            // on_code_change={handle_change}
                             // text_value={search_value}
-                            // on_text_change={handle_change}
                             code_width="150px"
                             show_search_button={false}
                             disabled
@@ -147,9 +137,7 @@ const Delete_SO = ({ is_open, on_close, width = "max-w-[700px]" }) => {
                           <Text_Code_Field
                             label="Sold to Party / Address"
                             // code_value={search_value}
-                            // on_code_change={handle_change}
                             // text_value={search_value}
-                            // on_text_change={handle_change}
                             code_width="150px"
                             show_search_button={false}
                             disabled
@@ -159,9 +147,7 @@ const Delete_SO = ({ is_open, on_close, width = "max-w-[700px]" }) => {
                           <Text_Code_Field
                             label="Ship to Party / Address"
                             // code_value={search_value}
-                            // on_code_change={handle_change}
                             // text_value={search_value}
-                            // on_text_change={handle_change}
                             code_width="150px"
                             show_search_button={false}
                             disabled

@@ -1,6 +1,4 @@
 import React, { useEffect, useRef, useState } from "react";
-import Text_Field from "assets/elements/Text_Field";
-import Select_Field from "assets/elements/Select_Field";
 import {
   CirclePlus,
   FileText,
@@ -10,33 +8,23 @@ import {
   SquarePen,
   Trash2,
 } from "lucide-react";
+import { format_currency, format_percentage } from "assets/scripts/format";
+import Text_Field from "assets/elements/Text_Field";
 import Icon_Field from "assets/elements/Icon_Field";
 import Quantity_Field from "assets/elements/Quantity_Field";
 import Find_Field from "assets/elements/Find_Field";
-// import Show_Item_Details from "./modals/Show_Item_Details";
-import { format_currency, format_percentage } from "assets/scripts/format";
 import Button from "assets/elements/Button";
 import Checkbox_Field from "assets/elements/Checkbox_Field";
+import Show_Item_Details from "./modals/Show_Item_Details";
+import Button_Action from "assets/elements/Button_Action";
 
-const SO_Items = () => {
-  const filter_ref = useRef(null);
+const SO_Items = ({ handle_open_item_modal }) => {
+  const [display_item_modal, set_display_item_modal] = useState("");
   const [selected_row, set_selected_row] = useState(null);
   const [show_filter, set_show_filter] = useState(false);
-  // --- Close dropdown outside click ---
-  useEffect(() => {
-    const handle_click_outside = (event) => {
-      if (filter_ref.current && !filter_ref.current.contains(event.target)) {
-        // optional: close filter
-      }
-    };
-    document.addEventListener("mousedown", handle_click_outside);
-    return () =>
-      document.removeEventListener("mousedown", handle_click_outside);
-  }, []);
-  // + For Quantity Field
   const [quantity, set_quantity] = useState(1);
-  // - For Quantity Field
-  const item_list = [
+
+  const [item_list, set_item_list] = useState([
     {
       id: 1,
       item_code: "ITM-0001",
@@ -94,10 +82,9 @@ const SO_Items = () => {
       is_approved: 1,
       remarks: "Computer accessories bundle",
     },
-  ];
+  ]);
 
-  // 🔹 Define your columns
-  const all_columns = [
+  const columns = [
     { key: "no", label: "No.", visible: true },
     { key: "item_desc", label: "Item", visible: true },
     { key: "qty", label: "Qty", visible: true },
@@ -117,9 +104,8 @@ const SO_Items = () => {
     { key: "actions", label: "", visible: true },
   ];
 
-  // 🔹 Initialize visible columns based on "visible" flag
   const [visible_columns, set_visible_columns] = useState(
-    all_columns.filter((col) => col.visible).map((col) => col.key)
+    columns.filter((col) => col.visible).map((col) => col.key)
   );
 
   const toggle_column = (key, checked) => {
@@ -131,12 +117,22 @@ const SO_Items = () => {
   const handle_row_click = (item_id) => {
     set_selected_row(item_id);
   };
+
+  const handle_add_item = () => {
+    alert("Under Maintenance");
+  };
+
+  const handle_show_details = () => {
+    set_display_item_modal("show_details");
+  };
+
   // RETURN ORIGIN
   return (
     <React.Fragment>
-      {/* + Item Section */}
       <div className="flex flex-col gap-5 border-t p-5 sm:p-6">
+        {/* + Section 1 */}
         <div className="rounded-lg border border-gray-200 bg-white pt-4 dark:border-gray-800 dark:bg-white/[0.03]">
+          {/* + Header */}
           <div className="flex flex-col gap-5 px-6 md:pl-6 md:pr-3 mb-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <h1 className="font-semibold text-gray-600 whitespace-nowrap">
@@ -152,28 +148,27 @@ const SO_Items = () => {
                   icon_position="left"
                 />
               </div>
-              <div className="relative" ref={filter_ref}>
+              {/* + Dropdown Filter */}
+              <div className="relative">
                 <Button
                   variant="white"
                   width="w-[120px]"
                   icon={SlidersHorizontal}
                   icon_position="left"
-                  // loading
                   on_click={() => set_show_filter((prev) => !prev)}
                 >
                   Column
                 </Button>
-
-                {/* Filter Popover */}
+                {/* + Dropdown Content */}
                 {show_filter && (
                   <React.Fragment>
                     <div
                       className="fixed inset-0 bg-black/20 backdrop-blur-sm z-[9998]"
-                      // onClick={() => set_show_filter(false)}
+                      onClick={() => set_show_filter(false)}
                     ></div>
                     <div className="absolute top-full mt-2 right-0 z-[9999] bg-white border rounded-lg shadow-md p-4 w-[260px]">
                       <div className="grid grid-cols-1 gap-3 pt-2 max-h-[300px] overflow-y-auto">
-                        {all_columns.map((col) => (
+                        {columns.map((col) => (
                           <Checkbox_Field
                             key={col.key}
                             label={col.label || "Action"}
@@ -198,14 +193,18 @@ const SO_Items = () => {
                     </div>
                   </React.Fragment>
                 )}
+                {/* - Dropdown Content */}
               </div>
+              {/* - Dropdown Filter */}
             </div>
           </div>
+          {/* - Header */}
+          {/* + Table */}
           <div className="max-w-full overflow-x-auto custom-scrollbar">
             <table className="min-w-full text-left text-sm text-gray-700 dark:border-gray-800">
               <thead className="bg-gray-50 dark:bg-gray-900">
                 <tr className="border-b border-t border-gray-100 whitespace-nowrap dark:border-gray-800 text-xs">
-                  {all_columns
+                  {columns
                     .filter((col) => visible_columns.includes(col.key))
                     .map((col) => (
                       <th
@@ -229,7 +228,7 @@ const SO_Items = () => {
                       }`}
                       onClick={() => handle_row_click(item.id)}
                     >
-                      {all_columns
+                      {columns
                         .filter((col) => visible_columns.includes(col.key))
                         .map((col) => {
                           switch (col.key) {
@@ -275,7 +274,23 @@ const SO_Items = () => {
                                     checked={item.is_approved === 1}
                                     disabled
                                   />
-                                  {/* {item[col.key] ? "✅" : "❌"} */}
+                                </td>
+                              );
+                            case "actions":
+                              return (
+                                <td key={col.key} className="px-5 py-4">
+                                  <div className="flex gap-2">
+                                    <div className="relative group flex jusity-center items-center">
+                                      <Button_Action
+                                        icon={FileText}
+                                        size={18}
+                                        tooltip="Show Details"
+                                        on_click={() =>
+                                          handle_show_details(item)
+                                        }
+                                      />
+                                    </div>
+                                  </div>
                                 </td>
                               );
                             default:
@@ -295,7 +310,79 @@ const SO_Items = () => {
               </tbody>
             </table>
           </div>
+          {/* - Table */}
         </div>
+        {/* - Section 1 */}
+        {/* + Section 2 */}
+        <div className="mt-5 rounded-lg border border-gray-100 bg-gray-50 p-4 sm:p-6 dark:border-gray-800 dark:bg-gray-900">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 lg:grid-cols-12">
+            <div className="w-full lg:col-span-3">
+              <Text_Field
+                label="Item Code"
+                type={"number"}
+                // value={text}
+                disabled
+              />
+            </div>
+            <div className="w-full lg:col-span-9">
+              <Find_Field
+                label="Item Description"
+                // value={search_value}
+                on_click={handle_open_item_modal}
+                disabled
+              />
+            </div>
+            <div className="w-full lg:col-span-4">
+              <Text_Field
+                label="Unit Price"
+                type={"text"}
+                // value={text}
+                disabled
+              />
+            </div>
+            <div className="w-full lg:col-span-2">
+              <Text_Field
+                label="Unit"
+                type={"text"}
+                // value={text}
+                disabled
+              />
+            </div>
+            <div className="w-full lg:col-span-2">
+              <Quantity_Field
+                label="Quantity"
+                value={quantity}
+                on_change={set_quantity}
+                placeholder="0"
+                min={1}
+              />
+            </div>
+            <div className="flex w-full items-end lg:col-span-2">
+              <Button variant="white" width="w-full">
+                Discount
+              </Button>
+            </div>
+            <div className="flex w-full items-end lg:col-span-2">
+              <Button
+                variant="primary"
+                width="w-full"
+                icon={CirclePlus}
+                onClick={handle_add_item}
+              >
+                Add Item
+              </Button>
+            </div>
+          </div>
+          <div className="mt-5 flex max-w-2xl items-center gap-2 text-gray-500">
+            <Info size={18} />
+            <p className="text-sm dark:text-gray-400">
+              After filling in the item details, please make sure all the items
+              that you have listed is correct.
+            </p>
+          </div>
+        </div>
+        {/* - Section 2 */}
+        {/* + Section 3 */}
         <div className="flex flex-wrap justify-between sm:justify-end">
           <div className="mt-6 w-full space-y-1 text-right sm:w-[270px]">
             <p className="mb-4 text-left text-sm font-medium text-gray-800 dark:text-white/90">
@@ -307,7 +394,7 @@ const SO_Items = () => {
                   Sub Total
                 </span>
                 <span className="text-sm font-medium text-gray-700 dark:text-gray-400">
-                  492,800.00
+                  {format_currency(0, 2, true)}
                 </span>
               </li>
               <li className="flex justify-between gap-5">
@@ -315,7 +402,7 @@ const SO_Items = () => {
                   Vat (12%)
                 </span>
                 <span className="text-sm font-medium text-gray-700 dark:text-gray-400">
-                  67,200.00
+                  {format_currency(0, 2, true)}
                 </span>
               </li>
               <li className="flex justify-between gap-5">
@@ -323,14 +410,21 @@ const SO_Items = () => {
                   Total
                 </span>
                 <span className="text-lg font-semibold text-gray-800 dark:text-white/90">
-                  560,000.00
+                  {format_currency(0, 2, true)}
                 </span>
               </li>
             </ul>
           </div>
         </div>
+        {/* - Section 3 */}
       </div>
-      {/* - Item Section */}
+      {/* + Modals */}
+      <Show_Item_Details
+        is_open={display_item_modal === "show_details"}
+        on_close={() => set_display_item_modal("")}
+        width="max-w-[1280px]"
+      />
+      {/* - Modals */}
     </React.Fragment>
   );
 };

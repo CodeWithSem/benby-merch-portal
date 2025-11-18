@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import Text_Field from "assets/elements/Text_Field";
 import Button from "assets/elements/Button";
-import { ChevronLeft, Eye, Save, SaveAll } from "lucide-react";
+import { ChevronLeft, CirclePlus, Eye, Save, SaveAll } from "lucide-react";
 import Text_Code_Field from "assets/elements/Text_Code_Field";
 import { get_date_now, format_date_1 } from "assets/scripts/format";
 import Date_Field from "assets/elements/Date_Field";
@@ -59,12 +59,18 @@ const Create_New_SO = ({
   const handle_save = () => {
     alert("Under Maintenance");
   };
+
+  const handle_go_back = () => {
+    set_page("main");
+  };
+
   // RETURN ORIGIN
   return (
     <React.Fragment>
       <div className="w-full">
         <div className="flex flex-wrap items-center justify-between gap-3 py-5">
           <h1 className="text-xl">Inbound</h1>
+          {/* + Breadcrumbs */}
           <nav>
             <ol className="flex flex-wrap items-center gap-1.5">
               <li>
@@ -76,7 +82,7 @@ const Create_New_SO = ({
                 <span>/</span>
                 <a
                   className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-sky-500 cursor-pointer"
-                  onClick={() => set_page("main")}
+                  onClick={handle_go_back}
                 >
                   Inbound
                 </a>
@@ -85,7 +91,7 @@ const Create_New_SO = ({
                 <span>/</span>
                 <a
                   className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-sky-500 cursor-pointer"
-                  onClick={() => set_page("main")}
+                  onClick={handle_go_back}
                 >
                   Sales Order
                 </a>
@@ -96,9 +102,10 @@ const Create_New_SO = ({
               </li>
             </ol>
           </nav>
+          {/* - Breadcrumbs */}
         </div>
-
         <div className="w-full bg-white rounded-lg border">
+          {/* + Header */}
           <div className="flex flex-wrap items-center justify-between gap-3 p-5">
             <div className="flex items-center gap-3">
               <Button
@@ -106,9 +113,8 @@ const Create_New_SO = ({
                 icon={ChevronLeft}
                 icon_position="left"
                 width="w-[20px]"
-                on_click={() => set_page("main")}
+                on_click={handle_go_back}
               ></Button>
-              {/* <ChevronLeft className="text-gray-500" size={24} /> */}
               <h1 className="text-lg">Sales Order Creation</h1>
             </div>
 
@@ -118,7 +124,8 @@ const Create_New_SO = ({
               </div>
             </div>
           </div>
-
+          {/* - Header */}
+          {/* + Section 1 */}
           <div className="p-5 sm:p-6 border-t">
             <div className="w-full">
               <div className="space-y-6">
@@ -128,8 +135,6 @@ const Create_New_SO = ({
                       label="SO Number"
                       type={"text"}
                       value={"AUTO GENERATED"}
-                      // on_change={handle_text_change}
-                      pattern="[A-Za-z]{1,}"
                       disabled
                     />
                   </div>
@@ -137,9 +142,7 @@ const Create_New_SO = ({
                     <Text_Field
                       label="PO Number"
                       type={"text"}
-                      value={"PO-000000001"}
-                      // on_change={handle_text_change}
-                      pattern="[A-Za-z]{1,}"
+                      value={"PO-XXXXXXXXX"}
                       disabled
                     />
                   </div>
@@ -158,7 +161,7 @@ const Create_New_SO = ({
                       name="no_cancel_date"
                       box_size={24}
                       icon_size={14}
-                      //   checked={check}
+                      checked={false}
                       on_change={(e) => alert(e.target.checked)}
                     />
                   </div>
@@ -166,9 +169,7 @@ const Create_New_SO = ({
                     <Text_Code_Field
                       label="SO Type"
                       // code_value={search_value}
-                      // on_code_change={handle_change}
                       // text_value={search_value}
-                      // on_text_change={handle_change}
                       code_width="150px"
                       show_search_button={false}
                       disabled
@@ -178,9 +179,7 @@ const Create_New_SO = ({
                     <Text_Code_Field
                       label="Sales Organization"
                       // code_value={search_value}
-                      // on_code_change={handle_change}
                       // text_value={search_value}
-                      // on_text_change={handle_change}
                       code_width="150px"
                       show_search_button={false}
                       on_click={() => set_display_modal("select_sales_org")}
@@ -191,9 +190,7 @@ const Create_New_SO = ({
                     <Text_Code_Field
                       label="Sold to Party / Address"
                       // code_value={search_value}
-                      // on_code_change={handle_change}
                       // text_value={search_value}
-                      // on_text_change={handle_change}
                       code_width="150px"
                       show_search_button={true}
                       on_click={() => set_display_modal("select_sold_to")}
@@ -204,9 +201,7 @@ const Create_New_SO = ({
                     <Text_Code_Field
                       label="Ship to Party / Address"
                       // code_value={search_value}
-                      // on_code_change={handle_change}
                       // text_value={search_value}
-                      // on_text_change={handle_change}
                       code_width="150px"
                       show_search_button={true}
                       on_click={() => set_display_modal("select_ship_to")}
@@ -217,8 +212,11 @@ const Create_New_SO = ({
               </div>
             </div>
           </div>
+          {/* - Section 1 */}
+          {/* + Section 2 */}
           <div className="p-5 sm:p-6 border-t">
             <div className="w-full bg-white rounded-lg border">
+              {/* + Tab Navigation */}
               <div className="w-full border-b p-2">
                 <nav className="flex overflow-x-auto rounded-lg bg-gray-100 p-1 dark:bg-gray-900 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-200 dark:[&::-webkit-scrollbar-thumb]:bg-gray-600 [&::-webkit-scrollbar-track]:bg-white dark:[&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar]:h-1.5">
                   {tabs.map((tab) => (
@@ -236,7 +234,7 @@ const Create_New_SO = ({
                   ))}
                 </nav>
               </div>
-
+              {/* - Tab Navigation */}
               {/* + Tab Content */}
               <div className="p-6">
                 {active_tab === "sales" && <Sales />}
@@ -253,13 +251,16 @@ const Create_New_SO = ({
               {/* - Tab Content */}
             </div>
           </div>
+          {/* - Section 2 */}
+          {/* + Section 3 */}
           <SO_Items handle_open_item_modal={handle_open_item_modal} />
+          {/* - Section 3 */}
+          {/* + Section 4 */}
           <div className="p-4 sm:p-8 border-t">
             <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
               <Button
                 variant="white"
                 size="lg"
-                // width="w-[100px]"
                 icon={Eye}
                 icon_position="left"
                 on_click={handle_preview}
@@ -269,7 +270,6 @@ const Create_New_SO = ({
               <Button
                 variant="primary"
                 size="lg"
-                // width="w-[100px]"
                 icon={SaveAll}
                 icon_position="left"
                 on_click={handle_save_as_draft}
@@ -279,15 +279,18 @@ const Create_New_SO = ({
               <Button
                 variant="primary"
                 size="lg"
-                // width="w-[100px]"
-                icon={Save}
+                icon={CirclePlus}
                 icon_position="left"
                 on_click={handle_save}
               >
-                Save
+                Create
+              </Button>
+              <Button variant="white" size="lg" on_click={handle_go_back}>
+                Cancel
               </Button>
             </div>
           </div>
+          {/* - Section 4 */}
         </div>
       </div>
       <Select_Sold_To

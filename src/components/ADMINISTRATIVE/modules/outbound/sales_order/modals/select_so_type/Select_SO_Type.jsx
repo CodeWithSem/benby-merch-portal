@@ -15,18 +15,13 @@ const Select_SO_Type = ({
   dist_channel_list,
   so_type_list,
 }) => {
-  // --- States ---
-  const [filtered_so_type, set_filtered_so_type] = useState([]);
+  // + Client-Side Filtering
+  const [filtered_so_type_list, set_filtered_so_type_list] = useState([]);
   const [current_page, set_current_page] = useState(1);
   const [rows_per_page, set_rows_per_page] = useState(5);
-
-  // 🔍 search input (immediate value)
   const [search_query, set_search_query] = useState("");
-  // 🔍 debounced search value
   const [debounced_query, set_debounced_query] = useState("");
   const [selected_so_type, set_selected_so_type] = useState(null);
-
-  // --- Debounce search ---
   useEffect(() => {
     const timer = setTimeout(() => {
       set_debounced_query(search_query);
@@ -35,7 +30,6 @@ const Select_SO_Type = ({
     return () => clearTimeout(timer);
   }, [search_query]);
 
-  // --- Create lookup maps once (outside render / effect) ---
   const sales_org_map = Object.fromEntries(
     sales_org_list.map((c) => [c.sales_org_code, c])
   );
@@ -43,7 +37,6 @@ const Select_SO_Type = ({
     dist_channel_list.map((p) => [p.dist_channel_code, p])
   );
 
-  // --- Filtering + Pagination ---
   useEffect(() => {
     let data = [...so_type_list];
 
@@ -51,11 +44,9 @@ const Select_SO_Type = ({
       const q = debounced_query.toLowerCase();
 
       data = data.filter((so_type) => {
-        // lookup related records
         const sales_org = sales_org_map[so_type.sales_org_code];
         const dist_channel = dist_channel_map[so_type.dist_channel_code];
 
-        // create one searchable string
         const combined = [
           so_type.so_type_code,
           so_type.so_type_desc,
@@ -74,7 +65,7 @@ const Select_SO_Type = ({
 
     const start_idx = (current_page - 1) * rows_per_page;
     const end_idx = start_idx + rows_per_page;
-    set_filtered_so_type(data.slice(start_idx, end_idx));
+    set_filtered_so_type_list(data.slice(start_idx, end_idx));
   }, [so_type_list, debounced_query, current_page, rows_per_page]);
 
   const total_pages = Math.ceil(
@@ -83,8 +74,8 @@ const Select_SO_Type = ({
     ).length / rows_per_page
   );
 
-  // --- Handlers ---
   const handle_page_change = (page) => set_current_page(page);
+  // - Client-Side Filtering
 
   const handle_proceed = () => {
     console.log(selected_so_type);
@@ -93,10 +84,8 @@ const Select_SO_Type = ({
     on_close();
   };
 
-  // --- Render ---
-  if (!is_open) return null;
-
-  return (
+  // RETURN ORIGIN
+  return is_open ? (
     <div className="fixed inset-0 flex items-center justify-center z-[97] px-4">
       {/* + Blur */}
       <div className="absolute inset-0 bg-black/50 backdrop-blur-sm z-[98]"></div>
@@ -106,20 +95,16 @@ const Select_SO_Type = ({
       <div
         className={`relative bg-white rounded-lg shadow-xl ${width} w-full py-7 m-5 z-[99]`}
       >
-        {/* Close button */}
         <button
           className="absolute top-5 right-5 p-2 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-400 hover:text-gray-500"
           onClick={on_close}
         >
           <X size={20} />
         </button>
-
-        {/* Header */}
         <div className="text-lg md:text-xl font-bold mb-5 px-7">
           SO Type Selection
         </div>
-
-        {/* Body */}
+        {/* + Modal Body */}
         <div className={`w-full overflow-y-auto ${height} scrollbar-custom`}>
           <div className="overflow-hidden border border-gray-200 bg-white pt-4">
             <div className="flex flex-col gap-5 px-6 mb-4 sm:flex-row sm:items-center sm:justify-between">
@@ -154,7 +139,7 @@ const Select_SO_Type = ({
                 </thead>
 
                 <tbody className="divide-y divide-gray-100">
-                  {filtered_so_type.length === 0 ? (
+                  {filtered_so_type_list.length === 0 ? (
                     <tr>
                       <td
                         colSpan={5}
@@ -164,7 +149,7 @@ const Select_SO_Type = ({
                       </td>
                     </tr>
                   ) : (
-                    filtered_so_type.map((so_type) => {
+                    filtered_so_type_list.map((so_type) => {
                       const sales_org = sales_org_list.find(
                         (c) => c.sales_org_code === so_type.sales_org_code
                       );
@@ -242,10 +227,10 @@ const Select_SO_Type = ({
             </div>
           </div>
         </div>
-
-        {/* Footer */}
+        {/* - Modal Body */}
+        {/* + Modal Footer */}
         <div className="flex flex-col items-center sm:flex-row sm:justify-between gap-3 mt-5 px-7">
-          {/* Pagination */}
+          {/* + Pagination */}
           {total_pages > 0 && (
             <div className="w-full sm:w-auto">
               <Pagination_Modal
@@ -255,8 +240,8 @@ const Select_SO_Type = ({
               />
             </div>
           )}
-
-          {/* Buttons */}
+          {/* - Pagination */}
+          {/* + Action Buttons */}
           <div className="flex justify-center sm:justify-end gap-2 w-full">
             <Button
               variant="primary"
@@ -274,10 +259,12 @@ const Select_SO_Type = ({
               Close
             </Button>
           </div>
+          {/* - Action Buttons */}
         </div>
+        {/* - Modal Footer */}
       </div>
     </div>
-  );
+  ) : null;
 };
 
 export default Select_SO_Type;

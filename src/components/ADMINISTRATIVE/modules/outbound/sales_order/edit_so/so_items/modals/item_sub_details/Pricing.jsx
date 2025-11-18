@@ -1,7 +1,7 @@
+import React from "react";
 import Date_Field from "assets/elements/Date_Field";
 import Text_Field from "assets/elements/Text_Field";
 import Text_Field_Adorn from "assets/elements/Text_Field_Adorn";
-import React from "react";
 
 const Pricing = () => {
   const columns = [
@@ -26,6 +26,7 @@ const Pricing = () => {
   // RETURN ORIGIN
   return (
     <React.Fragment>
+      {/* + Section 1 */}
       <div className="rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6 dark:border-gray-800 dark:bg-gray-900 whitespace-nowrap">
         <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
           <div>
@@ -33,7 +34,6 @@ const Pricing = () => {
               label="Quantity"
               type="text"
               // value={data}
-              // on_change={(e) => handle_data_change(e.target.value)}
               adornment="CS"
               adornment_position="right"
               adornment_width="w-[80px]"
@@ -45,7 +45,6 @@ const Pricing = () => {
               label="Unit Price"
               type="text"
               // value={data}
-              // on_change={(e) => handle_data_change(e.target.value)}
               adornment="PHP"
               adornment_position="right"
               adornment_width="w-[80px]"
@@ -57,7 +56,6 @@ const Pricing = () => {
               label="Net Price"
               type="text"
               // value={data}
-              // on_change={(e) => handle_data_change(e.target.value)}
               adornment="PHP"
               adornment_position="right"
               adornment_width="w-[80px]"
@@ -66,7 +64,7 @@ const Pricing = () => {
           </div>
           <div>
             <Date_Field
-              label="Date Field"
+              label="Pricing Date"
               // value={selected_data}
               on_change={(e) => alert(e.target.value)}
               placeholder="Select Date"
@@ -77,7 +75,6 @@ const Pricing = () => {
               label="Total Gross"
               type="text"
               // value={data}
-              // on_change={(e) => handle_data_change(e.target.value)}
               adornment="PHP"
               adornment_position="right"
               adornment_width="w-[80px]"
@@ -85,19 +82,13 @@ const Pricing = () => {
             />
           </div>
           <div>
-            <Text_Field
-              label="Line Disc"
-              type={"text"}
-              pattern="[0-9]{1,}"
-              disabled
-            />
+            <Text_Field label="Line Disc" type={"text"} disabled />
           </div>
           <div>
             <Text_Field_Adorn
               label="Total Net"
               type="text"
               // value={data}
-              // on_change={(e) => handle_data_change(e.target.value)}
               adornment="PHP"
               adornment_position="right"
               adornment_width="w-[80px]"
@@ -109,7 +100,6 @@ const Pricing = () => {
               label="Total Tax"
               type="text"
               // value={data}
-              // on_change={(e) => handle_data_change(e.target.value)}
               adornment="PHP"
               adornment_position="right"
               adornment_width="w-[80px]"
@@ -118,6 +108,8 @@ const Pricing = () => {
           </div>
         </div>
       </div>
+      {/* - Section 1 */}
+      {/* + Section 2 */}
       <div className="mt-5 grid grid-cols-1 gap-5">
         {/* + Table */}
         <div className="col-span-full scrollbar-custom overflow-x-auto max-h-[200px]">
@@ -137,7 +129,6 @@ const Pricing = () => {
                 ))}
               </tr>
             </thead>
-
             <tbody className="bg-white">
               {data.map((row, idx) => (
                 <tr key={idx} className="hover:bg-gray-50">
@@ -159,6 +150,7 @@ const Pricing = () => {
         </div>
         {/* - Table */}
       </div>
+      {/* - Section 2 */}
     </React.Fragment>
   );
 };

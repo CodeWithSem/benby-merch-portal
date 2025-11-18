@@ -87,7 +87,7 @@ const Delete_Vendor = ({ is_open, on_close, width = "max-w-[700px]" }) => {
 
                   <div className="flex gap-2">
                     <div className="text-gray-500 text-sm tracking-wider">
-                      10/30/2025
+                      MM-DD-YYYY
                     </div>
                   </div>
                 </div>
@@ -100,7 +100,6 @@ const Delete_Vendor = ({ is_open, on_close, width = "max-w-[700px]" }) => {
                           <Text_Field
                             label="Vendor Code"
                             type={"text"}
-                            pattern="[0-9]{1,}"
                             disabled
                           />
                         </div>
@@ -108,7 +107,6 @@ const Delete_Vendor = ({ is_open, on_close, width = "max-w-[700px]" }) => {
                           <Text_Field
                             label="Vendor Description"
                             type={"text"}
-                            pattern="[0-9]{1,}"
                             disabled
                           />
                         </div>
@@ -135,7 +133,6 @@ const Delete_Vendor = ({ is_open, on_close, width = "max-w-[700px]" }) => {
           </div>
           {/* - Modal Footer */}
         </div>
-
         {/* - Modal Content */}
       </div>
       {is_confirm_modal_open && <Confirm_Modal />}

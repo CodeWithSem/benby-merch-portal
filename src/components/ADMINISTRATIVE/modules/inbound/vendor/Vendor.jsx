@@ -11,32 +11,31 @@ import {
   SlidersHorizontal,
   FileUp,
 } from "lucide-react";
-import Icon_Field from "assets/elements/Icon_Field";
-import Select_Field from "assets/elements/Select_Field";
-import Pagination from "assets/elements/Pagination";
-import Button from "assets/elements/Button";
 import { useToast } from "../../../layout/Toast_Provider";
-import Date_Range_Field from "assets/elements/Date_Range_Field";
-import Create_New_Vendor from "./create_new_vendor/Create_New_Vendor";
-import Edit_Vendor from "./edit_vendor/Edit_Vendor";
-import Delete_Vendor from "./modals/delete_vendor/Delete_Vendor";
 import {
   city_list,
   company_list,
-  da_com_porg_pgroup_list,
+  com_porg_pgroup_list,
   purc_group_list,
   purc_org_list,
   trans_zone_list,
 } from "./VENDOR_DATA_MAP";
+import Icon_Field from "assets/elements/Icon_Field";
+import Select_Field from "assets/elements/Select_Field";
+import Pagination from "assets/elements/Pagination";
+import Button from "assets/elements/Button";
+import Create_New_Vendor from "./create_new_vendor/Create_New_Vendor";
+import Edit_Vendor from "./edit_vendor/Edit_Vendor";
 import View_Vendor from "./view_vendor/View_Vendor";
+import Delete_Vendor from "./modals/delete_vendor/Delete_Vendor";
+import Button_Action from "assets/elements/Button_Action";
 
 const Vendor = () => {
+  const { show_toast } = useToast();
   const filter_ref = useRef(null);
   const [show_filter, set_show_filter] = useState(false);
   const [page, set_page] = useState("main");
   const [display_modal, set_display_modal] = useState("");
-
-  const { show_toast } = useToast();
 
   const columns = [
     { key: "id", label: "ID", sortable: true },
@@ -51,10 +50,12 @@ const Vendor = () => {
       id: 1,
       vendor_code: "VN-0001",
       vendor_desc: "Vendor Description 1",
-      creation_date: "MM-DD-YYYY 12:00:00",
+      creation_date: "MM-DD-YYYY",
     },
   ]);
-  const [filtered_data, set_filtered_data] = useState([]);
+
+  // + Client-Side Filtering
+  const [filtered_vendor_list, set_filtered_vendor_list] = useState([]);
   const [loading, set_loading] = useState(false);
   const [select_option, set_select_option] = useState(5);
   const [current_page, set_current_page] = useState(1);
@@ -70,17 +71,6 @@ const Vendor = () => {
     }, 300);
     return () => clearTimeout(timer);
   }, [search_query]);
-
-  useEffect(() => {
-    const handle_click_outside = (event) => {
-      if (filter_ref.current && !filter_ref.current.contains(event.target)) {
-        // optional: close filter
-      }
-    };
-    document.addEventListener("mousedown", handle_click_outside);
-    return () =>
-      document.removeEventListener("mousedown", handle_click_outside);
-  }, []);
 
   useEffect(() => {
     let temp = [...vendor_list];
@@ -111,7 +101,7 @@ const Vendor = () => {
     const start_idx = (current_page - 1) * select_option;
     const end_idx = start_idx + select_option;
 
-    set_filtered_data(temp.slice(start_idx, end_idx));
+    set_filtered_vendor_list(temp.slice(start_idx, end_idx));
   }, [
     vendor_list,
     debounced_query,
@@ -147,8 +137,7 @@ const Vendor = () => {
   };
 
   const handle_page_change = (page) => set_current_page(page);
-
-  const date_range_ref = useRef(null);
+  // - Client-Side Filtering
 
   const handle_create_new_vendor = () => {
     set_page("vendor_creation");
@@ -177,6 +166,7 @@ const Vendor = () => {
           <div className="w-full">
             <div className="flex flex-wrap items-center justify-between gap-3 py-5">
               <h1 className="text-xl">Inbound</h1>
+              {/* + Breadcrumbs */}
               <nav>
                 <ol className="flex flex-wrap items-center gap-1.5">
                   <li>
@@ -196,8 +186,9 @@ const Vendor = () => {
                   </li>
                 </ol>
               </nav>
+              {/* - Breadcrumbs */}
             </div>
-
+            {/* + Header */}
             <div className="w-full bg-white rounded-lg border">
               <div className="flex flex-wrap items-center justify-between gap-3 p-5">
                 <h1 className="text-lg">Vendor</h1>
@@ -220,7 +211,8 @@ const Vendor = () => {
                   </Button>
                 </div>
               </div>
-
+              {/* - Header */}
+              {/* + Section 1 */}
               <div className="p-5 sm:p-6 border-t">
                 <div className="w-full border rounded-lg">
                   <div className="w-full md:flex md:justify-between p-4 gap-4">
@@ -248,7 +240,6 @@ const Vendor = () => {
                         icon_position="left"
                       ></Button>
                     </div>
-
                     <div className="w-full mt-4 md:mt-0 md:w-[600px]">
                       <div className="w-full flex items-center gap-2">
                         <div className="w-full">
@@ -275,12 +266,6 @@ const Vendor = () => {
                             <React.Fragment>
                               <div className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40"></div>
                               <div className="absolute top-full mt-2 right-0 z-50 bg-white border rounded-lg shadow-md p-4 w-[260px]">
-                                <div>
-                                  <Date_Range_Field
-                                    label="Date Range"
-                                    ref={date_range_ref}
-                                  />
-                                </div>
                                 <div className="flex justify-end gap-2 mt-4">
                                   <Button
                                     size="sm"
@@ -310,7 +295,7 @@ const Vendor = () => {
                       <div className="p-6 text-center text-gray-500 text-sm">
                         Loading...
                       </div>
-                    ) : filtered_data.length === 0 ? (
+                    ) : filtered_vendor_list.length === 0 ? (
                       <div className="p-6 text-center text-gray-500 text-sm">
                         No data found
                       </div>
@@ -356,50 +341,40 @@ const Vendor = () => {
                           </tr>
                         </thead>
                         <tbody className="bg-white">
-                          {filtered_data.map((row, idx) => {
+                          {filtered_vendor_list.map((row, idx) => {
                             const render_cell = (col, row) => {
                               const value = row[col.key];
                               if (col.key === "actions") {
                                 return (
                                   <div className="flex gap-2">
                                     <div className="relative group flex jusity-center items-center">
-                                      <button
-                                        className="text-gray-500 hover:text-sky-600 text-[12px] outline-none"
-                                        onClick={() =>
+                                      <Button_Action
+                                        icon={View}
+                                        tooltip="View Record"
+                                        on_click={() =>
                                           handle_view_vendor(row.id)
                                         }
-                                      >
-                                        <View size={19} />
-                                      </button>
-                                      <span className="absolute bottom-full mb-1 left-1/2 transform -translate-x-1/2 px-2 py-1 text-xs text-white bg-sky-600 rounded opacity-0 group-hover:opacity-100 transition-opacity">
-                                        View Record
-                                      </span>
+                                      />
                                     </div>
                                     <div className="relative group flex jusity-center items-center">
-                                      <button
-                                        className="text-gray-500 hover:text-sky-600 text-[12px] outline-none"
-                                        onClick={() =>
+                                      <Button_Action
+                                        icon={Edit}
+                                        tooltip="Edit Record"
+                                        on_click={() =>
                                           handle_edit_vendor(row.id)
                                         }
-                                      >
-                                        <Edit size={19} />
-                                      </button>
-                                      <span className="absolute bottom-full mb-1 left-1/2 transform -translate-x-1/2 px-2 py-1 text-xs text-white bg-sky-600 rounded opacity-0 group-hover:opacity-100 transition-opacity">
-                                        Edit Record
-                                      </span>
+                                      />
                                     </div>
                                     <div className="relative group flex jusity-center items-center">
-                                      <button
-                                        className="text-gray-500 hover:text-red-600 text-[12px] mb-[1px] outline-none"
-                                        onClick={() =>
+                                      <Button_Action
+                                        class_name="mb-[1px]"
+                                        icon={Trash}
+                                        variant="danger"
+                                        tooltip="Delete Record"
+                                        on_click={() =>
                                           handle_delete_vendor(row.id)
                                         }
-                                      >
-                                        <Trash size={19} />
-                                      </button>
-                                      <span className="absolute bottom-full mb-1 left-1/2 transform -translate-x-1/2 px-2 py-1 text-xs text-white bg-red-600 rounded opacity-0 group-hover:opacity-100 transition-opacity">
-                                        Delete Record
-                                      </span>
+                                      />
                                     </div>
                                   </div>
                                 );
@@ -443,28 +418,41 @@ const Vendor = () => {
                   )}
                 </div>
               </div>
+              {/* - Section 1 */}
             </div>
           </div>
         </React.Fragment>
       )}
+      {/* + Pages */}
       {page === "vendor_creation" && (
         <Create_New_Vendor
           set_page={set_page}
           city_list={city_list}
           company_list={company_list}
-          da_com_porg_pgroup_list={da_com_porg_pgroup_list}
+          com_porg_pgroup_list={com_porg_pgroup_list}
           purc_group_list={purc_group_list}
           purc_org_list={purc_org_list}
           trans_zone_list={trans_zone_list}
         />
       )}
-      {page === "edit_vendor" && <Edit_Vendor set_page={set_page} />}
+      {page === "edit_vendor" && (
+        <Edit_Vendor
+          set_page={set_page}
+          city_list={city_list}
+          company_list={company_list}
+          com_porg_pgroup_list={com_porg_pgroup_list}
+          purc_group_list={purc_group_list}
+          purc_org_list={purc_org_list}
+          trans_zone_list={trans_zone_list}
+        />
+      )}
       {page === "view_vendor" && <View_Vendor set_page={set_page} />}
       <Delete_Vendor
         is_open={display_modal === "delete_vendor"}
         on_close={() => set_display_modal("")}
         width="max-w-[1000px]"
       />
+      {/* - Pages */}
     </React.Fragment>
   );
 };

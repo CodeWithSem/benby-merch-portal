@@ -13,22 +13,18 @@ const Select_Company = ({
   company_list,
   purc_org_list,
   purc_group_list,
-  da_com_porg_pgroup_list,
+  com_porg_pgroup_list,
 }) => {
-  // --- States ---
-  const [filtered_da_com_porg_pgroup, set_filtered_da_com_porg_pgroup] =
+  // + Client-Side Filtering
+  const [filtered_com_porg_pgroup_list, set_filtered_com_porg_pgroup_list] =
     useState([]);
   const [current_page, set_current_page] = useState(1);
   const [rows_per_page, set_rows_per_page] = useState(5);
-
-  // 🔍 search input (immediate value)
   const [search_query, set_search_query] = useState("");
-  // 🔍 debounced search value
   const [debounced_query, set_debounced_query] = useState("");
   const [selected_da_com_porg_pgroup, set_selected_da_com_porg_pgroup] =
     useState(null);
 
-  // --- Debounce search ---
   useEffect(() => {
     const timer = setTimeout(() => {
       set_debounced_query(search_query);
@@ -37,7 +33,6 @@ const Select_Company = ({
     return () => clearTimeout(timer);
   }, [search_query]);
 
-  // --- Create lookup maps once (outside render / effect) ---
   const company_map = Object.fromEntries(
     company_list.map((c) => [c.company_code, c])
   );
@@ -48,20 +43,17 @@ const Select_Company = ({
     purc_group_list.map((g) => [g.purc_group_code, g])
   );
 
-  // --- Filtering + Pagination ---
   useEffect(() => {
-    let data = [...da_com_porg_pgroup_list];
+    let data = [...com_porg_pgroup_list];
 
     if (debounced_query.trim() !== "") {
       const q = debounced_query.toLowerCase();
 
       data = data.filter((data) => {
-        // lookup related records
         const company = company_map[data.company_code];
         const purc_org = purc_org_map[data.purc_org_code];
         const purc_group = purc_group_map[data.purc_group_code];
 
-        // create one searchable string
         const combined = [
           data.company_code,
           company?.company_desc,
@@ -80,11 +72,11 @@ const Select_Company = ({
 
     const start_idx = (current_page - 1) * rows_per_page;
     const end_idx = start_idx + rows_per_page;
-    set_filtered_da_com_porg_pgroup(data.slice(start_idx, end_idx));
-  }, [da_com_porg_pgroup_list, debounced_query, current_page, rows_per_page]);
+    set_filtered_com_porg_pgroup_list(data.slice(start_idx, end_idx));
+  }, [com_porg_pgroup_list, debounced_query, current_page, rows_per_page]);
 
   const total_pages = Math.ceil(
-    da_com_porg_pgroup_list.filter(
+    com_porg_pgroup_list.filter(
       (data) =>
         data.company_code
           .toLowerCase()
@@ -98,41 +90,33 @@ const Select_Company = ({
     ).length / rows_per_page
   );
 
-  // --- Handlers ---
   const handle_page_change = (page) => set_current_page(page);
+  // - Client-Side Filtering
 
   const handle_proceed = () => {
     alert(selected_da_com_porg_pgroup.company_code);
-    // on_close();
   };
 
-  // --- Render ---
-  if (!is_open) return null;
-
-  return (
+  // RETURN ORIGIN
+  return is_open ? (
     <div className="fixed inset-0 flex items-center justify-center z-[97] px-4">
       {/* + Blur */}
       <div className="absolute inset-0 bg-black/50 backdrop-blur-sm z-[98]"></div>
       {/* - Blur */}
-
       {/* + Modal Content */}
       <div
         className={`relative bg-white rounded-lg shadow-xl ${width} w-full py-7 m-5 z-[99]`}
       >
-        {/* Close button */}
         <button
           className="absolute top-5 right-5 p-2 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-400 hover:text-gray-500"
           onClick={on_close}
         >
           <X size={20} />
         </button>
-
-        {/* Header */}
         <div className="text-lg md:text-xl font-bold mb-5 px-7">
           Company Selection
         </div>
-
-        {/* Body */}
+        {/* + Modal Body */}
         <div className={`w-full overflow-y-auto ${height} scrollbar-custom`}>
           <div className="overflow-hidden border border-gray-200 bg-white pt-4">
             <div className="flex flex-col gap-5 px-6 mb-4 sm:flex-row sm:items-center sm:justify-between">
@@ -148,7 +132,7 @@ const Select_Company = ({
               </div>
             </div>
 
-            {/* Table */}
+            {/* + Table */}
             <div className="max-w-full overflow-x-auto custom-scrollbar">
               <table className="min-w-full whitespace-nowrap">
                 <thead className="border-gray-100 border-y bg-gray-50">
@@ -165,9 +149,8 @@ const Select_Company = ({
                     </th>
                   </tr>
                 </thead>
-
                 <tbody className="divide-y divide-gray-100">
-                  {filtered_da_com_porg_pgroup.length === 0 ? (
+                  {filtered_com_porg_pgroup_list.length === 0 ? (
                     <tr>
                       <td
                         colSpan={5}
@@ -177,7 +160,7 @@ const Select_Company = ({
                       </td>
                     </tr>
                   ) : (
-                    filtered_da_com_porg_pgroup.map((data) => {
+                    filtered_com_porg_pgroup_list.map((data) => {
                       const company = company_list.find(
                         (c) => c.company_code === data.company_code
                       );
@@ -249,12 +232,13 @@ const Select_Company = ({
                 </tbody>
               </table>
             </div>
+            {/* - Table */}
           </div>
         </div>
-
-        {/* Footer */}
+        {/* - Modal Body */}
+        {/* + Modal Footer */}
         <div className="flex flex-col items-center sm:flex-row sm:justify-between gap-3 mt-5 px-7">
-          {/* Pagination */}
+          {/* + Pagination */}
           {total_pages > 0 && (
             <div className="w-full sm:w-auto">
               <Pagination_Modal
@@ -264,8 +248,8 @@ const Select_Company = ({
               />
             </div>
           )}
-
-          {/* Buttons */}
+          {/* - Pagination */}
+          {/* + Action Buttons */}
           <div className="flex justify-center sm:justify-end gap-2 w-full">
             <Button
               variant="primary"
@@ -283,10 +267,12 @@ const Select_Company = ({
               Close
             </Button>
           </div>
+          {/* - Action Buttons */}
         </div>
+        {/* - Modal Footer */}
       </div>
     </div>
-  );
+  ) : null;
 };
 
 export default Select_Company;

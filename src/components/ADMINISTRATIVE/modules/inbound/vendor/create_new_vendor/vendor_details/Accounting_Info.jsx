@@ -1,12 +1,14 @@
+import React from "react";
 import Checkbox_Field from "assets/elements/Checkbox_Field";
 import Select_Field from "assets/elements/Select_Field";
 import Text_Code_Field from "assets/elements/Text_Code_Field";
 import Text_Field from "assets/elements/Text_Field";
-import React from "react";
 
 const Accounting_Info = ({ set_display_modal }) => {
+  // RETURN ORIGIN
   return (
     <React.Fragment>
+      {/* + Section 1 */}
       <div className="rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6 dark:border-gray-800 dark:bg-gray-900 whitespace-nowrap">
         <div className="grid grid-cols-1 gap-5">
           <div>
@@ -14,9 +16,7 @@ const Accounting_Info = ({ set_display_modal }) => {
               label="Company"
               code_width="150px"
               //    code_value={code_data}
-              //    on_code_change={(e) => handle_code_change(e.target.value)}
               //    text_value={text_data}
-              //    on_text_change={(e) => handle_text_change(e.target.value)}
               on_click={() => set_display_modal("select_company")}
               show_search_button={true}
               disabled
@@ -27,10 +27,7 @@ const Accounting_Info = ({ set_display_modal }) => {
               label="Purchasing Organization"
               code_width="150px"
               //    code_value={code_data}
-              //    on_code_change={(e) => handle_code_change(e.target.value)}
               //    text_value={text_data}
-              //    on_text_change={(e) => handle_text_change(e.target.value)}
-              //    on_click={handle_text_code_click}
               show_search_button={false}
               disabled
             />
@@ -40,16 +37,15 @@ const Accounting_Info = ({ set_display_modal }) => {
               label="Purchasing Group"
               code_width="150px"
               //    code_value={code_data}
-              //    on_code_change={(e) => handle_code_change(e.target.value)}
               //    text_value={text_data}
-              //    on_text_change={(e) => handle_text_change(e.target.value)}
-              //    on_click={handle_text_code_click}
               show_search_button={false}
               disabled
             />
           </div>
         </div>
       </div>
+      {/* - Section 1 */}
+      {/* + Section 2 */}
       <div className="mt-5 rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6 dark:border-gray-800 dark:bg-gray-900 whitespace-nowrap">
         <h1 className="mb-5 font-semibold text-sky-700">
           Delivery and Payment Details
@@ -87,7 +83,6 @@ const Accounting_Info = ({ set_display_modal }) => {
               label="Credit Limit"
               type={"number"}
               placeholder="0"
-              pattern="[0-9]{1,}"
               int_only={true}
             />
           </div>
@@ -105,12 +100,13 @@ const Accounting_Info = ({ set_display_modal }) => {
               label="Tax Liable"
               box_size={24}
               icon_size={14}
-              // checked={check}
+              checked={false}
               on_change={(e) => alert(e.target.checked)}
             />
           </div>
         </div>
       </div>
+      {/* - Section 2 */}
     </React.Fragment>
   );
 };

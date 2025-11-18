@@ -12,7 +12,7 @@ const Select_Ship_To = ({
   height = "h-[500px]",
   customer_sh_list,
 }) => {
-  // --- States ---
+  // + Client-Side Filtering
   const [filtered_customer_sh_list, set_filtered_customer_sh_list] = useState(
     []
   );
@@ -21,7 +21,6 @@ const Select_Ship_To = ({
   const [search_query, set_search_query] = useState("");
   const [selected_customer_sh, set_selected_customer_sh] = useState(null);
 
-  // --- Pagination + Filtering Logic ---
   useEffect(() => {
     let data = [...customer_sh_list];
 
@@ -49,8 +48,8 @@ const Select_Ship_To = ({
     ).length / rows_per_page
   );
 
-  // --- Handlers ---
   const handle_page_change = (page) => set_current_page(page);
+  // - Client-Side Filtering
 
   const handle_select_sold_to = () => {
     if (!selected_customer_sh) {
@@ -60,13 +59,13 @@ const Select_Ship_To = ({
     alert(`Selected: ${selected_customer_sh.customer_sh_desc}`);
   };
 
+  // RETURN ORIGIN
   return is_open ? (
     <React.Fragment>
       <div className="fixed inset-0 flex items-center justify-center z-[97] px-4">
         {/* + Blur */}
         <div className="absolute inset-0 bg-black/50 backdrop-blur-sm z-[98]"></div>
         {/* - Blur */}
-
         {/* + Modal Content */}
         <div
           className={`relative bg-white rounded-lg shadow-xl ${width} w-full py-7 m-5 z-[99]`}
@@ -77,13 +76,9 @@ const Select_Ship_To = ({
           >
             <X size={20} />
           </button>
-
-          {/* + Modal Label */}
           <div className="text-lg md:text-xl font-bold mb-5 px-7">
             Customer Selection
           </div>
-          {/* - Modal Label */}
-
           {/* + Modal Body */}
           <div className={`w-full overflow-y-auto ${height} scrollbar-custom`}>
             <div className="overflow-hidden border border-gray-200 bg-white pt-4">
@@ -102,8 +97,7 @@ const Select_Ship_To = ({
                   />
                 </div>
               </div>
-
-              {/* Table */}
+              {/* + Table */}
               <div className="max-w-full overflow-x-auto custom-scrollbar">
                 <table className="min-w-full whitespace-nowrap">
                   <thead className="border-gray-100 border-y bg-gray-50">
@@ -117,7 +111,6 @@ const Select_Ship_To = ({
                       </th>
                     </tr>
                   </thead>
-
                   <tbody className="divide-y divide-gray-100">
                     {filtered_customer_sh_list.length === 0 ? (
                       <tr>
@@ -169,13 +162,13 @@ const Select_Ship_To = ({
                   </tbody>
                 </table>
               </div>
+              {/* - Table */}
             </div>
           </div>
           {/* - Modal Body */}
-
           {/* + Modal Footer */}
           <div className="flex flex-col items-center sm:flex-row sm:justify-between gap-3 mt-5 px-7">
-            {/* Pagination */}
+            {/* + Pagination */}
             {total_pages > 0 && (
               <div className="w-full sm:w-auto">
                 <Pagination_Modal
@@ -185,8 +178,8 @@ const Select_Ship_To = ({
                 />
               </div>
             )}
-
-            {/* Buttons */}
+            {/* - Pagination */}
+            {/* + Action Buttons */}
             <div className="flex justify-center sm:justify-end gap-2 w-full">
               <Button
                 variant="primary"
@@ -204,6 +197,7 @@ const Select_Ship_To = ({
                 Close
               </Button>
             </div>
+            {/* - Action Buttons */}
           </div>
           {/* - Modal Footer */}
         </div>

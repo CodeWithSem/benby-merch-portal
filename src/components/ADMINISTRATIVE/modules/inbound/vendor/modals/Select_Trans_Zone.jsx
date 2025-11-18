@@ -12,14 +12,13 @@ const Select_Trans_Zone = ({
   height = "h-[500px]",
   trans_zone_list,
 }) => {
-  // --- States ---
-  const [filtered_trans_zones, set_filtered_trans_zones] = useState([]);
+  // + Client-Side Filtering
+  const [filtered_trans_zone_list, set_filtered_trans_zone_list] = useState([]);
   const [current_page, set_current_page] = useState(1);
   const [rows_per_page, set_rows_per_page] = useState(5);
   const [search_query, set_search_query] = useState("");
   const [selected_branch, set_selected_branch] = useState(null);
 
-  // --- Pagination + Filtering Logic ---
   useEffect(() => {
     let data = [...trans_zone_list];
 
@@ -34,7 +33,7 @@ const Select_Trans_Zone = ({
 
     const start_idx = (current_page - 1) * rows_per_page;
     const end_idx = start_idx + rows_per_page;
-    set_filtered_trans_zones(data.slice(start_idx, end_idx));
+    set_filtered_trans_zone_list(data.slice(start_idx, end_idx));
   }, [trans_zone_list, search_query, current_page, rows_per_page]);
 
   const total_pages = Math.ceil(
@@ -47,15 +46,15 @@ const Select_Trans_Zone = ({
     ).length / rows_per_page
   );
 
-  // --- Handlers ---
   const handle_page_change = (page) => set_current_page(page);
+  // - Client-Side Filtering
 
   const handle_select_branch = () => {
     if (!selected_branch) {
       alert("Please select a branch before proceeding.");
       return;
     }
-    alert(`Selected: ${selected_branch.description}`);
+    alert(`Selected: ${selected_branch.branch_desc}`);
   };
 
   return is_open ? (
@@ -75,13 +74,9 @@ const Select_Trans_Zone = ({
           >
             <X size={20} />
           </button>
-
-          {/* + Modal Label */}
           <div className="text-lg md:text-xl font-bold mb-5 px-7">
             Tansportation Zone Selection
           </div>
-          {/* - Modal Label */}
-
           {/* + Modal Body */}
           <div className={`w-full overflow-y-auto ${height} scrollbar-custom`}>
             <div className="overflow-hidden border border-gray-200 bg-white pt-4">
@@ -100,8 +95,7 @@ const Select_Trans_Zone = ({
                   />
                 </div>
               </div>
-
-              {/* Table */}
+              {/* + Table */}
               <div className="max-w-full overflow-x-auto custom-scrollbar">
                 <table className="min-w-full whitespace-nowrap">
                   <thead className="border-gray-100 border-y bg-gray-50">
@@ -117,7 +111,7 @@ const Select_Trans_Zone = ({
                   </thead>
 
                   <tbody className="divide-y divide-gray-100">
-                    {filtered_trans_zones.length === 0 ? (
+                    {filtered_trans_zone_list.length === 0 ? (
                       <tr>
                         <td
                           colSpan={3}
@@ -127,7 +121,7 @@ const Select_Trans_Zone = ({
                         </td>
                       </tr>
                     ) : (
-                      filtered_trans_zones.map((data) => (
+                      filtered_trans_zone_list.map((data) => (
                         <tr
                           key={data.id}
                           className={`hover:bg-sky-50/50 cursor-pointer text-[12px] ${
@@ -165,6 +159,7 @@ const Select_Trans_Zone = ({
                   </tbody>
                 </table>
               </div>
+              {/* - Table */}
             </div>
           </div>
           {/* - Modal Body */}

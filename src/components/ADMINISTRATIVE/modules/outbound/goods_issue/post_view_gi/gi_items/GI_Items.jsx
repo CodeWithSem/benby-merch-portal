@@ -1,12 +1,9 @@
 import React, { useState } from "react";
-import Text_Field from "assets/elements/Text_Field";
-import { Info, PackageSearch, Search } from "lucide-react";
+import { Info, Search } from "lucide-react";
 import Icon_Field from "assets/elements/Icon_Field";
-import { format_currency } from "assets/scripts/format";
 
 const GI_Items = ({ for_posting }) => {
   const [selected_item_id, set_selected_item_id] = useState(null);
-  const [display_item_modal, set_display_item_modal] = useState("");
   const [items, set_items] = useState([
     {
       id: 1,
@@ -24,17 +21,12 @@ const GI_Items = ({ for_posting }) => {
     },
   ]);
 
-  // Open batch modal
-  const handle_open_batch = (item) => {
-    set_display_item_modal("select_batch");
-  };
-
   return (
     <React.Fragment>
-      {/* + Item Section */}
+      {/* + Item List */}
       <div className="flex flex-col gap-5 border-t p-5 sm:p-6">
-        {/* === TABLE HEADER === */}
         <div className="overflow-hidden rounded-lg border border-gray-200 bg-white pt-4">
+          {/* + Header */}
           <div className="flex flex-col gap-5 px-6 mb-4 sm:flex-row sm:items-center sm:justify-between">
             <h1 className="font-semibold text-gray-600 whitespace-nowrap">
               SO Items
@@ -48,8 +40,8 @@ const GI_Items = ({ for_posting }) => {
               />
             </div>
           </div>
-
-          {/* === TABLE === */}
+          {/* - Header */}
+          {/* + Table */}
           <div className="max-w-full overflow-x-auto custom-scrollbar">
             <table className="min-w-full text-left text-sm text-gray-700 whitespace-nowrap">
               <thead className="bg-gray-50">
@@ -88,8 +80,6 @@ const GI_Items = ({ for_posting }) => {
                     <td className="px-5 py-4 text-gray-600 border-r">
                       {item.unit}
                     </td>
-
-                    {/* === Delivered Quantity === */}
                     <td className="px-5 py-4 text-gray-600">
                       {item.issued_quantity}
                     </td>
@@ -98,9 +88,8 @@ const GI_Items = ({ for_posting }) => {
               </tbody>
             </table>
           </div>
+          {/* - Table */}
         </div>
-
-        {/* === FOOTER INFO === */}
         {for_posting && (
           <div className="mt-5 flex items-center gap-2 text-gray-500">
             <Info size={18} />
@@ -111,6 +100,7 @@ const GI_Items = ({ for_posting }) => {
           </div>
         )}
       </div>
+      {/* - Item List */}
     </React.Fragment>
   );
 };

@@ -22,10 +22,7 @@ const Show_Item_Details = ({ is_open, on_close, width = "max-w-[700px]" }) => {
     { key: "pricing", title: "Pricing" },
   ];
 
-  const handle_post_po = () => {
-    alert("Post PO");
-  };
-
+  // RETURN ORIGIN
   return is_open ? (
     <React.Fragment>
       <div className="fixed inset-0 flex items-center justify-center z-[97] px-4">
@@ -42,9 +39,7 @@ const Show_Item_Details = ({ is_open, on_close, width = "max-w-[700px]" }) => {
           >
             <X size={20} />
           </button>
-          {/* + Modal Label */}
           <div className="text-lg md:text-xl font-bold mb-5">Show Details</div>
-          {/* - Modal Label */}
           {/* + Modal Body */}
           <div className="w-full pl-1 p-4 overflow-y-auto h-[500px] scrollbar-custom">
             <div className="w-full">
@@ -59,20 +54,16 @@ const Show_Item_Details = ({ is_open, on_close, width = "max-w-[700px]" }) => {
                         <div className="w-full lg:col-span-3">
                           <Text_Field
                             label="Item Code"
-                            type={"number"}
+                            type={"text"}
                             // value={text}
-                            // on_change={handle_text_change}
-                            pattern="[A-Za-z]{1,}"
                             disabled
                           />
                         </div>
                         <div className="w-full lg:col-span-9">
                           <Text_Field
-                            label="Item Name"
+                            label="Item Description"
                             type={"number"}
                             // value={text}
-                            // on_change={handle_text_change}
-                            pattern="[A-Za-z]{1,}"
                             disabled
                           />
                         </div>
@@ -82,6 +73,7 @@ const Show_Item_Details = ({ is_open, on_close, width = "max-w-[700px]" }) => {
                 </div>
                 <div className="p-5 sm:p-6 border-t">
                   <div className="w-full bg-white rounded-lg border">
+                    {/* + Tab Navigation */}
                     <div className="w-full border-b p-2">
                       <nav className="flex overflow-x-auto rounded-lg bg-gray-100 p-1 dark:bg-gray-900 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-200 dark:[&::-webkit-scrollbar-thumb]:bg-gray-600 [&::-webkit-scrollbar-track]:bg-white dark:[&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar]:h-1.5">
                         {tabs.map((tab) => (
@@ -99,7 +91,7 @@ const Show_Item_Details = ({ is_open, on_close, width = "max-w-[700px]" }) => {
                         ))}
                       </nav>
                     </div>
-
+                    {/* - Tab Navigation */}
                     {/* + Tab Content */}
                     <div className="p-6">
                       {active_tab === "item_data_1" && <Item_Data_1 />}
@@ -118,11 +110,7 @@ const Show_Item_Details = ({ is_open, on_close, width = "max-w-[700px]" }) => {
           {/* - Modal Body */}
           {/* + Modal Footer */}
           <div className="flex justify-end gap-2 mt-5">
-            <Button
-              width="w-[100px]"
-              variant="primary"
-              // on_click={() => set_is_confirm_modal_open(true)}
-            >
+            <Button width="w-[100px]" variant="primary" on_click={on_close}>
               Proceed
             </Button>
             <Button width="w-[100px]" variant="white" on_click={on_close}>
