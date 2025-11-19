@@ -1,8 +1,5 @@
-import Button from "assets/elements/Button";
-import Text_Code_Field from "assets/elements/Text_Code_Field";
-import Textarea_Field from "assets/elements/Textarea_Field";
-import { PlusCircle, SquarePen, Trash2 } from "lucide-react";
 import React from "react";
+import Textarea_Field from "assets/elements/Textarea_Field";
 
 const Partner = () => {
   const columns = [
@@ -24,6 +21,7 @@ const Partner = () => {
   // RETURN ORIGIN
   return (
     <React.Fragment>
+      {/* + Section 1 */}
       <div className="rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6 dark:border-gray-800 dark:bg-gray-900 whitespace-nowrap">
         <h1 className="mb-5 font-semibold text-sky-700">Partner Details</h1>
         <div className="grid grid-cols-1 gap-5">
@@ -62,19 +60,21 @@ const Partner = () => {
           {/* - Table */}
         </div>
       </div>
+      {/* - Section 1 */}
+      {/* + Section 2 */}
       <div className="mt-5 rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6 dark:border-gray-800 dark:bg-gray-900 whitespace-nowrap">
         <div className="grid grid-cols-1 gap-5">
           <div>
             <Textarea_Field
               label="Collection Remarks"
               //   value={data}
-              //   on_change={(e) => handle_data_change(e.target.value)}
               height="120px"
               disabled
             />
           </div>
         </div>
       </div>
+      {/* - Section 2 */}
     </React.Fragment>
   );
 };

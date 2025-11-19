@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import { useToast } from "../../../layout/Toast_Provider";
 import {
   Search,
   ChevronDown,
@@ -10,28 +11,21 @@ import {
   RefreshCw,
   SlidersHorizontal,
   FileUp,
-  FileInput,
 } from "lucide-react";
 import Icon_Field from "assets/elements/Icon_Field";
 import Select_Field from "assets/elements/Select_Field";
 import Pagination from "assets/elements/Pagination";
 import Button from "assets/elements/Button";
-import { useToast } from "../../../layout/Toast_Provider";
-import Date_Range_Field from "assets/elements/Date_Range_Field";
 import Create_New_Truck from "./create_new_truck/Create_New_Truck";
 import Edit_Truck from "./edit_truck/Edit_Truck";
 import View_Truck from "./view_truck/View_Truck";
 import Delete_Truck from "./modals/delete_truck/Delete_Truck";
-// import Create_New_Truck from "./create_new_truck/Create_New_Truck";
 
 const Truck = () => {
-  const filter_ref = useRef(null);
+  const { show_toast } = useToast();
   const [show_filter, set_show_filter] = useState(false);
   const [page, set_page] = useState("main");
   const [display_modal, set_display_modal] = useState("");
-  const [for_posting, set_for_posting] = useState(false);
-
-  const { show_toast } = useToast();
 
   const columns = [
     { key: "id", label: "ID", sortable: true },
@@ -46,10 +40,12 @@ const Truck = () => {
       id: 1,
       plate_no: "ABC-123",
       truck_type: "10ft Dry Truck",
-      creation_date: "MM-DD-YYYY 12:00:00",
+      creation_date: "MM-DD-YYYY",
     },
   ]);
-  const [filtered_data, set_filtered_data] = useState([]);
+
+  // + Client-Side Filtering
+  const [filtered_truck_list, set_filtered_truck_list] = useState([]);
   const [loading, set_loading] = useState(false);
   const [select_option, set_select_option] = useState(5);
   const [current_page, set_current_page] = useState(1);
@@ -65,17 +61,6 @@ const Truck = () => {
     }, 300);
     return () => clearTimeout(timer);
   }, [search_query]);
-
-  useEffect(() => {
-    const handle_click_outside = (event) => {
-      if (filter_ref.current && !filter_ref.current.contains(event.target)) {
-        // optional: close filter
-      }
-    };
-    document.addEventListener("mousedown", handle_click_outside);
-    return () =>
-      document.removeEventListener("mousedown", handle_click_outside);
-  }, []);
 
   useEffect(() => {
     let temp = [...truck_list];
@@ -106,7 +91,7 @@ const Truck = () => {
     const start_idx = (current_page - 1) * select_option;
     const end_idx = start_idx + select_option;
 
-    set_filtered_data(temp.slice(start_idx, end_idx));
+    set_filtered_truck_list(temp.slice(start_idx, end_idx));
   }, [
     truck_list,
     debounced_query,
@@ -142,8 +127,7 @@ const Truck = () => {
   };
 
   const handle_page_change = (page) => set_current_page(page);
-
-  const date_range_ref = useRef(null);
+  // - Client-Side Filtering
 
   const handle_create_new_truck = () => {
     set_page("truck_creation");
@@ -172,6 +156,7 @@ const Truck = () => {
           <div className="w-full">
             <div className="flex flex-wrap items-center justify-between gap-3 py-5">
               <h1 className="text-xl">Outbound</h1>
+              {/* + Breadcrumbs */}
               <nav>
                 <ol className="flex flex-wrap items-center gap-1.5">
                   <li>
@@ -191,9 +176,10 @@ const Truck = () => {
                   </li>
                 </ol>
               </nav>
+              {/* - Breadcrumbs */}
             </div>
-
             <div className="w-full bg-white rounded-lg border">
+              {/* + Header */}
               <div className="flex flex-wrap items-center justify-between gap-3 p-5">
                 <h1 className="text-lg">Truck</h1>
                 <div className="flex gap-2">
@@ -215,7 +201,8 @@ const Truck = () => {
                   </Button>
                 </div>
               </div>
-
+              {/* - Header */}
+              {/* + Section 1 */}
               <div className="p-5 sm:p-6 border-t">
                 <div className="w-full border rounded-lg">
                   <div className="w-full md:flex md:justify-between p-4 gap-4">
@@ -255,7 +242,8 @@ const Truck = () => {
                             on_change={(e) => set_search_query(e.target.value)}
                           />
                         </div>
-                        <div className="relative" ref={filter_ref}>
+                        {/* + Dropdown Filter */}
+                        <div className="relative">
                           <Button
                             variant="white"
                             width="w-[100px]"
@@ -265,17 +253,11 @@ const Truck = () => {
                           >
                             Filter
                           </Button>
-
+                          {/* + Dropdown Content */}
                           {show_filter && (
                             <React.Fragment>
                               <div className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40"></div>
                               <div className="absolute top-full mt-2 right-0 z-50 bg-white border rounded-lg shadow-md p-4 w-[260px]">
-                                <div>
-                                  <Date_Range_Field
-                                    label="Date Range"
-                                    ref={date_range_ref}
-                                  />
-                                </div>
                                 <div className="flex justify-end gap-2 mt-4">
                                   <Button
                                     size="sm"
@@ -295,17 +277,19 @@ const Truck = () => {
                               </div>
                             </React.Fragment>
                           )}
+                          {/* - Dropdown Content */}
                         </div>
+                        {/* - Dropdown Filter */}
                       </div>
                     </div>
                   </div>
-
+                  {/* + Table */}
                   <div className="overflow-x-auto">
                     {loading ? (
                       <div className="p-6 text-center text-gray-500 text-sm">
                         Loading...
                       </div>
-                    ) : filtered_data.length === 0 ? (
+                    ) : filtered_truck_list.length === 0 ? (
                       <div className="p-6 text-center text-gray-500 text-sm">
                         No data found
                       </div>
@@ -351,7 +335,7 @@ const Truck = () => {
                           </tr>
                         </thead>
                         <tbody className="bg-white">
-                          {filtered_data.map((row, idx) => {
+                          {filtered_truck_list.map((row, idx) => {
                             const render_cell = (col, row) => {
                               const value = row[col.key];
                               if (col.key === "actions") {
@@ -428,6 +412,8 @@ const Truck = () => {
                       </table>
                     )}
                   </div>
+                  {/* - Table */}
+                  {/* + Pagination */}
                   {total_pages > 0 && (
                     <Pagination
                       current_page={current_page}
@@ -436,20 +422,26 @@ const Truck = () => {
                       variant="compact"
                     />
                   )}
+                  {/* - Pagination */}
                 </div>
               </div>
+              {/* - Section 1 */}
             </div>
           </div>
         </React.Fragment>
       )}
+      {/* + Pages */}
       {page === "truck_creation" && <Create_New_Truck set_page={set_page} />}
       {page === "edit_truck" && <Edit_Truck set_page={set_page} />}
       {page === "view_truck" && <View_Truck set_page={set_page} />}
+      {/* - Pages */}
+      {/* + Modals */}
       <Delete_Truck
         is_open={display_modal === "delete_truck"}
         on_close={() => set_display_modal("")}
         width="max-w-[1280px]"
       />
+      {/* - Modals */}
     </React.Fragment>
   );
 };

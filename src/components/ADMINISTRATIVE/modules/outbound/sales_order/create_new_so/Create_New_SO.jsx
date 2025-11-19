@@ -142,8 +142,9 @@ const Create_New_SO = ({
                     <Text_Field
                       label="PO Number"
                       type={"text"}
-                      value={"PO-XXXXXXXXX"}
-                      disabled
+                      placeholder={"Enter PO Number"}
+                      // value={""}
+                      // on_change={}
                     />
                   </div>
                   <div>

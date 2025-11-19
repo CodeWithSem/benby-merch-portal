@@ -1,9 +1,8 @@
+import React, { useState } from "react";
+import { ChevronLeft, FileInput } from "lucide-react";
 import Button from "assets/elements/Button";
-import Date_Field from "assets/elements/Date_Field";
 import Text_Code_Field from "assets/elements/Text_Code_Field";
 import Text_Field from "assets/elements/Text_Field";
-import { ChevronLeft, Eye, FileInput, Save, SaveAll } from "lucide-react";
-import React, { useState } from "react";
 import Truck from "./sh_details/Truck";
 import Partner from "./sh_details/Partner";
 import Shipment from "./sh_details/Shipment";
@@ -35,14 +34,10 @@ const Post_View_SH = ({ set_page, for_posting }) => {
     return (
       <React.Fragment>
         <div className="fixed inset-0 flex items-center justify-center z-[100]">
-          {/* + Blur */}
           <div className="absolute inset-0 bg-black/50 backdrop-blur-sm z-[101]"></div>
-          {/* - Blur */}
-          {/* + Modal Content */}
           <div
             className={`relative bg-white rounded-lg shadow-xl max-w-[500px] w-full p-10 m-5 z-[102]`}
           >
-            {/* Modal Body */}
             <div className="w-full flex justify-center items-center text-lg md:text-xl font-bold mb-4">
               Confirm Shipment Posting
             </div>
@@ -74,7 +69,6 @@ const Post_View_SH = ({ set_page, for_posting }) => {
               </Button>
             </div>
           </div>
-          {/* - Modal Content */}
         </div>
       </React.Fragment>
     );
@@ -84,9 +78,9 @@ const Post_View_SH = ({ set_page, for_posting }) => {
   return (
     <React.Fragment>
       <div className="w-full">
-        {/* === HEADER & BREADCRUMBS === */}
         <div className="flex flex-wrap items-center justify-between gap-3 py-5">
           <h1 className="text-xl">Outbound</h1>
+          {/* + Breadcrumbs */}
           <nav>
             <ol className="flex flex-wrap items-center gap-1.5">
               <li>
@@ -120,11 +114,10 @@ const Post_View_SH = ({ set_page, for_posting }) => {
               </li>
             </ol>
           </nav>
+          {/* - Breadcrumbs */}
         </div>
-
-        {/* === MAIN CARD === */}
         <div className="w-full bg-white rounded-lg border">
-          {/* === HEADER BAR === */}
+          {/* + Header */}
           <div className="flex flex-wrap items-center justify-between gap-3 p-5">
             <div className="flex items-center gap-3">
               <Button
@@ -143,8 +136,8 @@ const Post_View_SH = ({ set_page, for_posting }) => {
               MM-DD-YYYY
             </div>
           </div>
-
-          {/* === FORM FIELDS === */}
+          {/* - Header */}
+          {/* + Section 1 */}
           <div className="p-5 sm:p-6 border-t">
             <div className="w-full">
               <div className="grid grid-cols-1 gap-5 lg:grid-cols-3">
@@ -184,8 +177,11 @@ const Post_View_SH = ({ set_page, for_posting }) => {
               </div>
             </div>
           </div>
+          {/* - Section 1 */}
+          {/* + Section 2 */}
           <div className="p-5 sm:p-6 border-t">
             <div className="w-full bg-white rounded-lg border">
+              {/* + Tab Navigation */}
               <div className="w-full border-b p-2">
                 <nav className="flex overflow-x-auto rounded-lg bg-gray-100 p-1 dark:bg-gray-900 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-200 dark:[&::-webkit-scrollbar-thumb]:bg-gray-600 [&::-webkit-scrollbar-track]:bg-white dark:[&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar]:h-1.5">
                   {tabs.map((tab) => (
@@ -203,6 +199,7 @@ const Post_View_SH = ({ set_page, for_posting }) => {
                   ))}
                 </nav>
               </div>
+              {/* - Tab Navigation */}
               {/* + Tab Content */}
               <div className="p-6">
                 {active_tab === "truck" && <Truck />}
@@ -214,31 +211,30 @@ const Post_View_SH = ({ set_page, for_posting }) => {
               {/* - Tab Content */}
             </div>
           </div>
+          {/* - Section 2 */}
+          {/* + Section 3 */}
           <SH_Delivery_Order for_posting={for_posting} />
+          {/* - Section 3 */}
+          {/* + Section 4 */}
           {for_posting && (
             <div className="p-4 sm:p-8 border-t">
               <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
                 <Button
                   variant="primary"
                   size="lg"
-                  // width="w-[100px]"
                   icon={FileInput}
                   icon_position="left"
                   on_click={() => set_is_confirm_modal_open(true)}
                 >
                   Post Shipment
                 </Button>
-                <Button
-                  variant="white"
-                  size="lg"
-                  // width="w-[100px]"
-                  on_click={handle_go_back}
-                >
+                <Button variant="white" size="lg" on_click={handle_go_back}>
                   Cancel
                 </Button>
               </div>
             </div>
           )}
+          {/* - Section 4 */}
         </div>
       </div>
       {is_confirm_modal_open && <Confirm_Modal />}

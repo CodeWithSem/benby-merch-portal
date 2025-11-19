@@ -1,47 +1,27 @@
-import React, { useEffect, useRef, useState } from "react";
-import Text_Field from "assets/elements/Text_Field";
-import Select_Field from "assets/elements/Select_Field";
+import React, { useState } from "react";
 import {
   CirclePlus,
-  FileText,
   Info,
   Search,
   SlidersHorizontal,
-  SquarePen,
   Trash2,
 } from "lucide-react";
+import Text_Field from "assets/elements/Text_Field";
 import Icon_Field from "assets/elements/Icon_Field";
 import Find_Field from "assets/elements/Find_Field";
-// import Show_Item_Details from "./modals/Show_Item_Details";
-import { format_currency, format_percentage } from "assets/scripts/format";
 import Button from "assets/elements/Button";
 import Checkbox_Field from "assets/elements/Checkbox_Field";
-// import Edit_Item from "./modals/Edit_Item";
+import Remove_Order from "./modals/Remove_Order";
 
-const SH_Delivery_Order = ({ handle_open_item_modal }) => {
-  const [display_item_modal, set_display_item_modal] = useState("");
-  const filter_ref = useRef(null);
+const SH_Delivery_Order = ({ set_display_modal }) => {
   const [selected_row, set_selected_row] = useState(null);
   const [show_filter, set_show_filter] = useState(false);
-  // --- Close dropdown outside click ---
-  useEffect(() => {
-    const handle_click_outside = (event) => {
-      if (filter_ref.current && !filter_ref.current.contains(event.target)) {
-        // optional: close filter
-      }
-    };
-    document.addEventListener("mousedown", handle_click_outside);
-    return () =>
-      document.removeEventListener("mousedown", handle_click_outside);
-  }, []);
-  // + For Quantity Field
-  const [quantity, set_quantity] = useState(1);
-  // - For Quantity Field
-  const item_list = [
+  const [display_item_modal, set_display_item_modal] = useState("");
+  const [sh_do_list, set_sh_do_list] = useState([
     {
       id: 1,
       do_number: "DO-000000001",
-      sold_to: "CM-0001",
+      sold_to: "CS-0001",
       sh_type: "SH-01",
       total_qty: "5",
       total_amount: "3000",
@@ -49,15 +29,14 @@ const SH_Delivery_Order = ({ handle_open_item_modal }) => {
     {
       id: 2,
       do_number: "DO-000000002",
-      sold_to: "CM-0002",
+      sold_to: "CS-0002",
       sh_type: "SH-02",
       total_qty: "10",
       total_amount: "5000",
     },
-  ];
+  ]);
 
-  // 🔹 Define your columns
-  const all_columns = [
+  const columns = [
     { key: "no", label: "No.", visible: true },
     { key: "do_number", label: "DO Number", visible: true },
     { key: "sold_to", label: "Sold To", visible: true },
@@ -74,9 +53,8 @@ const SH_Delivery_Order = ({ handle_open_item_modal }) => {
     { key: "actions", label: "", visible: true },
   ];
 
-  // 🔹 Initialize visible columns based on "visible" flag
   const [visible_columns, set_visible_columns] = useState(
-    all_columns.filter((col) => col.visible).map((col) => col.key)
+    columns.filter((col) => col.visible).map((col) => col.key)
   );
 
   const toggle_column = (key, checked) => {
@@ -85,25 +63,27 @@ const SH_Delivery_Order = ({ handle_open_item_modal }) => {
     );
   };
 
-  const handle_row_click = (item_id) => {
-    set_selected_row(item_id);
+  const handle_row_click = (id) => {
+    set_selected_row(id);
   };
 
-  const handle_add_item = () => {
-    alert("Under Maintenance");
+  const handle_add_shipment = () => {
+    alert("Add Shipment");
   };
-  const handle_show_details = () => {
-    set_display_item_modal("show_details");
+
+  const handle_remove_order = (data) => {
+    console.log(data);
+    set_display_item_modal("remove_order");
   };
-  const handle_edit_item = () => {
-    set_display_item_modal("edit_item");
-  };
+
   // RETURN ORIGIN
   return (
     <React.Fragment>
-      {/* + Item Section */}
+      {/* + SH Delivery Order List */}
       <div className="flex flex-col gap-5 border-t p-5 sm:p-6">
+        {/* + Section 1 */}
         <div className="rounded-lg border border-gray-200 bg-white pt-4 dark:border-gray-800 dark:bg-white/[0.03]">
+          {/* + Header */}
           <div className="flex flex-col gap-5 px-6 md:pl-6 md:pr-3 mb-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <h1 className="font-semibold text-gray-600 whitespace-nowrap">
@@ -119,19 +99,18 @@ const SH_Delivery_Order = ({ handle_open_item_modal }) => {
                   icon_position="left"
                 />
               </div>
-              <div className="relative" ref={filter_ref}>
+              {/* + Column Filter */}
+              <div className="relative">
                 <Button
                   variant="white"
                   width="w-[120px]"
                   icon={SlidersHorizontal}
                   icon_position="left"
-                  // loading
                   on_click={() => set_show_filter((prev) => !prev)}
                 >
                   Column
                 </Button>
-
-                {/* Filter Popover */}
+                {/* + Filter Content */}
                 {show_filter && (
                   <React.Fragment>
                     <div
@@ -140,7 +119,7 @@ const SH_Delivery_Order = ({ handle_open_item_modal }) => {
                     ></div>
                     <div className="absolute top-full mt-2 right-0 z-[9999] bg-white border rounded-lg shadow-md p-4 w-[260px]">
                       <div className="grid grid-cols-1 gap-3 pt-2 max-h-[300px] overflow-y-auto">
-                        {all_columns.map((col) => (
+                        {columns.map((col) => (
                           <Checkbox_Field
                             key={col.key}
                             label={col.label || "Action"}
@@ -165,14 +144,18 @@ const SH_Delivery_Order = ({ handle_open_item_modal }) => {
                     </div>
                   </React.Fragment>
                 )}
+                {/* - Filter Content */}
               </div>
+              {/* - Column Filter */}
             </div>
           </div>
+          {/* - Header */}
+          {/* + Table */}
           <div className="max-w-full overflow-x-auto custom-scrollbar">
             <table className="min-w-full text-left text-sm text-gray-700 dark:border-gray-800">
               <thead className="bg-gray-50 dark:bg-gray-900">
                 <tr className="border-b border-t border-gray-100 whitespace-nowrap dark:border-gray-800 text-xs">
-                  {all_columns
+                  {columns
                     .filter((col) => visible_columns.includes(col.key))
                     .map((col, colIndex, arr) => (
                       <th
@@ -189,18 +172,18 @@ const SH_Delivery_Order = ({ handle_open_item_modal }) => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
-                {item_list.map((item, index) => {
-                  const is_active = selected_row === item.id;
+                {sh_do_list.map((data, index) => {
+                  const is_active = selected_row === data.id;
 
                   return (
                     <tr
-                      key={item.id}
+                      key={data.id}
                       className={`text-xs whitespace-nowrap ${
                         is_active ? "bg-sky-50" : "hover:bg-gray-50"
                       }`}
-                      onClick={() => handle_row_click(item.id)}
+                      onClick={() => handle_row_click(data.id)}
                     >
-                      {all_columns
+                      {columns
                         .filter((col) => visible_columns.includes(col.key))
                         .map((col, colIndex, arr) => {
                           const borderClass =
@@ -223,7 +206,10 @@ const SH_Delivery_Order = ({ handle_open_item_modal }) => {
                                   key={col.key}
                                   className={`px-5 py-4 text-gray-500 ${borderClass}`}
                                 >
-                                  <button className="text-gray-500 hover:text-red-600">
+                                  <button
+                                    className="text-gray-500 hover:text-red-600"
+                                    onClick={() => handle_remove_order(data)}
+                                  >
                                     <Trash2 size={18} />
                                   </button>
                                 </td>
@@ -234,7 +220,7 @@ const SH_Delivery_Order = ({ handle_open_item_modal }) => {
                                   key={col.key}
                                   className={`px-5 py-4 text-gray-500 ${borderClass}`}
                                 >
-                                  {item[col.key] ?? "-"}
+                                  {data[col.key] ?? "-"}
                                 </td>
                               );
                           }
@@ -245,7 +231,10 @@ const SH_Delivery_Order = ({ handle_open_item_modal }) => {
               </tbody>
             </table>
           </div>
+          {/* - Table */}
         </div>
+        {/* - Section 1 */}
+        {/* + Section 2 */}
         <div className="mt-5 rounded-lg border border-gray-100 bg-gray-50 p-4 sm:p-6 dark:border-gray-800 dark:bg-gray-900">
           <div className="grid grid-cols-1 gap-4 lg:grid-cols-12">
             <div className="w-full lg:col-span-4">
@@ -253,7 +242,7 @@ const SH_Delivery_Order = ({ handle_open_item_modal }) => {
                 label="DO Number"
                 // value={search_value}
                 // on_change={handle_change}
-                // on_click={handle_open_item_modal}
+                on_click={() => set_display_modal("select_gi")}
                 disabled
               />
             </div>
@@ -262,8 +251,6 @@ const SH_Delivery_Order = ({ handle_open_item_modal }) => {
                 label="SO Number"
                 type={"text"}
                 // value={text}
-                // on_change={handle_text_change}
-                pattern="[A-Za-z]{1,}"
                 disabled
               />
             </div>
@@ -272,8 +259,6 @@ const SH_Delivery_Order = ({ handle_open_item_modal }) => {
                 label="PO Number"
                 type={"text"}
                 // value={text}
-                // on_change={handle_text_change}
-                pattern="[A-Za-z]{1,}"
                 disabled
               />
             </div>
@@ -282,8 +267,6 @@ const SH_Delivery_Order = ({ handle_open_item_modal }) => {
                 label="Sold To"
                 type={"text"}
                 // value={text}
-                // on_change={handle_text_change}
-                pattern="[A-Za-z]{1,}"
                 disabled
               />
             </div>
@@ -292,8 +275,6 @@ const SH_Delivery_Order = ({ handle_open_item_modal }) => {
                 label="Name"
                 type={"text"}
                 // value={text}
-                // on_change={handle_text_change}
-                pattern="[A-Za-z]{1,}"
                 disabled
               />
             </div>
@@ -302,7 +283,7 @@ const SH_Delivery_Order = ({ handle_open_item_modal }) => {
                 variant="primary"
                 width="w-full"
                 icon={CirclePlus}
-                onClick={handle_add_item}
+                on_click={handle_add_shipment}
               >
                 Add Shipment
               </Button>
@@ -316,18 +297,16 @@ const SH_Delivery_Order = ({ handle_open_item_modal }) => {
             </p>
           </div>
         </div>
+        {/* - Section 2 */}
       </div>
-      {/* - Item Section */}
-      {/* <Show_Item_Details
-        is_open={display_item_modal === "show_details"}
+      {/* - SH Delivery Order List */}
+      {/* + Modals */}
+      <Remove_Order
+        is_open={display_item_modal === "remove_order"}
         on_close={() => set_display_item_modal("")}
-        width="max-w-[1280px]"
+        width="max-w-[920px]"
       />
-      <Edit_Item
-        is_open={display_item_modal === "edit_item"}
-        on_close={() => set_display_item_modal("")}
-        width="max-w-[1280px]"
-      /> */}
+      {/* - Modals */}
     </React.Fragment>
   );
 };

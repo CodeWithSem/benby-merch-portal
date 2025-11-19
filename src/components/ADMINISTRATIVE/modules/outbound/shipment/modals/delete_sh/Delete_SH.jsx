@@ -1,8 +1,8 @@
 import React, { useState } from "react";
-import Text_Field from "assets/elements/Text_Field";
-import Button from "assets/elements/Button";
 import { X } from "lucide-react";
+import Text_Field from "assets/elements/Text_Field";
 import Text_Code_Field from "assets/elements/Text_Code_Field";
+import Button from "assets/elements/Button";
 
 const Delete_SH = ({ is_open, on_close, width = "max-w-[700px]" }) => {
   const [is_confirm_modal_open, set_is_confirm_modal_open] = useState(false);
@@ -15,14 +15,10 @@ const Delete_SH = ({ is_open, on_close, width = "max-w-[700px]" }) => {
     return (
       <React.Fragment>
         <div className="fixed inset-0 flex items-center justify-center z-[100]">
-          {/* + Blur */}
           <div className="absolute inset-0 bg-black/50 backdrop-blur-sm z-[101]"></div>
-          {/* - Blur */}
-          {/* + Modal Content */}
           <div
             className={`relative bg-white rounded-lg shadow-xl max-w-[500px] w-full p-10 m-5 z-[102]`}
           >
-            {/* Modal Body */}
             <div className="w-full flex justify-center items-center text-lg md:text-xl font-bold mb-4">
               Delete Shipment
             </div>
@@ -54,12 +50,12 @@ const Delete_SH = ({ is_open, on_close, width = "max-w-[700px]" }) => {
               </Button>
             </div>
           </div>
-          {/* - Modal Content */}
         </div>
       </React.Fragment>
     );
   };
 
+  // RETURN ORIGIN
   return is_open ? (
     <React.Fragment>
       <div className="fixed inset-0 flex items-center justify-center z-[97] px-4">
@@ -76,25 +72,21 @@ const Delete_SH = ({ is_open, on_close, width = "max-w-[700px]" }) => {
           >
             <X size={20} />
           </button>
-          {/* + Modal Label */}
           <div className="text-lg md:text-xl font-bold mb-5">
             Delete Shipment
           </div>
-          {/* - Modal Label */}
           {/* + Modal Body */}
           <div className="w-full pl-1 p-4 overflow-y-auto max-h-[500px] scrollbar-custom">
             <div className="w-full">
               <div className="w-full bg-white rounded-lg border">
                 <div className="flex flex-wrap items-center justify-between gap-3 p-5">
                   <h1 className="text-lg">Shipment Details</h1>
-
                   <div className="flex gap-2">
                     <div className="text-gray-500 text-sm tracking-wider">
-                      06-05-2025
+                      MM-DD-YYYY
                     </div>
                   </div>
                 </div>
-
                 <div className="p-5 sm:p-6 border-t">
                   <div className="w-full">
                     <div className="space-y-6">
@@ -103,9 +95,7 @@ const Delete_SH = ({ is_open, on_close, width = "max-w-[700px]" }) => {
                           <Text_Field
                             label="Shipment Number"
                             type={"text"}
-                            // value={"AUTO GENERATED"}
-                            // on_change={handle_text_change}
-                            pattern="[A-Za-z]{1,}"
+                            // value={""}
                             disabled
                           />
                         </div>
@@ -113,9 +103,7 @@ const Delete_SH = ({ is_open, on_close, width = "max-w-[700px]" }) => {
                           <Text_Code_Field
                             label="Shipment Type"
                             // code_value={search_value}
-                            // on_code_change={handle_change}
                             // text_value={search_value}
-                            // on_text_change={handle_change}
                             code_width="150px"
                             show_search_button={false}
                             disabled
@@ -125,7 +113,6 @@ const Delete_SH = ({ is_open, on_close, width = "max-w-[700px]" }) => {
                           <Text_Field
                             label="Plate Number"
                             type={"text"}
-                            pattern="[A-Za-z]{1,}"
                             disabled
                           />
                         </div>

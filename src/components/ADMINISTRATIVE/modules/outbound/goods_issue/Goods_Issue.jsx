@@ -38,16 +38,16 @@ const Goods_Issue = () => {
   const [end_date, set_end_date] = useState(today);
   const [show_load_data_button, set_show_load_data_button] = useState(false);
 
-  const company_list = [
-    { id: 1, company_code: "COM-001", company_desc: "Company 1" },
-    { id: 2, company_code: "COM-002", company_desc: "Company 2" },
+  const customer_list = [
+    { id: 1, customer_code: "CS-001", customer_desc: "Customer Description 1" },
+    { id: 2, customer_code: "CS-002", customer_desc: "Customer Description 2" },
   ];
 
   const columns = [
     { key: "so_number", label: "SO Number", sortable: true },
     { key: "do_number", label: "DO Number", sortable: true },
     { key: "so_type", label: "SO Type", sortable: true },
-    { key: "company", label: "Company", sortable: true },
+    { key: "customer", label: "Customer", sortable: true },
     { key: "creation_date", label: "Creation Date", sortable: true },
     { key: "status", label: "Status", sortable: true },
     { key: "actions", label: "", sortable: false },
@@ -59,7 +59,7 @@ const Goods_Issue = () => {
       so_number: "SO-XXXXXXXXX",
       do_number: "DO-XXXXXXXXX",
       so_type: "LF-SO",
-      company_code: "COM-001",
+      customer_code: "CS-001",
       creation_date: "MM-DD-YYYY",
       status: "Pending",
     },
@@ -406,15 +406,15 @@ const Goods_Issue = () => {
                         </thead>
                         <tbody className="bg-white">
                           {filtered_gi_list.map((row, idx) => {
-                            const company = company_list.find(
-                              (c) => c.company_code === row.company_code
+                            const customer = customer_list.find(
+                              (c) => c.customer_code === row.customer_code
                             );
 
                             const render_cell = (col, row) => {
                               const value = row[col.key];
-                              if (col.key === "company") {
+                              if (col.key === "customer") {
                                 return (
-                                  <div>{company?.company_desc || "-"}</div>
+                                  <div>{customer?.customer_desc || "-"}</div>
                                 );
                               }
                               if (col.key === "status") {

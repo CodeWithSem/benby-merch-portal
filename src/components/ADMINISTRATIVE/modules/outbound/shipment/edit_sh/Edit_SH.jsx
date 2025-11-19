@@ -1,19 +1,20 @@
+import React, { useState } from "react";
+import { ChevronLeft, Eye, RefreshCcwDot } from "lucide-react";
 import Button from "assets/elements/Button";
 import Date_Field from "assets/elements/Date_Field";
 import Text_Code_Field from "assets/elements/Text_Code_Field";
 import Text_Field from "assets/elements/Text_Field";
-import { ChevronLeft, Eye, RefreshCcwDot, Save, SaveAll } from "lucide-react";
-import React, { useState } from "react";
 import Truck from "./sh_details/Truck";
 import Partner from "./sh_details/Partner";
 import Shipment from "./sh_details/Shipment";
 import Instruction from "./sh_details/Instruction";
 import Administrative from "./sh_details/Administrative";
+import SH_Delivery_Order from "./sh_delivery_order/SH_Delivery_Order";
 import Select_SH_Type from "../modals/Select_SH_Type";
 import Select_Plate_No from "../modals/Select_Plate_No";
 import Select_Trans_Plan from "../modals/Select_Trans_Plan";
 import Select_Forward_Agent from "../modals/Select_Forward_Agent";
-import SH_Delivery_Order from "./sh_delivery_order/SH_Delivery_Order";
+import Select_GI from "../modals/Select_GI";
 
 const Edit_SH = ({
   set_page,
@@ -46,13 +47,29 @@ const Edit_SH = ({
     set_display_modal("select_forward_agent");
   };
 
+  const handle_preview_sh = () => {
+    alert("Preview Shipment");
+  };
+
+  const handle_save_as_draft_sh = () => {
+    alert("Save as Draft Shipment");
+  };
+
+  const handle_update_sh = () => {
+    alert("Update Shipment");
+  };
+
+  const handle_go_back = () => {
+    set_page("main");
+  };
+
   // RETURN ORIGIN
   return (
     <React.Fragment>
       <div className="w-full">
-        {/* === HEADER & BREADCRUMBS === */}
         <div className="flex flex-wrap items-center justify-between gap-3 py-5">
           <h1 className="text-xl">Outbound</h1>
+          {/* + Breadcrumbs */}
           <nav>
             <ol className="flex flex-wrap items-center gap-1.5">
               <li>
@@ -64,7 +81,7 @@ const Edit_SH = ({
                 <span>/</span>
                 <a
                   className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-sky-500 cursor-pointer"
-                  onClick={() => set_page("main")}
+                  onClick={handle_go_back}
                 >
                   Outbound
                 </a>
@@ -73,7 +90,7 @@ const Edit_SH = ({
                 <span>/</span>
                 <a
                   className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-sky-500 cursor-pointer"
-                  onClick={() => set_page("main")}
+                  onClick={handle_go_back}
                 >
                   Shipment
                 </a>
@@ -84,11 +101,10 @@ const Edit_SH = ({
               </li>
             </ol>
           </nav>
+          {/* - Breadcrumbs */}
         </div>
-
-        {/* === MAIN CARD === */}
         <div className="w-full bg-white rounded-lg border">
-          {/* === HEADER BAR === */}
+          {/* + Header */}
           <div className="flex flex-wrap items-center justify-between gap-3 p-5">
             <div className="flex items-center gap-3">
               <Button
@@ -96,7 +112,7 @@ const Edit_SH = ({
                 icon={ChevronLeft}
                 icon_position="left"
                 width="w-[20px]"
-                on_click={() => set_page("main")}
+                on_click={handle_go_back}
               ></Button>
               <h1 className="text-lg">Edit Shipment</h1>
             </div>
@@ -105,8 +121,8 @@ const Edit_SH = ({
               MM-DD-YYYY
             </div>
           </div>
-
-          {/* === FORM FIELDS === */}
+          {/* - Header */}
+          {/* + Section 1 */}
           <div className="p-5 sm:p-6 border-t">
             <div className="w-full">
               <div className="grid grid-cols-1 gap-5 lg:grid-cols-3">
@@ -117,7 +133,6 @@ const Edit_SH = ({
                         label="Shipment Number"
                         type={"text"}
                         value={"SH-XXXXXXXXX"}
-                        pattern="[0-9]{1,}"
                         disabled
                       />
                     </div>
@@ -126,9 +141,7 @@ const Edit_SH = ({
                         label="Shipment Type"
                         code_width="150px"
                         // code_value={code_data}
-                        // on_code_change={(e) => handle_code_change(e.target.value)}
                         // text_value={text_data}
-                        // on_text_change={(e) => handle_text_change(e.target.value)}
                         on_click={handle_open_sh_type_modal}
                         show_search_button={true}
                         disabled
@@ -147,6 +160,8 @@ const Edit_SH = ({
               </div>
             </div>
           </div>
+          {/* - Section 1 */}
+          {/* + Section 2 */}
           <div className="p-5 sm:p-6 border-t">
             <div className="w-full bg-white rounded-lg border">
               <div className="w-full border-b p-2">
@@ -188,29 +203,37 @@ const Edit_SH = ({
               {/* - Tab Content */}
             </div>
           </div>
-          <SH_Delivery_Order />
+          {/* - Section 2 */}
+          {/* + Section 3 */}
+          <SH_Delivery_Order set_display_modal={set_display_modal} />
+          {/* - Section 3 */}
+          {/* + Section 4 */}
           <div className="p-4 sm:p-8 border-t">
             <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
               <Button
+                variant="white"
+                size="lg"
+                icon={Eye}
+                icon_position="left"
+                on_click={handle_preview_sh}
+              >
+                Preview
+              </Button>
+              <Button
                 variant="primary"
                 size="lg"
-                // width="w-[100px]"
                 icon={RefreshCcwDot}
                 icon_position="left"
-                // on_click={handle_save}
+                on_click={handle_update_sh}
               >
                 Update
               </Button>
-              <Button
-                variant="white"
-                size="lg"
-                // width="w-[100px]"
-                on_click={() => set_page("main")}
-              >
+              <Button variant="white" size="lg" on_click={handle_go_back}>
                 Cancel
               </Button>
             </div>
           </div>
+          {/* - Section 4 */}
         </div>
       </div>
 
@@ -239,6 +262,13 @@ const Edit_SH = ({
         is_open={display_modal === "select_forward_agent"}
         on_close={() => set_display_modal("")}
         width="max-w-[1000px]"
+        height="max-h-[700px]"
+        forward_agent_list={forward_agent_list}
+      />
+      <Select_GI
+        is_open={display_modal === "select_gi"}
+        on_close={() => set_display_modal("")}
+        width="max-w-[1280px]"
         height="max-h-[700px]"
         forward_agent_list={forward_agent_list}
       />

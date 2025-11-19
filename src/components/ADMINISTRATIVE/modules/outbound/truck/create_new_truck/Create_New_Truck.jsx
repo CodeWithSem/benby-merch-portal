@@ -4,6 +4,7 @@ import Verify_Field from "assets/elements/Verify_Field";
 import { ChevronLeft, CirclePlus } from "lucide-react";
 import React, { useState } from "react";
 import Details from "./truck_details/Details";
+import Find_Field from "assets/elements/Find_Field";
 
 const Create_New_Truck = ({ set_page }) => {
   const [active_tab, set_active_tab] = useState("details");
@@ -88,12 +89,11 @@ const Create_New_Truck = ({ set_page }) => {
                   />
                 </div>
                 <div className="col-span-2">
-                  <Select_Field
+                  <Find_Field
                     label="Truck Type"
-                    // value={selected_data}
-                    // on_change={(e) => handle_data_change(e.target.value)}
-                    // options={options}
-                    placeholder="Select Option"
+                    // value={}
+                    // on_click={handle_find_click}
+                    disabled
                   />
                 </div>
               </div>

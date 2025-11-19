@@ -14,14 +14,10 @@ const Delete_Customer = ({ is_open, on_close, width = "max-w-[700px]" }) => {
     return (
       <React.Fragment>
         <div className="fixed inset-0 flex items-center justify-center z-[100]">
-          {/* + Blur */}
           <div className="absolute inset-0 bg-black/50 backdrop-blur-sm z-[101]"></div>
-          {/* - Blur */}
-          {/* + Modal Content */}
           <div
             className={`relative bg-white rounded-lg shadow-xl max-w-[500px] w-full p-10 m-5 z-[102]`}
           >
-            {/* Modal Body */}
             <div className="w-full flex justify-center items-center text-lg md:text-xl font-bold mb-4">
               Delete Customer
             </div>
@@ -53,7 +49,6 @@ const Delete_Customer = ({ is_open, on_close, width = "max-w-[700px]" }) => {
               </Button>
             </div>
           </div>
-          {/* - Modal Content */}
         </div>
       </React.Fragment>
     );
@@ -75,11 +70,9 @@ const Delete_Customer = ({ is_open, on_close, width = "max-w-[700px]" }) => {
           >
             <X size={20} />
           </button>
-          {/* + Modal Label */}
           <div className="text-lg md:text-xl font-bold mb-5">
             Delete Customer
           </div>
-          {/* - Modal Label */}
           {/* + Modal Body */}
           <div className="w-full pl-1 p-4 overflow-y-auto max-h-[500px] scrollbar-custom">
             <div className="w-full">
@@ -89,7 +82,7 @@ const Delete_Customer = ({ is_open, on_close, width = "max-w-[700px]" }) => {
 
                   <div className="flex gap-2">
                     <div className="text-gray-500 text-sm tracking-wider">
-                      06-05-2025
+                      MM-DD-YYYY
                     </div>
                   </div>
                 </div>
@@ -102,9 +95,7 @@ const Delete_Customer = ({ is_open, on_close, width = "max-w-[700px]" }) => {
                           <Text_Field
                             label="Customer Code"
                             type={"text"}
-                            // value={"AUTO GENERATED"}
-                            // on_change={handle_text_change}
-                            pattern="[A-Za-z]{1,}"
+                            // value={""}
                             disabled
                           />
                         </div>
@@ -112,7 +103,6 @@ const Delete_Customer = ({ is_open, on_close, width = "max-w-[700px]" }) => {
                           <Text_Field
                             label="Customer Description"
                             type={"text"}
-                            pattern="[0-9]{1,}"
                             disabled
                           />
                         </div>

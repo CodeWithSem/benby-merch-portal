@@ -1,29 +1,18 @@
-import React, { useEffect, useRef, useState } from "react";
-import { Info, Search, SlidersHorizontal, Trash2 } from "lucide-react";
+import React, { useState } from "react";
+import { Search, SlidersHorizontal } from "lucide-react";
 import Icon_Field from "assets/elements/Icon_Field";
 import Button from "assets/elements/Button";
 import Checkbox_Field from "assets/elements/Checkbox_Field";
 
-const SH_Delivery_Order = ({ for_posting }) => {
-  const filter_ref = useRef(null);
+const SH_Delivery_Order = ({ set_display_modal }) => {
   const [selected_row, set_selected_row] = useState(null);
   const [show_filter, set_show_filter] = useState(false);
-  useEffect(() => {
-    const handle_click_outside = (event) => {
-      if (filter_ref.current && !filter_ref.current.contains(event.target)) {
-        // optional: close filter
-      }
-    };
-    document.addEventListener("mousedown", handle_click_outside);
-    return () =>
-      document.removeEventListener("mousedown", handle_click_outside);
-  }, []);
-
-  const item_list = [
+  const [display_item_modal, set_display_item_modal] = useState("");
+  const [sh_do_list, set_sh_do_list] = useState([
     {
       id: 1,
       do_number: "DO-000000001",
-      sold_to: "CM-0001",
+      sold_to: "CS-0001",
       sh_type: "SH-01",
       total_qty: "5",
       total_amount: "3000",
@@ -31,15 +20,14 @@ const SH_Delivery_Order = ({ for_posting }) => {
     {
       id: 2,
       do_number: "DO-000000002",
-      sold_to: "CM-0002",
+      sold_to: "CS-0002",
       sh_type: "SH-02",
       total_qty: "10",
       total_amount: "5000",
     },
-  ];
+  ]);
 
-  // 🔹 Define your columns
-  const all_columns = [
+  const columns = [
     { key: "no", label: "No.", visible: true },
     { key: "do_number", label: "DO Number", visible: true },
     { key: "sold_to", label: "Sold To", visible: true },
@@ -55,9 +43,8 @@ const SH_Delivery_Order = ({ for_posting }) => {
     { key: "re_delivery", label: "Re-delivered", visible: false },
   ];
 
-  // 🔹 Initialize visible columns based on "visible" flag
   const [visible_columns, set_visible_columns] = useState(
-    all_columns.filter((col) => col.visible).map((col) => col.key)
+    columns.filter((col) => col.visible).map((col) => col.key)
   );
 
   const toggle_column = (key, checked) => {
@@ -66,15 +53,27 @@ const SH_Delivery_Order = ({ for_posting }) => {
     );
   };
 
-  const handle_row_click = (item_id) => {
-    set_selected_row(item_id);
+  const handle_row_click = (id) => {
+    set_selected_row(id);
   };
+
+  const handle_add_shipment = () => {
+    alert("Add Shipment");
+  };
+
+  const handle_remove_order = (data) => {
+    console.log(data);
+    set_display_item_modal("remove_order");
+  };
+
   // RETURN ORIGIN
   return (
     <React.Fragment>
-      {/* + Item Section */}
+      {/* + SH Delivery Order List */}
       <div className="flex flex-col gap-5 border-t p-5 sm:p-6">
+        {/* + Section 1 */}
         <div className="rounded-lg border border-gray-200 bg-white pt-4 dark:border-gray-800 dark:bg-white/[0.03]">
+          {/* + Header */}
           <div className="flex flex-col gap-5 px-6 md:pl-6 md:pr-3 mb-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <h1 className="font-semibold text-gray-600 whitespace-nowrap">
@@ -90,28 +89,27 @@ const SH_Delivery_Order = ({ for_posting }) => {
                   icon_position="left"
                 />
               </div>
-              <div className="relative" ref={filter_ref}>
+              {/* + Column Filter */}
+              <div className="relative">
                 <Button
                   variant="white"
                   width="w-[120px]"
                   icon={SlidersHorizontal}
                   icon_position="left"
-                  // loading
                   on_click={() => set_show_filter((prev) => !prev)}
                 >
                   Column
                 </Button>
-
-                {/* Filter Popover */}
+                {/* + Filter Content */}
                 {show_filter && (
                   <React.Fragment>
                     <div
                       className="fixed inset-0 bg-black/20 backdrop-blur-sm z-[9998]"
-                      // onClick={() => set_show_filter(false)}
+                      onClick={() => set_show_filter(false)}
                     ></div>
                     <div className="absolute top-full mt-2 right-0 z-[9999] bg-white border rounded-lg shadow-md p-4 w-[260px]">
                       <div className="grid grid-cols-1 gap-3 pt-2 max-h-[300px] overflow-y-auto">
-                        {all_columns.map((col) => (
+                        {columns.map((col) => (
                           <Checkbox_Field
                             key={col.key}
                             label={col.label || "Action"}
@@ -136,14 +134,18 @@ const SH_Delivery_Order = ({ for_posting }) => {
                     </div>
                   </React.Fragment>
                 )}
+                {/* - Filter Content */}
               </div>
+              {/* - Column Filter */}
             </div>
           </div>
+          {/* - Header */}
+          {/* + Table */}
           <div className="max-w-full overflow-x-auto custom-scrollbar">
             <table className="min-w-full text-left text-sm text-gray-700 dark:border-gray-800">
               <thead className="bg-gray-50 dark:bg-gray-900">
                 <tr className="border-b border-t border-gray-100 whitespace-nowrap dark:border-gray-800 text-xs">
-                  {all_columns
+                  {columns
                     .filter((col) => visible_columns.includes(col.key))
                     .map((col, colIndex, arr) => (
                       <th
@@ -160,18 +162,18 @@ const SH_Delivery_Order = ({ for_posting }) => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
-                {item_list.map((item, index) => {
-                  const is_active = selected_row === item.id;
+                {sh_do_list.map((data, index) => {
+                  const is_active = selected_row === data.id;
 
                   return (
                     <tr
-                      key={item.id}
+                      key={data.id}
                       className={`text-xs whitespace-nowrap ${
                         is_active ? "bg-sky-50" : "hover:bg-gray-50"
                       }`}
-                      onClick={() => handle_row_click(item.id)}
+                      onClick={() => handle_row_click(data.id)}
                     >
-                      {all_columns
+                      {columns
                         .filter((col) => visible_columns.includes(col.key))
                         .map((col, colIndex, arr) => {
                           const borderClass =
@@ -194,7 +196,7 @@ const SH_Delivery_Order = ({ for_posting }) => {
                                   key={col.key}
                                   className={`px-5 py-4 text-gray-500 ${borderClass}`}
                                 >
-                                  {item[col.key] ?? "-"}
+                                  {data[col.key] ?? "-"}
                                 </td>
                               );
                           }
@@ -205,18 +207,11 @@ const SH_Delivery_Order = ({ for_posting }) => {
               </tbody>
             </table>
           </div>
+          {/* - Table */}
         </div>
-        {for_posting && (
-          <div className="mt-5 flex max-w-2xl items-center gap-2 text-gray-500">
-            <Info size={18} />
-            <p className="text-sm dark:text-gray-400">
-              Please make sure all the orders that you have listed is correct
-              before posting this shipment.
-            </p>
-          </div>
-        )}
+        {/* - Section 1 */}
       </div>
-      {/* - Item Section */}
+      {/* - SH Delivery Order List */}
     </React.Fragment>
   );
 };

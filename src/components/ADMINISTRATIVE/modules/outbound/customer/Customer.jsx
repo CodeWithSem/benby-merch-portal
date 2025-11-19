@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import { useToast } from "../../../layout/Toast_Provider";
 import {
   Search,
   ChevronDown,
@@ -10,32 +11,26 @@ import {
   RefreshCw,
   SlidersHorizontal,
   FileUp,
-  FileInput,
 } from "lucide-react";
 import Icon_Field from "assets/elements/Icon_Field";
 import Select_Field from "assets/elements/Select_Field";
-import Pagination from "assets/elements/Pagination";
 import Button from "assets/elements/Button";
-import { useToast } from "../../../layout/Toast_Provider";
-import Date_Range_Field from "assets/elements/Date_Range_Field";
+import Pagination from "assets/elements/Pagination";
 import Create_New_Customer from "./create_new_customer/Create_New_Customer";
 import Edit_Customer from "./edit_customer/Edit_Customer";
 import View_Customer from "./view_customer/View_Customer";
 import Delete_Customer from "./modals/delete_customer/Delete_Customer";
 
 const Customer = () => {
-  const filter_ref = useRef(null);
-  const [show_filter, set_customerow_filter] = useState(false);
+  const { show_toast } = useToast();
+  const [show_filter, set_show_filter] = useState(false);
   const [page, set_page] = useState("main");
   const [display_modal, set_display_modal] = useState("");
-  const [for_posting, set_for_posting] = useState(false);
-
-  const { show_toast } = useToast();
 
   const columns = [
     { key: "id", label: "ID", sortable: true },
     { key: "customer_code", label: "Customer Code", sortable: true },
-    { key: "customer_name_1", label: "Customer Name", sortable: true },
+    { key: "customer_desc", label: "Customer Description", sortable: true },
     { key: "creation_date", label: "Creation Date", sortable: true },
     { key: "actions", label: "", sortable: false },
   ];
@@ -44,11 +39,13 @@ const Customer = () => {
     {
       id: 1,
       customer_code: "CS-0001",
-      customer_name_1: "Customer Name 1",
+      customer_desc: "Customer Description 1",
       creation_date: "MM-DD-YYYY",
     },
   ]);
-  const [filtered_data, set_filtered_data] = useState([]);
+
+  // + Client-Side Filtering
+  const [filtered_customer_list, set_filtered_customer_list] = useState([]);
   const [loading, set_loading] = useState(false);
   const [select_option, set_select_option] = useState(5);
   const [current_page, set_current_page] = useState(1);
@@ -64,17 +61,6 @@ const Customer = () => {
     }, 300);
     return () => clearTimeout(timer);
   }, [search_query]);
-
-  useEffect(() => {
-    const handle_click_outside = (event) => {
-      if (filter_ref.current && !filter_ref.current.contains(event.target)) {
-        // optional: close filter
-      }
-    };
-    document.addEventListener("mousedown", handle_click_outside);
-    return () =>
-      document.removeEventListener("mousedown", handle_click_outside);
-  }, []);
 
   useEffect(() => {
     let temp = [...customer_list];
@@ -105,7 +91,7 @@ const Customer = () => {
     const start_idx = (current_page - 1) * select_option;
     const end_idx = start_idx + select_option;
 
-    set_filtered_data(temp.slice(start_idx, end_idx));
+    set_filtered_customer_list(temp.slice(start_idx, end_idx));
   }, [
     customer_list,
     debounced_query,
@@ -141,8 +127,7 @@ const Customer = () => {
   };
 
   const handle_page_change = (page) => set_current_page(page);
-
-  const date_range_ref = useRef(null);
+  // - Client-Side Filtering
 
   const handle_create_new_customer = () => {
     set_page("customer_creation");
@@ -164,6 +149,7 @@ const Customer = () => {
     set_display_modal("delete_customer");
   };
 
+  // RETURN ORIGIN
   return (
     <React.Fragment>
       {page === "main" && (
@@ -171,6 +157,7 @@ const Customer = () => {
           <div className="w-full">
             <div className="flex flex-wrap items-center justify-between gap-3 py-5">
               <h1 className="text-xl">Outbound</h1>
+              {/* + Breadcrumbs */}
               <nav>
                 <ol className="flex flex-wrap items-center gap-1.5">
                   <li>
@@ -190,9 +177,10 @@ const Customer = () => {
                   </li>
                 </ol>
               </nav>
+              {/* - Breadcrumbs */}
             </div>
-
             <div className="w-full bg-white rounded-lg border">
+              {/* + Header */}
               <div className="flex flex-wrap items-center justify-between gap-3 p-5">
                 <h1 className="text-lg">Customer</h1>
                 <div className="flex gap-2">
@@ -214,7 +202,8 @@ const Customer = () => {
                   </Button>
                 </div>
               </div>
-
+              {/* - Header */}
+              {/* + Section 1 */}
               <div className="p-5 sm:p-6 border-t">
                 <div className="w-full border rounded-lg">
                   <div className="w-full md:flex md:justify-between p-4 gap-4">
@@ -254,45 +243,34 @@ const Customer = () => {
                             on_change={(e) => set_search_query(e.target.value)}
                           />
                         </div>
-                        <div className="relative" ref={filter_ref}>
+                        {/* + Dropdown Filter */}
+                        <div className="relative">
                           <Button
                             variant="white"
                             width="w-[100px]"
                             icon={SlidersHorizontal}
                             icon_position="left"
-                            on_click={() =>
-                              set_customerow_filter((prev) => !prev)
-                            }
+                            on_click={() => set_show_filter((prev) => !prev)}
                           >
                             Filter
                           </Button>
-
+                          {/* + Dropdown Content */}
                           {show_filter && (
                             <React.Fragment>
                               <div className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40"></div>
                               <div className="absolute top-full mt-2 right-0 z-50 bg-white border rounded-lg shadow-md p-4 w-[260px]">
-                                <div>
-                                  <Date_Range_Field
-                                    label="Date Range"
-                                    ref={date_range_ref}
-                                  />
-                                </div>
                                 <div className="flex justify-end gap-2 mt-4">
                                   <Button
                                     size="sm"
                                     variant="primary"
-                                    on_click={() =>
-                                      set_customerow_filter(false)
-                                    }
+                                    on_click={() => set_show_filter(false)}
                                   >
                                     Apply
                                   </Button>
                                   <Button
                                     size="sm"
                                     variant="secondary"
-                                    on_click={() =>
-                                      set_customerow_filter(false)
-                                    }
+                                    on_click={() => set_show_filter(false)}
                                   >
                                     Cancel
                                   </Button>
@@ -300,17 +278,19 @@ const Customer = () => {
                               </div>
                             </React.Fragment>
                           )}
+                          {/* - Dropdown Content */}
                         </div>
+                        {/* - Dropdown Filter */}
                       </div>
                     </div>
                   </div>
-
+                  {/* + Table */}
                   <div className="overflow-x-auto">
                     {loading ? (
                       <div className="p-6 text-center text-gray-500 text-sm">
                         Loading...
                       </div>
-                    ) : filtered_data.length === 0 ? (
+                    ) : filtered_customer_list.length === 0 ? (
                       <div className="p-6 text-center text-gray-500 text-sm">
                         No data found
                       </div>
@@ -356,7 +336,7 @@ const Customer = () => {
                           </tr>
                         </thead>
                         <tbody className="bg-white">
-                          {filtered_data.map((row, idx) => {
+                          {filtered_customer_list.map((row, idx) => {
                             const render_cell = (col, row) => {
                               const value = row[col.key];
                               if (col.key === "actions") {
@@ -433,6 +413,8 @@ const Customer = () => {
                       </table>
                     )}
                   </div>
+                  {/* - Table */}
+                  {/* + Pagination */}
                   {total_pages > 0 && (
                     <Pagination
                       current_page={current_page}
@@ -441,22 +423,28 @@ const Customer = () => {
                       variant="compact"
                     />
                   )}
+                  {/* - Pagination */}
                 </div>
               </div>
+              {/* - Section 1 */}
             </div>
           </div>
         </React.Fragment>
       )}
+      {/* + Pages */}
       {page === "customer_creation" && (
         <Create_New_Customer set_page={set_page} />
       )}
       {page === "edit_customer" && <Edit_Customer set_page={set_page} />}
       {page === "view_customer" && <View_Customer set_page={set_page} />}
+      {/* - Pages */}
+      {/* + Modals */}
       <Delete_Customer
         is_open={display_modal === "delete_customer"}
         on_close={() => set_display_modal("")}
         width="max-w-[1280px]"
       />
+      {/* - Modals */}
     </React.Fragment>
   );
 };

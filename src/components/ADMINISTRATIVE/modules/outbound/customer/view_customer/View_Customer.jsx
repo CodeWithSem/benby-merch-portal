@@ -1,8 +1,7 @@
+import React, { useState } from "react";
+import { ChevronLeft } from "lucide-react";
 import Button from "assets/elements/Button";
 import Text_Field from "assets/elements/Text_Field";
-import { format_date_1, get_date_now } from "assets/scripts/format";
-import { ChevronLeft, RefreshCcwDot, Save, UserPlus } from "lucide-react";
-import React, { useState } from "react";
 import Address from "./customer_details/Address";
 import Account from "./customer_details/Account";
 import Sales_Tab from "./customer_details/Sales_Tab";
@@ -10,7 +9,6 @@ import Partner from "./customer_details/Partner";
 
 const View_Customer = ({ set_page }) => {
   const [active_tab, set_active_tab] = useState("address");
-  const [display_modal, set_display_modal] = useState("");
 
   const tabs = [
     { key: "address", title: "Address" },
@@ -25,6 +23,7 @@ const View_Customer = ({ set_page }) => {
       <div className="w-full">
         <div className="flex flex-wrap items-center justify-between gap-3 py-5">
           <h1 className="text-xl">Outbound</h1>
+          {/* + Breadcrumbs */}
           <nav>
             <ol className="flex flex-wrap items-center gap-1.5">
               <li>
@@ -56,9 +55,10 @@ const View_Customer = ({ set_page }) => {
               </li>
             </ol>
           </nav>
+          {/* - Breadcrumbs */}
         </div>
-
         <div className="w-full bg-white rounded-lg border">
+          {/* + Header */}
           <div className="flex flex-wrap items-center justify-between gap-3 p-5">
             <div className="flex items-center gap-3">
               <Button
@@ -77,6 +77,8 @@ const View_Customer = ({ set_page }) => {
               </div>
             </div>
           </div>
+          {/* - Header */}
+          {/* + Section 1 */}
           <div className="p-5 sm:p-6 border-t">
             <div className="grid grid-cols-1 gap-5 lg:grid-cols-3">
               <div className="w-full">
@@ -97,8 +99,11 @@ const View_Customer = ({ set_page }) => {
               </div>
             </div>
           </div>
+          {/* - Section 1 */}
+          {/* + Section 2 */}
           <div className="p-5 sm:p-6 border-t">
             <div className="w-full bg-white rounded-lg border">
+              {/* + Tab Navigation */}
               <div className="w-full border-b p-2">
                 <nav className="flex overflow-x-auto rounded-lg bg-gray-100 p-1 dark:bg-gray-900 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-200 dark:[&::-webkit-scrollbar-thumb]:bg-gray-600 [&::-webkit-scrollbar-track]:bg-white dark:[&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar]:h-1.5">
                   {tabs.map((tab) => (
@@ -116,6 +121,7 @@ const View_Customer = ({ set_page }) => {
                   ))}
                 </nav>
               </div>
+              {/* - Tab Navigation */}
               {/* + Tab Content */}
               <div className="p-6">
                 {active_tab === "address" && <Address />}
@@ -126,6 +132,7 @@ const View_Customer = ({ set_page }) => {
               {/* - Tab Content */}
             </div>
           </div>
+          {/* - Section 2 */}
         </div>
       </div>
     </React.Fragment>

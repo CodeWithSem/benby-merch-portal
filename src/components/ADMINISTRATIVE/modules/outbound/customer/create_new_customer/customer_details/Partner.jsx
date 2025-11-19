@@ -1,10 +1,10 @@
+import React from "react";
+import { PlusCircle, Trash2 } from "lucide-react";
 import Button from "assets/elements/Button";
 import Text_Code_Field from "assets/elements/Text_Code_Field";
 import Textarea_Field from "assets/elements/Textarea_Field";
-import { PlusCircle, SquarePen, Trash2 } from "lucide-react";
-import React from "react";
 
-const Partner = () => {
+const Partner = ({ set_display_modal }) => {
   const columns = [
     { key: "pf_id", label: "PF ID" },
     { key: "pf_desc", label: "PF Description" },
@@ -21,9 +21,14 @@ const Partner = () => {
     },
   ];
 
+  const handle_add_partner = () => {
+    alert("Add Partner");
+  };
+
   // RETURN ORIGIN
   return (
     <React.Fragment>
+      {/* + Section 1 */}
       <div className="rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6 dark:border-gray-800 dark:bg-gray-900 whitespace-nowrap">
         <h1 className="mb-5 font-semibold text-sky-700">Partner Details</h1>
         <div className="grid grid-cols-1 gap-5">
@@ -45,7 +50,6 @@ const Partner = () => {
                   ></th>
                 </tr>
               </thead>
-
               <tbody className="bg-white">
                 {data.map((row, idx) => (
                   <tr key={idx} className="hover:bg-gray-50/50">
@@ -74,6 +78,8 @@ const Partner = () => {
           {/* - Table */}
         </div>
       </div>
+      {/* - Section 1 */}
+      {/* + Section 2 */}
       <div className="mt-5 rounded-lg border border-gray-100 bg-gray-50 p-4 sm:p-6 dark:border-gray-800 dark:bg-gray-900 whitespace-nowrap">
         <div className="grid grid-cols-1 gap-5">
           <div>
@@ -81,10 +87,8 @@ const Partner = () => {
               label="Partner Function"
               code_width="150px"
               // code_value={code_data}
-              // on_code_change={(e) => handle_code_change(e.target.value)}
               // text_value={text_data}
-              // on_text_change={(e) => handle_text_change(e.target.value)}
-              // on_click={handle_text_code_click}
+              on_click={() => set_display_modal("select_partner_func")}
               show_search_button={true}
               disabled
             />
@@ -94,10 +98,8 @@ const Partner = () => {
               label="Employee"
               code_width="150px"
               // code_value={code_data}
-              // on_code_change={(e) => handle_code_change(e.target.value)}
               // text_value={text_data}
-              // on_text_change={(e) => handle_text_change(e.target.value)}
-              // on_click={handle_text_code_click}
+              on_click={() => set_display_modal("select_partner_emp")}
               show_search_button={true}
               disabled
             />
@@ -108,26 +110,29 @@ const Partner = () => {
               icon={PlusCircle}
               icon_position="left"
               width="w-full md:w-auto"
-              // on_click={handle_create_new_customer}
+              on_click={handle_add_partner}
             >
               Add Partner
             </Button>
           </div>
         </div>
       </div>
+      {/* - Section 2 */}
+      {/* + Section 3 */}
       <div className="mt-5 rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6 dark:border-gray-800 dark:bg-gray-900 whitespace-nowrap">
         <div className="grid grid-cols-1 gap-5">
           <div>
             <Textarea_Field
               label="Collection Remarks"
-              //   value={data}
-              //   on_change={(e) => handle_data_change(e.target.value)}
               height="120px"
               placeholder="Enter your remarks..."
+              //   value={data}
+              //   on_change={(e) => handle_data_change(e.target.value)}
             />
           </div>
         </div>
       </div>
+      {/* - Section 3 */}
     </React.Fragment>
   );
 };
