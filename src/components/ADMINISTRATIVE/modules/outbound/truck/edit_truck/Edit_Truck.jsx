@@ -1,23 +1,34 @@
-import Button from "assets/elements/Button";
-import Select_Field from "assets/elements/Select_Field";
-import Text_Field from "assets/elements/Text_Field";
-import { ChevronLeft, RefreshCcwDot } from "lucide-react";
 import React, { useState } from "react";
+import { truck_type_list } from "../TR_DATA_MAP";
+import { ChevronLeft, RefreshCcwDot } from "lucide-react";
+import { format_date_1, get_date_now } from "assets/scripts/format";
+import Button from "assets/elements/Button";
+import Verify_Field from "assets/elements/Verify_Field";
 import Details from "./truck_details/Details";
+import Find_Field from "assets/elements/Find_Field";
+import Select_Truck_Type from "../modals/Select_Truck_Type";
 
-const Edit_Truck = ({ set_page }) => {
+const Create_New_Truck = ({ set_page }) => {
   const [active_tab, set_active_tab] = useState("details");
   const [display_modal, set_display_modal] = useState("");
 
   const tabs = [{ key: "details", title: "Details" }];
 
+  const handle_update_truck = () => {
+    alert("Update Truck");
+  };
+
+  const handle_go_back = () => {
+    set_page("main");
+  };
+
   // RETURN ORIGIN
   return (
     <React.Fragment>
       <div className="w-full">
-        {/* === HEADER & BREADCRUMBS === */}
         <div className="flex flex-wrap items-center justify-between gap-3 py-5">
           <h1 className="text-xl">Outbound</h1>
+          {/* + Breadcrumbs */}
           <nav>
             <ol className="flex flex-wrap items-center gap-1.5">
               <li>
@@ -29,7 +40,7 @@ const Edit_Truck = ({ set_page }) => {
                 <span>/</span>
                 <a
                   className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-sky-500 cursor-pointer"
-                  onClick={() => set_page("main")}
+                  onClick={handle_go_back}
                 >
                   Outbound
                 </a>
@@ -38,7 +49,7 @@ const Edit_Truck = ({ set_page }) => {
                 <span>/</span>
                 <a
                   className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-sky-500 cursor-pointer"
-                  onClick={() => set_page("main")}
+                  onClick={handle_go_back}
                 >
                   Truck
                 </a>
@@ -49,11 +60,10 @@ const Edit_Truck = ({ set_page }) => {
               </li>
             </ol>
           </nav>
+          {/* - Breadcrumbs */}
         </div>
-
-        {/* === MAIN CARD === */}
         <div className="w-full bg-white rounded-lg border">
-          {/* === HEADER BAR === */}
+          {/* + Header */}
           <div className="flex flex-wrap items-center justify-between gap-3 p-5">
             <div className="flex items-center gap-3">
               <Button
@@ -61,40 +71,44 @@ const Edit_Truck = ({ set_page }) => {
                 icon={ChevronLeft}
                 icon_position="left"
                 width="w-[20px]"
-                on_click={() => set_page("main")}
+                on_click={handle_go_back}
               ></Button>
               <h1 className="text-lg">Edit Truck</h1>
             </div>
 
             <div className="flex gap-2 text-gray-500 text-sm tracking-wider">
-              MM-DD-YYYY
+              {format_date_1(get_date_now())}
             </div>
           </div>
-
-          {/* === FORM FIELDS === */}
+          {/* - Header */}
+          {/* + Section 1 */}
           <div className="p-5 sm:p-6 border-t">
             <div className="w-full">
               <div className="grid grid-cols-1 gap-x-0 gap-y-5 lg:gap-x-5 lg:grid-cols-3">
                 <div>
-                  <Text_Field
+                  <Verify_Field
                     label="Plate Number"
-                    type={"text"}
-                    pattern="[0-9]{1,}"
-                    disabled
+                    // value={data}
+                    // on_change={(e) => handle_data_change(e.target.value)}
+                    show_find_button={false}
+                    on_verify={() => alert("Verify Plate Number")}
+                    verify_status={""}
+                    placeholder="Enter plate no."
                   />
                 </div>
                 <div className="col-span-2">
-                  <Select_Field
+                  <Find_Field
                     label="Truck Type"
-                    // value={selected_data}
-                    // on_change={(e) => handle_data_change(e.target.value)}
-                    // options={options}
-                    placeholder="Select Option"
+                    // value={}
+                    on_click={() => set_display_modal("select_truck_type")}
+                    disabled
                   />
                 </div>
               </div>
             </div>
           </div>
+          {/* - Section 1 */}
+          {/* + Section 2 */}
           <div className="p-5 sm:p-6 border-t">
             <div className="w-full bg-white rounded-lg border">
               <div className="w-full border-b p-2">
@@ -121,32 +135,38 @@ const Edit_Truck = ({ set_page }) => {
               {/* - Tab Content */}
             </div>
           </div>
+          {/* - Section 2 */}
+          {/* + Section 3 */}
           <div className="p-4 sm:p-8 border-t">
             <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
               <Button
                 variant="primary"
                 size="lg"
-                // width="w-[100px]"
                 icon={RefreshCcwDot}
                 icon_position="left"
-                // on_click={handle_save}
+                on_click={handle_update_truck}
               >
                 Update
               </Button>
-              <Button
-                variant="white"
-                size="lg"
-                // width="w-[100px]"
-                on_click={() => set_page("main")}
-              >
+              <Button variant="white" size="lg" on_click={handle_go_back}>
                 Cancel
               </Button>
             </div>
           </div>
+          {/* - Section 3 */}
         </div>
       </div>
+      {/* + Modals */}
+      <Select_Truck_Type
+        is_open={display_modal === "select_truck_type"}
+        on_close={() => set_display_modal("")}
+        width="max-w-[1000px]"
+        height="max-h-[700px]"
+        truck_type_list={truck_type_list}
+      />
+      {/* - Modals */}
     </React.Fragment>
   );
 };
 
-export default Edit_Truck;
+export default Create_New_Truck;

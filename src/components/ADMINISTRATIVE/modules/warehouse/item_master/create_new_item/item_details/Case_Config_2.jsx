@@ -1,28 +1,25 @@
-import Checkbox_Field from "assets/elements/Checkbox_Field";
-import Date_Field from "assets/elements/Date_Field";
-import Select_Field from "assets/elements/Select_Field";
-import Text_Field from "assets/elements/Text_Field";
-import Textarea_Field from "assets/elements/Textarea_Field";
 import React from "react";
+import Textarea_Field from "assets/elements/Textarea_Field";
 
 const Case_Config_2 = () => {
   const columns = [
-    { key: "customer_id", label: "Customer ID" },
-    { key: "customer_name", label: "Customer Name" },
+    { key: "id", label: "ID" },
+    { key: "customer_code", label: "Customer Code" },
     { key: "customer_desc", label: "Customer Description" },
   ];
 
   const data = [
     {
-      customer_id: "CS-0001",
-      customer_name: "QS IT SERVICE",
-      customer_desc: "Imman Santos",
+      id: 1,
+      customer_code: "CS-0001",
+      customer_desc: "QS IT SERVICE",
     },
   ];
 
   // RETURN ORIGIN
   return (
     <React.Fragment>
+      {/* + Section 1 */}
       <div className="rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6 dark:border-gray-800 dark:bg-gray-900">
         <h1 className="mb-5 font-semibold text-sky-700">
           General Item Details
@@ -43,7 +40,6 @@ const Case_Config_2 = () => {
                   ))}
                 </tr>
               </thead>
-
               <tbody className="bg-white">
                 {data.map((row, idx) => (
                   <tr key={idx} className="hover:bg-gray-50">
@@ -63,40 +59,43 @@ const Case_Config_2 = () => {
           {/* - Table */}
         </div>
       </div>
+      {/* - Section 1 */}
+      {/* + Section 2 */}
       <div className="mt-5 rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6 dark:border-gray-800 dark:bg-gray-900">
         <div className="grid grid-cols-1 gap-5">
           <div>
             <Textarea_Field
               label="Inspection Remarks"
               name="inspection_remarks"
+              placeholder="Enter your remarks..."
+              height="120px"
               // value={data}
               // on_change={(e) => handle_data_change(e.target.value)}
-              placeholder="Enter your remarks..."
-              height="121px"
             />
           </div>
           <div>
             <Textarea_Field
               label="Internal Comments"
               name="internal_comments"
+              placeholder="Enter your comments..."
+              height="120px"
               // value={data}
               // on_change={(e) => handle_data_change(e.target.value)}
-              placeholder="Enter your comments..."
-              height="121px"
             />
           </div>
           <div>
             <Textarea_Field
               label="Base Case Configuration Notes"
               name="base_case_config_notes"
+              placeholder="Enter your notes..."
+              height="120px"
               // value={data}
               // on_change={(e) => handle_data_change(e.target.value)}
-              placeholder="Enter your notes..."
-              height="121px"
             />
           </div>
         </div>
       </div>
+      {/* - Section 2 */}
     </React.Fragment>
   );
 };

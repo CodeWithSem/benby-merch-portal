@@ -1,11 +1,7 @@
+import React from "react";
 import Checkbox_Field from "assets/elements/Checkbox_Field";
-import Date_Field from "assets/elements/Date_Field";
-import Find_Field from "assets/elements/Find_Field";
-import Select_Field from "assets/elements/Select_Field";
 import Text_Code_Field from "assets/elements/Text_Code_Field";
 import Text_Field from "assets/elements/Text_Field";
-import Textarea_Field from "assets/elements/Textarea_Field";
-import React from "react";
 
 const Plant_Data = () => {
   return (
@@ -15,24 +11,20 @@ const Plant_Data = () => {
           <div>
             <Text_Code_Field
               label="Plant / DC"
-              // code_value={code_data}
-              // on_code_change={handle_code_data_change}
-              // text_value={text_data}
-              // on_text_change={handle_text_data_change}
               code_width="150px"
               show_search_button={false}
+              // code_value={code_data}
+              // text_value={text_data}
               disabled
             />
           </div>
           <div>
             <Text_Code_Field
               label="SLOC"
-              // code_value={code_data}
-              // on_code_change={handle_code_data_change}
-              // text_value={text_data}
-              // on_text_change={handle_text_data_change}
               code_width="150px"
               show_search_button={false}
+              // code_value={code_data}
+              // text_value={text_data}
               disabled
             />
           </div>
@@ -42,28 +34,13 @@ const Plant_Data = () => {
         <h1 className="mb-5 font-semibold text-sky-700">General Data</h1>
         <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
           <div>
-            <Text_Field
-              label="Item Group"
-              type={"text"}
-              pattern="[0-9]{1,}"
-              disabled
-            />
+            <Text_Field label="Item Group" type={"text"} disabled />
           </div>
           <div>
-            <Text_Field
-              label="Base Unit of Measure"
-              type={"text"}
-              pattern="[0-9]{1,}"
-              disabled
-            />
+            <Text_Field label="Base Unit of Measure" type={"text"} disabled />
           </div>
           <div>
-            <Text_Field
-              label="Storage Condition"
-              type={"text"}
-              pattern="[0-9]{1,}"
-              disabled
-            />
+            <Text_Field label="Storage Condition" type={"text"} disabled />
           </div>
           <div className="mt-4 flex items-end col-span-full">
             <Checkbox_Field
@@ -71,7 +48,7 @@ const Plant_Data = () => {
               name="batch_manage"
               box_size={24}
               icon_size={14}
-              // checked={check}
+              checked={false}
               disabled
             />
           </div>
@@ -83,34 +60,22 @@ const Plant_Data = () => {
         </h1>
         <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
           <div>
-            <Text_Field
-              label="Maximum Shelf Life"
-              type={"text"}
-              pattern="[0-9]{1,}"
-              disabled
-            />
+            <Text_Field label="Maximum Shelf Life" type={"text"} disabled />
           </div>
           <div>
             <Text_Field
               label="Shelf Life Indicator (Max)"
               type={"text"}
-              pattern="[0-9]{1,}"
               disabled
             />
           </div>
           <div>
-            <Text_Field
-              label="Minimum Shelf Life"
-              type={"text"}
-              pattern="[0-9]{1,}"
-              disabled
-            />
+            <Text_Field label="Minimum Shelf Life" type={"text"} disabled />
           </div>
           <div>
             <Text_Field
               label="Shelf Life Indicator (Min)"
               type={"text"}
-              pattern="[0-9]{1,}"
               disabled
             />
           </div>
@@ -124,12 +89,10 @@ const Plant_Data = () => {
           <div>
             <Text_Code_Field
               label="Inventory Account Center"
-              // code_value={code_data}
-              // on_code_change={handle_code_data_change}
-              // text_value={text_data}
-              // on_text_change={handle_text_data_change}
               code_width="150px"
               show_search_button={false}
+              // code_value={code_data}
+              // text_value={text_data}
               disabled
             />
           </div>

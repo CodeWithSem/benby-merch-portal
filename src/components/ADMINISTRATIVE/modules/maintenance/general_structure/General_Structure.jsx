@@ -1,4 +1,4 @@
-import Icon_Field from "assets/elements/Icon_Field";
+import React, { useState } from "react";
 import {
   Archive,
   Building2,
@@ -9,7 +9,6 @@ import {
   HousePlug,
   Languages,
   LayoutList,
-  Link,
   List,
   MapPin,
   PackageCheck,
@@ -18,7 +17,7 @@ import {
   Users,
   Warehouse,
 } from "lucide-react";
-import React, { useState } from "react";
+import Icon_Field from "assets/elements/Icon_Field";
 import Company from "./components/company/Company";
 import Purchase_Org from "./components/purchase_org/Purchase_Org";
 import Purchase_Group from "./components/purchase_group/Purchase_Group";
@@ -67,10 +66,9 @@ const General_Structure = () => {
     { key: "industry_type", icon: List, title: "Industry Type" },
   ];
 
-  // ✅ Filter based on search query
   const filtered_list = structure_list.filter((item) => {
     const text =
-      typeof item.title === "string" ? item.title : item.plain_title || ""; // fallback for JSX titles
+      typeof item.title === "string" ? item.title : item.plain_title || "";
     return text.toLowerCase().includes(search_query.toLowerCase());
   });
 
@@ -83,8 +81,7 @@ const General_Structure = () => {
             {/* + Header */}
             <div className="flex flex-wrap items-center justify-between gap-3 py-5">
               <h1 className="text-xl">Maintenance</h1>
-
-              {/* + Breadcrumb */}
+              {/* + Breadcrumbs */}
               <nav>
                 <ol className="flex flex-wrap items-center gap-1.5">
                   <li>
@@ -104,7 +101,7 @@ const General_Structure = () => {
                   </li>
                 </ol>
               </nav>
-              {/* - Breadcrumb */}
+              {/* - Breadcrumbs */}
             </div>
             {/* - Header */}
 
@@ -114,7 +111,6 @@ const General_Structure = () => {
                 <h1 className="text-lg">General Structure</h1>
               </div>
               {/* - Title */}
-
               {/* + Content */}
               <div className="p-5 sm:p-6 border-t bg-gray-100/50">
                 <div className="w-full mb-5">
@@ -159,6 +155,7 @@ const General_Structure = () => {
           </div>
         </React.Fragment>
       )}
+      {/* + Pages */}
       {page === "company" && <Company set_page={set_page} />}
       {page === "p_org" && <Purchase_Org set_page={set_page} />}
       {page === "p_group" && <Purchase_Group set_page={set_page} />}
@@ -177,6 +174,7 @@ const General_Structure = () => {
       {page === "country" && <Country set_page={set_page} />}
       {page === "gen_item_group" && <Gen_Item_Group set_page={set_page} />}
       {page === "industry_type" && <Industry_Type set_page={set_page} />}
+      {/* - Pages */}
     </React.Fragment>
   );
 };

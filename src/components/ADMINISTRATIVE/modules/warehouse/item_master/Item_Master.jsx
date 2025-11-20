@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import { useToast } from "../../../layout/Toast_Provider";
 import {
   Search,
   ChevronDown,
@@ -15,22 +16,18 @@ import Icon_Field from "assets/elements/Icon_Field";
 import Select_Field from "assets/elements/Select_Field";
 import Pagination from "assets/elements/Pagination";
 import Button from "assets/elements/Button";
-import { useToast } from "../../../layout/Toast_Provider";
-import Date_Range_Field from "assets/elements/Date_Range_Field";
 import Create_New_Item from "./create_new_item/Create_New_Item";
 import Edit_Item from "./edit_item/Edit_Item";
 import View_Item from "./view_item/View_Item";
 import Delete_Item from "./modals/delete_item/Delete_Item";
+import Button_Action from "assets/elements/Button_Action";
+import { dist_channel_list, sales_org_list } from "./ITEM_DATA_MAP";
 
 const Item_Master = () => {
-  const filter_ref = useRef(null);
+  const { show_toast } = useToast();
   const [show_filter, set_show_filter] = useState(false);
   const [page, set_page] = useState("main");
   const [display_modal, set_display_modal] = useState("");
-  const [for_itemsting, set_for_itemsting] = useState(false);
-
-  // Close dropdown on outside click
-  const { show_toast } = useToast();
 
   const columns = [
     { key: "index", label: "No.", sortable: true },
@@ -45,16 +42,7 @@ const Item_Master = () => {
     { key: "actions", label: "", sortable: false },
   ];
 
-  // --- State ---
-  //   const all_data = [
-  //     {
-  //       po_number: "10000001",
-  //       po_type: "LFPO",
-  //       company: "QS IT Services",
-  //       creation_date: "10/29/2025 04:04:23 PM",
-  //     },
-  //   ];
-  const [all_data, set_all_data] = useState([
+  const [item_list, set_item_list] = useState([
     {
       id: 1,
       item_code: "ITM-0001",
@@ -89,7 +77,9 @@ const Item_Master = () => {
       status: "Active",
     },
   ]);
-  const [filtered_data, set_filtered_data] = useState([]);
+
+  // + Client-Side Filtering
+  const [filtered_item_list, set_filtered_item_list] = useState([]);
   const [loading, set_loading] = useState(false);
   const [select_option, set_select_option] = useState(5);
   const [current_page, set_current_page] = useState(1);
@@ -98,7 +88,6 @@ const Item_Master = () => {
   const [search_query, set_search_query] = useState("");
   const [debounced_query, set_debounced_query] = useState("");
 
-  // --- Debounce search ---
   useEffect(() => {
     const timer = setTimeout(() => {
       set_debounced_query(search_query);
@@ -107,35 +96,9 @@ const Item_Master = () => {
     return () => clearTimeout(timer);
   }, [search_query]);
 
-  // --- Close dropdown outside click ---
   useEffect(() => {
-    const handle_click_outside = (event) => {
-      if (filter_ref.current && !filter_ref.current.contains(event.target)) {
-        // optional: close filter
-      }
-    };
-    document.addEventListener("mousedown", handle_click_outside);
-    return () =>
-      document.removeEventListener("mousedown", handle_click_outside);
-  }, []);
+    let temp = [...item_list];
 
-  // --- Load all users once ---
-  //   const load_data = async () => {
-  //     set_loading(true);
-  //     const data = await fetch_all_data();
-  //     set_all_data(data);
-  //     set_loading(false);
-  //   };
-
-  //   useEffect(() => {
-  //     load_data();
-  //   }, []);
-
-  // + Client-side Filtering
-  useEffect(() => {
-    let temp = [...all_data];
-
-    // + Column Filter
     if (debounced_query.trim() !== "") {
       const q = debounced_query.toLowerCase();
       temp = temp.filter((u) =>
@@ -146,9 +109,7 @@ const Item_Master = () => {
         })
       );
     }
-    // - Column Filter
 
-    // + Sort Function
     temp.sort((a, b) => {
       const val_a = a[sort_by];
       const val_b = b[sort_by];
@@ -160,27 +121,22 @@ const Item_Master = () => {
       if (val_a > val_b) return sort_order === "asc" ? 1 : -1;
       return 0;
     });
-    // - Sort Function
 
-    // + Pagination Function
     const start_idx = (current_page - 1) * select_option;
     const end_idx = start_idx + select_option;
-    // - Pagination Function
-    set_filtered_data(temp.slice(start_idx, end_idx));
+    set_filtered_item_list(temp.slice(start_idx, end_idx));
   }, [
-    all_data,
+    item_list,
     debounced_query,
     sort_by,
     sort_order,
     current_page,
     select_option,
   ]);
-  // - Client-side Filtering
 
-  // + Total page of Pagination
   const total_pages = Math.ceil(
     (debounced_query
-      ? all_data.filter((u) =>
+      ? item_list.filter((u) =>
           columns.some((col) => {
             if (col.key === "actions") return false;
             const val = u[col.key];
@@ -190,11 +146,9 @@ const Item_Master = () => {
               .includes(debounced_query.toLowerCase());
           })
         ).length
-      : all_data.length) / select_option
+      : item_list.length) / select_option
   );
-  // - Total page of Pagination
 
-  // + Sort Filtering
   const handle_sort = (column) => {
     if (sort_by === column)
       set_sort_order(sort_order === "asc" ? "desc" : "asc");
@@ -204,19 +158,16 @@ const Item_Master = () => {
     }
     set_current_page(1);
   };
-  // - Sort Filtering
-  const handle_page_change = (page) => set_current_page(page);
 
-  // + For Date Range Field
-  const date_range_ref = useRef(null);
-  // - For Date Range Field
+  const handle_page_change = (page) => set_current_page(page);
+  // - Client-Side Filtering
 
   const handle_create_new_item = () => {
     set_page("item_creation");
   };
 
   const handle_upload_item = () => {
-    alert("Under Maintenance");
+    alert("Upload Item");
   };
 
   const handle_view_item = (id) => {
@@ -231,6 +182,15 @@ const Item_Master = () => {
     set_display_modal("delete_item");
   };
 
+  const data_map_object = {
+    sales_org_list: sales_org_list,
+    sales_dist_channel: dist_channel_list,
+  };
+
+  useEffect(() => {
+    console.log(data_map_object);
+  }, []);
+
   // RETURN ORIGIN
   return (
     <React.Fragment>
@@ -239,6 +199,7 @@ const Item_Master = () => {
           <div className="w-full">
             <div className="flex flex-wrap items-center justify-between gap-3 py-5">
               <h1 className="text-xl">Warehouse</h1>
+              {/* + Breadcrumbs */}
               <nav>
                 <ol className="flex flex-wrap items-center gap-1.5">
                   <li>
@@ -258,9 +219,10 @@ const Item_Master = () => {
                   </li>
                 </ol>
               </nav>
+              {/* - Breadcrumbs */}
             </div>
-
             <div className="w-full bg-white rounded-lg border">
+              {/* + Header */}
               <div className="flex flex-wrap items-center justify-between gap-3 p-5">
                 <h1 className="text-lg">Item Master</h1>
                 <div className="flex gap-2">
@@ -282,7 +244,8 @@ const Item_Master = () => {
                   </Button>
                 </div>
               </div>
-
+              {/* - Header */}
+              {/* + Section 1 */}
               <div className="p-5 sm:p-6 border-t">
                 <div className="w-full border rounded-lg">
                   <div className="w-full md:flex md:justify-between p-4 gap-4">
@@ -324,33 +287,26 @@ const Item_Master = () => {
                             on_change={(e) => set_search_query(e.target.value)}
                           />
                         </div>
-                        <div className="relative" ref={filter_ref}>
+                        {/* + Dropdown Filter */}
+                        <div className="relative">
                           <Button
                             variant="white"
                             width="w-[100px]"
                             icon={SlidersHorizontal}
                             icon_itemsition="left"
-                            // loading
                             on_click={() => set_show_filter((prev) => !prev)}
                           >
                             Filter
                           </Button>
 
-                          {/* Filter Popover */}
+                          {/* + Dropdown Content */}
                           {show_filter && (
                             <React.Fragment>
                               <div
                                 className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40"
-                                // onClick={() => set_show_filter(false)}
+                                onClick={() => set_show_filter(false)}
                               ></div>
                               <div className="absolute top-full mt-2 right-0 z-50 bg-white border rounded-lg shadow-md p-4 w-[260px]">
-                                <div>
-                                  <Date_Range_Field
-                                    label="Date Range"
-                                    ref={date_range_ref}
-                                  />
-                                </div>
-
                                 <div className="flex justify-end gap-2 mt-4">
                                   <Button
                                     size="sm"
@@ -370,18 +326,19 @@ const Item_Master = () => {
                               </div>
                             </React.Fragment>
                           )}
+                          {/* - Dropdown Content */}
                         </div>
+                        {/* - Dropdown Filter */}
                       </div>
                     </div>
                   </div>
-
-                  {/* Table */}
+                  {/* + Table */}
                   <div className="overflow-x-auto">
                     {loading ? (
                       <div className="p-6 text-center text-gray-500 text-sm">
                         Loading...
                       </div>
-                    ) : filtered_data.length === 0 ? (
+                    ) : filtered_item_list.length === 0 ? (
                       <div className="p-6 text-center text-gray-500 text-sm">
                         No data found
                       </div>
@@ -433,8 +390,7 @@ const Item_Master = () => {
                           </tr>
                         </thead>
                         <tbody className="bg-white">
-                          {filtered_data.map((row, idx) => {
-                            // + Cell Renderer
+                          {filtered_item_list.map((row, idx) => {
                             const render_cell = (col, row) => {
                               const value = row[col.key];
                               if (col.key === "index") {
@@ -449,47 +405,40 @@ const Item_Master = () => {
                                 return (
                                   <div className="flex gap-2">
                                     <div className="relative group flex jusity-center items-center">
-                                      <button
-                                        className="text-gray-500 hover:text-sky-600 text-[12px] outline-none"
-                                        onClick={() => handle_view_item(row.id)}
-                                      >
-                                        <View size={19} />
-                                      </button>
-                                      <span className="absolute bottom-full mb-1 left-1/2 transform -translate-x-1/2 px-2 py-1 text-xs text-white bg-sky-600 rounded opacity-0 group-hover:opacity-100 transition-opacity">
-                                        View Item
-                                      </span>
+                                      <Button_Action
+                                        icon={View}
+                                        tooltip="View Item"
+                                        on_click={() =>
+                                          handle_view_item(row.id)
+                                        }
+                                      />
                                     </div>
                                     <div className="relative group flex jusity-center items-center">
-                                      <button
-                                        className="text-gray-500 hover:text-sky-600 text-[12px] outline-none"
-                                        onClick={() => handle_edit_item(row.id)}
-                                      >
-                                        <Edit size={19} />
-                                      </button>
-                                      <span className="absolute bottom-full mb-1 left-1/2 transform -translate-x-1/2 px-2 py-1 text-xs text-white bg-sky-600 rounded opacity-0 group-hover:opacity-100 transition-opacity">
-                                        Edit Item
-                                      </span>
+                                      <Button_Action
+                                        icon={Edit}
+                                        tooltip="Edit Item"
+                                        on_click={() =>
+                                          handle_edit_item(row.id)
+                                        }
+                                      />
                                     </div>
                                     <div className="relative group flex jusity-center items-center">
-                                      <button
-                                        className="text-gray-500 hover:text-red-600 text-[12px] mb-[1px] outline-none"
-                                        onClick={() =>
+                                      <Button_Action
+                                        class_name="mb-[1px]"
+                                        icon={Trash}
+                                        variant="danger"
+                                        tooltip="Delete Item"
+                                        on_click={() =>
                                           handle_delete_item(row.id)
                                         }
-                                      >
-                                        <Trash size={19} />
-                                      </button>
-                                      <span className="absolute bottom-full mb-1 left-1/2 transform -translate-x-1/2 px-2 py-1 text-xs text-white bg-red-600 rounded opacity-0 group-hover:opacity-100 transition-opacity">
-                                        Delete Item
-                                      </span>
+                                      />
                                     </div>
                                   </div>
                                 );
                               }
 
-                              return value; // Default render for all other fields
+                              return value;
                             };
-                            // - Cell Renderer
 
                             return (
                               <tr
@@ -517,7 +466,8 @@ const Item_Master = () => {
                       </table>
                     )}
                   </div>
-
+                  {/* - Table */}
+                  {/* + Pagination */}
                   {total_pages > 0 && (
                     <Pagination
                       current_page={current_page}
@@ -526,20 +476,26 @@ const Item_Master = () => {
                       variant="compact"
                     />
                   )}
+                  {/* - Pagination */}
                 </div>
               </div>
+              {/* - Section 1 */}
             </div>
           </div>
         </React.Fragment>
       )}
+      {/* + Pages */}
       {page === "item_creation" && <Create_New_Item set_page={set_page} />}
       {page === "edit_item" && <Edit_Item set_page={set_page} />}
       {page === "view_item" && <View_Item set_page={set_page} />}
+      {/* - Pages */}
+      {/* + Modals */}
       <Delete_Item
         is_open={display_modal === "delete_item"}
         on_close={() => set_display_modal("")}
         width="max-w-[1280px]"
       />
+      {/* - Modals */}
     </React.Fragment>
   );
 };

@@ -1,6 +1,6 @@
+import React, { useState } from "react";
 import Text_Code_Field from "assets/elements/Text_Code_Field";
 import Text_Field from "assets/elements/Text_Field";
-import React, { useState } from "react";
 
 const Sales_Data = () => {
   const [sd_active_tab, set_sd_active_tab] = useState("item_group");
@@ -13,91 +13,69 @@ const Sales_Data = () => {
   // RETURN ORIGIN
   return (
     <React.Fragment>
+      {/* + Section 1 */}
       <div className="rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6 dark:border-gray-800 dark:bg-gray-900">
         <div className="grid grid-cols-1 gap-5">
           <div>
             <Text_Code_Field
-              label="Sales Organization" // code_value={code_data} // on_code_change={handle_code_data_change} // text_value={text_data} // on_text_change={handle_text_data_change}
+              label="Sales Organization"
               code_width="150px"
               show_search_button={false}
+              // code_value={code_data}
+              // text_value={text_data}
               disabled
             />
           </div>
           <div>
             <Text_Code_Field
-              label="Distribution Channel" // code_value={code_data} // on_code_change={handle_code_data_change} // text_value={text_data} // on_text_change={handle_text_data_change}
+              label="Distribution Channel"
               code_width="150px"
               show_search_button={false}
+              // code_value={code_data}
+              // text_value={text_data}
               disabled
             />
           </div>
         </div>
       </div>
+      {/* - Section 1 */}
+      {/* + Section 2 */}
       <div className="mt-5 rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6 dark:border-gray-800 dark:bg-gray-900">
         <h1 className="mb-5 font-semibold text-sky-700">
           General Sales Details
         </h1>
         <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
           <div>
-            <Text_Field
-              label="Item Group"
-              type={"text"}
-              pattern="[0-9]{1,}"
-              disabled
-            />
+            <Text_Field label="Item Group" type={"text"} disabled />
           </div>
           <div>
             <Text_Field
               label="Gen. Item Group Category"
               type={"text"}
-              pattern="[0-9]{1,}"
               disabled
             />
           </div>
           <div>
-            <Text_Field
-              label="Item Division"
-              type={"text"}
-              pattern="[0-9]{1,}"
-              disabled
-            />
+            <Text_Field label="Item Division" type={"text"} disabled />
           </div>
           <div>
-            <Text_Field
-              label="Sales Specific Status"
-              type={"text"}
-              pattern="[0-9]{1,}"
-              disabled
-            />
+            <Text_Field label="Sales Specific Status" type={"text"} disabled />
           </div>
           <div>
-            <Text_Field
-              label="Validity From"
-              type={"text"}
-              pattern="[0-9]{1,}"
-              disabled
-            />
+            <Text_Field label="Validity From" type={"text"} disabled />
           </div>
           <div>
-            <Text_Field
-              label="Validity To"
-              type={"text"}
-              pattern="[0-9]{1,}"
-              disabled
-            />
+            <Text_Field label="Validity To" type={"text"} disabled />
           </div>
           <div>
-            <Text_Field
-              label="Sales Unit"
-              type={"text"}
-              pattern="[0-9]{1,}"
-              disabled
-            />
+            <Text_Field label="Sales Unit" type={"text"} disabled />
           </div>
         </div>
       </div>
-
+      {/* - Section 2 */}
+      {/* + Section 3 */}
       <div className="mt-5 w-full bg-white rounded-lg border">
+        {/* + Tab Navigation */}
         <div className="w-full border-b p-2">
           <nav className="flex overflow-x-auto rounded-lg bg-gray-100 p-1 dark:bg-gray-900 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-200 dark:[&::-webkit-scrollbar-thumb]:bg-gray-600 [&::-webkit-scrollbar-track]:bg-white dark:[&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar]:h-1.5">
             {tabs.map((tab) => (
@@ -115,7 +93,7 @@ const Sales_Data = () => {
             ))}
           </nav>
         </div>
-
+        {/* - Tab Navigation */}
         {/* + Tab Content */}
         <div className="p-6">
           {sd_active_tab === "item_group" && <Item_Group />}
@@ -123,6 +101,7 @@ const Sales_Data = () => {
         </div>
         {/* - Tab Content */}
       </div>
+      {/* - Section 3 */}
     </React.Fragment>
   );
 };

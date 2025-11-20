@@ -1,46 +1,33 @@
 import React, { useEffect, useRef, useState } from "react";
+import { useToast } from "../../../layout/Toast_Provider";
+import { format_date_1 } from "assets/scripts/format";
 import {
   ArrowLeftRight,
   Search,
   ChevronDown,
   ChevronUp,
-  Edit,
-  Trash,
   View,
   RefreshCw,
   SlidersHorizontal,
-  FileInput,
   Database,
 } from "lucide-react";
-import { useToast } from "../../../layout/Toast_Provider";
 import Button from "assets/elements/Button";
 import Icon_Field from "assets/elements/Icon_Field";
 import Select_Field from "assets/elements/Select_Field";
-import Date_Range_Field from "assets/elements/Date_Range_Field";
+import Date_Field from "assets/elements/Date_Field";
 import Pagination from "assets/elements/Pagination";
 import Transfer_Process from "./transfer_process/Transfer_Process";
-import Date_Field from "assets/elements/Date_Field";
-import { format_date_1 } from "assets/scripts/format";
+import View_Transfer from "./view_transfer/View_Transfer";
+import Button_Action from "assets/elements/Button_Action";
 
 const Stock_Transfer = () => {
-  const filter_ref = useRef(null);
+  const { show_toast } = useToast();
   const [show_filter, set_show_filter] = useState(false);
   const [page, set_page] = useState("main");
-  const [display_modal, set_display_modal] = useState("");
-  const date_range_ref = useRef(null);
-
   const today = format_date_1(new Date());
   const [start_date, set_start_date] = useState(today);
   const [end_date, set_end_date] = useState(today);
   const [show_load_data_button, set_show_load_data_button] = useState(false);
-
-  // Close dropdown on outside click
-  const { show_toast } = useToast();
-
-  const company_list = [
-    { id: 1, company_code: "20001", company_desc: "Company 1" },
-    { id: 2, company_code: "20002", company_desc: "Company 2" },
-  ];
 
   const columns = [
     { key: "id", label: "ID", sortable: true },
@@ -54,13 +41,12 @@ const Stock_Transfer = () => {
     { key: "actions", label: "", sortable: false },
   ];
 
-  // --- State ---
-  const [all_data, set_all_data] = useState([
+  const [stock_transfer_list, set_stock_transfer_list] = useState([
     {
       id: 1,
       from_branch_code: "BR001",
       to_branch_code: "BR002",
-      transfer_date: "11/04/2025 10:05:50",
+      transfer_date: "MM-DD-YYYY",
       status: "In Transit",
       created_by: "John Doe",
       approved_by: "",
@@ -70,7 +56,7 @@ const Stock_Transfer = () => {
       id: 2,
       from_branch_code: "BR003",
       to_branch_code: "BR005",
-      transfer_date: "11/04/2025 10:05:50",
+      transfer_date: "MM-DD-YYYY",
       status: "Approved",
       created_by: "Jane Smith",
       approved_by: "Michael Reyes",
@@ -80,7 +66,7 @@ const Stock_Transfer = () => {
       id: 3,
       from_branch_code: "BR002",
       to_branch_code: "BR004",
-      transfer_date: "11/04/2025 10:05:50",
+      transfer_date: "MM-DD-YYYY",
       status: "Received",
       created_by: "Alex Cruz",
       approved_by: "Sarah Lim",
@@ -90,14 +76,17 @@ const Stock_Transfer = () => {
       id: 4,
       from_branch_code: "BR001",
       to_branch_code: "BR003",
-      transfer_date: "11/04/2025 10:05:50",
+      transfer_date: "MM-DD-YYYY",
       status: "Cancelled",
       created_by: "Maria Dela Cruz",
       approved_by: "",
       receive_by: "",
     },
   ]);
-  const [filtered_data, set_filtered_data] = useState([]);
+
+  // + Client-Side Filtering
+  const [filtered_stock_transfer_list, set_filtered_stock_transfer_list] =
+    useState([]);
   const [loading, set_loading] = useState(false);
   const [select_option, set_select_option] = useState(5);
   const [current_page, set_current_page] = useState(1);
@@ -106,7 +95,6 @@ const Stock_Transfer = () => {
   const [search_query, set_search_query] = useState("");
   const [debounced_query, set_debounced_query] = useState("");
 
-  // --- Debounce search ---
   useEffect(() => {
     const timer = setTimeout(() => {
       set_debounced_query(search_query);
@@ -115,35 +103,9 @@ const Stock_Transfer = () => {
     return () => clearTimeout(timer);
   }, [search_query]);
 
-  // --- Close dropdown outside click ---
   useEffect(() => {
-    const handle_click_outside = (event) => {
-      if (filter_ref.current && !filter_ref.current.contains(event.target)) {
-        // optional: close filter
-      }
-    };
-    document.addEventListener("mousedown", handle_click_outside);
-    return () =>
-      document.removeEventListener("mousedown", handle_click_outside);
-  }, []);
+    let temp = [...stock_transfer_list];
 
-  // --- Load all users once ---
-  //   const load_data = async () => {
-  //     set_loading(true);
-  //     const data = await fetch_all_data();
-  //     set_all_data(data);
-  //     set_loading(false);
-  //   };
-
-  //   useEffect(() => {
-  //     load_data();
-  //   }, []);
-
-  // + Client-side Filtering
-  useEffect(() => {
-    let temp = [...all_data];
-
-    // + Column Filter
     if (debounced_query.trim() !== "") {
       const q = debounced_query.toLowerCase();
       temp = temp.filter((u) =>
@@ -154,9 +116,7 @@ const Stock_Transfer = () => {
         })
       );
     }
-    // - Column Filter
 
-    // + Sort Function
     temp.sort((a, b) => {
       const val_a = a[sort_by];
       const val_b = b[sort_by];
@@ -168,27 +128,22 @@ const Stock_Transfer = () => {
       if (val_a > val_b) return sort_order === "asc" ? 1 : -1;
       return 0;
     });
-    // - Sort Function
 
-    // + Pagination Function
     const start_idx = (current_page - 1) * select_option;
     const end_idx = start_idx + select_option;
-    // - Pagination Function
-    set_filtered_data(temp.slice(start_idx, end_idx));
+    set_filtered_stock_transfer_list(temp.slice(start_idx, end_idx));
   }, [
-    all_data,
+    stock_transfer_list,
     debounced_query,
     sort_by,
     sort_order,
     current_page,
     select_option,
   ]);
-  // - Client-side Filtering
 
-  // + Total page of Pagination
   const total_pages = Math.ceil(
     (debounced_query
-      ? all_data.filter((u) =>
+      ? stock_transfer_list.filter((u) =>
           columns.some((col) => {
             if (col.key === "actions") return false;
             const val = u[col.key];
@@ -198,11 +153,9 @@ const Stock_Transfer = () => {
               .includes(debounced_query.toLowerCase());
           })
         ).length
-      : all_data.length) / select_option
+      : stock_transfer_list.length) / select_option
   );
-  // - Total page of Pagination
 
-  // + Sort Filtering
   const handle_sort = (column) => {
     if (sort_by === column)
       set_sort_order(sort_order === "asc" ? "desc" : "asc");
@@ -212,8 +165,9 @@ const Stock_Transfer = () => {
     }
     set_current_page(1);
   };
-  // - Sort Filtering
+
   const handle_page_change = (page) => set_current_page(page);
+  // - Client-Side Filtering
 
   const handle_transfer_process = () => {
     set_page("transfer_process");
@@ -229,9 +183,14 @@ const Stock_Transfer = () => {
     set_show_load_data_button(true);
   };
 
+  const handle_view_transfer = () => {
+    set_page("view_transfer");
+  };
+
   const handle_load_data = () => {
     set_show_load_data_button(false);
   };
+
   // RETURN ORIGIN
   return (
     <React.Fragment>
@@ -347,7 +306,8 @@ const Stock_Transfer = () => {
                             on_change={(e) => set_search_query(e.target.value)}
                           />
                         </div>
-                        <div className="relative" ref={filter_ref}>
+                        {/* + Dropdown Filter */}
+                        <div className="relative">
                           <Button
                             variant="white"
                             width="w-[100px]"
@@ -359,20 +319,14 @@ const Stock_Transfer = () => {
                             Filter
                           </Button>
 
-                          {/* Filter Popover */}
+                          {/* + Dropdown Content */}
                           {show_filter && (
                             <React.Fragment>
                               <div
                                 className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40"
-                                // onClick={() => set_show_filter(false)}
+                                onClick={() => set_show_filter(false)}
                               ></div>
                               <div className="absolute top-full mt-2 right-0 z-50 bg-white border rounded-lg shadow-md p-4 w-[260px]">
-                                <div>
-                                  <Date_Range_Field
-                                    label="Date Range"
-                                    ref={date_range_ref}
-                                  />
-                                </div>
                                 <div className="flex justify-end gap-2 mt-4">
                                   <Button
                                     size="sm"
@@ -392,7 +346,9 @@ const Stock_Transfer = () => {
                               </div>
                             </React.Fragment>
                           )}
+                          {/* - Dropdown Content */}
                         </div>
+                        {/* - Dropdown Filter */}
                       </div>
                     </div>
                   </div>
@@ -403,7 +359,7 @@ const Stock_Transfer = () => {
                       <div className="p-6 text-center text-gray-500 text-sm">
                         Loading...
                       </div>
-                    ) : filtered_data.length === 0 ? (
+                    ) : filtered_stock_transfer_list.length === 0 ? (
                       <div className="p-6 text-center text-gray-500 text-sm">
                         No data found
                       </div>
@@ -455,18 +411,9 @@ const Stock_Transfer = () => {
                           </tr>
                         </thead>
                         <tbody className="bg-white">
-                          {filtered_data.map((row, idx) => {
-                            const company = company_list.find(
-                              (c) => c.company_code === row.company_code
-                            );
-                            // + Cell Renderer
+                          {filtered_stock_transfer_list.map((row, idx) => {
                             const render_cell = (col, row) => {
                               const value = row[col.key];
-                              if (col.key === "company") {
-                                return (
-                                  <div>{company?.company_desc || "-"}</div>
-                                );
-                              }
                               if (col.key === "status") {
                                 return (
                                   <span
@@ -490,21 +437,20 @@ const Stock_Transfer = () => {
                                 return (
                                   <div className="flex gap-2">
                                     <div className="relative group flex jusity-center items-center">
-                                      <button className="text-gray-500 hover:text-sky-600 text-[12px] outline-none">
-                                        <View size={19} />
-                                      </button>
-                                      <span className="absolute bottom-full mb-1 left-1/2 transform -translate-x-1/2 px-2 py-1 text-xs text-white bg-sky-600 rounded opacity-0 group-hover:opacity-100 transition-opacity">
-                                        View Record
-                                      </span>
+                                      <Button_Action
+                                        icon={View}
+                                        tooltip="View Record"
+                                        on_click={() =>
+                                          handle_view_transfer(row.id)
+                                        }
+                                      />
                                     </div>
                                   </div>
                                 );
                               }
 
-                              return value; // Default render for all other fields
+                              return value;
                             };
-                            // - Cell Renderer
-
                             return (
                               <tr key={idx} className="hover:bg-gray-50">
                                 {columns.map((col, i) => (
@@ -543,7 +489,10 @@ const Stock_Transfer = () => {
           </div>
         </React.Fragment>
       )}
+      {/* + Pages */}
       {page === "transfer_process" && <Transfer_Process set_page={set_page} />}
+      {page === "view_transfer" && <View_Transfer set_page={set_page} />}
+      {/* - Pages */}
     </React.Fragment>
   );
 };

@@ -1,107 +1,66 @@
+import React from "react";
 import Checkbox_Field from "assets/elements/Checkbox_Field";
-import Date_Field from "assets/elements/Date_Field";
-import Select_Field from "assets/elements/Select_Field";
 import Text_Code_Field from "assets/elements/Text_Code_Field";
 import Text_Field from "assets/elements/Text_Field";
 import Textarea_Field from "assets/elements/Textarea_Field";
-import React from "react";
 
 const Purchasing = () => {
-  const currency = [
-    { id: 1, currency_code: "PHP", currency_desc: "Philippine Peso" },
-    { id: 2, currency_code: "USD", currency_desc: "US Dollar" },
-  ];
+  // RETURN ORIGIN
   return (
     <React.Fragment>
+      {/* + Section 1 */}
       <div className="rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6 dark:border-gray-800 dark:bg-gray-900">
         <div className="grid grid-cols-1 gap-5">
           <div>
             <Text_Code_Field
-              label="Plant / DC" // code_value={code_data} // on_code_change={handle_code_data_change} // text_value={text_data} // on_text_change={handle_text_data_change}
+              label="Plant / DC"
               code_width="150px"
               show_search_button={false}
+              // code_value={code_data}
+              // text_value={text_data}
               disabled
             />
           </div>
           <div>
             <Text_Code_Field
-              label="SLOC" // code_value={code_data} // on_code_change={handle_code_data_change} // text_value={text_data} // on_text_change={handle_text_data_change}
+              label="SLOC"
               code_width="150px"
               show_search_button={false}
+              // code_value={code_data}
+              // text_value={text_data}
               disabled
             />
           </div>
         </div>
       </div>
+      {/* - Section 1 */}
       <div className="mt-5 rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6 dark:border-gray-800 dark:bg-gray-900">
         <h1 className="mb-5 font-semibold text-sky-700">Purchasing Details</h1>
         <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
           <div>
-            <Text_Field
-              label="Item Group"
-              type={"text"}
-              pattern="[0-9]{1,}"
-              disabled
-            />
+            <Text_Field label="Item Group" type={"text"} disabled />
           </div>
           <div>
-            <Text_Field
-              label="Purchasing Group"
-              type={"text"}
-              pattern="[0-9]{1,}"
-              disabled
-            />
+            <Text_Field label="Purchasing Group" type={"text"} disabled />
           </div>
           <div>
             <Text_Field
               label="Base Unit of Measure (UoM)"
               type={"text"}
-              pattern="[0-9]{1,}"
               disabled
             />
           </div>
           <div>
-            <Text_Field
-              label="Ordering Unit"
-              type={"text"}
-              pattern="[0-9]{1,}"
-              disabled
-            />
+            <Text_Field label="Ordering Unit" type={"text"} disabled />
           </div>
           <div>
-            <Text_Field
-              label="Validity From"
-              type={"text"}
-              pattern="[0-9]{1,}"
-              disabled
-            />
+            <Text_Field label="Validity From" type={"text"} disabled />
           </div>
           <div>
-            <Text_Field
-              label="Validity To"
-              type={"text"}
-              pattern="[0-9]{1,}"
-              disabled
-            />
+            <Text_Field label="Validity To" type={"text"} disabled />
           </div>
           <div>
-            <Text_Field
-              label="Plant Specific Status"
-              type={"text"}
-              pattern="[0-9]{1,}"
-              disabled
-            />
-            {/* <Select_Field
-              label="Plant Specific Status"
-              name="plant_spec_status"
-              value={""}
-              // // on_change={handle_option_change}
-              options={currency.map((c) => ({
-                label: `${c.currency_desc} (${c.currency_code})`,
-                value: c.currency_code,
-              }))}
-              placeholder="Select Option"
-            /> */}
+            <Text_Field label="Plant Specific Status" type={"text"} disabled />
           </div>
           <div className="mt-4 flex items-end col-span-full">
             <Checkbox_Field
@@ -109,7 +68,7 @@ const Purchasing = () => {
               name="batch_manage"
               box_size={24}
               icon_size={14}
-              // checked={check}
+              checked={false}
               disabled
             />
           </div>
@@ -121,20 +80,10 @@ const Purchasing = () => {
         </h1>
         <div className="grid grid-cols-1 gap-5">
           <div>
-            <Text_Field
-              label="To Quality Inspection"
-              type={"text"}
-              pattern="[0-9]{1,}"
-              disabled
-            />
+            <Text_Field label="To Quality Inspection" type={"text"} disabled />
           </div>
           <div>
-            <Text_Field
-              label="Source Hub"
-              type={"text"}
-              pattern="[0-9]{1,}"
-              disabled
-            />
+            <Text_Field label="Source Hub" type={"text"} disabled />
           </div>
           <div>
             <Textarea_Field label="Purchasing Text" height="120px" disabled />

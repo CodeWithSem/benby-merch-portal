@@ -1,8 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import Text_Field from "assets/elements/Text_Field";
 import Button from "assets/elements/Button";
-import { ChevronLeft, Eye, Save, SaveAll } from "lucide-react";
-import Verify_Field from "assets/elements/Verify_Field";
+import { ChevronLeft } from "lucide-react";
 import Standard_Data from "./item_details/Standard_Data";
 import Purchasing from "./item_details/Purchasing";
 import Case_Config_1 from "./item_details/Case_Config_1";
@@ -28,27 +27,19 @@ const View_Item = ({ set_page }) => {
     { key: "plant_data", title: "Plant Data" },
     { key: "wm_data_1", title: "WM Data 1" },
     { key: "wm_data_2", title: "WM Data 2" },
-    // You can add more tabs easily here
-    // { key: "inventory", title: "Inventory" },
   ];
 
-  const handle_preview = () => {
-    alert("Under Maintenance");
+  const handle_go_back = () => {
+    set_page("main");
   };
 
-  const handle_save_as_draft = () => {
-    alert("Under Maintenance");
-  };
-
-  const handle_save = () => {
-    alert("Under Maintenance");
-  };
   // RETURN ORIGIN
   return (
     <React.Fragment>
       <div className="w-full">
         <div className="flex flex-wrap items-center justify-between gap-3 py-5">
           <h1 className="text-xl">Inbound</h1>
+          {/* + Breadcrumbs */}
           <nav>
             <ol className="flex flex-wrap items-center gap-1.5">
               <li>
@@ -60,7 +51,7 @@ const View_Item = ({ set_page }) => {
                 <span>/</span>
                 <a
                   className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-sky-500 cursor-pointer"
-                  onClick={() => set_page("main")}
+                  onClick={handle_go_back}
                 >
                   Warehouse
                 </a>
@@ -69,7 +60,7 @@ const View_Item = ({ set_page }) => {
                 <span>/</span>
                 <a
                   className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-sky-500 cursor-pointer"
-                  onClick={() => set_page("main")}
+                  onClick={handle_go_back}
                 >
                   Item Master
                 </a>
@@ -80,9 +71,10 @@ const View_Item = ({ set_page }) => {
               </li>
             </ol>
           </nav>
+          {/* - Breadcrumbs */}
         </div>
-
         <div className="w-full bg-white rounded-lg border">
+          {/* + Header */}
           <div className="flex flex-wrap items-center justify-between gap-3 p-5">
             <div className="flex items-center gap-3">
               <Button
@@ -90,9 +82,8 @@ const View_Item = ({ set_page }) => {
                 icon={ChevronLeft}
                 icon_position="left"
                 width="w-[20px]"
-                on_click={() => set_page("main")}
+                on_click={handle_go_back}
               ></Button>
-              {/* <ChevronLeft className="text-gray-500" size={24} /> */}
               <h1 className="text-lg">View Item</h1>
             </div>
 
@@ -102,29 +93,23 @@ const View_Item = ({ set_page }) => {
               </div>
             </div>
           </div>
-
+          {/* - Header */}
+          {/* + Section 1 */}
           <div className="p-5 sm:p-6 border-t">
             <div className="grid grid-cols-1 gap-5 lg:grid-cols-4">
               <div className="w-full">
-                <Text_Field
-                  label="Item Code"
-                  type={"text"}
-                  pattern="[A-Za-z]{1,}"
-                  disabled
-                />
+                <Text_Field label="Item Code" type={"text"} disabled />
               </div>
               <div className="w-full lg:col-span-3">
-                <Text_Field
-                  label="Item Description"
-                  type={"text"}
-                  pattern="[A-Za-z]{1,}"
-                  disabled
-                />
+                <Text_Field label="Item Description" type={"text"} disabled />
               </div>
             </div>
           </div>
+          {/* - Section 1 */}
+          {/* + Section 2 */}
           <div className="p-5 sm:p-6 border-t">
             <div className="w-full bg-white rounded-lg border">
+              {/* + Tab Navigation */}
               <div className="w-full border-b p-2">
                 <nav className="flex overflow-x-auto rounded-lg bg-gray-100 p-1 dark:bg-gray-900 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-200 dark:[&::-webkit-scrollbar-thumb]:bg-gray-600 [&::-webkit-scrollbar-track]:bg-white dark:[&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar]:h-1.5">
                   {tabs.map((tab) => (
@@ -142,7 +127,7 @@ const View_Item = ({ set_page }) => {
                   ))}
                 </nav>
               </div>
-
+              {/* - Tab Navigation */}
               {/* + Tab Content */}
               <div className="p-6">
                 {active_tab === "standard_data" && <Standard_Data />}
@@ -158,6 +143,7 @@ const View_Item = ({ set_page }) => {
               {/* - Tab Content */}
             </div>
           </div>
+          {/* - Section 2 */}
         </div>
       </div>
     </React.Fragment>

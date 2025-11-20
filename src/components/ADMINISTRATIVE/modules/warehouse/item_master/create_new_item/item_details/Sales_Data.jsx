@@ -1,12 +1,9 @@
-import Checkbox_Field from "assets/elements/Checkbox_Field";
+import React, { useState } from "react";
 import Date_Field from "assets/elements/Date_Field";
 import Select_Field from "assets/elements/Select_Field";
 import Text_Code_Field from "assets/elements/Text_Code_Field";
-import Text_Field from "assets/elements/Text_Field";
-import Textarea_Field from "assets/elements/Textarea_Field";
-import React, { useState } from "react";
 
-const Sales_Data = () => {
+const Sales_Data = ({ set_display_modal }) => {
   const [sd_active_tab, set_sd_active_tab] = useState("item_group");
 
   const tabs = [
@@ -17,26 +14,35 @@ const Sales_Data = () => {
   // RETURN ORIGIN
   return (
     <React.Fragment>
+      {/* + Section 1 */}
       <div className="rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6 dark:border-gray-800 dark:bg-gray-900">
         <div className="grid grid-cols-1 gap-5">
           <div>
             <Text_Code_Field
-              label="Sales Organization" // code_value={code_data} // on_code_change={handle_code_data_change} // text_value={text_data} // on_text_change={handle_text_data_change}
+              label="Sales Organization"
               code_width="150px"
               show_search_button={true}
+              // code_value={code_data}
+              // text_value={text_data}
+              on_click={() => set_display_modal("select_sd_sales_org")}
               disabled
             />
           </div>
           <div>
             <Text_Code_Field
-              label="Distribution Channel" // code_value={code_data} // on_code_change={handle_code_data_change} // text_value={text_data} // on_text_change={handle_text_data_change}
+              label="Distribution Channel"
               code_width="150px"
               show_search_button={true}
+              // code_value={code_data}
+              // text_value={text_data}
+              on_click={() => set_display_modal("select_sd_dist_channel")}
               disabled
             />
           </div>
         </div>
       </div>
+      {/* - Section 1 */}
+      {/* + Section 2 */}
       <div className="mt-5 rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6 dark:border-gray-800 dark:bg-gray-900">
         <h1 className="mb-5 font-semibold text-sky-700">
           General Sales Details
@@ -45,75 +51,70 @@ const Sales_Data = () => {
           <div>
             <Select_Field
               label="Item Group"
-              name="item_group"
-              // value={selected_data}
-              // // on_change={handle_option_change}
-              // // options={options}
               placeholder="Select Option"
+              // options={options}
+              // value={selected_data}
+              // on_change={handle_option_change}
             />
           </div>
           <div>
             <Select_Field
               label="Gen. Item Group Category"
-              name="gen_group_category"
-              // value={selected_data}
-              // // on_change={handle_option_change}
-              // // options={options}
               placeholder="Select Option"
+              // options={options}
+              // value={selected_data}
+              // on_change={handle_option_change}
             />
           </div>
           <div>
             <Select_Field
               label="Item Division"
-              name="item_division"
-              // value={selected_data}
-              // // on_change={handle_option_change}
-              // // options={options}
               placeholder="Select Option"
+              // options={options}
+              // value={selected_data}
+              // on_change={handle_option_change}
             />
           </div>
           <div>
             <Select_Field
               label="Sales Specific Status"
-              name="sales_spec_status"
-              // value={selected_data}
-              // // on_change={handle_option_change}
-              // // options={options}
               placeholder="Select Option"
+              // options={options}
+              // value={selected_data}
+              // on_change={handle_option_change}
             />
           </div>
           <div>
             <Date_Field
               label="Validity From"
-              name="valid_from"
+              placeholder="Select Date"
               // value={selected_data}
               on_change={(e) => alert(e.target.value)}
-              placeholder="Select Date"
             />
           </div>
           <div>
             <Date_Field
               label="Validity To"
-              name="valid_to"
+              placeholder="Select Date"
               // value={selected_data}
               on_change={(e) => alert(e.target.value)}
-              placeholder="Select Date"
             />
           </div>
           <div>
             <Select_Field
               label="Sales Unit"
-              name="sales_unit"
-              // value={selected_data}
-              // // on_change={handle_option_change}
-              // // options={options}
               placeholder="Select Option"
+              // options={options}
+              // value={selected_data}
+              // on_change={handle_option_change}
             />
           </div>
         </div>
       </div>
-
+      {/* - Section 2 */}
+      {/* + Section 3 */}
       <div className="mt-5 w-full bg-white rounded-lg border">
+        {/* + Tab Navigation */}
         <div className="w-full border-b p-2">
           <nav className="flex overflow-x-auto rounded-lg bg-gray-100 p-1 dark:bg-gray-900 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-200 dark:[&::-webkit-scrollbar-thumb]:bg-gray-600 [&::-webkit-scrollbar-track]:bg-white dark:[&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar]:h-1.5">
             {tabs.map((tab) => (
@@ -131,23 +132,29 @@ const Sales_Data = () => {
             ))}
           </nav>
         </div>
-
+        {/* - Tab Navigation */}
         {/* + Tab Content */}
         <div className="p-6">
-          {sd_active_tab === "item_group" && <Item_Group />}
-          {sd_active_tab === "product_class" && <Product_Class />}
+          {sd_active_tab === "item_group" && (
+            <Item_Group set_display_modal={set_display_modal} />
+          )}
+          {sd_active_tab === "product_class" && (
+            <Product_Class set_display_modal={set_display_modal} />
+          )}
         </div>
         {/* - Tab Content */}
       </div>
+      {/* - Section 3 */}
     </React.Fragment>
   );
 };
 
 export default Sales_Data;
 
-const Item_Group = () => {
+const Item_Group = ({ set_display_modal }) => {
   return (
     <React.Fragment>
+      {/* + Section 1 */}
       <div className="rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6 dark:border-gray-800 dark:bg-gray-900">
         <div className="grid grid-cols-1 gap-5">
           <div>
@@ -155,6 +162,9 @@ const Item_Group = () => {
               label="Item Grouping 1"
               code_width="150px"
               show_search_button={true}
+              // code_value={code_data}
+              // text_value={text_data}
+              on_click={() => set_display_modal("select_item_group_1")}
               disabled
             />
           </div>
@@ -163,6 +173,9 @@ const Item_Group = () => {
               label="Item Grouping 2"
               code_width="150px"
               show_search_button={true}
+              // code_value={code_data}
+              // text_value={text_data}
+              on_click={() => set_display_modal("select_item_group_2")}
               disabled
             />
           </div>
@@ -171,6 +184,9 @@ const Item_Group = () => {
               label="Item Grouping 3"
               code_width="150px"
               show_search_button={true}
+              // code_value={code_data}
+              // text_value={text_data}
+              on_click={() => set_display_modal("select_item_group_3")}
               disabled
             />
           </div>
@@ -179,6 +195,9 @@ const Item_Group = () => {
               label="Item Grouping 4"
               code_width="150px"
               show_search_button={true}
+              // code_value={code_data}
+              // text_value={text_data}
+              on_click={() => set_display_modal("select_item_group_4")}
               disabled
             />
           </div>
@@ -187,17 +206,22 @@ const Item_Group = () => {
               label="Item Grouping 5"
               code_width="150px"
               show_search_button={true}
+              // code_value={code_data}
+              // text_value={text_data}
+              on_click={() => set_display_modal("select_item_group_5")}
               disabled
             />
           </div>
         </div>
       </div>
+      {/* - Section 1 */}
     </React.Fragment>
   );
 };
-const Product_Class = () => {
+const Product_Class = ({ set_display_modal }) => {
   return (
     <React.Fragment>
+      {/* + Section 1 */}
       <div className="rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6 dark:border-gray-800 dark:bg-gray-900">
         <div className="grid grid-cols-1 gap-5">
           <div>
@@ -205,6 +229,9 @@ const Product_Class = () => {
               label="Product Classification 1"
               code_width="150px"
               show_search_button={true}
+              // code_value={code_data}
+              // text_value={text_data}
+              on_click={() => set_display_modal("select_product_class_1")}
               disabled
             />
           </div>
@@ -213,6 +240,9 @@ const Product_Class = () => {
               label="Product Classification 2"
               code_width="150px"
               show_search_button={true}
+              // code_value={code_data}
+              // text_value={text_data}
+              on_click={() => set_display_modal("select_product_class_2")}
               disabled
             />
           </div>
@@ -221,6 +251,9 @@ const Product_Class = () => {
               label="Product Classification 3"
               code_width="150px"
               show_search_button={true}
+              // code_value={code_data}
+              // text_value={text_data}
+              on_click={() => set_display_modal("select_product_class_3")}
               disabled
             />
           </div>
@@ -229,6 +262,9 @@ const Product_Class = () => {
               label="Product Classification 4"
               code_width="150px"
               show_search_button={true}
+              // code_value={code_data}
+              // text_value={text_data}
+              on_click={() => set_display_modal("select_product_class_4")}
               disabled
             />
           </div>
@@ -237,11 +273,15 @@ const Product_Class = () => {
               label="Product Classification 5"
               code_width="150px"
               show_search_button={true}
+              // code_value={code_data}
+              // text_value={text_data}
+              on_click={() => set_display_modal("select_product_class_5")}
               disabled
             />
           </div>
         </div>
       </div>
+      {/* - Section 1 */}
     </React.Fragment>
   );
 };

@@ -13,10 +13,9 @@ const Transfer_Process = ({ set_page }) => {
   return (
     <React.Fragment>
       <div className="w-full">
-        {/* + Header */}
         <div className="flex flex-wrap items-center justify-between gap-3 py-5">
           <h1 className="text-xl">Warehouse</h1>
-          {/* + Breadcrumb */}
+          {/* + Breadcrumbs */}
           <nav>
             <ol className="flex flex-wrap items-center gap-1.5">
               <li>
@@ -45,9 +44,9 @@ const Transfer_Process = ({ set_page }) => {
               </li>
             </ol>
           </nav>
-          {/* - Breadcrumb */}
+          {/* - Breadcrumbs */}
         </div>
-        {/* - Header */}
+        {/* + Section 1 */}
         <div>
           <Source
             selected_items={selected_items}
@@ -55,16 +54,22 @@ const Transfer_Process = ({ set_page }) => {
             set_page={set_page}
           />
         </div>
+        {/* - Section 1 */}
+        {/* + Section 2 */}
         <div className="my-5 w-full flex justify-center items-center text-sky-600">
           <ChevronsDown size={42} />
         </div>
+        {/* - Section 2 */}
+        {/* + Section 3 */}
         <div>
           <Destination
             selected_items={selected_items}
             set_selected_items={set_selected_items}
             handle_save_transfer={handle_save_transfer}
+            set_page={set_page}
           />
         </div>
+        {/* - Section 3 */}
       </div>
     </React.Fragment>
   );

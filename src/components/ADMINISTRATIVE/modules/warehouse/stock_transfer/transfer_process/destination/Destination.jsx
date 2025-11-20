@@ -1,26 +1,19 @@
-import React, { useEffect, useRef, useState } from "react";
-import Text_Code_Field from "assets/elements/Text_Code_Field";
+import React, { useEffect, useState } from "react";
 import { useToast } from "../../../../../layout/Toast_Provider";
 import {
   ArrowLeftRight,
   Search,
   ChevronDown,
   ChevronUp,
-  Edit,
-  Trash,
   View,
   RefreshCw,
-  SlidersHorizontal,
-  FileInput,
-  Save,
 } from "lucide-react";
 import Button from "assets/elements/Button";
 import Icon_Field from "assets/elements/Icon_Field";
 import Select_Field from "assets/elements/Select_Field";
-import Date_Range_Field from "assets/elements/Date_Range_Field";
-import Pagination from "assets/elements/Pagination";
-import Checkbox_Field from "assets/elements/Checkbox_Field";
 import Text_Field from "assets/elements/Text_Field";
+import Text_Code_Field from "assets/elements/Text_Code_Field";
+import Pagination from "assets/elements/Pagination";
 import Select_Branch from "./modals/Select_Branch";
 import Select_Plant from "./modals/Select_Plant";
 import Select_SLOC from "./modals/Select_SLOC";
@@ -29,6 +22,7 @@ const Destination = ({
   selected_items,
   set_selected_items,
   handle_save_transfer,
+  set_page,
 }) => {
   const { show_toast } = useToast();
   const [display_modal, set_display_modal] = useState("");
@@ -46,12 +40,13 @@ const Destination = ({
     },
   ];
 
-  // --- State ---
   useEffect(() => {
-    set_all_data(selected_items);
+    set_dest_item_list(selected_items);
   }, [selected_items]);
-  const [all_data, set_all_data] = useState([]);
-  const [filtered_data, set_filtered_data] = useState([]);
+
+  // + Client-Side Filtering
+  const [dest_item_list, set_dest_item_list] = useState([]);
+  const [filtered_dest_item_list, set_filtered_dest_item_list] = useState([]);
   const [loading, set_loading] = useState(false);
   const [select_option, set_select_option] = useState(5);
   const [current_page, set_current_page] = useState(1);
@@ -60,7 +55,6 @@ const Destination = ({
   const [search_query, set_search_query] = useState("");
   const [debounced_query, set_debounced_query] = useState("");
 
-  // --- Debounce search ---
   useEffect(() => {
     const timer = setTimeout(() => {
       set_debounced_query(search_query);
@@ -69,23 +63,9 @@ const Destination = ({
     return () => clearTimeout(timer);
   }, [search_query]);
 
-  // --- Load all users once ---
-  //   const load_data = async () => {
-  //     set_loading(true);
-  //     const data = await fetch_all_data();
-  //     set_all_data(data);
-  //     set_loading(false);
-  //   };
-
-  //   useEffect(() => {
-  //     load_data();
-  //   }, []);
-
-  // + Client-side Filtering
   useEffect(() => {
-    let temp = [...all_data];
+    let temp = [...dest_item_list];
 
-    // + Column Filter
     if (debounced_query.trim() !== "") {
       const q = debounced_query.toLowerCase();
       temp = temp.filter((u) =>
@@ -96,9 +76,7 @@ const Destination = ({
         })
       );
     }
-    // - Column Filter
 
-    // + Sort Function
     temp.sort((a, b) => {
       const val_a = a[sort_by];
       const val_b = b[sort_by];
@@ -110,27 +88,22 @@ const Destination = ({
       if (val_a > val_b) return sort_order === "asc" ? 1 : -1;
       return 0;
     });
-    // - Sort Function
 
-    // + Pagination Function
     const start_idx = (current_page - 1) * select_option;
     const end_idx = start_idx + select_option;
-    // - Pagination Function
-    set_filtered_data(temp.slice(start_idx, end_idx));
+    set_filtered_dest_item_list(temp.slice(start_idx, end_idx));
   }, [
-    all_data,
+    dest_item_list,
     debounced_query,
     sort_by,
     sort_order,
     current_page,
     select_option,
   ]);
-  // - Client-side Filtering
 
-  // + Total page of Pagination
   const total_pages = Math.ceil(
     (debounced_query
-      ? all_data.filter((u) =>
+      ? dest_item_list.filter((u) =>
           columns.some((col) => {
             if (col.key === "actions") return false;
             const val = u[col.key];
@@ -140,11 +113,9 @@ const Destination = ({
               .includes(debounced_query.toLowerCase());
           })
         ).length
-      : all_data.length) / select_option
+      : dest_item_list.length) / select_option
   );
-  // - Total page of Pagination
 
-  // + Sort Filtering
   const handle_sort = (column) => {
     if (sort_by === column)
       set_sort_order(sort_order === "asc" ? "desc" : "asc");
@@ -154,8 +125,9 @@ const Destination = ({
     }
     set_current_page(1);
   };
-  // - Sort Filtering
+
   const handle_page_change = (page) => set_current_page(page);
+  // - Client-Side Filtering
 
   const handle_select_branch = () => {
     set_display_modal("select_branch");
@@ -167,22 +139,28 @@ const Destination = ({
     set_display_modal("select_sloc");
   };
 
+  const handle_go_back = () => {
+    set_page("main");
+  };
+
   // RETURN ORIGIN
   return (
     <React.Fragment>
       <div className="w-full bg-white rounded-lg border">
-        {/* + Title */}
+        {/* + Header */}
         <div className="flex flex-wrap items-center justify-between gap-3 p-5">
           <h1 className="text-lg">Destination</h1>
         </div>
-        {/* - Title */}
-        {/* + Branch > Plant > SLOC Selection */}
+        {/* - Header */}
+        {/* + Section 1 */}
         <div className="p-5 sm:p-6 border-t">
           <div className="grid grid-cols-1 gap-5">
             <Text_Code_Field
               label="Branch"
               code_width="150px"
               show_search_button={true}
+              // code_value={}
+              // text_value={}
               on_click={handle_select_branch}
               disabled
             />
@@ -190,6 +168,8 @@ const Destination = ({
               label="Plant / DC"
               code_width="150px"
               show_search_button={true}
+              // code_value={}
+              // text_value={}
               on_click={handle_select_plant}
               disabled
             />
@@ -197,13 +177,15 @@ const Destination = ({
               label="SLOC"
               code_width="150px"
               show_search_button={true}
+              // code_value={}
+              // text_value={}
               on_click={handle_select_sloc}
               disabled
             />
           </div>
         </div>
-        {/* - Branch > Plant > SLOC Selection */}
-        {/* + Destination Items */}
+        {/* - Section 1 */}
+        {/* + Section 2 */}
         <div className="p-5 sm:p-6 border-t">
           <div className="w-full border rounded-lg">
             <div className="w-full md:flex md:justify-between p-4 gap-4">
@@ -248,14 +230,13 @@ const Destination = ({
                 </div>
               </div>
             </div>
-
-            {/* Table */}
+            {/* + Table */}
             <div className="overflow-x-auto">
               {loading ? (
                 <div className="p-6 text-center text-gray-500 text-sm">
                   Loading...
                 </div>
-              ) : filtered_data.length === 0 ? (
+              ) : filtered_dest_item_list.length === 0 ? (
                 <div className="p-6 text-center text-gray-500 text-sm">
                   No data found
                 </div>
@@ -303,12 +284,10 @@ const Destination = ({
                     </tr>
                   </thead>
                   <tbody className="bg-white">
-                    {filtered_data.map((row, idx) => {
-                      // + Cell Renderer
+                    {filtered_dest_item_list.map((row, idx) => {
                       const render_cell = (col, row) => {
                         const value = row[col.key];
                         if (col.key === "transfer_qty") {
-                          // Get current quantity for this row
                           const current_item = selected_items.find(
                             (item) => item.id === row.id
                           );
@@ -328,7 +307,6 @@ const Destination = ({
                                       : Number(e.target.value);
 
                                   set_selected_items((prev) => {
-                                    // If item already exists, update transfer_qty
                                     if (
                                       prev.some((item) => item.id === row.id)
                                     ) {
@@ -338,7 +316,6 @@ const Destination = ({
                                           : item
                                       );
                                     } else {
-                                      // Add new item
                                       return [
                                         ...prev,
                                         { id: row.id, transfer_qty: val },
@@ -382,9 +359,8 @@ const Destination = ({
                           );
                         }
 
-                        return value; // Default render for all other fields
+                        return value;
                       };
-                      // - Cell Renderer
 
                       return (
                         <tr key={idx} className="hover:bg-gray-50">
@@ -409,6 +385,8 @@ const Destination = ({
                 </table>
               )}
             </div>
+            {/* - Table */}
+            {/* + Pagination */}
             {total_pages > 0 && (
               <Pagination
                 current_page={current_page}
@@ -417,24 +395,31 @@ const Destination = ({
                 variant="compact"
               />
             )}
+            {/* - Pagination */}
           </div>
         </div>
-        {/* - Destination Items */}
+        {/* - Section 2 */}
+        {/* + Section 3 */}
         <div className="p-4 sm:p-8 border-t">
           <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
             <Button
               variant="primary"
               size="lg"
               // width="w-[100px]"
-              icon={Save}
+              icon={ArrowLeftRight}
               icon_position="left"
               on_click={handle_save_transfer}
             >
-              Save
+              Transfer
+            </Button>
+            <Button variant="white" size="lg" on_click={handle_go_back}>
+              Cancel
             </Button>
           </div>
         </div>
+        {/* - Section 3 */}
       </div>
+      {/* + Modals */}
       <Select_Branch
         is_open={display_modal === "select_branch"}
         on_close={() => set_display_modal("")}
@@ -453,6 +438,7 @@ const Destination = ({
         width="max-w-[1000px]"
         height="max-h-[700px]"
       />
+      {/* - Modals */}
     </React.Fragment>
   );
 };

@@ -1,44 +1,35 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useToast } from "../../../layout/Toast_Provider";
 import {
-  ArrowLeftRight,
   Search,
   ChevronDown,
   ChevronUp,
-  Edit,
-  Trash,
   View,
   RefreshCw,
-  SlidersHorizontal,
-  FileInput,
   FileUp,
   Database,
+  SlidersHorizontal,
 } from "lucide-react";
-import { useToast } from "../../../layout/Toast_Provider";
 import Button from "assets/elements/Button";
 import Icon_Field from "assets/elements/Icon_Field";
 import Select_Field from "assets/elements/Select_Field";
-import Date_Range_Field from "assets/elements/Date_Range_Field";
-import Pagination from "assets/elements/Pagination";
 import Text_Code_Field from "assets/elements/Text_Code_Field";
+import Pagination from "assets/elements/Pagination";
 import Select_Branch from "./modals/Select_Branch";
 import Select_Plant from "./modals/Select_Plant";
 import Select_SLOC from "./modals/Select_SLOC";
 
 const Inventory_Master = () => {
-  const filter_ref = useRef(null);
+  const { show_toast } = useToast();
   const [show_filter, set_show_filter] = useState(false);
   const [page, set_page] = useState("main");
   const [display_modal, set_display_modal] = useState("");
-  const date_range_ref = useRef(null);
   const [show_load_data_button, set_show_load_data_button] = useState(true);
 
-  // Close dropdown on outside click
-  const { show_toast } = useToast();
-
   const item_list = [
-    { id: 1, item_code: "ITM-0001", item_desc: "Item Description 1" },
-    { id: 2, item_code: "ITM-0002", item_desc: "Item Description 2" },
-    { id: 3, item_code: "ITM-0003", item_desc: "Item Description 3" },
+    { id: 1, item_code: "ITM-000000001", item_desc: "Item Description 1" },
+    { id: 2, item_code: "ITM-000000002", item_desc: "Item Description 2" },
+    { id: 3, item_code: "ITM-000000003", item_desc: "Item Description 3" },
   ];
 
   const columns = [
@@ -54,14 +45,13 @@ const Inventory_Master = () => {
     { key: "actions", label: "", sortable: false },
   ];
 
-  // --- State ---
-  const [all_data, set_all_data] = useState([
+  const [inv_item_list, set_inv_item_list] = useState([
     {
       id: 1,
       branch_code: "BR-001",
       plant_code: "PL-001",
       sloc_code: "SL-001",
-      item_code: "ITM-0001",
+      item_code: "ITM-000000001",
       batch_code: "BATCH-001",
       qty_available: 50,
       uom: "PC",
@@ -71,7 +61,7 @@ const Inventory_Master = () => {
       branch_code: "BR-001",
       plant_code: "PL-001",
       sloc_code: "SL-001",
-      item_code: "ITM-0002",
+      item_code: "ITM-000000002",
       batch_code: "BATCH-002",
       qty_available: 100,
       uom: "PC",
@@ -81,13 +71,15 @@ const Inventory_Master = () => {
       branch_code: "BR-001",
       plant_code: "PL-001",
       sloc_code: "SL-001",
-      item_code: "ITM-0003",
+      item_code: "ITM-000000003",
       batch_code: "BATCH-003",
       qty_available: 20,
       uom: "PC",
     },
   ]);
-  const [filtered_data, set_filtered_data] = useState([]);
+
+  // + Client-Side Filtering
+  const [filtered_inv_item_list, set_filtered_inv_item_list] = useState([]);
   const [loading, set_loading] = useState(false);
   const [select_option, set_select_option] = useState(5);
   const [current_page, set_current_page] = useState(1);
@@ -96,7 +88,6 @@ const Inventory_Master = () => {
   const [search_query, set_search_query] = useState("");
   const [debounced_query, set_debounced_query] = useState("");
 
-  // --- Debounce search ---
   useEffect(() => {
     const timer = setTimeout(() => {
       set_debounced_query(search_query);
@@ -105,35 +96,9 @@ const Inventory_Master = () => {
     return () => clearTimeout(timer);
   }, [search_query]);
 
-  // --- Close dropdown outside click ---
   useEffect(() => {
-    const handle_click_outside = (event) => {
-      if (filter_ref.current && !filter_ref.current.contains(event.target)) {
-        // optional: close filter
-      }
-    };
-    document.addEventListener("mousedown", handle_click_outside);
-    return () =>
-      document.removeEventListener("mousedown", handle_click_outside);
-  }, []);
+    let temp = [...inv_item_list];
 
-  // --- Load all users once ---
-  //   const load_data = async () => {
-  //     set_loading(true);
-  //     const data = await fetch_all_data();
-  //     set_all_data(data);
-  //     set_loading(false);
-  //   };
-
-  //   useEffect(() => {
-  //     load_data();
-  //   }, []);
-
-  // + Client-side Filtering
-  useEffect(() => {
-    let temp = [...all_data];
-
-    // + Column Filter
     if (debounced_query.trim() !== "") {
       const q = debounced_query.toLowerCase();
       temp = temp.filter((u) =>
@@ -144,9 +109,7 @@ const Inventory_Master = () => {
         })
       );
     }
-    // - Column Filter
 
-    // + Sort Function
     temp.sort((a, b) => {
       const val_a = a[sort_by];
       const val_b = b[sort_by];
@@ -158,27 +121,22 @@ const Inventory_Master = () => {
       if (val_a > val_b) return sort_order === "asc" ? 1 : -1;
       return 0;
     });
-    // - Sort Function
 
-    // + Pagination Function
     const start_idx = (current_page - 1) * select_option;
     const end_idx = start_idx + select_option;
-    // - Pagination Function
-    set_filtered_data(temp.slice(start_idx, end_idx));
+    set_filtered_inv_item_list(temp.slice(start_idx, end_idx));
   }, [
-    all_data,
+    inv_item_list,
     debounced_query,
     sort_by,
     sort_order,
     current_page,
     select_option,
   ]);
-  // - Client-side Filtering
 
-  // + Total page of Pagination
   const total_pages = Math.ceil(
     (debounced_query
-      ? all_data.filter((u) =>
+      ? inv_item_list.filter((u) =>
           columns.some((col) => {
             if (col.key === "actions") return false;
             const val = u[col.key];
@@ -188,11 +146,9 @@ const Inventory_Master = () => {
               .includes(debounced_query.toLowerCase());
           })
         ).length
-      : all_data.length) / select_option
+      : inv_item_list.length) / select_option
   );
-  // - Total page of Pagination
 
-  // + Sort Filtering
   const handle_sort = (column) => {
     if (sort_by === column)
       set_sort_order(sort_order === "asc" ? "desc" : "asc");
@@ -202,8 +158,9 @@ const Inventory_Master = () => {
     }
     set_current_page(1);
   };
-  // - Sort Filtering
+
   const handle_page_change = (page) => set_current_page(page);
+  // - Client-Side Filtering
 
   const handle_select_branch = () => {
     set_display_modal("select_branch");
@@ -215,14 +172,17 @@ const Inventory_Master = () => {
     set_display_modal("select_sloc");
   };
 
+  const handle_upload_inv = () => {
+    alert("Upload Inventory");
+  };
+
   // RETURN ORIGIN
   return (
     <React.Fragment>
       <div className="w-full">
-        {/* + Header */}
         <div className="flex flex-wrap items-center justify-between gap-3 py-5">
           <h1 className="text-xl">Warehouse</h1>
-          {/* + Breadcrumb */}
+          {/* + Breadcrumbs */}
           <nav>
             <ol className="flex flex-wrap items-center gap-1.5">
               <li>
@@ -242,11 +202,10 @@ const Inventory_Master = () => {
               </li>
             </ol>
           </nav>
-          {/* - Breadcrumb */}
+          {/* - Breadcrumbs */}
         </div>
-        {/* - Header */}
         <div className="w-full bg-white rounded-lg border">
-          {/* + Title */}
+          {/* + Header */}
           <div className="flex flex-wrap items-center justify-between gap-3 p-5">
             <h1 className="text-lg">Inventory Master</h1>
             <div className="flex gap-2">
@@ -254,14 +213,14 @@ const Inventory_Master = () => {
                 variant="primary"
                 icon={FileUp}
                 icon_position="left"
-                // on_click={handle_upload_gr}
+                on_click={handle_upload_inv}
               >
                 Upload
               </Button>
             </div>
           </div>
-          {/* - Title */}
-          {/* + Branch > Plant > SLOC Selection */}
+          {/* - Header */}
+          {/* + Section 1 */}
           <div className="p-5 sm:p-6 border-t">
             <div className="grid grid-cols-1 gap-5">
               <Text_Code_Field
@@ -306,8 +265,8 @@ const Inventory_Master = () => {
               )}
             </div>
           </div>
-          {/* - Branch > Plant > SLOC Selection */}
-          {/* + List of Item */}
+          {/* - Section 1 */}
+          {/* + Section 2 */}
           <div className="p-5 sm:p-6 border-t">
             <div className="w-full border rounded-lg">
               <div className="w-full md:flex md:justify-between p-4 gap-4">
@@ -341,7 +300,6 @@ const Inventory_Master = () => {
                   <div className="w-full flex items-center gap-2">
                     <div className="w-full">
                       <Icon_Field
-                        //   name="search"
                         placeholder="Search..."
                         icon={Search}
                         icon_position="left"
@@ -349,30 +307,25 @@ const Inventory_Master = () => {
                         on_change={(e) => set_search_query(e.target.value)}
                       />
                     </div>
-                    {/* <div className="relative" ref={filter_ref}>
+                    {/* + Dropdown Filter */}
+                    <div className="relative">
                       <Button
                         variant="white"
                         width="w-[100px]"
                         icon={SlidersHorizontal}
                         icon_position="left"
-                        // loading
                         on_click={() => set_show_filter((prev) => !prev)}
                       >
                         Filter
                       </Button>
-
+                      {/* + Dropdown Content */}
                       {show_filter && (
                         <React.Fragment>
                           <div
                             className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40"
+                            onClick={() => set_show_filter(false)}
                           ></div>
                           <div className="absolute top-full mt-2 right-0 z-50 bg-white border rounded-lg shadow-md p-4 w-[260px]">
-                            <div>
-                              <Date_Range_Field
-                                label="Date Range"
-                                ref={date_range_ref}
-                              />
-                            </div>
                             <div className="flex justify-end gap-2 mt-4">
                               <Button
                                 size="sm"
@@ -392,18 +345,19 @@ const Inventory_Master = () => {
                           </div>
                         </React.Fragment>
                       )}
-                    </div> */}
+                      {/* - Dropdown Content */}
+                    </div>
+                    {/* - Dropdown Filter */}
                   </div>
                 </div>
               </div>
-
-              {/* Table */}
+              {/* + Table */}
               <div className="overflow-x-auto">
                 {loading ? (
                   <div className="p-6 text-center text-gray-500 text-sm">
                     Loading...
                   </div>
-                ) : filtered_data.length === 0 ? (
+                ) : filtered_inv_item_list.length === 0 ? (
                   <div className="p-6 text-center text-gray-500 text-sm">
                     No data found
                   </div>
@@ -453,11 +407,10 @@ const Inventory_Master = () => {
                       </tr>
                     </thead>
                     <tbody className="bg-white">
-                      {filtered_data.map((row, idx) => {
+                      {filtered_inv_item_list.map((row, idx) => {
                         const item_data = item_list.find(
                           (c) => c.item_code === row.item_code
                         );
-                        // + Cell Renderer
                         const render_cell = (col, row) => {
                           const value = row[col.key];
                           if (col.key === "index") {
@@ -502,9 +455,8 @@ const Inventory_Master = () => {
                               </div>
                             );
                           }
-                          return value; // Default render for all other fields
+                          return value;
                         };
-                        // - Cell Renderer
 
                         return (
                           <tr key={idx} className="hover:bg-gray-50">
@@ -529,6 +481,8 @@ const Inventory_Master = () => {
                   </table>
                 )}
               </div>
+              {/* - Table */}
+              {/* + Pagination */}
               {total_pages > 0 && (
                 <Pagination
                   current_page={current_page}
@@ -537,11 +491,13 @@ const Inventory_Master = () => {
                   variant="compact"
                 />
               )}
+              {/* - Pagination */}
             </div>
           </div>
-          {/* - List of Item */}
+          {/* - Section 2 */}
         </div>
       </div>
+      {/* + Modals */}
       <Select_Branch
         is_open={display_modal === "select_branch"}
         on_close={() => set_display_modal("")}
@@ -560,6 +516,7 @@ const Inventory_Master = () => {
         width="max-w-[1000px]"
         height="max-h-[700px]"
       />
+      {/* - Modals */}
     </React.Fragment>
   );
 };

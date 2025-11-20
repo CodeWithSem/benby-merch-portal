@@ -1,30 +1,41 @@
+import React from "react";
 import Checkbox_Field from "assets/elements/Checkbox_Field";
-import Date_Field from "assets/elements/Date_Field";
-import Select_Field from "assets/elements/Select_Field";
 import Text_Code_Field from "assets/elements/Text_Code_Field";
 import Text_Field from "assets/elements/Text_Field";
 import Textarea_Field from "assets/elements/Textarea_Field";
-import React from "react";
 
-const Sales_Data_Plant = () => {
+const Sales_Data_Plant = ({ set_display_modal }) => {
   return (
     <React.Fragment>
+      {/* + Section 1 */}
       <div className="rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6 dark:border-gray-800 dark:bg-gray-900">
         <div className="grid grid-cols-1 gap-5">
           <div>
             <Text_Code_Field
-              label="Plant / DC"
-              // code_value={code_data}
-              // on_code_change={handle_code_data_change}
-              // text_value={text_data}
-              // on_text_change={handle_text_data_change}
+              label="Branch"
               code_width="150px"
               show_search_button={true}
+              // code_value={code_data}
+              // text_value={text_data}
+              on_click={() => set_display_modal("select_sdp_branch")}
+              disabled
+            />
+          </div>
+          <div>
+            <Text_Code_Field
+              label="Plant / DC"
+              code_width="150px"
+              show_search_button={true}
+              // code_value={code_data}
+              // text_value={text_data}
+              on_click={() => set_display_modal("select_sdp_plant")}
               disabled
             />
           </div>
         </div>
       </div>
+      {/* - Section 1 */}
+      {/* + Section 2 */}
       <div className="mt-5 rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6 dark:border-gray-800 dark:bg-gray-900">
         <h1 className="mb-5 font-semibold text-sky-700">Sales Item Details</h1>
         <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
@@ -88,30 +99,30 @@ const Sales_Data_Plant = () => {
           </div>
         </div>
       </div>
+      {/* - Section 2 */}
+      {/* + Section 3 */}
       <div className="mt-5 rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6 dark:border-gray-800 dark:bg-gray-900">
         <h1 className="mb-5 font-semibold text-sky-700">Shipping Details</h1>
         <div className="grid grid-cols-1 gap-5">
           <div>
             <Text_Code_Field
               label="Transportation Group"
-              // code_value={code_data}
-              // on_code_change={handle_code_data_change}
-              // text_value={text_data}
-              // on_text_change={handle_text_data_change}
               code_width="150px"
               show_search_button={true}
+              // code_value={code_data}
+              // text_value={text_data}
+              on_click={() => set_display_modal("select_sdp_tans_group")}
               disabled
             />
           </div>
           <div>
             <Text_Code_Field
               label="Loading Group"
-              // code_value={code_data}
-              // on_code_change={handle_code_data_change}
-              // text_value={text_data}
-              // on_text_change={handle_text_data_change}
               code_width="150px"
               show_search_button={true}
+              // code_value={code_data}
+              // text_value={text_data}
+              on_click={() => set_display_modal("select_sdp_load_group")}
               disabled
             />
           </div>
@@ -119,14 +130,16 @@ const Sales_Data_Plant = () => {
             <Textarea_Field
               label="Sales Text"
               name="sales_text"
-              // value={data}
-              // on_change={(e) => handle_data_change(e.target.value)}
               placeholder="Enter your description..."
-              height="121px"
+              height="120px"
+              // value={}
+              //  on_change={}
             />
           </div>
         </div>
       </div>
+      {/* - Section 3 */}
+      {/* + Section 4 */}
       <div className="mt-5 rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6 dark:border-gray-800 dark:bg-gray-900">
         <h1 className="mb-5 font-semibold text-sky-700">
           General Plant Inventory Account Details
@@ -135,17 +148,17 @@ const Sales_Data_Plant = () => {
           <div>
             <Text_Code_Field
               label="Inventory Account Center"
-              // code_value={code_data}
-              // on_code_change={handle_code_data_change}
-              // text_value={text_data}
-              // on_text_change={handle_text_data_change}
               code_width="150px"
               show_search_button={true}
+              // code_value={code_data}
+              // text_value={text_data}
+              on_click={() => set_display_modal("select_sdp_inv_acc_center")}
               disabled
             />
           </div>
         </div>
       </div>
+      {/* - Section 4 */}
     </React.Fragment>
   );
 };

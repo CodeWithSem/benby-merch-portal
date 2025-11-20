@@ -1,13 +1,11 @@
-import Button from "assets/elements/Button";
-import Select_Field from "assets/elements/Select_Field";
-import Text_Field from "assets/elements/Text_Field";
-import { ChevronLeft, RefreshCcwDot } from "lucide-react";
 import React, { useState } from "react";
+import { ChevronLeft } from "lucide-react";
+import Button from "assets/elements/Button";
+import Text_Field from "assets/elements/Text_Field";
 import Details from "./truck_details/Details";
 
 const View_Truck = ({ set_page }) => {
   const [active_tab, set_active_tab] = useState("details");
-  const [display_modal, set_display_modal] = useState("");
 
   const tabs = [{ key: "details", title: "Details" }];
 
@@ -15,9 +13,9 @@ const View_Truck = ({ set_page }) => {
   return (
     <React.Fragment>
       <div className="w-full">
-        {/* === HEADER & BREADCRUMBS === */}
         <div className="flex flex-wrap items-center justify-between gap-3 py-5">
           <h1 className="text-xl">Outbound</h1>
+          {/* + Breadcrumbs */}
           <nav>
             <ol className="flex flex-wrap items-center gap-1.5">
               <li>
@@ -49,11 +47,10 @@ const View_Truck = ({ set_page }) => {
               </li>
             </ol>
           </nav>
+          {/* - Breadcrumbs */}
         </div>
-
-        {/* === MAIN CARD === */}
         <div className="w-full bg-white rounded-lg border">
-          {/* === HEADER BAR === */}
+          {/* + Header */}
           <div className="flex flex-wrap items-center justify-between gap-3 p-5">
             <div className="flex items-center gap-3">
               <Button
@@ -70,32 +67,25 @@ const View_Truck = ({ set_page }) => {
               MM-DD-YYYY
             </div>
           </div>
-
-          {/* === FORM FIELDS === */}
+          {/* - Header */}
+          {/* + Section 1 */}
           <div className="p-5 sm:p-6 border-t">
             <div className="w-full">
               <div className="grid grid-cols-1 gap-x-0 gap-y-5 lg:gap-x-5 lg:grid-cols-3">
                 <div>
-                  <Text_Field
-                    label="Plate Number"
-                    type={"text"}
-                    pattern="[0-9]{1,}"
-                    disabled
-                  />
+                  <Text_Field label="Plate Number" type={"text"} disabled />
                 </div>
                 <div className="col-span-2">
-                  <Text_Field
-                    label="Truck Type"
-                    type={"text"}
-                    pattern="[0-9]{1,}"
-                    disabled
-                  />
+                  <Text_Field label="Truck Type" type={"text"} disabled />
                 </div>
               </div>
             </div>
           </div>
+          {/* - Section 1 */}
+          {/* + Section 2 */}
           <div className="p-5 sm:p-6 border-t">
             <div className="w-full bg-white rounded-lg border">
+              {/* + Tab Navigation */}
               <div className="w-full border-b p-2">
                 <nav className="flex overflow-x-auto rounded-lg bg-gray-100 p-1 dark:bg-gray-900 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-200 dark:[&::-webkit-scrollbar-thumb]:bg-gray-600 [&::-webkit-scrollbar-track]:bg-white dark:[&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar]:h-1.5">
                   {tabs.map((tab) => (
@@ -113,6 +103,7 @@ const View_Truck = ({ set_page }) => {
                   ))}
                 </nav>
               </div>
+              {/* - Tab Navigation */}
               {/* + Tab Content */}
               <div className="p-6">
                 {active_tab === "details" && <Details />}
@@ -120,6 +111,7 @@ const View_Truck = ({ set_page }) => {
               {/* - Tab Content */}
             </div>
           </div>
+          {/* - Section 2 */}
         </div>
       </div>
     </React.Fragment>

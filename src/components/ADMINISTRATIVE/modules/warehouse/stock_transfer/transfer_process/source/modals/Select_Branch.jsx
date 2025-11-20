@@ -11,60 +11,49 @@ const Select_Branch = ({
   width = "max-w-[700px]",
   height = "h-[500px]",
 }) => {
-  // --- Mock Data (replace later with API call if needed)
-  const [all_branch, set_all_branch] = useState([
+  const [branch_list, set_branch_list] = useState([
     {
-      id: "BR-001",
-      description: "Branch Description 1",
-      creation_date: "10/08/2025 12:00:00",
-    },
-    {
-      id: "BR-002",
-      description: "Branch Description 2",
-      creation_date: "10/08/2025 12:00:00",
-    },
-    {
-      id: "BR-003",
-      description: "Branch Description 3",
-      creation_date: "10/09/2025 12:00:00",
+      id: 1,
+      branch_code: "BR-001",
+      branch_desc: "Branch Description 1",
+      creation_date: "MM-DD-YYYY",
     },
   ]);
 
-  // --- States ---
-  const [filtered_branches, set_filtered_branches] = useState([]);
+  // + Client-Side Filtering
+  const [filtered_branch_list, set_filtered_branch_list] = useState([]);
   const [current_page, set_current_page] = useState(1);
   const [rows_per_page, set_rows_per_page] = useState(5);
   const [search_query, set_search_query] = useState("");
   const [selected_branch, set_selected_branch] = useState(null);
 
-  // --- Pagination + Filtering Logic ---
   useEffect(() => {
-    let data = [...all_branch];
+    let data = [...branch_list];
 
     if (search_query.trim() !== "") {
       const q = search_query.toLowerCase();
       data = data.filter(
-        (branch) =>
-          branch.id.toLowerCase().includes(q) ||
-          branch.description.toLowerCase().includes(q)
+        (data) =>
+          data.branch_code.toLowerCase().includes(q) ||
+          data.branch_desc.toLowerCase().includes(q)
       );
     }
 
     const start_idx = (current_page - 1) * rows_per_page;
     const end_idx = start_idx + rows_per_page;
-    set_filtered_branches(data.slice(start_idx, end_idx));
-  }, [all_branch, search_query, current_page, rows_per_page]);
+    set_filtered_branch_list(data.slice(start_idx, end_idx));
+  }, [branch_list, search_query, current_page, rows_per_page]);
 
   const total_pages = Math.ceil(
-    all_branch.filter(
-      (branch) =>
-        branch.id.toLowerCase().includes(search_query.toLowerCase()) ||
-        branch.description.toLowerCase().includes(search_query.toLowerCase())
+    branch_list.filter(
+      (data) =>
+        data.branch_code.toLowerCase().includes(search_query.toLowerCase()) ||
+        data.branch_desc.toLowerCase().includes(search_query.toLowerCase())
     ).length / rows_per_page
   );
 
-  // --- Handlers ---
   const handle_page_change = (page) => set_current_page(page);
+  // - Client-Side Filtering
 
   const handle_select_branch = () => {
     if (!selected_branch) {
@@ -74,13 +63,13 @@ const Select_Branch = ({
     alert(`Selected: ${selected_branch.description}`);
   };
 
+  // RETURN ORIGIN
   return is_open ? (
     <React.Fragment>
       <div className="fixed inset-0 flex items-center justify-center z-[97] px-4">
         {/* + Blur */}
         <div className="absolute inset-0 bg-black/50 backdrop-blur-sm z-[98]"></div>
         {/* - Blur */}
-
         {/* + Modal Content */}
         <div
           className={`relative bg-white rounded-lg shadow-xl ${width} w-full py-7 m-5 z-[99]`}
@@ -91,13 +80,9 @@ const Select_Branch = ({
           >
             <X size={20} />
           </button>
-
-          {/* + Modal Label */}
           <div className="text-lg md:text-xl font-bold mb-5 px-7">
             Branch Selection
           </div>
-          {/* - Modal Label */}
-
           {/* + Modal Body */}
           <div className={`w-full overflow-y-auto ${height} scrollbar-custom`}>
             <div className="overflow-hidden border border-gray-200 bg-white pt-4">
@@ -116,8 +101,7 @@ const Select_Branch = ({
                   />
                 </div>
               </div>
-
-              {/* Table */}
+              {/* + Table */}
               <div className="max-w-full overflow-x-auto custom-scrollbar">
                 <table className="min-w-full whitespace-nowrap">
                   <thead className="border-gray-100 border-y bg-gray-50">
@@ -133,7 +117,7 @@ const Select_Branch = ({
                   </thead>
 
                   <tbody className="divide-y divide-gray-100">
-                    {filtered_branches.length === 0 ? (
+                    {filtered_branch_list.length === 0 ? (
                       <tr>
                         <td
                           colSpan={3}
@@ -143,13 +127,13 @@ const Select_Branch = ({
                         </td>
                       </tr>
                     ) : (
-                      filtered_branches.map((branch) => (
+                      filtered_branch_list.map((data) => (
                         <tr
-                          key={branch.id}
+                          key={data.id}
                           className={`hover:bg-sky-50/50 cursor-pointer text-[12px] ${
-                            selected_branch?.id === branch.id ? "bg-sky-50" : ""
+                            selected_branch?.id === data.id ? "bg-sky-50" : ""
                           }`}
-                          onClick={() => set_selected_branch(branch)}
+                          onClick={() => set_selected_branch(data)}
                         >
                           <td className="px-5 py-4 sm:px-6 text-center">
                             <div className="flex justify-center items-center">
@@ -157,23 +141,23 @@ const Select_Branch = ({
                                 name="check"
                                 box_size={18}
                                 icon_size={12}
-                                checked={selected_branch?.id === branch.id}
-                                on_change={() => set_selected_branch(branch)}
+                                checked={selected_branch?.id === data.id}
+                                on_change={() => set_selected_branch(data)}
                               />
                             </div>
                           </td>
                           <td className="px-5 py-4 sm:px-6">
                             <div className="block font-medium text-gray-800">
                               <span className="block text-gray-500 text-[12px]">
-                                {branch.id}
+                                {data.branch_code}
                               </span>
                               <span className="block text-gray-800 text-sm">
-                                {branch.description}
+                                {data.branch_desc}
                               </span>
                             </div>
                           </td>
                           <td className="px-6 py-3 text-gray-700 tracking-wide">
-                            {branch.creation_date}
+                            {data.creation_date}
                           </td>
                         </tr>
                       ))
@@ -181,13 +165,14 @@ const Select_Branch = ({
                   </tbody>
                 </table>
               </div>
+              {/* - Table */}
             </div>
           </div>
           {/* - Modal Body */}
 
           {/* + Modal Footer */}
           <div className="flex flex-col items-center sm:flex-row sm:justify-between gap-3 mt-5 px-7">
-            {/* Pagination */}
+            {/* + Pagination */}
             {total_pages > 0 && (
               <div className="w-full sm:w-auto">
                 <Pagination_Modal
@@ -197,8 +182,8 @@ const Select_Branch = ({
                 />
               </div>
             )}
-
-            {/* Buttons */}
+            {/* - Pagination */}
+            {/* + Action Buttons */}
             <div className="flex justify-center sm:justify-end gap-2 w-full">
               <Button
                 variant="primary"
@@ -216,6 +201,7 @@ const Select_Branch = ({
                 Close
               </Button>
             </div>
+            {/* - Action Buttons */}
           </div>
           {/* - Modal Footer */}
         </div>

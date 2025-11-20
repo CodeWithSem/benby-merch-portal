@@ -1,23 +1,17 @@
-import React, { useEffect, useRef, useState } from "react";
-import Text_Code_Field from "assets/elements/Text_Code_Field";
+import React, { useEffect, useState } from "react";
 import { useToast } from "../../../../../layout/Toast_Provider";
 import {
-  ArrowLeftRight,
   Search,
   ChevronDown,
   ChevronUp,
-  Edit,
-  Trash,
   View,
   RefreshCw,
-  SlidersHorizontal,
-  FileInput,
   ChevronLeft,
 } from "lucide-react";
 import Button from "assets/elements/Button";
+import Text_Code_Field from "assets/elements/Text_Code_Field";
 import Icon_Field from "assets/elements/Icon_Field";
 import Select_Field from "assets/elements/Select_Field";
-import Date_Range_Field from "assets/elements/Date_Range_Field";
 import Pagination from "assets/elements/Pagination";
 import Checkbox_Field from "assets/elements/Checkbox_Field";
 import Select_Branch from "./modals/Select_Branch";
@@ -36,8 +30,7 @@ const Source = ({ selected_items, set_selected_items, set_page }) => {
     { key: "available_qty", label: "Available Qty", sortable: true },
   ];
 
-  // --- State ---
-  const [all_data, set_all_data] = useState([
+  const [source_item_list, set_source_item_list] = useState([
     {
       id: 1,
       item_code: "ITM-0001",
@@ -60,7 +53,11 @@ const Source = ({ selected_items, set_selected_items, set_page }) => {
       available_qty: 20,
     },
   ]);
-  const [filtered_data, set_filtered_data] = useState([]);
+
+  // + Client-Side Filtering
+  const [filtered_source_item_list, set_filtered_source_item_list] = useState(
+    []
+  );
   const [loading, set_loading] = useState(false);
   const [select_option, set_select_option] = useState(5);
   const [current_page, set_current_page] = useState(1);
@@ -69,7 +66,6 @@ const Source = ({ selected_items, set_selected_items, set_page }) => {
   const [search_query, set_search_query] = useState("");
   const [debounced_query, set_debounced_query] = useState("");
 
-  // --- Debounce search ---
   useEffect(() => {
     const timer = setTimeout(() => {
       set_debounced_query(search_query);
@@ -78,23 +74,9 @@ const Source = ({ selected_items, set_selected_items, set_page }) => {
     return () => clearTimeout(timer);
   }, [search_query]);
 
-  // --- Load all users once ---
-  //   const load_data = async () => {
-  //     set_loading(true);
-  //     const data = await fetch_all_data();
-  //     set_all_data(data);
-  //     set_loading(false);
-  //   };
-
-  //   useEffect(() => {
-  //     load_data();
-  //   }, []);
-
-  // + Client-side Filtering
   useEffect(() => {
-    let temp = [...all_data];
+    let temp = [...source_item_list];
 
-    // + Column Filter
     if (debounced_query.trim() !== "") {
       const q = debounced_query.toLowerCase();
       temp = temp.filter((u) =>
@@ -105,9 +87,7 @@ const Source = ({ selected_items, set_selected_items, set_page }) => {
         })
       );
     }
-    // - Column Filter
 
-    // + Sort Function
     temp.sort((a, b) => {
       const val_a = a[sort_by];
       const val_b = b[sort_by];
@@ -119,27 +99,22 @@ const Source = ({ selected_items, set_selected_items, set_page }) => {
       if (val_a > val_b) return sort_order === "asc" ? 1 : -1;
       return 0;
     });
-    // - Sort Function
 
-    // + Pagination Function
     const start_idx = (current_page - 1) * select_option;
     const end_idx = start_idx + select_option;
-    // - Pagination Function
-    set_filtered_data(temp.slice(start_idx, end_idx));
+    set_filtered_source_item_list(temp.slice(start_idx, end_idx));
   }, [
-    all_data,
+    source_item_list,
     debounced_query,
     sort_by,
     sort_order,
     current_page,
     select_option,
   ]);
-  // - Client-side Filtering
 
-  // + Total page of Pagination
   const total_pages = Math.ceil(
     (debounced_query
-      ? all_data.filter((u) =>
+      ? source_item_list.filter((u) =>
           columns.some((col) => {
             if (col.key === "actions") return false;
             const val = u[col.key];
@@ -149,11 +124,9 @@ const Source = ({ selected_items, set_selected_items, set_page }) => {
               .includes(debounced_query.toLowerCase());
           })
         ).length
-      : all_data.length) / select_option
+      : source_item_list.length) / select_option
   );
-  // - Total page of Pagination
 
-  // + Sort Filtering
   const handle_sort = (column) => {
     if (sort_by === column)
       set_sort_order(sort_order === "asc" ? "desc" : "asc");
@@ -163,39 +136,49 @@ const Source = ({ selected_items, set_selected_items, set_page }) => {
     }
     set_current_page(1);
   };
-  // - Sort Filtering
+
   const handle_page_change = (page) => set_current_page(page);
+  // - Client-Side Filtering
 
   const handle_select_branch = () => {
     set_display_modal("select_branch");
   };
+
   const handle_select_plant = () => {
     set_display_modal("select_plant");
   };
+
   const handle_select_sloc = () => {
     set_display_modal("select_sloc");
+  };
+
+  const handle_go_back = () => {
+    set_page("main");
   };
 
   // RETURN ORIGIN
   return (
     <React.Fragment>
       <div className="w-full bg-white rounded-lg border">
-        {/* + Title */}
+        {/* + Header */}
         <div className="flex flex-wrap items-center justify-between gap-3 p-5">
-          <h1 className="text-lg">Source</h1>
-          <div className="flex gap-2">
+          <div className="flex items-center gap-3">
             <Button
               variant="white"
               icon={ChevronLeft}
               icon_position="left"
-              on_click={() => set_page("main")}
-            >
-              Go Back
-            </Button>
+              width="w-[20px]"
+              on_click={handle_go_back}
+            ></Button>
+            <h1 className="text-lg">Source</h1>
+          </div>
+
+          <div className="flex gap-2 text-gray-500 text-sm tracking-wider">
+            MM-DD-YYYY
           </div>
         </div>
-        {/* - Title */}
-        {/* + Branch > Plant > SLOC Selection */}
+        {/* - Header */}
+        {/* + Section 1 */}
         <div className="p-5 sm:p-6 border-t">
           <div className="grid grid-cols-1 gap-5">
             <Text_Code_Field
@@ -221,8 +204,8 @@ const Source = ({ selected_items, set_selected_items, set_page }) => {
             />
           </div>
         </div>
-        {/* - Branch > Plant > SLOC Selection */}
-        {/* + Source Items */}
+        {/* - Section 1 */}
+        {/* + Section 2 */}
         <div className="p-5 sm:p-6 border-t">
           <div className="w-full border rounded-lg">
             <div className="w-full md:flex md:justify-between p-4 gap-4">
@@ -268,13 +251,13 @@ const Source = ({ selected_items, set_selected_items, set_page }) => {
               </div>
             </div>
 
-            {/* Table */}
+            {/* + Table */}
             <div className="overflow-x-auto">
               {loading ? (
                 <div className="p-6 text-center text-gray-500 text-sm">
                   Loading...
                 </div>
-              ) : filtered_data.length === 0 ? (
+              ) : filtered_source_item_list.length === 0 ? (
                 <div className="p-6 text-center text-gray-500 text-sm">
                   No data found
                 </div>
@@ -322,8 +305,7 @@ const Source = ({ selected_items, set_selected_items, set_page }) => {
                     </tr>
                   </thead>
                   <tbody className="bg-white">
-                    {filtered_data.map((row, idx) => {
-                      // + Cell Renderer
+                    {filtered_source_item_list.map((row, idx) => {
                       const render_cell = (col, row) => {
                         const value = row[col.key];
                         if (col.key === "checkbox") {
@@ -383,9 +365,8 @@ const Source = ({ selected_items, set_selected_items, set_page }) => {
                           );
                         }
 
-                        return value; // Default render for all other fields
+                        return value;
                       };
-                      // - Cell Renderer
 
                       return (
                         <tr key={idx} className="hover:bg-gray-50">
@@ -410,6 +391,9 @@ const Source = ({ selected_items, set_selected_items, set_page }) => {
                 </table>
               )}
             </div>
+            {/* + Table */}
+
+            {/* + Pagination */}
             {total_pages > 0 && (
               <Pagination
                 current_page={current_page}
@@ -418,10 +402,12 @@ const Source = ({ selected_items, set_selected_items, set_page }) => {
                 variant="compact"
               />
             )}
+            {/* - Pagination */}
           </div>
         </div>
-        {/* - Source Items */}
+        {/* - Section 2 */}
       </div>
+      {/* + Modals */}
       <Select_Branch
         is_open={display_modal === "select_branch"}
         on_close={() => set_display_modal("")}
@@ -440,6 +426,7 @@ const Source = ({ selected_items, set_selected_items, set_page }) => {
         width="max-w-[1000px]"
         height="max-h-[700px]"
       />
+      {/* - Modals */}
     </React.Fragment>
   );
 };

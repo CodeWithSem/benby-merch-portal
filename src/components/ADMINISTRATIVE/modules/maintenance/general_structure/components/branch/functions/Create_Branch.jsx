@@ -93,7 +93,6 @@ const Create_Branch = ({ handle_go_back }) => {
             <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
               <Button
                 variant="primary"
-                // width="w-[100px]"
                 icon={CirclePlus}
                 icon_position="left"
                 // on_click={handle_save}
@@ -102,7 +101,6 @@ const Create_Branch = ({ handle_go_back }) => {
               </Button>
               <Button
                 variant="white"
-                // width="w-[100px]"
                 on_click={() => handle_go_back("sub_level")}
               >
                 Cancel
