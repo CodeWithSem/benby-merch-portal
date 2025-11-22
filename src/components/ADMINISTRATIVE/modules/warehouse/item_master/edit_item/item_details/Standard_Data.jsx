@@ -3,8 +3,9 @@ import Checkbox_Field from "assets/elements/Checkbox_Field";
 import Date_Field from "assets/elements/Date_Field";
 import Select_Field from "assets/elements/Select_Field";
 import Text_Field from "assets/elements/Text_Field";
+import Find_Field from "assets/elements/Find_Field";
 
-const Standard_Data = () => {
+const Standard_Data = ({ set_display_modal }) => {
   // RETURN ORIGIN
   return (
     <React.Fragment>
@@ -39,39 +40,39 @@ const Standard_Data = () => {
         </h1>
         <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
           <div>
-            <Select_Field
+            <Find_Field
               label="Item Group"
-              placeholder="Select Option"
-              // options={options}
-              // value={selected_data}
-              // on_change={handle_option_change}
+              // value={data}
+              // on_change={(e) => handle_data_change(e.target.value)}
+              on_click={() => set_display_modal("select_item_group")}
+              disabled
             />
           </div>
           <div>
-            <Select_Field
+            <Find_Field
               label="Gen. Item Group Category"
-              placeholder="Select Option"
-              // options={options}
-              // value={selected_data}
-              // on_change={handle_option_change}
+              // value={data}
+              // on_change={(e) => handle_data_change(e.target.value)}
+              on_click={() => set_display_modal("select_gen_item_group_cat")}
+              disabled
             />
           </div>
           <div>
-            <Select_Field
+            <Find_Field
               label="Item Division"
-              placeholder="Select Option"
-              // options={options}
-              // value={selected_data}
-              // on_change={handle_option_change}
+              // value={data}
+              // on_change={(e) => handle_data_change(e.target.value)}
+              on_click={() => set_display_modal("select_item_division")}
+              disabled
             />
           </div>
           <div>
-            <Select_Field
+            <Find_Field
               label="Item Status"
-              placeholder="Select Option"
-              // options={options}
-              // value={selected_data}
-              // on_change={handle_option_change}
+              // value={data}
+              // on_change={(e) => handle_data_change(e.target.value)}
+              on_click={() => set_display_modal("select_item_status")}
+              disabled
             />
           </div>
           <div>

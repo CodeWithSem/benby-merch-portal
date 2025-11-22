@@ -31,6 +31,11 @@ import {
   sloc_list,
   stype_list,
   trans_group_list,
+  item_group_list,
+  item_status_list,
+  item_division_list,
+  gen_item_group_cat_list,
+  load_group_list,
 } from "../ITEM_DATA_MAP";
 import Select_SD_Sales_Org from "../modals/sales_data/Select_SD_Sales_Org";
 import Select_SD_Dist_Channel from "../modals/sales_data/Select_SD_Dist_Channel";
@@ -61,6 +66,13 @@ import Select_Product_Class_2 from "../modals/product_class/Select_Product_Class
 import Select_Product_Class_3 from "../modals/product_class/Select_Product_Class_3";
 import Select_Product_Class_4 from "../modals/product_class/Select_Product_Class_4";
 import Select_Product_Class_5 from "../modals/product_class/Select_Product_Class_5";
+import Select_WM1_SLOC from "../modals/wm_data_1/Select_WM1_SLOC";
+import Select_Item_Group from "../modals/item_group/Select_Item_Group";
+import Select_G_Item_Group_Cat from "../modals/standard_data/Select_G_Item_Group_Cat";
+import Select_Item_Division from "../modals/standard_data/Select_Item_Division";
+import Select_Item_Status from "../modals/standard_data/Select_Item_Status";
+import Select_SDP_Load_Group from "../modals/sales_data_plant/Select_SDP_Load_Group";
+import Select_SD_S_Spec_Status from "../modals/sales_data/Select_SD_S_Spec_Status";
 
 const Edit_Item = ({ set_page }) => {
   const [active_tab, set_active_tab] = useState("standard_data");
@@ -162,7 +174,7 @@ const Edit_Item = ({ set_page }) => {
                 <Text_Field
                   label="Item Code"
                   type={"text"}
-                  value={"AUTO GENERATED"}
+                  value={"ITM-XXXXXXXXX"}
                   // on_change={handle_text_change}
                   pattern="[A-Za-z]{1,}"
                   disabled
@@ -204,26 +216,57 @@ const Edit_Item = ({ set_page }) => {
               {/* - Tab Navigation */}
               {/* + Tab Content */}
               <div className="p-6">
-                {active_tab === "standard_data" && <Standard_Data />}
+                {active_tab === "standard_data" && (
+                  <Standard_Data set_display_modal={set_display_modal} />
+                )}
                 {active_tab === "purchasing" && (
-                  <Purchasing set_display_modal={set_display_modal} />
+                  <Purchasing
+                    set_display_modal={set_display_modal}
+                    branch_list={branch_list}
+                    plant_list={plant_list}
+                    sloc_list={sloc_list}
+                  />
                 )}
                 {active_tab === "case_config_1" && <Case_Config_1 />}
                 {active_tab === "case_config_2" && <Case_Config_2 />}
                 {active_tab === "sales_data" && (
-                  <Sales_Data set_display_modal={set_display_modal} />
+                  <Sales_Data
+                    set_display_modal={set_display_modal}
+                    sales_org_list={sales_org_list}
+                    dist_channel_list={dist_channel_list}
+                  />
                 )}
                 {active_tab === "sales_data_plant" && (
-                  <Sales_Data_Plant set_display_modal={set_display_modal} />
+                  <Sales_Data_Plant
+                    set_display_modal={set_display_modal}
+                    branch_list={branch_list}
+                    plant_list={plant_list}
+                  />
                 )}
                 {active_tab === "plant_data" && (
-                  <Plant_Data set_display_modal={set_display_modal} />
+                  <Plant_Data
+                    set_display_modal={set_display_modal}
+                    branch_list={branch_list}
+                    plant_list={plant_list}
+                    sloc_list={sloc_list}
+                  />
                 )}
                 {active_tab === "wm_data_1" && (
-                  <WM_Data_1 set_display_modal={set_display_modal} />
+                  <WM_Data_1
+                    set_display_modal={set_display_modal}
+                    branch_list={branch_list}
+                    plant_list={plant_list}
+                    sloc_list={sloc_list}
+                  />
                 )}
                 {active_tab === "wm_data_2" && (
-                  <WM_Data_2 set_display_modal={set_display_modal} />
+                  <WM_Data_2
+                    set_display_modal={set_display_modal}
+                    branch_list={branch_list}
+                    plant_list={plant_list}
+                    sloc_list={sloc_list}
+                    stype_list={stype_list}
+                  />
                 )}
               </div>
               {/* - Tab Content */}
@@ -263,6 +306,13 @@ const Edit_Item = ({ set_page }) => {
         height="max-h-[700px]"
         dist_channel_list={dist_channel_list}
       />
+      <Select_SD_S_Spec_Status
+        is_open={display_modal === "select_sd_s_spec_status"}
+        on_close={() => set_display_modal("")}
+        width="max-w-[1000px]"
+        height="max-h-[700px]"
+        item_status_list={item_status_list}
+      />
       <Select_SDP_Branch
         is_open={display_modal === "select_sdp_branch"}
         on_close={() => set_display_modal("")}
@@ -283,6 +333,13 @@ const Edit_Item = ({ set_page }) => {
         width="max-w-[1000px]"
         height="max-h-[700px]"
         trans_group_list={trans_group_list}
+      />
+      <Select_SDP_Load_Group
+        is_open={display_modal === "select_sdp_load_group"}
+        on_close={() => set_display_modal("")}
+        width="max-w-[1000px]"
+        height="max-h-[700px]"
+        load_group_list={load_group_list}
       />
       <Select_SDP_Inv_Center
         is_open={display_modal === "select_sdp_inv_acc_center"}
@@ -354,6 +411,13 @@ const Edit_Item = ({ set_page }) => {
         height="max-h-[700px]"
         plant_list={plant_list}
       />
+      <Select_WM1_SLOC
+        is_open={display_modal === "select_wm1_sloc"}
+        on_close={() => set_display_modal("")}
+        width="max-w-[1000px]"
+        height="max-h-[700px]"
+        sloc_list={sloc_list}
+      />
       <Select_WM2_Branch
         is_open={display_modal === "select_wm2_branch"}
         on_close={() => set_display_modal("")}
@@ -381,6 +445,34 @@ const Edit_Item = ({ set_page }) => {
         width="max-w-[1000px]"
         height="max-h-[700px]"
         stype_list={stype_list}
+      />
+      <Select_G_Item_Group_Cat
+        is_open={display_modal === "select_gen_item_group_cat"}
+        on_close={() => set_display_modal("")}
+        width="max-w-[1000px]"
+        height="max-h-[700px]"
+        gen_item_group_cat_list={gen_item_group_cat_list}
+      />
+      <Select_Item_Division
+        is_open={display_modal === "select_item_division"}
+        on_close={() => set_display_modal("")}
+        width="max-w-[1000px]"
+        height="max-h-[700px]"
+        item_division_list={item_division_list}
+      />
+      <Select_Item_Status
+        is_open={display_modal === "select_item_status"}
+        on_close={() => set_display_modal("")}
+        width="max-w-[1000px]"
+        height="max-h-[700px]"
+        item_status_list={item_status_list}
+      />
+      <Select_Item_Group
+        is_open={display_modal === "select_item_group"}
+        on_close={() => set_display_modal("")}
+        width="max-w-[1000px]"
+        height="max-h-[700px]"
+        item_group_list={item_group_list}
       />
       <Select_Item_Group_1
         is_open={display_modal === "select_item_group_1"}

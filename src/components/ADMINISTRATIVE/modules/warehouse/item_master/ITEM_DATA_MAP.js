@@ -28,6 +28,33 @@ export const dist_channel_list = [
   },
 ];
 
+export const gen_item_group_cat_list = [
+  {
+    id: 1,
+    gen_item_group_cat_code: "GITM-G-001",
+    gen_item_group_cat_desc: "Gen. Item Group Description 1",
+    creation_date: "MM-DD-YYYY",
+  },
+];
+
+export const item_division_list = [
+  {
+    id: 1,
+    item_division_code: "ITM-V-001",
+    item_division_desc: "Item Division Description 1",
+    creation_date: "MM-DD-YYYY",
+  },
+];
+
+export const item_status_list = [
+  {
+    id: 1,
+    item_status_code: "ITM-S-001",
+    item_status_desc: "Item Status Description 1",
+    creation_date: "MM-DD-YYYY",
+  },
+];
+
 export const item_group_list = [
   {
     id: 1,

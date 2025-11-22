@@ -31,6 +31,11 @@ import {
   sloc_list,
   stype_list,
   trans_group_list,
+  item_group_list,
+  gen_item_group_cat_list,
+  item_division_list,
+  item_status_list,
+  load_group_list,
 } from "../ITEM_DATA_MAP";
 import Select_SD_Sales_Org from "../modals/sales_data/Select_SD_Sales_Org";
 import Select_SD_Dist_Channel from "../modals/sales_data/Select_SD_Dist_Channel";
@@ -61,6 +66,12 @@ import Select_Product_Class_2 from "../modals/product_class/Select_Product_Class
 import Select_Product_Class_3 from "../modals/product_class/Select_Product_Class_3";
 import Select_Product_Class_4 from "../modals/product_class/Select_Product_Class_4";
 import Select_Product_Class_5 from "../modals/product_class/Select_Product_Class_5";
+import Select_Item_Group from "../modals/item_group/Select_Item_Group";
+import Select_G_Item_Group_Cat from "../modals/standard_data/Select_G_Item_Group_Cat";
+import Select_Item_Division from "../modals/standard_data/Select_Item_Division";
+import Select_Item_Status from "../modals/standard_data/Select_Item_Status";
+import Select_SD_S_Spec_Status from "../modals/sales_data/Select_SD_S_Spec_Status";
+import Select_SDP_Load_Group from "../modals/sales_data_plant/Select_SDP_Load_Group";
 
 const Create_New_Item = ({ set_page }) => {
   const [active_tab, set_active_tab] = useState("standard_data");
@@ -204,7 +215,9 @@ const Create_New_Item = ({ set_page }) => {
               {/* - Tab Navigation */}
               {/* + Tab Content */}
               <div className="p-6">
-                {active_tab === "standard_data" && <Standard_Data />}
+                {active_tab === "standard_data" && (
+                  <Standard_Data set_display_modal={set_display_modal} />
+                )}
                 {active_tab === "purchasing" && (
                   <Purchasing set_display_modal={set_display_modal} />
                 )}
@@ -263,6 +276,13 @@ const Create_New_Item = ({ set_page }) => {
         height="max-h-[700px]"
         dist_channel_list={dist_channel_list}
       />
+      <Select_SD_S_Spec_Status
+        is_open={display_modal === "select_sd_s_spec_status"}
+        on_close={() => set_display_modal("")}
+        width="max-w-[1000px]"
+        height="max-h-[700px]"
+        item_status_list={item_status_list}
+      />
       <Select_SDP_Branch
         is_open={display_modal === "select_sdp_branch"}
         on_close={() => set_display_modal("")}
@@ -283,6 +303,13 @@ const Create_New_Item = ({ set_page }) => {
         width="max-w-[1000px]"
         height="max-h-[700px]"
         trans_group_list={trans_group_list}
+      />
+      <Select_SDP_Load_Group
+        is_open={display_modal === "select_sdp_load_group"}
+        on_close={() => set_display_modal("")}
+        width="max-w-[1000px]"
+        height="max-h-[700px]"
+        load_group_list={load_group_list}
       />
       <Select_SDP_Inv_Center
         is_open={display_modal === "select_sdp_inv_acc_center"}
@@ -381,6 +408,34 @@ const Create_New_Item = ({ set_page }) => {
         width="max-w-[1000px]"
         height="max-h-[700px]"
         stype_list={stype_list}
+      />
+      <Select_G_Item_Group_Cat
+        is_open={display_modal === "select_gen_item_group_cat"}
+        on_close={() => set_display_modal("")}
+        width="max-w-[1000px]"
+        height="max-h-[700px]"
+        gen_item_group_cat_list={gen_item_group_cat_list}
+      />
+      <Select_Item_Division
+        is_open={display_modal === "select_item_division"}
+        on_close={() => set_display_modal("")}
+        width="max-w-[1000px]"
+        height="max-h-[700px]"
+        item_division_list={item_division_list}
+      />
+      <Select_Item_Status
+        is_open={display_modal === "select_item_status"}
+        on_close={() => set_display_modal("")}
+        width="max-w-[1000px]"
+        height="max-h-[700px]"
+        item_status_list={item_status_list}
+      />
+      <Select_Item_Group
+        is_open={display_modal === "select_item_group"}
+        on_close={() => set_display_modal("")}
+        width="max-w-[1000px]"
+        height="max-h-[700px]"
+        item_group_list={item_group_list}
       />
       <Select_Item_Group_1
         is_open={display_modal === "select_item_group_1"}

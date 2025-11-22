@@ -8,7 +8,7 @@ const Sales_Data_Plant = ({ set_display_modal }) => {
   return (
     <React.Fragment>
       {/* + Section 1 */}
-      <div className="rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6 dark:border-gray-800 dark:bg-gray-900">
+      {/* <div className="rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6 dark:border-gray-800 dark:bg-gray-900">
         <div className="grid grid-cols-1 gap-5">
           <div>
             <Text_Code_Field
@@ -33,7 +33,7 @@ const Sales_Data_Plant = ({ set_display_modal }) => {
             />
           </div>
         </div>
-      </div>
+      </div> */}
       {/* - Section 1 */}
       {/* + Section 2 */}
       <div className="mt-5 rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6 dark:border-gray-800 dark:bg-gray-900">
@@ -111,7 +111,7 @@ const Sales_Data_Plant = ({ set_display_modal }) => {
               show_search_button={true}
               // code_value={code_data}
               // text_value={text_data}
-              on_click={() => set_display_modal("select_sdp_tans_group")}
+              on_click={() => set_display_modal("select_sdp_trans_group")}
               disabled
             />
           </div>

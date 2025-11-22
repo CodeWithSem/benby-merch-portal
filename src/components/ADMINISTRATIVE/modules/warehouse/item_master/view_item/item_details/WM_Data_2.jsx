@@ -2,52 +2,122 @@ import React from "react";
 import Text_Code_Field from "assets/elements/Text_Code_Field";
 import Text_Field from "assets/elements/Text_Field";
 
-const WM_Data_2 = () => {
+const WM_Data_2 = ({ branch_list, plant_list, sloc_list, stype_list }) => {
+  const columns = [
+    { key: "branch_code", label: "Branch" },
+    { key: "plant_code", label: "Plant" },
+    { key: "sloc_code", label: "SLOC" },
+    { key: "stype_code", label: "Storage Type" },
+  ];
+
+  const plant_ext_list = [
+    {
+      id: 1,
+      branch_code: "BR-0001",
+      plant_code: "PL-0001",
+      sloc_code: "SLOC-0001",
+      stype_code: "ST-01",
+    },
+  ];
+
+  const branch_lookup = (code) => {
+    const item = branch_list.find((x) => x.branch_code === code);
+    return item ? item.branch_desc : "-";
+  };
+
+  const plant_lookup = (code) => {
+    const item = plant_list.find((x) => x.plant_code === code);
+    return item ? item.plant_desc : "-";
+  };
+
+  const sloc_lookup = (code) => {
+    const item = sloc_list.find((x) => x.sloc_code === code);
+    return item ? item.sloc_desc : "-";
+  };
+
+  const stype_lookup = (code) => {
+    const item = stype_list.find((x) => x.stype_code === code);
+    return item ? item.stype_desc : "-";
+  };
+  // RETURN ORIGIN
   return (
     <React.Fragment>
       {/* + Section 1 */}
       <div className="rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6 dark:border-gray-800 dark:bg-gray-900 whitespace-nowrap">
+        <h1 className="mb-5 font-semibold text-sky-700">Plant Extension</h1>
         <div className="grid grid-cols-1 gap-5">
-          <div>
-            <Text_Code_Field
-              label="Plant / DC"
-              code_width="150px"
-              show_search_button={false}
-              // code_value={code_data}
-              // text_value={text_data}
-              disabled
-            />
+          {/* + Table */}
+          <div className="col-span-full scrollbar-custom overflow-x-auto max-h-[400px]">
+            <table className="min-w-full">
+              <thead className="bg-gray-100">
+                <tr className="whitespace-nowrap">
+                  {columns.map((col, i) => (
+                    <th
+                      key={col.key}
+                      className={`border px-4 py-3 text-left text-[12px] font-medium text-gray-700 select-none`}
+                    >
+                      {col.label}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody className="bg-white">
+                {plant_ext_list.map((data, idx) => (
+                  <tr key={idx} className="hover:bg-gray-50/50">
+                    <td
+                      className={`border px-4 py-4 text-[12px] text-gray-600`}
+                    >
+                      <div className="block font-medium">
+                        <span className="block text-gray-500 text-[10px]">
+                          {data.branch_code}
+                        </span>
+                        <span className="block text-gray-800">
+                          {branch_lookup(data.branch_code)}
+                        </span>
+                      </div>
+                    </td>
+                    <td
+                      className={`border px-4 py-4 text-[12px] text-gray-600`}
+                    >
+                      <div className="block font-medium">
+                        <span className="block text-gray-500 text-[10px]">
+                          {data.plant_code}
+                        </span>
+                        <span className="block text-gray-800">
+                          {plant_lookup(data.plant_code)}
+                        </span>
+                      </div>
+                    </td>
+                    <td
+                      className={`border px-4 py-4 text-[12px] text-gray-600`}
+                    >
+                      <div className="block font-medium">
+                        <span className="block text-gray-500 text-[10px]">
+                          {data.sloc_code}
+                        </span>
+                        <span className="block text-gray-800">
+                          {sloc_lookup(data.sloc_code)}
+                        </span>
+                      </div>
+                    </td>
+                    <td
+                      className={`border px-4 py-4 text-[12px] text-gray-600`}
+                    >
+                      <div className="block font-medium">
+                        <span className="block text-gray-500 text-[10px]">
+                          {data.stype_code}
+                        </span>
+                        <span className="block text-gray-800">
+                          {stype_lookup(data.stype_code)}
+                        </span>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
-          <div>
-            <Text_Code_Field
-              label="SLOC"
-              code_width="150px"
-              show_search_button={false}
-              // code_value={code_data}
-              // text_value={text_data}
-              disabled
-            />
-          </div>
-          <div>
-            <Text_Code_Field
-              label="Warehouse"
-              code_width="150px"
-              show_search_button={false}
-              // code_value={code_data}
-              // text_value={text_data}
-              disabled
-            />
-          </div>
-          <div>
-            <Text_Code_Field
-              label="Storage Type"
-              code_width="150px"
-              show_search_button={false}
-              // code_value={code_data}
-              // text_value={text_data}
-              disabled
-            />
-          </div>
+          {/* - Table */}
         </div>
       </div>
       {/* - Section 1 */}

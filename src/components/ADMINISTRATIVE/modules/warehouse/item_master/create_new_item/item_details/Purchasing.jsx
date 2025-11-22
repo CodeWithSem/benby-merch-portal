@@ -5,12 +5,13 @@ import Select_Field from "assets/elements/Select_Field";
 import Text_Code_Field from "assets/elements/Text_Code_Field";
 import Text_Field from "assets/elements/Text_Field";
 import Textarea_Field from "assets/elements/Textarea_Field";
+import Find_Field from "assets/elements/Find_Field";
 
 const Purchasing = ({ set_display_modal }) => {
   return (
     <React.Fragment>
       {/* + Section 1 */}
-      <div className="rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6 dark:border-gray-800 dark:bg-gray-900">
+      {/* <div className="rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6 dark:border-gray-800 dark:bg-gray-900">
         <div className="grid grid-cols-1 gap-5">
           <div>
             <Text_Code_Field
@@ -46,38 +47,29 @@ const Purchasing = ({ set_display_modal }) => {
             />
           </div>
         </div>
-      </div>
+      </div> */}
       {/* - Section 1 */}
       {/* + Section 2 */}
       <div className="mt-5 rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6 dark:border-gray-800 dark:bg-gray-900">
         <h1 className="mb-5 font-semibold text-sky-700">Purchasing Details</h1>
         <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
           <div>
-            <Select_Field
-              label="Item Group"
-              placeholder="Select Option"
-              // options={options}
-              // value={selected_data}
-              // on_change={handle_option_change}
-            />
+            <Text_Field label="Item Group" type={"text"} disabled />
           </div>
           <div>
-            <Select_Field
+            <Find_Field
               label="Purchasing Group"
-              name="gen_group_category"
-              // value={selected_data}
-              // on_change={handle_option_change}
-              // options={options}
-              placeholder="Select Option"
+              // value={data}
+              // on_change={(e) => handle_data_change(e.target.value)}
+              on_click={() => set_display_modal("select_pu_p_group")}
+              disabled
             />
           </div>
           <div>
-            <Select_Field
+            <Text_Field
               label="Base Unit of Measure (UoM)"
-              placeholder="Select Option"
-              // options={options}
-              // value={selected_data}
-              // on_change={handle_option_change}
+              type={"text"}
+              disabled
             />
           </div>
           <div>
@@ -106,12 +98,12 @@ const Purchasing = ({ set_display_modal }) => {
             />
           </div>
           <div>
-            <Select_Field
+            <Find_Field
               label="Plant Specific Status"
-              placeholder="Select Option"
-              // value={selected_data}
-              // on_change={handle_option_change}
-              // options={options}
+              // value={data}
+              // on_change={(e) => handle_data_change(e.target.value)}
+              on_click={() => set_display_modal("select_pu_pl_spec_status")}
+              disabled
             />
           </div>
           <div className="mt-4 flex items-end col-span-full">

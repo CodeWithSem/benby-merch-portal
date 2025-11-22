@@ -1,9 +1,17 @@
 import React, { useState } from "react";
+import { CirclePlus, Trash2 } from "lucide-react";
 import Date_Field from "assets/elements/Date_Field";
 import Select_Field from "assets/elements/Select_Field";
 import Text_Code_Field from "assets/elements/Text_Code_Field";
+import Button from "assets/elements/Button";
+import Text_Field from "assets/elements/Text_Field";
+import Find_Field from "assets/elements/Find_Field";
 
-const Sales_Data = ({ set_display_modal }) => {
+const Sales_Data = ({
+  set_display_modal,
+  sales_org_list,
+  dist_channel_list,
+}) => {
   const [sd_active_tab, set_sd_active_tab] = useState("item_group");
 
   const tabs = [
@@ -11,11 +19,107 @@ const Sales_Data = ({ set_display_modal }) => {
     { key: "product_class", title: "Product Classification" },
   ];
 
+  const columns = [
+    { key: "sales_org_code", label: "Sales Organization" },
+    { key: "dist_channel_code", label: "Distribution Channel" },
+  ];
+
+  const sales_org_ext_list = [
+    {
+      id: 1,
+      sales_org_code: "SAO-0001",
+      dist_channel_code: "DC-0001",
+    },
+  ];
+
+  const sales_org_lookup = (code) => {
+    const item = sales_org_list.find((x) => x.sales_org_code === code);
+    return item ? item.sales_org_desc : "";
+  };
+
+  const dist_channel_lookup = (code) => {
+    const item = dist_channel_list.find((x) => x.dist_channel_code === code);
+    return item ? item.dist_channel_desc : "";
+  };
+
+  const handle_add_ext = () => {
+    alert("Add Extension");
+  };
+
   // RETURN ORIGIN
   return (
     <React.Fragment>
       {/* + Section 1 */}
-      <div className="rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6 dark:border-gray-800 dark:bg-gray-900">
+      <div className="rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6 dark:border-gray-800 dark:bg-gray-900 whitespace-nowrap">
+        <h1 className="mb-5 font-semibold text-sky-700">
+          Sales Organization Extension
+        </h1>
+        <div className="grid grid-cols-1 gap-5">
+          {/* + Table */}
+          <div className="col-span-full scrollbar-custom overflow-x-auto max-h-[400px]">
+            <table className="min-w-full">
+              <thead className="bg-gray-100">
+                <tr className="whitespace-nowrap">
+                  {columns.map((col, i) => (
+                    <th
+                      key={col.key}
+                      className={`border px-4 py-3 text-left text-[12px] font-medium text-gray-700 select-none`}
+                    >
+                      {col.label}
+                    </th>
+                  ))}
+                  <th
+                    className={`border px-4 py-3 text-left text-[12px] font-medium text-gray-700 select-none`}
+                  ></th>
+                </tr>
+              </thead>
+              <tbody className="bg-white">
+                {sales_org_ext_list.map((data, idx) => (
+                  <tr key={idx} className="hover:bg-gray-50/50">
+                    <td
+                      className={`border px-4 py-4 text-[12px] text-gray-600`}
+                    >
+                      <div className="block font-medium">
+                        <span className="block text-gray-500 text-[10px]">
+                          {data.sales_org_code}
+                        </span>
+                        <span className="block text-gray-800">
+                          {sales_org_lookup(data.sales_org_code)}
+                        </span>
+                      </div>
+                    </td>
+                    <td
+                      className={`border px-4 py-4 text-[12px] text-gray-600`}
+                    >
+                      <div className="block font-medium">
+                        <span className="block text-gray-500 text-[10px]">
+                          {data.dist_channel_code}
+                        </span>
+                        <span className="block text-gray-800">
+                          {dist_channel_lookup(data.dist_channel_code)}
+                        </span>
+                      </div>
+                    </td>
+                    <td
+                      className={`border px-4 py-4 text-[12px] text-gray-600`}
+                    >
+                      <div className="flex gap-2">
+                        <button className="text-gray-500 hover:text-red-600">
+                          <Trash2 size={18} />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          {/* - Table */}
+        </div>
+      </div>
+      {/* - Section 1 */}
+      {/* + Section 2 */}
+      <div className="mt-5 rounded-lg border border-gray-100 bg-gray-50 p-4 sm:p-6 dark:border-gray-800 dark:bg-gray-900 whitespace-nowrap">
         <div className="grid grid-cols-1 gap-5">
           <div>
             <Text_Code_Field
@@ -39,55 +143,52 @@ const Sales_Data = ({ set_display_modal }) => {
               disabled
             />
           </div>
+          <div className="mt-2 flex justify-end">
+            <Button
+              variant="primary"
+              icon={CirclePlus}
+              icon_position="left"
+              width="w-full md:w-auto"
+              on_click={handle_add_ext}
+            >
+              Add Extension
+            </Button>
+          </div>
         </div>
       </div>
-      {/* - Section 1 */}
-      {/* + Section 2 */}
+      {/* - Section 2 */}
+      {/* + Section 3 */}
       <div className="mt-5 rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6 dark:border-gray-800 dark:bg-gray-900">
         <h1 className="mb-5 font-semibold text-sky-700">
           General Sales Details
         </h1>
         <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
           <div>
-            <Select_Field
-              label="Item Group"
-              placeholder="Select Option"
-              // options={options}
-              // value={selected_data}
-              // on_change={handle_option_change}
-            />
+            <Text_Field label="Item Group" type={"text"} disabled />
           </div>
           <div>
-            <Select_Field
+            <Text_Field
               label="Gen. Item Group Category"
-              placeholder="Select Option"
-              // options={options}
-              // value={selected_data}
-              // on_change={handle_option_change}
+              type={"text"}
+              disabled
             />
           </div>
           <div>
-            <Select_Field
-              label="Item Division"
-              placeholder="Select Option"
-              // options={options}
-              // value={selected_data}
-              // on_change={handle_option_change}
-            />
+            <Text_Field label="Item Division" type={"text"} disabled />
           </div>
           <div>
-            <Select_Field
+            <Find_Field
               label="Sales Specific Status"
-              placeholder="Select Option"
-              // options={options}
-              // value={selected_data}
-              // on_change={handle_option_change}
+              // value={data}
+              // on_change={(e) => handle_data_change(e.target.value)}
+              on_click={() => set_display_modal("select_sd_s_spec_status")}
+              disabled
             />
           </div>
           <div>
             <Date_Field
               label="Validity From"
-              placeholder="Select Date"
+              placeholder="MM-DD-YYYY"
               // value={selected_data}
               on_change={(e) => alert(e.target.value)}
             />
@@ -95,7 +196,7 @@ const Sales_Data = ({ set_display_modal }) => {
           <div>
             <Date_Field
               label="Validity To"
-              placeholder="Select Date"
+              placeholder="MM-DD-YYYY"
               // value={selected_data}
               on_change={(e) => alert(e.target.value)}
             />
@@ -111,8 +212,8 @@ const Sales_Data = ({ set_display_modal }) => {
           </div>
         </div>
       </div>
-      {/* - Section 2 */}
-      {/* + Section 3 */}
+      {/* - Section 3 */}
+      {/* + Section 4 */}
       <div className="mt-5 w-full bg-white rounded-lg border">
         {/* + Tab Navigation */}
         <div className="w-full border-b p-2">
@@ -144,7 +245,7 @@ const Sales_Data = ({ set_display_modal }) => {
         </div>
         {/* - Tab Content */}
       </div>
-      {/* - Section 3 */}
+      {/* - Section 4 */}
     </React.Fragment>
   );
 };

@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import Date_Field from "assets/elements/Date_Field";
 import Select_Field from "assets/elements/Select_Field";
 import Text_Code_Field from "assets/elements/Text_Code_Field";
+import Text_Field from "assets/elements/Text_Field";
+import Find_Field from "assets/elements/Find_Field";
 
 const Sales_Data = ({ set_display_modal }) => {
   const [sd_active_tab, set_sd_active_tab] = useState("item_group");
@@ -15,7 +17,7 @@ const Sales_Data = ({ set_display_modal }) => {
   return (
     <React.Fragment>
       {/* + Section 1 */}
-      <div className="rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6 dark:border-gray-800 dark:bg-gray-900">
+      {/* <div className="rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6 dark:border-gray-800 dark:bg-gray-900">
         <div className="grid grid-cols-1 gap-5">
           <div>
             <Text_Code_Field
@@ -40,7 +42,7 @@ const Sales_Data = ({ set_display_modal }) => {
             />
           </div>
         </div>
-      </div>
+      </div> */}
       {/* - Section 1 */}
       {/* + Section 2 */}
       <div className="mt-5 rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6 dark:border-gray-800 dark:bg-gray-900">
@@ -49,45 +51,31 @@ const Sales_Data = ({ set_display_modal }) => {
         </h1>
         <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
           <div>
-            <Select_Field
-              label="Item Group"
-              placeholder="Select Option"
-              // options={options}
-              // value={selected_data}
-              // on_change={handle_option_change}
-            />
+            <Text_Field label="Item Group" type={"text"} disabled />
           </div>
           <div>
-            <Select_Field
+            <Text_Field
               label="Gen. Item Group Category"
-              placeholder="Select Option"
-              // options={options}
-              // value={selected_data}
-              // on_change={handle_option_change}
+              type={"text"}
+              disabled
             />
           </div>
           <div>
-            <Select_Field
-              label="Item Division"
-              placeholder="Select Option"
-              // options={options}
-              // value={selected_data}
-              // on_change={handle_option_change}
-            />
+            <Text_Field label="Item Division" type={"text"} disabled />
           </div>
           <div>
-            <Select_Field
+            <Find_Field
               label="Sales Specific Status"
-              placeholder="Select Option"
-              // options={options}
-              // value={selected_data}
-              // on_change={handle_option_change}
+              // value={data}
+              // on_change={(e) => handle_data_change(e.target.value)}
+              on_click={() => set_display_modal("select_sd_s_spec_status")}
+              disabled
             />
           </div>
           <div>
             <Date_Field
               label="Validity From"
-              placeholder="Select Date"
+              placeholder="MM-DD-YYYY"
               // value={selected_data}
               on_change={(e) => alert(e.target.value)}
             />
@@ -95,7 +83,7 @@ const Sales_Data = ({ set_display_modal }) => {
           <div>
             <Date_Field
               label="Validity To"
-              placeholder="Select Date"
+              placeholder="MM-DD-YYYY"
               // value={selected_data}
               on_change={(e) => alert(e.target.value)}
             />

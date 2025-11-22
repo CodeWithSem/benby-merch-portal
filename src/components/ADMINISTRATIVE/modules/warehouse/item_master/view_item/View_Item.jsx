@@ -12,6 +12,14 @@ import Plant_Data from "./item_details/Plant_Data";
 import WM_Data_1 from "./item_details/WM_Data_1";
 import WM_Data_2 from "./item_details/WM_Data_2";
 import { format_date_1, get_date_now } from "assets/scripts/format";
+import {
+  branch_list,
+  dist_channel_list,
+  plant_list,
+  sales_org_list,
+  sloc_list,
+  stype_list,
+} from "../ITEM_DATA_MAP";
 
 const View_Item = ({ set_page }) => {
   const [active_tab, set_active_tab] = useState("standard_data");
@@ -134,11 +142,40 @@ const View_Item = ({ set_page }) => {
                 {active_tab === "purchasing" && <Purchasing />}
                 {active_tab === "case_config_1" && <Case_Config_1 />}
                 {active_tab === "case_config_2" && <Case_Config_2 />}
-                {active_tab === "sales_data" && <Sales_Data />}
-                {active_tab === "sales_data_plant" && <Sales_Data_Plant />}
-                {active_tab === "plant_data" && <Plant_Data />}
-                {active_tab === "wm_data_1" && <WM_Data_1 />}
-                {active_tab === "wm_data_2" && <WM_Data_2 />}
+                {active_tab === "sales_data" && (
+                  <Sales_Data
+                    sales_org_list={sales_org_list}
+                    dist_channel_list={dist_channel_list}
+                  />
+                )}
+                {active_tab === "sales_data_plant" && (
+                  <Sales_Data_Plant
+                    branch_list={branch_list}
+                    plant_list={plant_list}
+                  />
+                )}
+                {active_tab === "plant_data" && (
+                  <Plant_Data
+                    branch_list={branch_list}
+                    plant_list={plant_list}
+                    sloc_list={sloc_list}
+                  />
+                )}
+                {active_tab === "wm_data_1" && (
+                  <WM_Data_1
+                    branch_list={branch_list}
+                    plant_list={plant_list}
+                    sloc_list={sloc_list}
+                  />
+                )}
+                {active_tab === "wm_data_2" && (
+                  <WM_Data_2
+                    branch_list={branch_list}
+                    plant_list={plant_list}
+                    sloc_list={sloc_list}
+                    stype_list={stype_list}
+                  />
+                )}
               </div>
               {/* - Tab Content */}
             </div>

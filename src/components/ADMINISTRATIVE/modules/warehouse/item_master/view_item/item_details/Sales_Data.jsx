@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import Text_Code_Field from "assets/elements/Text_Code_Field";
 import Text_Field from "assets/elements/Text_Field";
 
-const Sales_Data = () => {
+const Sales_Data = ({ sales_org_list, dist_channel_list }) => {
   const [sd_active_tab, set_sd_active_tab] = useState("item_group");
 
   const tabs = [
@@ -10,32 +10,86 @@ const Sales_Data = () => {
     { key: "product_class", title: "Product Classification" },
   ];
 
+  const columns = [
+    { key: "sales_org_code", label: "Sales Organization" },
+    { key: "dist_channel_code", label: "Distribution Channel" },
+  ];
+
+  const sales_org_ext_list = [
+    {
+      id: 1,
+      sales_org_code: "SAO-0001",
+      dist_channel_code: "DC-0001",
+    },
+  ];
+
+  const sales_org_lookup = (code) => {
+    const item = sales_org_list.find((x) => x.sales_org_code === code);
+    return item ? item.sales_org_desc : "";
+  };
+
+  const dist_channel_lookup = (code) => {
+    const item = dist_channel_list.find((x) => x.dist_channel_code === code);
+    return item ? item.dist_channel_desc : "";
+  };
+
   // RETURN ORIGIN
   return (
     <React.Fragment>
       {/* + Section 1 */}
-      <div className="rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6 dark:border-gray-800 dark:bg-gray-900">
+      <div className="rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6 dark:border-gray-800 dark:bg-gray-900 whitespace-nowrap">
+        <h1 className="mb-5 font-semibold text-sky-700">
+          Sales Organization Extension
+        </h1>
         <div className="grid grid-cols-1 gap-5">
-          <div>
-            <Text_Code_Field
-              label="Sales Organization"
-              code_width="150px"
-              show_search_button={false}
-              // code_value={code_data}
-              // text_value={text_data}
-              disabled
-            />
+          {/* + Table */}
+          <div className="col-span-full scrollbar-custom overflow-x-auto max-h-[400px]">
+            <table className="min-w-full">
+              <thead className="bg-gray-100">
+                <tr className="whitespace-nowrap">
+                  {columns.map((col, i) => (
+                    <th
+                      key={col.key}
+                      className={`border px-4 py-3 text-left text-[12px] font-medium text-gray-700 select-none`}
+                    >
+                      {col.label}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody className="bg-white">
+                {sales_org_ext_list.map((data, idx) => (
+                  <tr key={idx} className="hover:bg-gray-50/50">
+                    <td
+                      className={`border px-4 py-4 text-[12px] text-gray-600`}
+                    >
+                      <div className="block font-medium">
+                        <span className="block text-gray-500 text-[10px]">
+                          {data.sales_org_code}
+                        </span>
+                        <span className="block text-gray-800">
+                          {sales_org_lookup(data.sales_org_code)}
+                        </span>
+                      </div>
+                    </td>
+                    <td
+                      className={`border px-4 py-4 text-[12px] text-gray-600`}
+                    >
+                      <div className="block font-medium">
+                        <span className="block text-gray-500 text-[10px]">
+                          {data.dist_channel_code}
+                        </span>
+                        <span className="block text-gray-800">
+                          {dist_channel_lookup(data.dist_channel_code)}
+                        </span>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
-          <div>
-            <Text_Code_Field
-              label="Distribution Channel"
-              code_width="150px"
-              show_search_button={false}
-              // code_value={code_data}
-              // text_value={text_data}
-              disabled
-            />
-          </div>
+          {/* - Table */}
         </div>
       </div>
       {/* - Section 1 */}
