@@ -86,7 +86,6 @@ const Select_PO_Type = ({
   // - Client-Side Filtering
 
   const handle_proceed = () => {
-    console.log(selected_po_type);
     set_page("po_creation");
     set_selected_po_type(null);
     on_close();

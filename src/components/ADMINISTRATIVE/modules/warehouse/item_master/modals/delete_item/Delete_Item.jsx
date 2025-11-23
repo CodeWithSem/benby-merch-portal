@@ -86,7 +86,7 @@ const Delete_Item = ({ is_open, on_close, width = "max-w-[700px]" }) => {
 
                   <div className="flex gap-2">
                     <div className="text-gray-500 text-sm tracking-wider">
-                      06-05-2025
+                      MM-DD-YYYY
                     </div>
                   </div>
                 </div>

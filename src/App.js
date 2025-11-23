@@ -5,9 +5,11 @@ import { Toast_Provider } from "./components/ADMINISTRATIVE/layout/Toast_Provide
 import Login from "./components/AUTHENTICATION/Login";
 import Sign_Up from "./components/AUTHENTICATION/Sign_Up";
 import { App_Provider, Use_App } from "./context/app_context";
+import { Use_ESC_Clear_Console } from "assets/scripts/functions/clear_console";
 
 const App_Content = () => {
   const { page, set_page } = Use_App();
+  Use_ESC_Clear_Console();
 
   return (
     <Toast_Provider>

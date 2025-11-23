@@ -4,6 +4,7 @@ import Select_Field from "assets/elements/Select_Field";
 import Text_Code_Field from "assets/elements/Text_Code_Field";
 import Text_Field from "assets/elements/Text_Field";
 import Text_Field_Adorn from "assets/elements/Text_Field_Adorn";
+import Find_Field from "assets/elements/Find_Field";
 
 const WM_Data_1 = ({ set_display_modal }) => {
   // RETURN ORIGIN
@@ -164,31 +165,38 @@ const WM_Data_1 = ({ set_display_modal }) => {
         </h1>
         <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
           <div>
-            <Select_Field
-              label={"Stock Source / Origin"}
-              placeholder="Select Option"
-              // options={options}
-              // value={selected_data}
-              // on_change={handle_option_change}
+            <Find_Field
+              label="Stock Source / Origin"
+              // value={data}
+              // on_change={(e) => handle_data_change(e.target.value)}
+              on_click={() => set_display_modal("select_wm1_stock_source")}
+              disabled
             />
           </div>
           <div>
-            <Select_Field
-              label={"Stock Destination"}
-              placeholder="Select Option"
-              // options={options}
-              // value={selected_data}
-              // on_change={handle_option_change}
+            <Find_Field
+              label="Stock Destination"
+              // value={data}
+              // on_change={(e) => handle_data_change(e.target.value)}
+              on_click={() => set_display_modal("select_wm1_stock_dest")}
+              disabled
             />
           </div>
           <div>
-            <Select_Field
+            <Find_Field
+              label="Indicator-Storage Section"
+              // value={data}
+              // on_change={(e) => handle_data_change(e.target.value)}
+              on_click={() => set_display_modal("select_wm1_ind_storage_sec")}
+              disabled
+            />
+            {/* <Select_Field
               label={"Indicator-Storage Section"}
               placeholder="Select Option"
               // options={options}
               // value={selected_data}
               // on_change={handle_option_change}
-            />
+            /> */}
           </div>
           <div className="mt-4 flex items-end col-span-full">
             <Checkbox_Field

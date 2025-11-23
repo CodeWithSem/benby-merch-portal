@@ -47,7 +47,7 @@ const Region = ({ set_page }) => {
     { key: "region_desc", label: "Region Description", sortable: true },
     { key: "created_by", label: "Created By", sortable: true },
     { key: "creation_date", label: "Creation Date", sortable: true },
-    { key: "updated_by", label: "Change By", sortable: true },
+    { key: "change_by", label: "Change By", sortable: true },
     { key: "change_date", label: "Change Date", sortable: true },
     { key: "actions", label: "", sortable: false },
   ];
@@ -60,7 +60,7 @@ const Region = ({ set_page }) => {
       region_desc: "National Capital Region",
       created_by: "Admin",
       creation_date: "11-11-2025",
-      updated_by: "",
+      change_by: "",
       change_date: "",
     },
   ]);

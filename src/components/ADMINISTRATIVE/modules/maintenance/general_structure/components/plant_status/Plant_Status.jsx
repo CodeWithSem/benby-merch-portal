@@ -27,13 +27,13 @@ const Plant_Status = ({ set_page }) => {
   const [display_modal, set_display_modal] = useState("");
   const [edit_data, set_edit_data] = useState({
     id: 0,
-    pl_status_code: "",
-    pl_status_desc: "",
+    plant_status_code: "",
+    plant_status_desc: "",
   });
   const [delete_data, set_delete_data] = useState({
     id: 0,
-    pl_status_code: "",
-    pl_status_desc: "",
+    plant_status_code: "",
+    plant_status_desc: "",
   });
   // - Variables
 
@@ -43,28 +43,28 @@ const Plant_Status = ({ set_page }) => {
   const columns = [
     { key: "index", label: "#", sortable: true },
     { key: "id", label: "ID", sortable: true },
-    { key: "pl_status_code", label: "Plant Status Code", sortable: true },
+    { key: "plant_status_code", label: "Plant Status Code", sortable: true },
     {
-      key: "pl_status_desc",
+      key: "plant_status_desc",
       label: "Plant Status Description",
       sortable: true,
     },
     { key: "created_by", label: "Created By", sortable: true },
     { key: "creation_date", label: "Creation Date", sortable: true },
-    { key: "updated_by", label: "Change By", sortable: true },
+    { key: "change_by", label: "Change By", sortable: true },
     { key: "change_date", label: "Change Date", sortable: true },
     { key: "actions", label: "", sortable: false },
   ];
 
   // --- State ---
-  const [pl_status_list, set_pl_status_list] = useState([
+  const [plant_status_list, set_plant_status_list] = useState([
     {
       id: 1,
-      pl_status_code: "PL-S-001",
-      pl_status_desc: "Plant Status Description 1",
+      plant_status_code: "PL-S-001",
+      plant_status_desc: "Plant Status Description 1",
       created_by: "Admin",
       creation_date: "11-11-2025",
-      updated_by: "",
+      change_by: "",
       change_date: "",
     },
   ]);
@@ -102,7 +102,7 @@ const Plant_Status = ({ set_page }) => {
   //   const load_data = async () => {
   //     set_loading(true);
   //     const data = await fetch_data_list();
-  //     set_pl_status_list(data);
+  //     set_plant_status_list(data);
   //     set_loading(false);
   //   };
 
@@ -112,7 +112,7 @@ const Plant_Status = ({ set_page }) => {
 
   // + Client-side Filtering
   useEffect(() => {
-    let temp = [...pl_status_list];
+    let temp = [...plant_status_list];
 
     // + Column Filter
     if (debounced_query.trim() !== "") {
@@ -147,7 +147,7 @@ const Plant_Status = ({ set_page }) => {
     // - Pagination Function
     set_filtered_data(temp.slice(start_idx, end_idx));
   }, [
-    pl_status_list,
+    plant_status_list,
     debounced_query,
     sort_by,
     sort_order,
@@ -159,7 +159,7 @@ const Plant_Status = ({ set_page }) => {
   // + Total page of Pagination
   const total_pages = Math.ceil(
     (debounced_query
-      ? pl_status_list.filter((u) =>
+      ? plant_status_list.filter((u) =>
           columns.some((col) => {
             if (col.key === "actions") return false;
             const val = u[col.key];
@@ -169,7 +169,7 @@ const Plant_Status = ({ set_page }) => {
               .includes(debounced_query.toLowerCase());
           })
         ).length
-      : pl_status_list.length) / select_option
+      : plant_status_list.length) / select_option
   );
   // - Total page of Pagination
 
@@ -186,17 +186,17 @@ const Plant_Status = ({ set_page }) => {
   // - Sort Filtering
   const handle_page_change = (page) => set_current_page(page);
 
-  const handle_create_new_pl_status = () => {
-    set_sub_page("create_new_pl_status");
+  const handle_create_new_plant_status = () => {
+    set_sub_page("create_new_plant_status");
   };
 
-  const handle_edit_pl_status = (data) => {
+  const handle_edit_plant_status = (data) => {
     set_edit_data(data);
-    set_sub_page("edit_pl_status");
+    set_sub_page("edit_plant_status");
   };
-  const handle_delete_pl_status = (data) => {
+  const handle_delete_plant_status = (data) => {
     set_delete_data(data);
-    set_display_modal("delete_pl_status");
+    set_display_modal("delete_plant_status");
   };
 
   const handle_go_back = (value) => {
@@ -276,7 +276,7 @@ const Plant_Status = ({ set_page }) => {
                     variant="primary"
                     icon={PlusCircle}
                     icon_position="left"
-                    on_click={handle_create_new_pl_status}
+                    on_click={handle_create_new_plant_status}
                   >
                     Create New Data
                   </Button>
@@ -473,7 +473,7 @@ const Plant_Status = ({ set_page }) => {
                                     {/* <div className="relative group flex jusity-center items-center">
                                       <button
                                         className="text-gray-500 hover:text-sky-600 text-[12px] outline-none"
-                                        // onClick={() => handle_view_pl_status(row.id)}
+                                        // onClick={() => handle_view_plant_status(row.id)}
                                       >
                                         <View size={19} />
                                       </button>
@@ -485,7 +485,7 @@ const Plant_Status = ({ set_page }) => {
                                       <button
                                         className="text-gray-500 hover:text-sky-600 text-[12px] outline-none"
                                         onClick={() =>
-                                          handle_edit_pl_status(row)
+                                          handle_edit_plant_status(row)
                                         }
                                       >
                                         <Edit size={19} />
@@ -498,7 +498,7 @@ const Plant_Status = ({ set_page }) => {
                                       <button
                                         className="text-gray-500 hover:text-red-600 text-[12px] mb-[1px] outline-none"
                                         onClick={() =>
-                                          handle_delete_pl_status(row)
+                                          handle_delete_plant_status(row)
                                         }
                                       >
                                         <Trash size={19} />
@@ -556,10 +556,10 @@ const Plant_Status = ({ set_page }) => {
           </div>
         </React.Fragment>
       )}
-      {sub_page === "create_new_pl_status" && (
+      {sub_page === "create_new_plant_status" && (
         <Create_PL_Status handle_go_back={handle_go_back} />
       )}
-      {sub_page === "edit_pl_status" && (
+      {sub_page === "edit_plant_status" && (
         <Edit_PL_Status
           handle_go_back={handle_go_back}
           edit_data={edit_data}
@@ -567,7 +567,7 @@ const Plant_Status = ({ set_page }) => {
         />
       )}
       <Delete_PL_Status
-        is_open={display_modal === "delete_pl_status"}
+        is_open={display_modal === "delete_plant_status"}
         on_close={() => set_display_modal("")}
         width="max-w-[1000px]"
         delete_data={delete_data}

@@ -84,7 +84,7 @@ const Case_Config_1 = () => {
         {/* + Section 2 */}
         <div className="rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6 dark:border-gray-800 dark:bg-gray-900">
           <h1 className="mb-5 font-semibold text-sky-700">
-            Active Case Codes / Bardcodes
+            Active Case Codes / Barcodes
           </h1>
           <div className="grid grid-cols-1 gap-5">
             <div className="mt-[4px]">
@@ -182,7 +182,7 @@ const Case_Config_1 = () => {
         {/* + Section 4 */}
         <div className="rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6 dark:border-gray-800 dark:bg-gray-900">
           <h1 className="mb-5 font-semibold text-sky-700">
-            Inactive Case Codes / Bardcodes
+            Inactive Case Codes / Barcodes
           </h1>
           <div className="grid grid-cols-1 gap-5">
             <div className="mt-[4px]">

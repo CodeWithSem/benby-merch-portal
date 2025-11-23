@@ -6,10 +6,10 @@ import { ChevronLeft, CirclePlus, RefreshCcwDot } from "lucide-react";
 import React from "react";
 
 const Edit_G_Item_Group = ({ handle_go_back, edit_data, set_edit_data }) => {
-  const handle_change_g_item_goup_desc = (value) => {
+  const handle_change_item_group_desc = (value) => {
     set_edit_data({
       ...edit_data,
-      g_item_goup_desc: value,
+      item_group_desc: value,
     });
   };
 
@@ -83,7 +83,7 @@ const Edit_G_Item_Group = ({ handle_go_back, edit_data, set_edit_data }) => {
                 <Text_Field
                   label="General Item Group Code"
                   type={"text"}
-                  value={edit_data.g_item_goup_code || "-"}
+                  value={edit_data.item_group_code || "-"}
                   pattern="[0-9]{1,}"
                   disabled
                 />
@@ -92,9 +92,9 @@ const Edit_G_Item_Group = ({ handle_go_back, edit_data, set_edit_data }) => {
                 <Text_Field
                   label="General Item Group Description"
                   type={"text"}
-                  value={edit_data.g_item_goup_desc}
+                  value={edit_data.item_group_desc}
                   on_change={(e) =>
-                    handle_change_g_item_goup_desc(e.target.value)
+                    handle_change_item_group_desc(e.target.value)
                   }
                   placeholder="Enter description"
                   pattern="[0-9]{1,}"

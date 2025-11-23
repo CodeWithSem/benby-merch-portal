@@ -134,13 +134,22 @@ const Purchasing = ({ set_display_modal }) => {
             />
           </div>
           <div>
-            <Text_Field
+            <Text_Code_Field
+              label="Source Hub"
+              code_width="150px"
+              show_search_button={true}
+              // code_value={code_data}
+              // text_value={text_data}
+              on_click={() => set_display_modal("select_pu_source_hub")}
+              disabled
+            />
+            {/* <Text_Field
               label="Source Hub"
               type={"text"}
               placeholder="Enter source hub"
               // value={}
               // on_change={}
-            />
+            /> */}
           </div>
           <div>
             <Textarea_Field

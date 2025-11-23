@@ -55,6 +55,15 @@ export const item_status_list = [
   },
 ];
 
+export const purc_group_list = [
+  {
+    id: 1,
+    purc_group_code: "PU-G-0001",
+    purc_group_desc: "Purchasing Group Description 1",
+    creation_date: "MM-DD-YYYY",
+  },
+];
+
 export const item_group_list = [
   {
     id: 1,
@@ -113,7 +122,7 @@ export const product_class_list = [
   {
     id: 1,
     product_class_code: "PR-C-001",
-    product_class_desc: "Customer Group Description 1",
+    product_class_desc: "Product Classification Description 1",
     creation_date: "MM-DD-YYYY",
   },
 ];
@@ -122,7 +131,7 @@ export const product_class_1_list = [
   {
     id: 1,
     product_class_1_code: "PR-C1-001",
-    product_class_1_desc: "Customer Group 1 Description 1",
+    product_class_1_desc: "Product Classification 1 Description 1",
     creation_date: "MM-DD-YYYY",
   },
 ];
@@ -131,7 +140,7 @@ export const product_class_2_list = [
   {
     id: 1,
     product_class_2_code: "PR-C2-001",
-    product_class_2_desc: "Customer Group 2 Description 1",
+    product_class_2_desc: "Product Classification 2 Description 1",
     creation_date: "MM-DD-YYYY",
   },
 ];
@@ -140,7 +149,7 @@ export const product_class_3_list = [
   {
     id: 1,
     product_class_3_code: "PR-C3-001",
-    product_class_3_desc: "Customer Group 3 Description 1",
+    product_class_3_desc: "Product Classification 3 Description 1",
     creation_date: "MM-DD-YYYY",
   },
 ];
@@ -149,7 +158,7 @@ export const product_class_4_list = [
   {
     id: 1,
     product_class_4_code: "PR-C4-001",
-    product_class_4_desc: "Customer Group 4 Description 1",
+    product_class_4_desc: "Product Classification 4 Description 1",
     creation_date: "MM-DD-YYYY",
   },
 ];
@@ -158,7 +167,7 @@ export const product_class_5_list = [
   {
     id: 1,
     product_class_5_code: "PR-C5-001",
-    product_class_5_desc: "Customer Group 5 Description 1",
+    product_class_5_desc: "Product Classification 5 Description 1",
     creation_date: "MM-DD-YYYY",
   },
 ];
@@ -186,6 +195,15 @@ export const sloc_list = [
     id: 1,
     sloc_code: "SLOC-0001",
     sloc_desc: "SLOC Description 1",
+    creation_date: "MM-DD-YYYY",
+  },
+];
+
+export const scon_list = [
+  {
+    id: 1,
+    scon_code: "SCON-0001",
+    scon_desc: "Storage Condition Description 1",
     creation_date: "MM-DD-YYYY",
   },
 ];

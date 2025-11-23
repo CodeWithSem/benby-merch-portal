@@ -47,7 +47,7 @@ const Currency = ({ set_page }) => {
     { key: "currency_desc", label: "Currency Description", sortable: true },
     { key: "created_by", label: "Created By", sortable: true },
     { key: "creation_date", label: "Creation Date", sortable: true },
-    { key: "updated_by", label: "Change By", sortable: true },
+    { key: "change_by", label: "Change By", sortable: true },
     { key: "change_date", label: "Change Date", sortable: true },
     { key: "actions", label: "", sortable: false },
   ];
@@ -60,7 +60,7 @@ const Currency = ({ set_page }) => {
       currency_desc: "Philippine Peso",
       created_by: "Admin",
       creation_date: "11-11-2025",
-      updated_by: "",
+      change_by: "",
       change_date: "",
     },
   ]);

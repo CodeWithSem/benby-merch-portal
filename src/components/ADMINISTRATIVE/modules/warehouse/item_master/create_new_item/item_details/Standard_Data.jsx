@@ -78,7 +78,7 @@ const Standard_Data = ({ set_display_modal }) => {
           <div>
             <Date_Field
               label="Validity From"
-              placeholder="Select Date"
+              placeholder="MM-DD-YYYY"
               // value={selected_data}
               on_change={(e) => console.log(e.target.value)}
             />
@@ -86,7 +86,7 @@ const Standard_Data = ({ set_display_modal }) => {
           <div>
             <Date_Field
               label="Validity To"
-              placeholder="Select Date"
+              placeholder="MM-DD-YYYY"
               // value={selected_data}
               on_change={(e) => console.log(e.target.value)}
             />

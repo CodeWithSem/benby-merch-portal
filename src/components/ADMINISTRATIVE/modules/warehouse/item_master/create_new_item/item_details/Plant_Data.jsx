@@ -3,6 +3,7 @@ import Checkbox_Field from "assets/elements/Checkbox_Field";
 import Select_Field from "assets/elements/Select_Field";
 import Text_Code_Field from "assets/elements/Text_Code_Field";
 import Text_Field from "assets/elements/Text_Field";
+import Find_Field from "assets/elements/Find_Field";
 
 const Plant_Data = ({ set_display_modal }) => {
   return (
@@ -61,12 +62,12 @@ const Plant_Data = ({ set_display_modal }) => {
             />
           </div>
           <div>
-            <Select_Field
+            <Find_Field
               label="Storage Condition"
-              placeholder="Select Option"
-              // options={options}
-              // value={selected_data}
-              // on_change={handle_option_change}
+              // value={data}
+              // on_change={(e) => handle_data_change(e.target.value)}
+              on_click={() => set_display_modal("select_pd_scon")}
+              disabled
             />
           </div>
           <div className="mt-4 flex items-end col-span-full">

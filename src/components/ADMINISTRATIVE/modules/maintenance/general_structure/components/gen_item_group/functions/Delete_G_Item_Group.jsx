@@ -12,7 +12,7 @@ const Delete_G_Item_Group = ({
 }) => {
   const [is_confirm_modal_open, set_is_confirm_modal_open] = useState(false);
 
-  const handle_delete_g_item_goup = () => {
+  const handle_delete_item_group = () => {
     alert("Delete General Item Group");
   };
 
@@ -45,7 +45,7 @@ const Delete_G_Item_Group = ({
               <Button
                 width="w-[100px]"
                 variant="danger"
-                on_click={handle_delete_g_item_goup}
+                on_click={handle_delete_item_group}
               >
                 Yes
               </Button>
@@ -105,7 +105,7 @@ const Delete_G_Item_Group = ({
                       <Text_Field
                         label="General Item Group Code"
                         type={"text"}
-                        value={delete_data.g_item_goup_code}
+                        value={delete_data.item_group_code}
                         pattern="[A-Za-z]{1,}"
                         disabled
                       />
@@ -114,7 +114,7 @@ const Delete_G_Item_Group = ({
                       <Text_Field
                         label="General Item Group Description"
                         type={"text"}
-                        value={delete_data.g_item_goup_desc}
+                        value={delete_data.item_group_desc}
                         pattern="[A-Za-z]{1,}"
                         disabled
                       />

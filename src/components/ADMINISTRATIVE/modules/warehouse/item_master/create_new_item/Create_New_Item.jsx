@@ -36,6 +36,8 @@ import {
   item_division_list,
   item_status_list,
   load_group_list,
+  purc_group_list,
+  scon_list,
 } from "../ITEM_DATA_MAP";
 import Select_SD_Sales_Org from "../modals/sales_data/Select_SD_Sales_Org";
 import Select_SD_Dist_Channel from "../modals/sales_data/Select_SD_Dist_Channel";
@@ -72,6 +74,9 @@ import Select_Item_Division from "../modals/standard_data/Select_Item_Division";
 import Select_Item_Status from "../modals/standard_data/Select_Item_Status";
 import Select_SD_S_Spec_Status from "../modals/sales_data/Select_SD_S_Spec_Status";
 import Select_SDP_Load_Group from "../modals/sales_data_plant/Select_SDP_Load_Group";
+import Select_PU_P_Group from "../modals/purchasing/Select_PU_P_Group";
+import Select_PU_PL_Spec_Status from "../modals/purchasing/Select_PU_PL_Spec_Status";
+import Select_PD_SCON from "../modals/plant_data/Select_PD_SCON";
 
 const Create_New_Item = ({ set_page }) => {
   const [active_tab, set_active_tab] = useState("standard_data");
@@ -339,6 +344,20 @@ const Create_New_Item = ({ set_page }) => {
         height="max-h-[700px]"
         sloc_list={sloc_list}
       />
+      <Select_PU_P_Group
+        is_open={display_modal === "select_pu_p_group"}
+        on_close={() => set_display_modal("")}
+        width="max-w-[1000px]"
+        height="max-h-[700px]"
+        purc_group_list={purc_group_list}
+      />
+      <Select_PU_PL_Spec_Status
+        is_open={display_modal === "select_pu_pl_spec_status"}
+        on_close={() => set_display_modal("")}
+        width="max-w-[1000px]"
+        height="max-h-[700px]"
+        item_status_list={item_status_list}
+      />
       <Select_PD_Branch
         is_open={display_modal === "select_pd_branch"}
         on_close={() => set_display_modal("")}
@@ -346,6 +365,7 @@ const Create_New_Item = ({ set_page }) => {
         height="max-h-[700px]"
         branch_list={branch_list}
       />
+
       <Select_PD_Plant
         is_open={display_modal === "select_pd_plant"}
         on_close={() => set_display_modal("")}
@@ -359,6 +379,13 @@ const Create_New_Item = ({ set_page }) => {
         width="max-w-[1000px]"
         height="max-h-[700px]"
         sloc_list={sloc_list}
+      />
+      <Select_PD_SCON
+        is_open={display_modal === "select_pd_scon"}
+        on_close={() => set_display_modal("")}
+        width="max-w-[1000px]"
+        height="max-h-[700px]"
+        scon_list={scon_list}
       />
       <Select_PD_Inv_Center
         is_open={display_modal === "select_pd_inv_acc_center"}

@@ -12,7 +12,7 @@ const Delete_PL_Status = ({
 }) => {
   const [is_confirm_modal_open, set_is_confirm_modal_open] = useState(false);
 
-  const handle_delete_pl_status = () => {
+  const handle_delete_plant_status = () => {
     alert("Delete Plant Status");
   };
 
@@ -45,7 +45,7 @@ const Delete_PL_Status = ({
               <Button
                 width="w-[100px]"
                 variant="danger"
-                on_click={handle_delete_pl_status}
+                on_click={handle_delete_plant_status}
               >
                 Yes
               </Button>
@@ -105,7 +105,7 @@ const Delete_PL_Status = ({
                       <Text_Field
                         label="Plant Status Code"
                         type={"text"}
-                        value={delete_data.pl_status_code}
+                        value={delete_data.plant_status_code}
                         pattern="[A-Za-z]{1,}"
                         disabled
                       />
@@ -114,7 +114,7 @@ const Delete_PL_Status = ({
                       <Text_Field
                         label="Plant Status Description"
                         type={"text"}
-                        value={delete_data.pl_status_desc}
+                        value={delete_data.plant_status_desc}
                         pattern="[A-Za-z]{1,}"
                         disabled
                       />

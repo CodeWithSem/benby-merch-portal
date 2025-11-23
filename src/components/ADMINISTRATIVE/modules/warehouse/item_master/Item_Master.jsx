@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useToast } from "../../../layout/Toast_Provider";
+import { dist_channel_list, sales_org_list } from "./ITEM_DATA_MAP";
 import {
   Search,
   ChevronDown,
@@ -21,7 +22,6 @@ import Edit_Item from "./edit_item/Edit_Item";
 import View_Item from "./view_item/View_Item";
 import Delete_Item from "./modals/delete_item/Delete_Item";
 import Button_Action from "assets/elements/Button_Action";
-import { dist_channel_list, sales_org_list } from "./ITEM_DATA_MAP";
 
 const Item_Master = () => {
   const { show_toast } = useToast();

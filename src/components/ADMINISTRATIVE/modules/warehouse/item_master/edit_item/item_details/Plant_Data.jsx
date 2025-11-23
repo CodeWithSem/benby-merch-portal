@@ -5,6 +5,7 @@ import Select_Field from "assets/elements/Select_Field";
 import Text_Code_Field from "assets/elements/Text_Code_Field";
 import Text_Field from "assets/elements/Text_Field";
 import Button from "assets/elements/Button";
+import Find_Field from "assets/elements/Find_Field";
 
 const Plant_Data = ({
   set_display_modal,
@@ -193,12 +194,12 @@ const Plant_Data = ({
             />
           </div>
           <div>
-            <Select_Field
+            <Find_Field
               label="Storage Condition"
-              placeholder="Select Option"
-              // options={options}
-              // value={selected_data}
-              // on_change={handle_option_change}
+              // value={data}
+              // on_change={(e) => handle_data_change(e.target.value)}
+              on_click={() => set_display_modal("select_pd_scon")}
+              disabled
             />
           </div>
           <div className="mt-4 flex items-end col-span-full">

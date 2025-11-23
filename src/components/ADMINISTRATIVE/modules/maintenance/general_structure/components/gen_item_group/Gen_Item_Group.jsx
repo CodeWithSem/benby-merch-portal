@@ -27,13 +27,13 @@ const Gen_Item_Group = ({ set_page }) => {
   const [display_modal, set_display_modal] = useState("");
   const [edit_data, set_edit_data] = useState({
     id: 0,
-    g_item_goup_code: "",
-    g_item_goup_desc: "",
+    item_group_code: "",
+    item_group_desc: "",
   });
   const [delete_data, set_delete_data] = useState({
     id: 0,
-    g_item_goup_code: "",
-    g_item_goup_desc: "",
+    item_group_code: "",
+    item_group_desc: "",
   });
   // - Variables
 
@@ -44,31 +44,31 @@ const Gen_Item_Group = ({ set_page }) => {
     { key: "index", label: "#", sortable: true },
     { key: "id", label: "ID", sortable: true },
     {
-      key: "g_item_goup_code",
+      key: "item_group_code",
       label: "Gen. Item Group Code",
       sortable: true,
     },
     {
-      key: "g_item_goup_desc",
+      key: "item_group_desc",
       label: "Gen. Item Group Description",
       sortable: true,
     },
     { key: "created_by", label: "Created By", sortable: true },
     { key: "creation_date", label: "Creation Date", sortable: true },
-    { key: "updated_by", label: "Change By", sortable: true },
+    { key: "change_by", label: "Change By", sortable: true },
     { key: "change_date", label: "Change Date", sortable: true },
     { key: "actions", label: "", sortable: false },
   ];
 
   // --- State ---
-  const [g_item_goup_list, set_g_item_goup_list] = useState([
+  const [item_group_list, set_item_group_list] = useState([
     {
       id: 1,
-      g_item_goup_code: "G-ITM-0001",
-      g_item_goup_desc: "Gen. Item Group Description 1",
+      item_group_code: "G-ITM-0001",
+      item_group_desc: "Gen. Item Group Description 1",
       created_by: "Admin",
       creation_date: "11-11-2025",
-      updated_by: "",
+      change_by: "",
       change_date: "",
     },
   ]);
@@ -106,7 +106,7 @@ const Gen_Item_Group = ({ set_page }) => {
   //   const load_data = async () => {
   //     set_loading(true);
   //     const data = await fetch_data_list();
-  //     set_g_item_goup_list(data);
+  //     set_item_group_list(data);
   //     set_loading(false);
   //   };
 
@@ -116,7 +116,7 @@ const Gen_Item_Group = ({ set_page }) => {
 
   // + Client-side Filtering
   useEffect(() => {
-    let temp = [...g_item_goup_list];
+    let temp = [...item_group_list];
 
     // + Column Filter
     if (debounced_query.trim() !== "") {
@@ -151,7 +151,7 @@ const Gen_Item_Group = ({ set_page }) => {
     // - Pagination Function
     set_filtered_data(temp.slice(start_idx, end_idx));
   }, [
-    g_item_goup_list,
+    item_group_list,
     debounced_query,
     sort_by,
     sort_order,
@@ -163,7 +163,7 @@ const Gen_Item_Group = ({ set_page }) => {
   // + Total page of Pagination
   const total_pages = Math.ceil(
     (debounced_query
-      ? g_item_goup_list.filter((u) =>
+      ? item_group_list.filter((u) =>
           columns.some((col) => {
             if (col.key === "actions") return false;
             const val = u[col.key];
@@ -173,7 +173,7 @@ const Gen_Item_Group = ({ set_page }) => {
               .includes(debounced_query.toLowerCase());
           })
         ).length
-      : g_item_goup_list.length) / select_option
+      : item_group_list.length) / select_option
   );
   // - Total page of Pagination
 
@@ -190,17 +190,17 @@ const Gen_Item_Group = ({ set_page }) => {
   // - Sort Filtering
   const handle_page_change = (page) => set_current_page(page);
 
-  const handle_create_new_g_item_goup = () => {
-    set_sub_page("create_new_g_item_goup");
+  const handle_create_new_item_group = () => {
+    set_sub_page("create_new_item_group");
   };
 
-  const handle_edit_g_item_goup = (data) => {
+  const handle_edit_item_group = (data) => {
     set_edit_data(data);
-    set_sub_page("edit_g_item_goup");
+    set_sub_page("edit_item_group");
   };
-  const handle_delete_g_item_goup = (data) => {
+  const handle_delete_item_group = (data) => {
     set_delete_data(data);
-    set_display_modal("delete_g_item_goup");
+    set_display_modal("delete_item_group");
   };
 
   const handle_go_back = (value) => {
@@ -280,7 +280,7 @@ const Gen_Item_Group = ({ set_page }) => {
                     variant="primary"
                     icon={PlusCircle}
                     icon_position="left"
-                    on_click={handle_create_new_g_item_goup}
+                    on_click={handle_create_new_item_group}
                   >
                     Create New Data
                   </Button>
@@ -477,7 +477,7 @@ const Gen_Item_Group = ({ set_page }) => {
                                     {/* <div className="relative group flex jusity-center items-center">
                                       <button
                                         className="text-gray-500 hover:text-sky-600 text-[12px] outline-none"
-                                        // onClick={() => handle_view_g_item_goup(row.id)}
+                                        // onClick={() => handle_view_item_group(row.id)}
                                       >
                                         <View size={19} />
                                       </button>
@@ -489,7 +489,7 @@ const Gen_Item_Group = ({ set_page }) => {
                                       <button
                                         className="text-gray-500 hover:text-sky-600 text-[12px] outline-none"
                                         onClick={() =>
-                                          handle_edit_g_item_goup(row)
+                                          handle_edit_item_group(row)
                                         }
                                       >
                                         <Edit size={19} />
@@ -502,7 +502,7 @@ const Gen_Item_Group = ({ set_page }) => {
                                       <button
                                         className="text-gray-500 hover:text-red-600 text-[12px] mb-[1px] outline-none"
                                         onClick={() =>
-                                          handle_delete_g_item_goup(row)
+                                          handle_delete_item_group(row)
                                         }
                                       >
                                         <Trash size={19} />
@@ -560,10 +560,10 @@ const Gen_Item_Group = ({ set_page }) => {
           </div>
         </React.Fragment>
       )}
-      {sub_page === "create_new_g_item_goup" && (
+      {sub_page === "create_new_item_group" && (
         <Create_PL_Status handle_go_back={handle_go_back} />
       )}
-      {sub_page === "edit_g_item_goup" && (
+      {sub_page === "edit_item_group" && (
         <Edit_PL_Status
           handle_go_back={handle_go_back}
           edit_data={edit_data}
@@ -571,7 +571,7 @@ const Gen_Item_Group = ({ set_page }) => {
         />
       )}
       <Delete_PL_Status
-        is_open={display_modal === "delete_g_item_goup"}
+        is_open={display_modal === "delete_item_group"}
         on_close={() => set_display_modal("")}
         width="max-w-[1000px]"
         delete_data={delete_data}

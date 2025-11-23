@@ -34,7 +34,7 @@ import {
   delete_data,
 } from "../../../../../api/firestore_crud_api";
 import Verify_Field from "../../../../elements/Verify_Field";
-import { format_date } from "../../../../../assets/scripts/format";
+import { format_date } from "../../../../scripts/format";
 import Form_Modal from "../../../../elements/modals/Form_Modal";
 import Add_Data from "./modals/Add_Data";
 

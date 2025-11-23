@@ -6,10 +6,10 @@ import { ChevronLeft, CirclePlus, RefreshCcwDot } from "lucide-react";
 import React from "react";
 
 const Edit_PL_Status = ({ handle_go_back, edit_data, set_edit_data }) => {
-  const handle_change_pl_status_desc = (value) => {
+  const handle_change_plant_status_desc = (value) => {
     set_edit_data({
       ...edit_data,
-      pl_status_desc: value,
+      plant_status_desc: value,
     });
   };
 
@@ -83,7 +83,7 @@ const Edit_PL_Status = ({ handle_go_back, edit_data, set_edit_data }) => {
                 <Text_Field
                   label="Plant Status Code"
                   type={"text"}
-                  value={edit_data.pl_status_code || "-"}
+                  value={edit_data.plant_status_code || "-"}
                   pattern="[0-9]{1,}"
                   disabled
                 />
@@ -92,9 +92,9 @@ const Edit_PL_Status = ({ handle_go_back, edit_data, set_edit_data }) => {
                 <Text_Field
                   label="Plant Status Description"
                   type={"text"}
-                  value={edit_data.pl_status_desc}
+                  value={edit_data.plant_status_desc}
                   on_change={(e) =>
-                    handle_change_pl_status_desc(e.target.value)
+                    handle_change_plant_status_desc(e.target.value)
                   }
                   placeholder="Enter description"
                   pattern="[0-9]{1,}"
