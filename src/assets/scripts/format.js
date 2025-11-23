@@ -1,3 +1,19 @@
+export function console_log(obj) {
+  if (!obj || typeof obj !== "object") {
+    console.log(`${obj} (${typeof obj})`);
+    return;
+  }
+
+  const keys = Object.keys(obj);
+
+  keys.forEach((key) => {
+    const value = obj[key];
+    const type = Array.isArray(value) ? "array" : typeof value;
+    console.log(`${key}: ${value}`);
+    // console.log(`${key}: ${value} [${type.toLocaleUpperCase()}]`);
+  });
+}
+
 // + Get Date Now
 export function get_date_now() {
   const date_now = new Date();
@@ -59,6 +75,8 @@ export function format_date_2(date, format) {
   }
 }
 // - Format Date 2 (mm-dd-yyyy with time)
+
+// + Format Currency
 export function format_currency(
   number,
   decimals = 2,
@@ -79,3 +97,4 @@ export function format_percentage(number, decimals = 2) {
   });
   return `${formatted} %`;
 }
+// - Format Currency

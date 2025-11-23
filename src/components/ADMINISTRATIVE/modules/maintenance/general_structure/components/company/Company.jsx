@@ -1,5 +1,6 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useToast } from "../../../../../layout/Toast_Provider";
+import { Get_TBL_COMPANY_ID } from "api/real_time_db/incremental";
 import {
   Search,
   ChevronDown,
@@ -20,8 +21,7 @@ import Edit_Company from "./functions/Edit_Company";
 import Delete_Company from "./functions/Delete_Company";
 
 const Company = ({ set_page }) => {
-  // + Variables
-  const filter_ref = useRef(null);
+  const { show_toast } = useToast();
   const [sub_page, set_sub_page] = useState("main");
   const [display_modal, set_display_modal] = useState("");
   const [edit_data, set_edit_data] = useState({
@@ -34,11 +34,26 @@ const Company = ({ set_page }) => {
     company_code: "",
     company_desc: "",
   });
-  // - Variables
 
-  // Close dropdown on outside click
-  const { show_toast } = useToast();
+  const [company_data, set_company_data] = useState({
+    id: null,
+    company_code: "",
+    company_desc: "",
+    creation_date: "",
+    created_by: "",
+    change_date: "",
+    change_by: "",
+  });
 
+  useEffect(() => {
+    Get_TBL_COMPANY_ID((value) => {
+      set_company_data((prev) => ({
+        ...prev,
+        id: value,
+        company_code: `COM-${String(value).padStart(3, "0")}`,
+      }));
+    });
+  }, []);
   const columns = [
     { key: "index", label: "#", sortable: true },
     { key: "id", label: "ID", sortable: true },
@@ -51,19 +66,20 @@ const Company = ({ set_page }) => {
     { key: "actions", label: "", sortable: false },
   ];
 
-  // --- State ---
   const [company_list, set_company_list] = useState([
     {
       id: 1,
       company_code: "COM-001",
       company_desc: "Company Description 1",
       created_by: "Admin",
-      creation_date: "11-11-2025",
+      creation_date: "MM-DD-YYYY",
       change_by: "",
       change_date: "",
     },
   ]);
-  const [filtered_data, set_filtered_data] = useState([]);
+
+  // + Client-Side Filtering
+  const [filtered_company_list, set_filtered_company_list] = useState([]);
   const [loading, set_loading] = useState(false);
   const [select_option, set_select_option] = useState(5);
   const [current_page, set_current_page] = useState(1);
@@ -72,7 +88,6 @@ const Company = ({ set_page }) => {
   const [search_query, set_search_query] = useState("");
   const [debounced_query, set_debounced_query] = useState("");
 
-  // --- Debounce search ---
   useEffect(() => {
     const timer = setTimeout(() => {
       set_debounced_query(search_query);
@@ -81,35 +96,9 @@ const Company = ({ set_page }) => {
     return () => clearTimeout(timer);
   }, [search_query]);
 
-  // --- Close dropdown outside click ---
-  useEffect(() => {
-    const handle_click_outside = (event) => {
-      if (filter_ref.current && !filter_ref.current.contains(event.target)) {
-        // optional: close filter
-      }
-    };
-    document.addEventListener("mousedown", handle_click_outside);
-    return () =>
-      document.removeEventListener("mousedown", handle_click_outside);
-  }, []);
-
-  // --- Load all data once ---
-  //   const load_data = async () => {
-  //     set_loading(true);
-  //     const data = await fetch_data_list();
-  //     set_company_list(data);
-  //     set_loading(false);
-  //   };
-
-  //   useEffect(() => {
-  //     load_data();
-  //   }, []);
-
-  // + Client-side Filtering
   useEffect(() => {
     let temp = [...company_list];
 
-    // + Column Filter
     if (debounced_query.trim() !== "") {
       const q = debounced_query.toLowerCase();
       temp = temp.filter((u) =>
@@ -120,9 +109,7 @@ const Company = ({ set_page }) => {
         })
       );
     }
-    // - Column Filter
 
-    // + Sort Function
     temp.sort((a, b) => {
       const val_a = a[sort_by];
       const val_b = b[sort_by];
@@ -134,13 +121,10 @@ const Company = ({ set_page }) => {
       if (val_a > val_b) return sort_order === "asc" ? 1 : -1;
       return 0;
     });
-    // - Sort Function
 
-    // + Pagination Function
     const start_idx = (current_page - 1) * select_option;
     const end_idx = start_idx + select_option;
-    // - Pagination Function
-    set_filtered_data(temp.slice(start_idx, end_idx));
+    set_filtered_company_list(temp.slice(start_idx, end_idx));
   }, [
     company_list,
     debounced_query,
@@ -149,9 +133,7 @@ const Company = ({ set_page }) => {
     current_page,
     select_option,
   ]);
-  // - Client-side Filtering
 
-  // + Total page of Pagination
   const total_pages = Math.ceil(
     (debounced_query
       ? company_list.filter((u) =>
@@ -166,9 +148,7 @@ const Company = ({ set_page }) => {
         ).length
       : company_list.length) / select_option
   );
-  // - Total page of Pagination
 
-  // + Sort Filtering
   const handle_sort = (column) => {
     if (sort_by === column)
       set_sort_order(sort_order === "asc" ? "desc" : "asc");
@@ -178,8 +158,9 @@ const Company = ({ set_page }) => {
     }
     set_current_page(1);
   };
-  // - Sort Filtering
+
   const handle_page_change = (page) => set_current_page(page);
+  // - Client-Side Filtering
 
   const handle_create_new_company = () => {
     set_sub_page("create_new_company");
@@ -322,7 +303,7 @@ const Company = ({ set_page }) => {
                             on_change={(e) => set_search_query(e.target.value)}
                           />
                         </div>
-                        <div className="relative" ref={filter_ref}>
+                        <div className="relative">
                           {/* <Button
                             variant="white"
                             width="w-[100px]"
@@ -390,7 +371,7 @@ const Company = ({ set_page }) => {
                       <div className="p-6 text-center text-gray-500 text-sm">
                         Loading...
                       </div>
-                    ) : filtered_data.length === 0 ? (
+                    ) : filtered_company_list.length === 0 ? (
                       <div className="p-6 text-center text-gray-500 text-sm">
                         No data found
                       </div>
@@ -442,7 +423,7 @@ const Company = ({ set_page }) => {
                           </tr>
                         </thead>
                         <tbody className="bg-white">
-                          {filtered_data.map((row, idx) => {
+                          {filtered_company_list.map((row, idx) => {
                             // + Cell Renderer
                             const render_cell = (col, row) => {
                               const value = row[col.key];
@@ -550,7 +531,11 @@ const Company = ({ set_page }) => {
         </React.Fragment>
       )}
       {sub_page === "create_new_company" && (
-        <Create_Company handle_go_back={handle_go_back} />
+        <Create_Company
+          handle_go_back={handle_go_back}
+          company_data={company_data}
+          set_company_data={set_company_data}
+        />
       )}
       {sub_page === "edit_company" && (
         <Edit_Company

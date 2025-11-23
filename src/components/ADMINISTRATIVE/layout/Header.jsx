@@ -20,7 +20,6 @@ const Header = ({ toggle_sidebar, set_active_item }) => {
   const [mobile_open, set_mobile_open] = useState(false);
   const [profile_open, set_profile_open] = useState(false);
   const [notif_open, set_notif_open] = useState(false);
-  const [user, set_user] = useState(null);
 
   const profile_ref = useRef(null);
   const notif_ref = useRef(null);

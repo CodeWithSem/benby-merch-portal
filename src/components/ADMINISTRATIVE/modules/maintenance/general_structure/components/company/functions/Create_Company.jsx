@@ -1,10 +1,43 @@
+import { api_create_company } from "api/firestore_db/tbl_company_api";
 import Button from "assets/elements/Button";
 import Text_Field from "assets/elements/Text_Field";
-import { format_date_1, get_date_now } from "assets/scripts/format";
+import {
+  console_log,
+  format_date_1,
+  get_date_now,
+} from "assets/scripts/format";
+import { Use_App } from "context/app_context";
 import { ChevronLeft, CirclePlus } from "lucide-react";
 import React from "react";
 
-const Create_Company = ({ handle_go_back }) => {
+const Create_Company = ({ handle_go_back, company_data, set_company_data }) => {
+  const { active_user } = Use_App();
+  const handle_change_company_desc = (value) => {
+    set_company_data((prev) => ({
+      ...prev,
+      company_desc: value,
+    }));
+  };
+
+  const handle_create_company = async () => {
+    try {
+      const response = await api_create_company(
+        company_data,
+        active_user?.username
+      );
+      if (response.success) {
+        console_log(response.data);
+        alert("Company created.");
+        handle_go_back("sub_level");
+      } else {
+        alert("Error.");
+      }
+    } catch (error) {
+      console.error("Failed to create company:", error);
+    }
+  };
+
+  // RETURN ORIGIN
   return (
     <React.Fragment>
       <div className="w-full">
@@ -74,8 +107,7 @@ const Create_Company = ({ handle_go_back }) => {
                 <Text_Field
                   label="Company Code"
                   type={"text"}
-                  value={"AUTO GENERATED"}
-                  pattern="[0-9]{1,}"
+                  value={company_data.company_code || ""}
                   disabled
                 />
               </div>
@@ -84,7 +116,8 @@ const Create_Company = ({ handle_go_back }) => {
                   label="Company Description"
                   type={"text"}
                   placeholder="Enter description"
-                  pattern="[0-9]{1,}"
+                  value={company_data.company_desc || ""}
+                  on_change={(e) => handle_change_company_desc(e.target.value)}
                 />
               </div>
             </div>
@@ -96,7 +129,7 @@ const Create_Company = ({ handle_go_back }) => {
                 // width="w-[100px]"
                 icon={CirclePlus}
                 icon_position="left"
-                // on_click={handle_save}
+                on_click={handle_create_company}
               >
                 Create
               </Button>
