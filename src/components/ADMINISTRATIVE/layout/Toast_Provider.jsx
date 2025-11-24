@@ -109,7 +109,7 @@ export const Toast_Provider = ({ children, defaultPosition = "top-right" }) => {
               >
                 <div className="flex-shrink-0">{toast.icon}</div>
                 <div style={{ width: toast.width || "20rem" }}>
-                  <div className="font-semibold text-sm text-gray-800 mb-1">
+                  <div className="font-semibold text-sm text-gray-700 mb-1">
                     {toast.title}
                   </div>
                   <p className="text-sm text-gray-600">{toast.message}</p>

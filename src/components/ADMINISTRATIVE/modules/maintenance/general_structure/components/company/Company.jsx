@@ -11,6 +11,8 @@ import {
   RefreshCw,
   FileUp,
   ChevronLeft,
+  Trash2,
+  CheckCircle2,
 } from "lucide-react";
 import Icon_Field from "assets/elements/Icon_Field";
 import Select_Field from "assets/elements/Select_Field";
@@ -19,23 +21,23 @@ import Button from "assets/elements/Button";
 import Create_Company from "./functions/Create_Company";
 import Edit_Company from "./functions/Edit_Company";
 import Delete_Company from "./functions/Delete_Company";
+import {
+  api_get_company_list,
+  api_truncate_company,
+} from "api/firestore_db/tbl_company_api";
+import { Use_App } from "context/app_context";
+import Spinner from "assets/elements/Spinner";
+import Upload_Company from "./functions/Upload_Company";
 
 const Company = ({ set_page }) => {
+  const { active_user } = Use_App();
   const { show_toast } = useToast();
   const [sub_page, set_sub_page] = useState("main");
   const [display_modal, set_display_modal] = useState("");
-  const [edit_data, set_edit_data] = useState({
-    id: 0,
-    company_code: "",
-    company_desc: "",
-  });
-  const [delete_data, set_delete_data] = useState({
-    id: 0,
-    company_code: "",
-    company_desc: "",
-  });
+  const [loading_list, set_loading_list] = useState(false);
+  const [truncate_loading, set_truncate_loading] = useState(false);
 
-  const [company_data, set_company_data] = useState({
+  const def_company_data = {
     id: null,
     company_code: "",
     company_desc: "",
@@ -43,47 +45,99 @@ const Company = ({ set_page }) => {
     created_by: "",
     change_date: "",
     change_by: "",
-  });
+  };
+
+  const [new_data, set_new_data] = useState({ ...def_company_data });
+  const [edit_data, set_edit_data] = useState({ ...def_company_data });
+  const [delete_data, set_delete_data] = useState({ ...def_company_data });
+
+  const reset_new_data = () => {
+    set_new_data((prev) => ({
+      ...prev,
+      company_desc: "",
+      creation_date: "",
+      created_by: "",
+      change_date: "",
+      change_by: "",
+    }));
+  };
 
   useEffect(() => {
     Get_TBL_COMPANY_ID((value) => {
-      set_company_data((prev) => ({
+      set_new_data((prev) => ({
         ...prev,
         id: value,
         company_code: `COM-${String(value).padStart(3, "0")}`,
       }));
     });
   }, []);
+
   const columns = [
-    { key: "index", label: "#", sortable: true },
+    { key: "index", label: "#", sortable: false },
     { key: "id", label: "ID", sortable: true },
     { key: "company_code", label: "Company Code", sortable: true },
     { key: "company_desc", label: "Company Description", sortable: true },
-    { key: "created_by", label: "Created By", sortable: true },
     { key: "creation_date", label: "Creation Date", sortable: true },
-    { key: "change_by", label: "Change By", sortable: true },
+    { key: "created_by", label: "Created By", sortable: true },
     { key: "change_date", label: "Change Date", sortable: true },
+    { key: "change_by", label: "Change By", sortable: true },
     { key: "actions", label: "", sortable: false },
   ];
 
-  const [company_list, set_company_list] = useState([
-    {
-      id: 1,
-      company_code: "COM-001",
-      company_desc: "Company Description 1",
-      created_by: "Admin",
-      creation_date: "MM-DD-YYYY",
-      change_by: "",
-      change_date: "",
-    },
-  ]);
+  const [company_list, set_company_list] = useState([]);
+  // {
+  //   id: 1,
+  //   company_code: "COM-001",
+  //   company_desc: "Company Description 1",
+  //   created_by: "Admin",
+  //   creation_date: "MM-DD-YYYY",
+  //   change_by: "",
+  //   change_date: "",
+  // }
+
+  const handle_get_company_list = async () => {
+    set_loading_list(true);
+    const response = await api_get_company_list();
+    if (response.success) {
+      set_company_list(response.data);
+    } else {
+      console.error(response.message);
+    }
+    set_loading_list(false);
+  };
+
+  useEffect(() => {
+    handle_get_company_list();
+  }, []);
+
+  const handle_truncate_company_list = async () => {
+    set_truncate_loading(true);
+    const response = await api_truncate_company();
+    if (response.success) {
+      show_toast({
+        type: "success",
+        title: "Truncate Success",
+        message: "You have deleted all the record",
+        icon: <CheckCircle2 size={21} className="text-green-500" />,
+      });
+    } else {
+      show_toast({
+        type: "danger",
+        title: "Truncate Failed",
+        message: "There was error occurred on truncate",
+      });
+      console.error(response.message);
+    }
+    handle_get_company_list();
+    set_truncate_loading(false);
+  };
 
   // + Client-Side Filtering
   const [filtered_company_list, set_filtered_company_list] = useState([]);
   const [loading, set_loading] = useState(false);
   const [select_option, set_select_option] = useState(5);
   const [current_page, set_current_page] = useState(1);
-  const [sort_by, set_sort_by] = useState("timestamp");
+  const [sort_by, set_sort_by] = useState("id");
   const [sort_order, set_sort_order] = useState("asc");
   const [search_query, set_search_query] = useState("");
   const [debounced_query, set_debounced_query] = useState("");
@@ -124,7 +178,13 @@ const Company = ({ set_page }) => {
 
     const start_idx = (current_page - 1) * select_option;
     const end_idx = start_idx + select_option;
-    set_filtered_company_list(temp.slice(start_idx, end_idx));
+    const sliced = temp.slice(start_idx, end_idx);
+    const indexed_data = sliced.map((item, i) => ({
+      ...item,
+      index: start_idx + i + 1,
+    }));
+
+    set_filtered_company_list(indexed_data);
   }, [
     company_list,
     debounced_query,
@@ -175,6 +235,10 @@ const Company = ({ set_page }) => {
     set_display_modal("delete_company");
   };
 
+  const handle_upload_company = () => {
+    set_sub_page("upload_company");
+  };
+
   const handle_go_back = (value) => {
     switch (value) {
       case "main":
@@ -189,18 +253,16 @@ const Company = ({ set_page }) => {
     }
   };
 
-  const go_back_to_main = () => {
-    set_page("main");
-  };
-
   // RETURN ORIGIN
   return (
     <React.Fragment>
       {sub_page === "main" && (
         <React.Fragment>
           <div className="w-full">
+            {/* + Title */}
             <div className="flex flex-wrap items-center justify-between gap-3 py-5">
               <h1 className="text-xl">Maintenance</h1>
+              {/* + Breadcrumbs */}
               <nav>
                 <ol className="flex flex-wrap items-center gap-1.5">
                   <li>
@@ -232,9 +294,11 @@ const Company = ({ set_page }) => {
                   </li>
                 </ol>
               </nav>
+              {/* - Breadcrumbs */}
             </div>
-
+            {/* - Title */}
             <div className="w-full bg-white rounded-lg border">
+              {/* + Header */}
               <div className="flex flex-wrap items-center justify-between gap-3 p-5">
                 <div className="flex items-center gap-3">
                   <Button
@@ -242,12 +306,24 @@ const Company = ({ set_page }) => {
                     icon={ChevronLeft}
                     icon_position="left"
                     width="w-[20px]"
-                    on_click={go_back_to_main}
+                    on_click={() => handle_go_back("main")}
                   ></Button>
                   {/* <ChevronLeft className="text-gray-500" size={24} /> */}
                   <h1 className="text-lg">Company</h1>
                 </div>
                 <div className="flex gap-2">
+                  {active_user?.category === "DEV" && (
+                    <Button
+                      variant="danger"
+                      icon={Trash2}
+                      icon_position="left"
+                      width="w-[110px]"
+                      loading={truncate_loading}
+                      on_click={handle_truncate_company_list}
+                    >
+                      Truncate
+                    </Button>
+                  )}
                   <Button
                     variant="primary"
                     icon={PlusCircle}
@@ -256,12 +332,18 @@ const Company = ({ set_page }) => {
                   >
                     Create New Data
                   </Button>
-                  <Button variant="primary" icon={FileUp} icon_position="left">
+                  <Button
+                    variant="primary"
+                    icon={FileUp}
+                    icon_position="left"
+                    on_click={handle_upload_company}
+                  >
                     Upload
                   </Button>
                 </div>
               </div>
-
+              {/* - Header */}
+              {/* + Section 1 */}
               <div className="p-5 sm:p-6 border-t">
                 <div className="w-full border rounded-lg">
                   <div className="w-full md:flex md:justify-between p-4 gap-4">
@@ -287,10 +369,9 @@ const Company = ({ set_page }) => {
                         variant="white"
                         icon={RefreshCw}
                         icon_position="left"
-                        //   on_click={() => load_data()}
+                        on_click={handle_get_company_list}
                       ></Button>
                     </div>
-
                     <div className="w-full mt-4 md:mt-0 md:w-[600px]">
                       <div className="w-full flex items-center gap-2">
                         <div className="w-full">
@@ -303,73 +384,15 @@ const Company = ({ set_page }) => {
                             on_change={(e) => set_search_query(e.target.value)}
                           />
                         </div>
-                        <div className="relative">
-                          {/* <Button
-                            variant="white"
-                            width="w-[100px]"
-                            icon={SlidersHorizontal}
-                            icon_position="left"
-                            // loading
-                            on_click={() => set_show_filter((prev) => !prev)}
-                          >
-                            Filter
-                          </Button> */}
-
-                          {/* Filter Popover */}
-                          {/* {show_filter && (
-                            <React.Fragment>
-                              <div
-                                className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40"
-                                // onClick={() => set_show_filter(false)}
-                              ></div>
-                              <div className="absolute top-full mt-2 right-0 z-50 bg-white border rounded-lg shadow-md p-4 w-[260px]">
-                                <div>
-                                  <Date_Range_Field
-                                    label="Date Range"
-                                    ref={date_range_ref}
-                                  />
-                                </div>
-                                <div className="mt-4">
-                                  <Checkbox_Field
-                                    label="Is Draft?"
-                                    name="terms"
-                                    box_size={20}
-                                    icon_size={12}
-                                    //   checked={check}
-                                    //   on_change={(e) => set_check(e.target.checked)}
-                                    on_change={(e) => alert("Is Draft")}
-                                  />
-                                </div>
-
-                                <div className="flex justify-end gap-2 mt-4">
-                                  <Button
-                                    size="sm"
-                                    variant="primary"
-                                    on_click={() => set_show_filter(false)}
-                                  >
-                                    Apply
-                                  </Button>
-                                  <Button
-                                    size="sm"
-                                    variant="secondary"
-                                    on_click={() => set_show_filter(false)}
-                                  >
-                                    Cancel
-                                  </Button>
-                                </div>
-                              </div>
-                            </React.Fragment>
-                          )} */}
-                        </div>
                       </div>
                     </div>
                   </div>
-
-                  {/* Table */}
+                  {/* + Table */}
                   <div className="overflow-x-auto">
-                    {loading ? (
-                      <div className="p-6 text-center text-gray-500 text-sm">
-                        Loading...
+                    {loading_list ? (
+                      <div className="p-6 flex justify-center items-center text-gray-500 text-sm">
+                        <Spinner />
+                        {/* Loading... */}
                       </div>
                     ) : filtered_company_list.length === 0 ? (
                       <div className="p-6 text-center text-gray-500 text-sm">
@@ -428,7 +451,7 @@ const Company = ({ set_page }) => {
                             const render_cell = (col, row) => {
                               const value = row[col.key];
                               if (col.key === "index") {
-                                return <span>{idx + 1}</span>;
+                                return <span>{row.index}</span>;
                               }
                               if (col.key === "status") {
                                 return (
@@ -446,17 +469,6 @@ const Company = ({ set_page }) => {
                               if (col.key === "actions") {
                                 return (
                                   <div className="flex gap-2">
-                                    {/* <div className="relative group flex jusity-center items-center">
-                                      <button
-                                        className="text-gray-500 hover:text-sky-600 text-[12px] outline-none"
-                                        // onClick={() => handle_view_company(row.id)}
-                                      >
-                                        <View size={19} />
-                                      </button>
-                                      <span className="absolute bottom-full mb-1 left-1/2 transform -translate-x-1/2 px-2 py-1 text-xs text-white bg-sky-600 rounded opacity-0 group-hover:opacity-100 transition-opacity">
-                                        View Record
-                                      </span>
-                                    </div> */}
                                     <div className="relative group flex jusity-center items-center">
                                       <button
                                         className="text-gray-500 hover:text-sky-600 text-[12px] outline-none"
@@ -485,9 +497,8 @@ const Company = ({ set_page }) => {
                                 );
                               }
 
-                              return value; // Default render for all other fields
+                              return value;
                             };
-                            // - Cell Renderer
 
                             return (
                               <tr
@@ -515,7 +526,8 @@ const Company = ({ set_page }) => {
                       </table>
                     )}
                   </div>
-
+                  {/* - Table */}
+                  {/* + Pagination */}
                   {total_pages > 0 && (
                     <Pagination
                       current_page={current_page}
@@ -524,8 +536,10 @@ const Company = ({ set_page }) => {
                       variant="compact"
                     />
                   )}
+                  {/* - Pagination */}
                 </div>
               </div>
+              {/* - Section 1 */}
             </div>
           </div>
         </React.Fragment>
@@ -533,22 +547,38 @@ const Company = ({ set_page }) => {
       {sub_page === "create_new_company" && (
         <Create_Company
           handle_go_back={handle_go_back}
-          company_data={company_data}
-          set_company_data={set_company_data}
+          active_user={active_user}
+          reset_new_data={reset_new_data}
+          show_toast={show_toast}
+          new_data={new_data}
+          set_new_data={set_new_data}
+          set_company_list={set_company_list}
         />
       )}
       {sub_page === "edit_company" && (
         <Edit_Company
           handle_go_back={handle_go_back}
+          active_user={active_user}
+          show_toast={show_toast}
           edit_data={edit_data}
           set_edit_data={set_edit_data}
+          set_company_list={set_company_list}
+        />
+      )}
+      {sub_page === "upload_company" && (
+        <Upload_Company
+          handle_go_back={handle_go_back}
+          handle_get_company_list={handle_get_company_list}
+          show_toast={show_toast}
         />
       )}
       <Delete_Company
         is_open={display_modal === "delete_company"}
         on_close={() => set_display_modal("")}
         width="max-w-[1000px]"
+        show_toast={show_toast}
         delete_data={delete_data}
+        set_company_list={set_company_list}
       />
     </React.Fragment>
   );

@@ -1,3 +1,5 @@
+import * as XLSX from "xlsx";
+
 export function console_log(obj) {
   if (!obj || typeof obj !== "object") {
     console.log(`${obj} (${typeof obj})`);
@@ -75,6 +77,32 @@ export function format_date_2(date, format) {
   }
 }
 // - Format Date 2 (mm-dd-yyyy with time)
+// + Format Excel Date
+export const convert_excel_date = (value) => {
+  // Case 1: JS Date object
+  if (value instanceof Date) {
+    return format_date_1(value);
+  }
+
+  // Case 2: Excel serial number (e.g., 45678)
+  if (typeof value === "number") {
+    const excel_date = XLSX.SSF.parse_date_code(value);
+    if (!excel_date) return null;
+
+    const jsDate = new Date(excel_date.y, excel_date.m - 1, excel_date.d);
+    return format_date_1(jsDate);
+  }
+
+  // Case 3: String like "11/24/2025"
+  if (typeof value === "string") {
+    const jsDate = new Date(value);
+    if (isNaN(jsDate.getTime())) return null;
+    return format_date_1(jsDate);
+  }
+
+  return null;
+};
+// - Format Excel Date
 
 // + Format Currency
 export function format_currency(

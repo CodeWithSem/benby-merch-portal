@@ -19,10 +19,20 @@ const Upload_Field = ({
     }
   };
 
+  // const handle_change = (e) => {
+  //   const selected_file = e.target.files?.[0];
+  //   set_file_name(selected_file ? selected_file.name : "");
+  //   if (on_change) on_change(e);
+  // };
+
   const handle_change = (e) => {
-    const selected_file = e.target.files?.[0];
+    const input = e.target;
+    const selected_file = input.files?.[0];
+
     set_file_name(selected_file ? selected_file.name : "");
     if (on_change) on_change(e);
+
+    input.value = "";
   };
 
   const wrapper_class = `${

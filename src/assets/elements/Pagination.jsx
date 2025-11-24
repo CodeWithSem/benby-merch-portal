@@ -12,7 +12,7 @@ const Pagination = ({
     flex items-center justify-center w-9 h-8 mx-1
     border border-gray-300 rounded-md 
     hover:bg-gray-100 
-    disabled:text-gray-300 disabled:border-gray-200 disabled:bg-transparent
+    disabled:text-gray-300 disabled:border-gray-200 disabled:bg-transparent outline-none
   `;
 
   const getPageNumbers = () => {
@@ -66,7 +66,7 @@ const Pagination = ({
             page === "..." ? (
               <span
                 key={idx}
-                className="w-9 h-8 flex items-center justify-center text-gray-500 text-sm select-none"
+                className="w-9 h-8 flex items-center justify-center text-gray-500 text-sm select-none outline-none"
               >
                 ...
               </span>
@@ -74,7 +74,7 @@ const Pagination = ({
               <button
                 key={idx}
                 onClick={() => on_page_change(page)}
-                className={`min-w-9 h-8 rounded-md text-sm px-2 ${
+                className={`min-w-9 h-8 rounded-md text-sm px-2 outline-none ${
                   current_page === page
                     ? "bg-sky-100 text-sky-600"
                     : "text-gray-700 hover:bg-gray-100"
@@ -135,7 +135,7 @@ const Pagination = ({
             <button
               key={idx}
               onClick={() => on_page_change(page)}
-              className={`min-w-9 h-8 rounded-md text-sm px-2 ${
+              className={`min-w-9 h-8 rounded-md text-sm px-2 outline-none ${
                 current_page === page
                   ? "bg-sky-100 text-sky-600"
                   : "text-gray-700 hover:bg-gray-100"

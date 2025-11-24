@@ -40,9 +40,9 @@ const Button = ({
   class_name = "",
   full_width = false,
   width = "",
-  icon: Icon, // ✅ New
-  icon_position = "left", // ✅ New
-  icon_size = 16, // ✅ Optional icon size
+  icon: Icon,
+  icon_position = "left",
+  icon_size = 16,
 }) => {
   const base_classes =
     "inline-flex items-center justify-center rounded-md font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors duration-150";
