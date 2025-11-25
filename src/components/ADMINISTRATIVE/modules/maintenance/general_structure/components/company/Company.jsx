@@ -1,6 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { useToast } from "../../../../../layout/Toast_Provider";
-import { Get_TBL_COMPANY_ID } from "api/real_time_db/incremental";
+import { Use_App } from "context/app_context";
+import {
+  api_get_company_list,
+  api_truncate_company,
+} from "api/firestore_db/tbl_company_api";
+import { Get_TBL_INCREMENTAL_ID } from "api/real_time_db/incremental";
 import {
   Search,
   ChevronDown,
@@ -13,6 +18,7 @@ import {
   ChevronLeft,
   Trash2,
   CheckCircle2,
+  SlidersHorizontal,
 } from "lucide-react";
 import Icon_Field from "assets/elements/Icon_Field";
 import Select_Field from "assets/elements/Select_Field";
@@ -21,19 +27,18 @@ import Button from "assets/elements/Button";
 import Create_Company from "./functions/Create_Company";
 import Edit_Company from "./functions/Edit_Company";
 import Delete_Company from "./functions/Delete_Company";
-import {
-  api_get_company_list,
-  api_truncate_company,
-} from "api/firestore_db/tbl_company_api";
-import { Use_App } from "context/app_context";
 import Spinner from "assets/elements/Spinner";
 import Upload_Company from "./functions/Upload_Company";
+import Text_Field from "assets/elements/Text_Field";
+
+const HAS_FILTER = true;
 
 const Company = ({ set_page }) => {
   const { active_user } = Use_App();
   const { show_toast } = useToast();
   const [sub_page, set_sub_page] = useState("main");
   const [display_modal, set_display_modal] = useState("");
+  const [show_filter, set_show_filter] = useState(false);
   const [loading_list, set_loading_list] = useState(false);
   const [truncate_loading, set_truncate_loading] = useState(false);
 
@@ -63,7 +68,7 @@ const Company = ({ set_page }) => {
   };
 
   useEffect(() => {
-    Get_TBL_COMPANY_ID((value) => {
+    Get_TBL_INCREMENTAL_ID("TBL_COMPANY", (value) => {
       set_new_data((prev) => ({
         ...prev,
         id: value,
@@ -85,7 +90,7 @@ const Company = ({ set_page }) => {
   ];
 
   const [company_list, set_company_list] = useState([]);
-  // {
+  // ======================================================
   //   id: 1,
   //   company_code: "COM-001",
   //   company_desc: "Company Description 1",
@@ -93,7 +98,7 @@ const Company = ({ set_page }) => {
   //   creation_date: "MM-DD-YYYY",
   //   change_by: "",
   //   change_date: "",
-  // }
+  // ======================================================
 
   const handle_get_company_list = async () => {
     set_loading_list(true);
@@ -116,15 +121,15 @@ const Company = ({ set_page }) => {
     if (response.success) {
       show_toast({
         type: "success",
-        title: "Truncate Success",
-        message: "You have deleted all the record",
+        title: "Truncated Successfully",
+        message: "You have deleted all the record.",
         icon: <CheckCircle2 size={21} className="text-green-500" />,
       });
     } else {
       show_toast({
         type: "danger",
-        title: "Truncate Failed",
-        message: "There was error occurred on truncate",
+        title: "Error",
+        message: "Something went wrong. Please try again.",
       });
       console.error(response.message);
     }
@@ -384,6 +389,76 @@ const Company = ({ set_page }) => {
                             on_change={(e) => set_search_query(e.target.value)}
                           />
                         </div>
+                        {/* + Filter Dropdown */}
+                        {HAS_FILTER ? (
+                          <React.Fragment>
+                            <div className="relative">
+                              <Button
+                                variant="white"
+                                width="w-[100px]"
+                                icon={SlidersHorizontal}
+                                icon_position="left"
+                                on_click={() =>
+                                  set_show_filter((prev) => !prev)
+                                }
+                              >
+                                Filter
+                              </Button>
+                              {/* + Filter Content */}
+                              {show_filter && (
+                                <React.Fragment>
+                                  <div
+                                    className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40"
+                                    onClick={() => set_show_filter(false)}
+                                  ></div>
+                                  <div className="absolute top-full mt-2 right-0 z-50 bg-white border rounded-lg shadow-md p-4 w-[260px]">
+                                    <div className="grid grid-cols-1 gap-2">
+                                      <div>
+                                        <Text_Field
+                                          label="Filter 1"
+                                          type={"text"}
+                                          disabled
+                                        />
+                                      </div>
+                                      <div>
+                                        <Text_Field
+                                          label="Filter 2"
+                                          type={"text"}
+                                          disabled
+                                        />
+                                      </div>
+                                      <div>
+                                        <Text_Field
+                                          label="Filter 3"
+                                          type={"text"}
+                                          disabled
+                                        />
+                                      </div>
+                                    </div>
+                                    <div className="flex justify-end gap-2 mt-4">
+                                      <Button
+                                        size="sm"
+                                        variant="primary"
+                                        on_click={() => set_show_filter(false)}
+                                      >
+                                        Apply
+                                      </Button>
+                                      <Button
+                                        size="sm"
+                                        variant="secondary"
+                                        on_click={() => set_show_filter(false)}
+                                      >
+                                        Cancel
+                                      </Button>
+                                    </div>
+                                  </div>
+                                </React.Fragment>
+                              )}
+                              {/* - Filter Content */}
+                            </div>
+                          </React.Fragment>
+                        ) : null}
+                        {/* - Filter Dropdown */}
                       </div>
                     </div>
                   </div>
@@ -392,7 +467,6 @@ const Company = ({ set_page }) => {
                     {loading_list ? (
                       <div className="p-6 flex justify-center items-center text-gray-500 text-sm">
                         <Spinner />
-                        {/* Loading... */}
                       </div>
                     ) : filtered_company_list.length === 0 ? (
                       <div className="p-6 text-center text-gray-500 text-sm">

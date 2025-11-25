@@ -91,15 +91,15 @@ const Edit_Company = ({
     if (status === "success") {
       show_toast({
         type: "success",
-        title: "Update Company",
-        message: "You have updated the database",
+        title: "Updated Successfully",
+        message: "The record has been updated.",
         icon: <CheckCircle2 size={21} className="text-green-500" />,
       });
     } else {
       show_toast({
         type: "danger",
-        title: "Update Company",
-        message: "There was an error occurred",
+        title: "Error",
+        message: "Something went wrong. Please try again.",
         icon: <CircleX size={21} className="text-red-500" />,
       });
     }
@@ -122,8 +122,8 @@ const Edit_Company = ({
               Confirm Company Update
             </div>
             <p className="w-full text-center text-sm leading-6 text-gray-500 dark:text-gray-400 pt-4">
-              You are about to edit a company. Once edited, it will be updated
-              to the database.
+              You are about to edit this Company. Once edited, it will be
+              updated to the database.
             </p>
             <p className="w-full text-center text-sm leading-6 text-gray-500 dark:text-gray-400 pt-4">
               Please review all the details — before proceeding.
@@ -229,7 +229,6 @@ const Edit_Company = ({
                   label="Company Code"
                   type={"text"}
                   value={edit_data.company_code || "-"}
-                  pattern="[0-9]{1,}"
                   disabled
                 />
               </div>
@@ -237,10 +236,9 @@ const Edit_Company = ({
                 <Text_Field
                   label="Company Description"
                   type={"text"}
+                  placeholder="Enter description"
                   value={edit_data.company_desc}
                   on_change={(e) => handle_change_company_desc(e.target.value)}
-                  placeholder="Enter description"
-                  pattern="[0-9]{1,}"
                 />
               </div>
             </div>

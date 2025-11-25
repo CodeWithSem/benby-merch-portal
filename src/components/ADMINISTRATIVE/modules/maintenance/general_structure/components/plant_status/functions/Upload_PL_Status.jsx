@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { api_bulk_upload_company } from "api/firestore_db/tbl_company_api";
+import { api_bulk_upload_pl_status } from "api/firestore_db/tbl_pl_status_api";
 import { handle_excel_upload_generic } from "assets/scripts/functions/upload_excel";
 import { format_date_1, get_date_now } from "assets/scripts/format";
 import {
@@ -7,6 +7,7 @@ import {
   ChevronDown,
   ChevronLeft,
   ChevronUp,
+  CircleX,
   FileUp,
   Search,
 } from "lucide-react";
@@ -16,9 +17,9 @@ import Pagination from "assets/elements/Pagination";
 import Select_Field from "assets/elements/Select_Field";
 import Icon_Field from "assets/elements/Icon_Field";
 
-const Upload_Company = ({
+const Upload_PL_Status = ({
   handle_go_back,
-  handle_get_company_list,
+  handle_get_pl_status_list,
   show_toast,
 }) => {
   const [is_confirm_modal_open, set_is_confirm_modal_open] = useState(false);
@@ -26,18 +27,22 @@ const Upload_Company = ({
 
   const columns = [
     { key: "id", label: "ID", sortable: true },
-    { key: "company_code", label: "Company Code", sortable: true },
-    { key: "company_desc", label: "Company Description", sortable: true },
+    { key: "pl_status_code", label: "Plant Status Code", sortable: true },
+    {
+      key: "pl_status_desc",
+      label: "Plant Status Description",
+      sortable: true,
+    },
     { key: "creation_date", label: "Creation Date", sortable: true },
     { key: "created_by", label: "Created By", sortable: true },
     { key: "change_date", label: "Change Date", sortable: true },
     { key: "change_by", label: "Change By", sortable: true },
   ];
 
-  const [upload_company_list, set_upload_company_list] = useState([]);
+  const [upload_pl_status_list, set_upload_pl_status_list] = useState([]);
 
   // + Client-Side Filtering
-  const [filtered_upload_company_list, set_filtered_upload_company_list] =
+  const [filtered_upload_pl_status_list, set_filtered_upload_pl_status_list] =
     useState([]);
   const [select_option, set_select_option] = useState(5);
   const [current_page, set_current_page] = useState(1);
@@ -55,7 +60,7 @@ const Upload_Company = ({
   }, [search_query]);
 
   useEffect(() => {
-    let temp = [...upload_company_list];
+    let temp = [...upload_pl_status_list];
 
     if (debounced_query.trim() !== "") {
       const q = debounced_query.toLowerCase();
@@ -88,9 +93,9 @@ const Upload_Company = ({
       index: start_idx + i + 1,
     }));
 
-    set_filtered_upload_company_list(indexed_data);
+    set_filtered_upload_pl_status_list(indexed_data);
   }, [
-    upload_company_list,
+    upload_pl_status_list,
     debounced_query,
     sort_by,
     sort_order,
@@ -100,7 +105,7 @@ const Upload_Company = ({
 
   const total_pages = Math.ceil(
     (debounced_query
-      ? upload_company_list.filter((u) =>
+      ? upload_pl_status_list.filter((u) =>
           columns.some((col) => {
             if (col.key === "actions") return false;
             const val = u[col.key];
@@ -110,7 +115,7 @@ const Upload_Company = ({
               .includes(debounced_query.toLowerCase());
           })
         ).length
-      : upload_company_list.length) / select_option
+      : upload_pl_status_list.length) / select_option
   );
 
   const handle_sort = (column) => {
@@ -129,15 +134,15 @@ const Upload_Company = ({
   const handle_excel_upload = (e) => {
     handle_excel_upload_generic({
       e,
-      code_field: "company_code",
-      desc_field: "company_desc",
-      set_data_callback: set_upload_company_list,
+      code_field: "pl_status_code",
+      desc_field: "pl_status_desc",
+      set_data_callback: set_upload_pl_status_list,
       show_toast,
     });
   };
 
-  const handle_upload_company = async () => {
-    if (upload_company_list.length === 0) {
+  const handle_upload_pl_status = async () => {
+    if (upload_pl_status_list.length === 0) {
       show_toast({
         type: "danger",
         title: "Invalid Data",
@@ -149,17 +154,17 @@ const Upload_Company = ({
     set_upload_loading(true);
 
     try {
-      const response = await api_bulk_upload_company(upload_company_list);
+      const response = await api_bulk_upload_pl_status(upload_pl_status_list);
 
       if (response.success) {
         show_toast({
           type: "success",
           title: "Upload Successfully",
-          message: `${upload_company_list.length} data has been uploaded.`,
+          message: `${upload_pl_status_list.length} data has been uploaded.`,
           icon: <CheckCircle2 size={21} className="text-green-500" />,
         });
-        set_upload_company_list([]);
-        handle_get_company_list();
+        set_upload_pl_status_list([]);
+        handle_get_pl_status_list();
         handle_go_back("sub_level");
       } else {
         show_toast({
@@ -196,7 +201,7 @@ const Upload_Company = ({
             className={`relative bg-white rounded-lg shadow-xl max-w-[500px] w-full p-10 m-5 z-[102]`}
           >
             <div className="w-full flex justify-center items-center text-lg md:text-xl font-bold mb-4">
-              Upload Company
+              Upload Plant Status
             </div>
             <p className="w-full text-center text-sm leading-6 text-gray-500 dark:text-gray-400 pt-4">
               You are about to upload the data. Once uploaded, it will be added
@@ -213,7 +218,7 @@ const Upload_Company = ({
                 width="w-[100px]"
                 variant="primary"
                 loading={upload_loading}
-                on_click={handle_upload_company}
+                on_click={handle_upload_pl_status}
               >
                 Yes
               </Button>
@@ -269,12 +274,12 @@ const Upload_Company = ({
               >
                 <span>/</span>
                 <a className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-sky-500 cursor-pointer">
-                  Company
+                  Plant Status
                 </a>
               </li>
               <li className="flex items-center gap-1.5 text-sm text-gray-500">
                 <span>/</span>
-                <span className="text-gray-800">Upload Company</span>
+                <span className="text-gray-800">Upload Plant Status</span>
               </li>
             </ol>
           </nav>
@@ -291,7 +296,7 @@ const Upload_Company = ({
                 width="w-[20px]"
                 on_click={() => handle_go_back("sub_level")}
               ></Button>
-              <h1 className="text-lg">Upload Company</h1>
+              <h1 className="text-lg">Upload Plant Status</h1>
             </div>
             <div className="flex gap-2 text-gray-500 text-sm tracking-wider">
               {format_date_1(get_date_now())}
@@ -351,7 +356,7 @@ const Upload_Company = ({
               </div>
               {/* + Table */}
               <div className="overflow-x-auto">
-                {filtered_upload_company_list.length === 0 ? (
+                {filtered_upload_pl_status_list.length === 0 ? (
                   <div className="p-6 text-center text-gray-500 text-sm">
                     No data found
                   </div>
@@ -362,7 +367,6 @@ const Upload_Company = ({
                         {columns.map((col, i) => {
                           const renderHeaderCell = (col) => {
                             const is_sorted = sort_by === col.key;
-
                             return (
                               <div className="flex items-center justify-between w-full">
                                 <span>{col.label}</span>
@@ -401,7 +405,7 @@ const Upload_Company = ({
                       </tr>
                     </thead>
                     <tbody className="bg-white">
-                      {filtered_upload_company_list.map((row, idx) => {
+                      {filtered_upload_pl_status_list.map((row, idx) => {
                         const render_cell = (col, row) => {
                           const value = row[col.key];
                           if (col.key === "index") {
@@ -480,4 +484,4 @@ const Upload_Company = ({
   );
 };
 
-export default Upload_Company;
+export default Upload_PL_Status;

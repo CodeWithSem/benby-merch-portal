@@ -41,15 +41,15 @@ const Delete_Company = ({
     if (status === "success") {
       show_toast({
         type: "success",
-        title: "Company Deletion",
-        message: `You have deleted the data`,
+        title: "Deleted Successfully",
+        message: `The record has been delete.`,
         icon: <CheckCircle2 size={21} className="text-green-500" />,
       });
     } else {
       show_toast({
         type: "danger",
-        title: "Company Deletion",
-        message: "There was an error occurred",
+        title: "Error",
+        message: "Something went wrong. Please try again.",
         icon: <CircleX size={21} className="text-red-500" />,
       });
     }
@@ -146,7 +146,6 @@ const Delete_Company = ({
                         label="Company Code"
                         type={"text"}
                         value={delete_data.company_code}
-                        pattern="[A-Za-z]{1,}"
                         disabled
                       />
                     </div>
@@ -155,7 +154,6 @@ const Delete_Company = ({
                         label="Company Description"
                         type={"text"}
                         value={delete_data.company_desc}
-                        pattern="[A-Za-z]{1,}"
                         disabled
                       />
                     </div>

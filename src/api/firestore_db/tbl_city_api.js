@@ -16,14 +16,14 @@ import {
 } from "api/db_path_contant";
 
 // + [Get]
-export const api_get_company_list = async () => {
+export const api_get_city_list = async () => {
   try {
-    const tbl_company_ref = collection(
+    const tbl_city_ref = collection(
       firestore_db,
-      ...get_firestore_path(TABLES.COMPANY)
+      ...get_firestore_path(TABLES.CITY)
     );
 
-    const query_snapshot = await getDocs(tbl_company_ref);
+    const query_snapshot = await getDocs(tbl_city_ref);
 
     const data_list = [];
     query_snapshot.forEach((doc) => {
@@ -49,11 +49,11 @@ export const api_get_company_list = async () => {
 };
 // - [Get]
 // + [Create]
-export const api_create_company = async (new_data, user) => {
+export const api_create_city = async (new_data, user) => {
   try {
-    const tbl_company_ref = collection(
+    const tbl_city_ref = collection(
       firestore_db,
-      ...get_firestore_path(TABLES.COMPANY)
+      ...get_firestore_path(TABLES.CITY)
     );
 
     const final_new_data = {
@@ -62,10 +62,10 @@ export const api_create_company = async (new_data, user) => {
       created_by: user || "N/A",
     };
 
-    const doc_ref = doc(tbl_company_ref, String(new_data.id));
+    const doc_ref = doc(tbl_city_ref, String(new_data.id));
 
     await setDoc(doc_ref, final_new_data);
-    await api_update_company_increment(new_data.id);
+    await api_update_city_increment(new_data.id);
     return {
       success: true,
       message: "Data created successfully",
@@ -82,15 +82,15 @@ export const api_create_company = async (new_data, user) => {
 };
 // - [Create]
 // + [Update Incremental ID]
-export const api_update_company_increment = async (id) => {
+export const api_update_city_increment = async (id) => {
   const new_id = id + 1;
   try {
-    const tbl_company_incre_ref = ref(
+    const tbl_city_incre_ref = ref(
       realtime_db,
-      get_incremental_path(TABLES.COMPANY)
+      get_incremental_path(TABLES.CITY)
     );
 
-    await set(tbl_company_incre_ref, new_id);
+    await set(tbl_city_incre_ref, new_id);
 
     return {
       success: true,
@@ -107,7 +107,7 @@ export const api_update_company_increment = async (id) => {
 };
 // - [Update Incremental ID]
 // + [Update]
-export const api_update_company = async (edit_data, user) => {
+export const api_update_city = async (edit_data, user) => {
   try {
     if (!edit_data.id) {
       return {
@@ -116,10 +116,10 @@ export const api_update_company = async (edit_data, user) => {
       };
     }
 
-    const tbl_company_ref = doc(
+    const tbl_city_ref = doc(
       firestore_db,
       "DB1_ERP_SYSTEM",
-      "TBL_COMPANY",
+      "TBL_CITY",
       "DATA",
       String(edit_data.id)
     );
@@ -130,7 +130,7 @@ export const api_update_company = async (edit_data, user) => {
       change_by: user || "N/A",
     };
 
-    await setDoc(tbl_company_ref, updated_edit_data);
+    await setDoc(tbl_city_ref, updated_edit_data);
 
     return {
       success: true,
@@ -148,7 +148,7 @@ export const api_update_company = async (edit_data, user) => {
 };
 // - [Update]
 // + [Bulk Upload]
-export const api_bulk_upload_company = async (upload_data_list) => {
+export const api_bulk_upload_city = async (upload_data_list) => {
   if (!Array.isArray(upload_data_list) || upload_data_list.length === 0) {
     return {
       success: false,
@@ -158,13 +158,13 @@ export const api_bulk_upload_company = async (upload_data_list) => {
 
   try {
     const batch = writeBatch(firestore_db);
-    const tbl_company_ref = collection(
+    const tbl_city_ref = collection(
       firestore_db,
-      ...get_firestore_path(TABLES.COMPANY)
+      ...get_firestore_path(TABLES.CITY)
     );
 
     upload_data_list.forEach((item) => {
-      const doc_ref = doc(tbl_company_ref, String(item.id));
+      const doc_ref = doc(tbl_city_ref, String(item.id));
       batch.set(doc_ref, item, { merge: true });
     });
 
@@ -184,7 +184,7 @@ export const api_bulk_upload_company = async (upload_data_list) => {
 };
 // - [Bulk Upload]
 // + [Delete]
-export const api_delete_company = async (id) => {
+export const api_delete_city = async (id) => {
   if (!id) {
     return {
       success: false,
@@ -193,12 +193,12 @@ export const api_delete_company = async (id) => {
   }
 
   try {
-    const tbl_company_ref = collection(
+    const tbl_city_ref = collection(
       firestore_db,
-      ...get_firestore_path(TABLES.COMPANY)
+      ...get_firestore_path(TABLES.CITY)
     );
 
-    const doc_ref = doc(tbl_company_ref, String(id));
+    const doc_ref = doc(tbl_city_ref, String(id));
     await deleteDoc(doc_ref);
 
     return {
@@ -217,21 +217,21 @@ export const api_delete_company = async (id) => {
 
 // - [Delete]
 // + [Truncate]
-export const api_truncate_company = async () => {
+export const api_truncate_city = async () => {
   try {
-    const tbl_company_ref = collection(
+    const tbl_city_ref = collection(
       firestore_db,
-      ...get_firestore_path(TABLES.COMPANY)
+      ...get_firestore_path(TABLES.CITY)
     );
 
-    const snapshot = await getDocs(tbl_company_ref);
+    const snapshot = await getDocs(tbl_city_ref);
 
     const delete_promises = snapshot.docs.map((document) =>
-      deleteDoc(doc(tbl_company_ref, document.id))
+      deleteDoc(doc(tbl_city_ref, document.id))
     );
 
     await Promise.all(delete_promises);
-    await api_reset_company_increment();
+    await api_reset_city_increment();
 
     return {
       success: true,
@@ -247,14 +247,14 @@ export const api_truncate_company = async () => {
 };
 // - [Truncate]
 // + [Reset Incremental ID]
-export const api_reset_company_increment = async () => {
+export const api_reset_city_increment = async () => {
   try {
-    const tbl_company_incre_ref = ref(
+    const tbl_city_incre_ref = ref(
       realtime_db,
-      get_incremental_path(TABLES.COMPANY)
+      get_incremental_path(TABLES.CITY)
     );
 
-    await set(tbl_company_incre_ref, 1);
+    await set(tbl_city_incre_ref, 1);
 
     return {
       success: true,

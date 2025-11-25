@@ -20,7 +20,7 @@ export const api_get_company_list = async () => {
   try {
     const tbl_company_ref = collection(
       firestore_db,
-      ...get_firestore_path(TABLES.COMPANY)
+      ...get_firestore_path(TABLES.LANGUAGE)
     );
 
     const query_snapshot = await getDocs(tbl_company_ref);
@@ -53,7 +53,7 @@ export const api_create_company = async (new_data, user) => {
   try {
     const tbl_company_ref = collection(
       firestore_db,
-      ...get_firestore_path(TABLES.COMPANY)
+      ...get_firestore_path(TABLES.LANGUAGE)
     );
 
     const final_new_data = {
@@ -87,7 +87,7 @@ export const api_update_company_increment = async (id) => {
   try {
     const tbl_company_incre_ref = ref(
       realtime_db,
-      get_incremental_path(TABLES.COMPANY)
+      get_incremental_path(TABLES.LANGUAGE)
     );
 
     await set(tbl_company_incre_ref, new_id);
@@ -119,7 +119,7 @@ export const api_update_company = async (edit_data, user) => {
     const tbl_company_ref = doc(
       firestore_db,
       "DB1_ERP_SYSTEM",
-      "TBL_COMPANY",
+      "TBL_LANGUAGE",
       "DATA",
       String(edit_data.id)
     );
@@ -160,7 +160,7 @@ export const api_bulk_upload_company = async (upload_data_list) => {
     const batch = writeBatch(firestore_db);
     const tbl_company_ref = collection(
       firestore_db,
-      ...get_firestore_path(TABLES.COMPANY)
+      ...get_firestore_path(TABLES.LANGUAGE)
     );
 
     upload_data_list.forEach((item) => {
@@ -195,7 +195,7 @@ export const api_delete_company = async (id) => {
   try {
     const tbl_company_ref = collection(
       firestore_db,
-      ...get_firestore_path(TABLES.COMPANY)
+      ...get_firestore_path(TABLES.LANGUAGE)
     );
 
     const doc_ref = doc(tbl_company_ref, String(id));
@@ -221,7 +221,7 @@ export const api_truncate_company = async () => {
   try {
     const tbl_company_ref = collection(
       firestore_db,
-      ...get_firestore_path(TABLES.COMPANY)
+      ...get_firestore_path(TABLES.LANGUAGE)
     );
 
     const snapshot = await getDocs(tbl_company_ref);
@@ -251,7 +251,7 @@ export const api_reset_company_increment = async () => {
   try {
     const tbl_company_incre_ref = ref(
       realtime_db,
-      get_incremental_path(TABLES.COMPANY)
+      get_incremental_path(TABLES.LANGUAGE)
     );
 
     await set(tbl_company_incre_ref, 1);

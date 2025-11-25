@@ -50,7 +50,7 @@ const General_Structure = () => {
     },
     { key: "p_group", icon: Users, title: "Purchasing Group" },
     { key: "branch", icon: Factory, title: "Branch" },
-    { key: "plant", icon: Warehouse, title: "Plant / DC" },
+    { key: "plant", icon: Warehouse, title: "Plant" },
     { key: "sloc", icon: Archive, title: "Storage Location" },
     { key: "plant_status", icon: HousePlug, title: "Plant Status" },
     { key: "scon", icon: PackageCheck, title: "Storage Condition" },

@@ -84,15 +84,15 @@ const Create_Company = ({
     if (status === "success") {
       show_toast({
         type: "success",
-        title: "Company Creation",
-        message: "You have created a new data",
+        title: "Created Successfully",
+        message: "A new record has been added.",
         icon: <CheckCircle2 size={21} className="text-green-500" />,
       });
     } else {
       show_toast({
         type: "danger",
-        title: "Company Creation",
-        message: "There was an error occurred",
+        title: "Error",
+        message: "Something went wrong. Please try again.",
         icon: <CircleX size={21} className="text-red-500" />,
       });
     }
@@ -115,7 +115,7 @@ const Create_Company = ({
               Confirm Company Creation
             </div>
             <p className="w-full text-center text-sm leading-6 text-gray-500 dark:text-gray-400 pt-4">
-              You are about to create a new company. Once created, it will be
+              You are about to create a new Company. Once created, it will be
               added to the database.
             </p>
             <p className="w-full text-center text-sm leading-6 text-gray-500 dark:text-gray-400 pt-4">

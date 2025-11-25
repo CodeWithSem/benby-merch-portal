@@ -30,12 +30,12 @@ export const Toast_Provider = ({ children, defaultPosition = "top-right" }) => {
         setToasts((prev) =>
           prev.map((t) => (t.id === id ? { ...t, show: false } : t))
         );
-      }, 3000);
+      }, 4000);
 
       // remove from DOM after animation
       setTimeout(() => {
         setToasts((prev) => prev.filter((t) => t.id !== id));
-      }, 3300);
+      }, 4300);
     },
     [defaultPosition]
   );
