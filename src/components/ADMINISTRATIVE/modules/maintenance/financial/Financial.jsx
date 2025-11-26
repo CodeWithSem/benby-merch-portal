@@ -12,9 +12,9 @@ import {
 import React, { useState } from "react";
 import Movement_Type from "./components/movement_type/Movement_Type";
 import Business_Area from "./components/business_area/Business_Area";
-import Taxation_Code from "./components/taxation_code/Taxation_Code";
+import Taxation_Code from "./components/taxation/Taxation";
 import Exchange_Rate from "./components/exchange_rate/Exchange_Rate";
-import Payment_Terms from "./components/payment_terms/Payment_Terms";
+import Payment_Term from "./components/payment_term/Payment_Term";
 import Payment_Method from "./components/payment_method/Payment_Method";
 import Inv_Acc_Center from "./components/inv_acc_center/Inv_Acc_Center";
 
@@ -29,9 +29,9 @@ const Financial = () => {
       icon: LandPlot,
       title: "Business Area",
     },
-    { key: "taxation_code", icon: ScrollText, title: "Taxation Code" },
+    { key: "taxation", icon: ScrollText, title: "Taxation" },
     { key: "exchange_rate", icon: ArrowLeftRight, title: "Exchange Rate" },
-    { key: "payment_terms", icon: HandshakeIcon, title: "Payment Terms" },
+    { key: "payment_terms", icon: HandshakeIcon, title: "Payment Term" },
     { key: "payment_method", icon: Banknote, title: "Payment Method" },
     {
       key: "inv_account_center",
@@ -135,9 +135,9 @@ const Financial = () => {
       )}
       {page === "movement_type" && <Movement_Type set_page={set_page} />}
       {page === "business_area" && <Business_Area set_page={set_page} />}
-      {page === "taxation_code" && <Taxation_Code set_page={set_page} />}
+      {page === "taxation" && <Taxation_Code set_page={set_page} />}
       {page === "exchange_rate" && <Exchange_Rate set_page={set_page} />}
-      {page === "payment_terms" && <Payment_Terms set_page={set_page} />}
+      {page === "payment_terms" && <Payment_Term set_page={set_page} />}
       {page === "payment_method" && <Payment_Method set_page={set_page} />}
       {page === "inv_account_center" && <Inv_Acc_Center set_page={set_page} />}
     </React.Fragment>

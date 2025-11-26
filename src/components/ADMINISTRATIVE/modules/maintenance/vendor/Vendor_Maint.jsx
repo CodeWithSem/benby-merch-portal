@@ -10,7 +10,7 @@ const Vendor_Maint = () => {
   const [search_query, set_search_query] = useState("");
 
   const structure_list = [
-    { key: "vendor", icon: ContactRound, title: "Vendor" },
+    // { key: "vendor", icon: ContactRound, title: "Vendor" },
     { key: "incoterms", icon: BanknoteArrowUp, title: "Incoterms" },
     { key: "source_hub", icon: BookText, title: "Source Hub" },
   ];

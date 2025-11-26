@@ -1,6 +1,7 @@
 import Icon_Field from "assets/elements/Icon_Field";
 import { Link, Search } from "lucide-react";
 import React, { useState } from "react";
+import Company_Hierarchy from "./components/company_hierarchy/Company_Hierarchy";
 
 const Data_Assignment = () => {
   const [page, set_page] = useState("main");
@@ -8,37 +9,48 @@ const Data_Assignment = () => {
 
   const structure_list = [
     {
-      key: "da_com_porg_pgroup",
+      key: "company_hierarchy",
       icon: Link,
       title: (
         <>
-          Data Assignment <br />
+          Company Hierarchy <br />
           (Company &gt; Organization &gt; Group)
         </>
       ),
-      plain_title: "Data Assignment (Company > Organization > Group)",
+      plain_title: "Company Hierarchy (Company > Organization > Group)",
     },
     {
-      key: "da_plant_sloc",
+      key: "branch_hierarchy",
       icon: Link,
       title: (
         <>
-          Data Assignment <br />
+          Branch Hierarchy <br />
+          (Branch &gt; Plant)
+        </>
+      ),
+      plain_title: "Branch Hierarchy (Branch > Plant)", // 👈 for searching
+    },
+    {
+      key: "plant_hierarchy",
+      icon: Link,
+      title: (
+        <>
+          Plant Hierarchy <br />
           (Plant &gt; Storage Location)
         </>
       ),
-      plain_title: "Data Assignment (Plant > SLOC)", // 👈 for searching
+      plain_title: "Plant Hierarchy (Plant > Storage Location)", // 👈 for searching
     },
     {
-      key: "da_pot_com",
+      key: "po_type_hierarchy",
       icon: Link,
       title: (
         <>
-          Data Assignment <br />
+          PO Type Hierarchy <br />
           (Purchase Order Type &gt; Company)
         </>
       ),
-      plain_title: "Data Assignment (Purchase Order Type > Company)",
+      plain_title: "PO Type Hierarchy (Purchase Order Type > Company)",
     },
   ];
 
@@ -134,7 +146,9 @@ const Data_Assignment = () => {
           </div>
         </React.Fragment>
       )}
-      {/* {page === "company" && <Company set_page={set_page} />} */}
+      {page === "company_hierarchy" && (
+        <Company_Hierarchy set_page={set_page} />
+      )}
     </React.Fragment>
   );
 };

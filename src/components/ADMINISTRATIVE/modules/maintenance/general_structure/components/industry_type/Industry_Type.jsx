@@ -1,83 +1,157 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
+import { Use_App } from "context/app_context";
+import { useToast } from "../../../../../layout/Toast_Provider";
+import { Get_TBL_INCREMENTAL_ID } from "api/real_time_db/incremental";
+import {
+  api_get_industry_type_list,
+  api_truncate_industry_type,
+} from "api/firestore_db/tbl_industry_type_api";
 import {
   Search,
   ChevronDown,
   ChevronUp,
   Edit,
   Trash,
-  View,
   PlusCircle,
   RefreshCw,
   FileUp,
   ChevronLeft,
+  SlidersHorizontal,
+  CheckCircle2,
+  Trash2,
 } from "lucide-react";
 import Icon_Field from "assets/elements/Icon_Field";
 import Select_Field from "assets/elements/Select_Field";
 import Pagination from "assets/elements/Pagination";
+import Text_Field from "assets/elements/Text_Field";
+import Spinner from "assets/elements/Spinner";
 import Button from "assets/elements/Button";
-import { useToast } from "../../../../../layout/Toast_Provider";
-import Create_PL_Status from "./functions/Create_Ind_Type";
-import Edit_PL_Status from "./functions/Edit_Ind_Type";
-import Delete_PL_Status from "./functions/Delete_Ind_Type";
+import Create_Industry_Type from "./functions/Create_Industry_Type";
+import Edit_Industry_Type from "./functions/Edit_Industry_Type";
+import Delete_Industry_Type from "./functions/Delete_Industry_Type";
+import Upload_Industry_Type from "./functions/Upload_Industry_Type";
+
+const HAS_FILTER = true;
 
 const Industry_Type = ({ set_page }) => {
-  // + Variables
-  const filter_ref = useRef(null);
+  const { active_user } = Use_App();
+  const { show_toast } = useToast();
   const [sub_page, set_sub_page] = useState("main");
   const [display_modal, set_display_modal] = useState("");
-  const [edit_data, set_edit_data] = useState({
-    id: 0,
-    ind_type_code: "",
-    ind_type_desc: "",
-  });
-  const [delete_data, set_delete_data] = useState({
-    id: 0,
-    ind_type_code: "",
-    ind_type_desc: "",
-  });
-  // - Variables
+  const [show_filter, set_show_filter] = useState(false);
+  const [loading_list, set_loading_list] = useState(false);
+  const [truncate_loading, set_truncate_loading] = useState(false);
 
-  // Close dropdown on outside click
-  const { show_toast } = useToast();
+  const def_industry_type_data = {
+    id: null,
+    industry_type_code: "",
+    industry_type_desc: "",
+    creation_date: "",
+    created_by: "",
+    change_date: "",
+    change_by: "",
+  };
+
+  const [new_data, set_new_data] = useState({ ...def_industry_type_data });
+  const [edit_data, set_edit_data] = useState({ ...def_industry_type_data });
+  const [delete_data, set_delete_data] = useState({
+    ...def_industry_type_data,
+  });
+
+  const reset_new_data = () => {
+    set_new_data((prev) => ({
+      ...prev,
+      industry_type_desc: "",
+      created_by: "",
+      change_date: "",
+      change_by: "",
+    }));
+  };
+
+  useEffect(() => {
+    Get_TBL_INCREMENTAL_ID("TBL_INDUSTRY_TYPE", (value) => {
+      set_new_data((prev) => ({
+        ...prev,
+        id: value,
+        industry_type_code: `IND-T-${String(value).padStart(2, "0")}`,
+      }));
+    });
+  }, []);
 
   const columns = [
     { key: "index", label: "#", sortable: true },
     { key: "id", label: "ID", sortable: true },
-    { key: "ind_type_code", label: "Industry Type Code", sortable: true },
+    { key: "industry_type_code", label: "Industry Type Code", sortable: true },
     {
-      key: "ind_type_desc",
+      key: "industry_type_desc",
       label: "Industry Type Description",
       sortable: true,
     },
-    { key: "created_by", label: "Created By", sortable: true },
     { key: "creation_date", label: "Creation Date", sortable: true },
-    { key: "change_by", label: "Change By", sortable: true },
+    { key: "created_by", label: "Created By", sortable: true },
     { key: "change_date", label: "Change Date", sortable: true },
+    { key: "change_by", label: "Change By", sortable: true },
     { key: "actions", label: "", sortable: false },
   ];
 
-  // --- State ---
-  const [ind_type_list, set_ind_type_list] = useState([
-    {
-      id: 1,
-      ind_type_code: "IND-T-001",
-      ind_type_desc: "Industry Type Description 1",
-      created_by: "Admin",
-      creation_date: "11-11-2025",
-      change_by: "",
-      change_date: "",
-    },
-  ]);
-  const [filtered_data, set_filtered_data] = useState([]);
-  const [loading, set_loading] = useState(false);
+  const [industry_type_list, set_industry_type_list] = useState([]);
+  // ======================================================
+  // id: 1,
+  // industry_type_code: "PL-S-001",
+  // industry_type_desc: "Industry Type Description 1",
+  // created_by: "Admin",
+  // creation_date: "MM-DD-YYYY",
+  // change_by: "",
+  // change_date: "",
+  // ======================================================
+
+  const handle_get_industry_type_list = async () => {
+    set_loading_list(true);
+    const response = await api_get_industry_type_list();
+    if (response.success) {
+      set_industry_type_list(response.data);
+    } else {
+      console.error(response.message);
+    }
+    set_loading_list(false);
+  };
+
+  useEffect(() => {
+    handle_get_industry_type_list();
+  }, []);
+
+  const handle_truncate_industry_type_list = async () => {
+    set_truncate_loading(true);
+    const response = await api_truncate_industry_type();
+    if (response.success) {
+      show_toast({
+        type: "success",
+        title: "Truncated Successfully",
+        message: "You have deleted all the record.",
+        icon: <CheckCircle2 size={21} className="text-green-500" />,
+      });
+    } else {
+      show_toast({
+        type: "danger",
+        title: "Error",
+        message: "Something went wrong. Please try again.",
+      });
+      console.error(response.message);
+    }
+    handle_get_industry_type_list();
+    set_truncate_loading(false);
+  };
+
+  // + Client-Side Filtering
+  const [filtered_industry_type_list, set_filtered_industry_type_list] =
+    useState([]);
   const [select_option, set_select_option] = useState(5);
   const [current_page, set_current_page] = useState(1);
-  const [sort_by, set_sort_by] = useState("timestamp");
+  const [sort_by, set_sort_by] = useState("id");
   const [sort_order, set_sort_order] = useState("asc");
   const [search_query, set_search_query] = useState("");
   const [debounced_query, set_debounced_query] = useState("");
 
-  // --- Debounce search ---
   useEffect(() => {
     const timer = setTimeout(() => {
       set_debounced_query(search_query);
@@ -86,35 +160,9 @@ const Industry_Type = ({ set_page }) => {
     return () => clearTimeout(timer);
   }, [search_query]);
 
-  // --- Close dropdown outside click ---
   useEffect(() => {
-    const handle_click_outside = (event) => {
-      if (filter_ref.current && !filter_ref.current.contains(event.target)) {
-        // optional: close filter
-      }
-    };
-    document.addEventListener("mousedown", handle_click_outside);
-    return () =>
-      document.removeEventListener("mousedown", handle_click_outside);
-  }, []);
+    let temp = [...industry_type_list];
 
-  // --- Load all data once ---
-  //   const load_data = async () => {
-  //     set_loading(true);
-  //     const data = await fetch_data_list();
-  //     set_ind_type_list(data);
-  //     set_loading(false);
-  //   };
-
-  //   useEffect(() => {
-  //     load_data();
-  //   }, []);
-
-  // + Client-side Filtering
-  useEffect(() => {
-    let temp = [...ind_type_list];
-
-    // + Column Filter
     if (debounced_query.trim() !== "") {
       const q = debounced_query.toLowerCase();
       temp = temp.filter((u) =>
@@ -125,9 +173,7 @@ const Industry_Type = ({ set_page }) => {
         })
       );
     }
-    // - Column Filter
 
-    // + Sort Function
     temp.sort((a, b) => {
       const val_a = a[sort_by];
       const val_b = b[sort_by];
@@ -139,27 +185,28 @@ const Industry_Type = ({ set_page }) => {
       if (val_a > val_b) return sort_order === "asc" ? 1 : -1;
       return 0;
     });
-    // - Sort Function
 
-    // + Pagination Function
     const start_idx = (current_page - 1) * select_option;
     const end_idx = start_idx + select_option;
-    // - Pagination Function
-    set_filtered_data(temp.slice(start_idx, end_idx));
+    const sliced = temp.slice(start_idx, end_idx);
+    const indexed_data = sliced.map((item, i) => ({
+      ...item,
+      index: start_idx + i + 1,
+    }));
+
+    set_filtered_industry_type_list(indexed_data);
   }, [
-    ind_type_list,
+    industry_type_list,
     debounced_query,
     sort_by,
     sort_order,
     current_page,
     select_option,
   ]);
-  // - Client-side Filtering
 
-  // + Total page of Pagination
   const total_pages = Math.ceil(
     (debounced_query
-      ? ind_type_list.filter((u) =>
+      ? industry_type_list.filter((u) =>
           columns.some((col) => {
             if (col.key === "actions") return false;
             const val = u[col.key];
@@ -169,11 +216,9 @@ const Industry_Type = ({ set_page }) => {
               .includes(debounced_query.toLowerCase());
           })
         ).length
-      : ind_type_list.length) / select_option
+      : industry_type_list.length) / select_option
   );
-  // - Total page of Pagination
 
-  // + Sort Filtering
   const handle_sort = (column) => {
     if (sort_by === column)
       set_sort_order(sort_order === "asc" ? "desc" : "asc");
@@ -183,20 +228,25 @@ const Industry_Type = ({ set_page }) => {
     }
     set_current_page(1);
   };
-  // - Sort Filtering
+
   const handle_page_change = (page) => set_current_page(page);
+  // - Client-Side Filtering
 
-  const handle_create_new_ind_type = () => {
-    set_sub_page("create_new_ind_type");
+  const handle_create_new_industry_type = () => {
+    set_sub_page("create_new_industry_type");
   };
 
-  const handle_edit_ind_type = (data) => {
+  const handle_edit_industry_type = (data) => {
     set_edit_data(data);
-    set_sub_page("edit_ind_type");
+    set_sub_page("edit_industry_type");
   };
-  const handle_delete_ind_type = (data) => {
+  const handle_delete_industry_type = (data) => {
     set_delete_data(data);
-    set_display_modal("delete_ind_type");
+    set_display_modal("delete_industry_type");
+  };
+
+  const handle_upload_industry_type = () => {
+    set_sub_page("upload_industry_type");
   };
 
   const handle_go_back = (value) => {
@@ -213,10 +263,6 @@ const Industry_Type = ({ set_page }) => {
     }
   };
 
-  const go_back_to_main = () => {
-    set_page("main");
-  };
-
   // RETURN ORIGIN
   return (
     <React.Fragment>
@@ -225,6 +271,7 @@ const Industry_Type = ({ set_page }) => {
           <div className="w-full">
             <div className="flex flex-wrap items-center justify-between gap-3 py-5">
               <h1 className="text-xl">Maintenance</h1>
+              {/* + Breadcrumbs */}
               <nav>
                 <ol className="flex flex-wrap items-center gap-1.5">
                   <li>
@@ -256,9 +303,10 @@ const Industry_Type = ({ set_page }) => {
                   </li>
                 </ol>
               </nav>
+              {/* - Breadcrumbs */}
             </div>
-
             <div className="w-full bg-white rounded-lg border">
+              {/* + Header */}
               <div className="flex flex-wrap items-center justify-between gap-3 p-5">
                 <div className="flex items-center gap-3">
                   <Button
@@ -266,26 +314,43 @@ const Industry_Type = ({ set_page }) => {
                     icon={ChevronLeft}
                     icon_position="left"
                     width="w-[20px]"
-                    on_click={go_back_to_main}
+                    on_click={() => handle_go_back("main")}
                   ></Button>
-                  {/* <ChevronLeft className="text-gray-500" size={24} /> */}
                   <h1 className="text-lg">Industry Type</h1>
                 </div>
                 <div className="flex gap-2">
+                  {active_user?.category === "DEV" && (
+                    <Button
+                      variant="danger"
+                      icon={Trash2}
+                      icon_position="left"
+                      width="w-[110px]"
+                      loading={truncate_loading}
+                      on_click={handle_truncate_industry_type_list}
+                    >
+                      Truncate
+                    </Button>
+                  )}
                   <Button
                     variant="primary"
                     icon={PlusCircle}
                     icon_position="left"
-                    on_click={handle_create_new_ind_type}
+                    on_click={handle_create_new_industry_type}
                   >
                     Create New Data
                   </Button>
-                  <Button variant="primary" icon={FileUp} icon_position="left">
+                  <Button
+                    variant="primary"
+                    icon={FileUp}
+                    icon_position="left"
+                    on_click={handle_upload_industry_type}
+                  >
                     Upload
                   </Button>
                 </div>
               </div>
-
+              {/* - Header */}
+              {/* + Section 1 */}
               <div className="p-5 sm:p-6 border-t">
                 <div className="w-full border rounded-lg">
                   <div className="w-full md:flex md:justify-between p-4 gap-4">
@@ -311,10 +376,9 @@ const Industry_Type = ({ set_page }) => {
                         variant="white"
                         icon={RefreshCw}
                         icon_position="left"
-                        //   on_click={() => load_data()}
+                        on_click={handle_get_industry_type_list}
                       ></Button>
                     </div>
-
                     <div className="w-full mt-4 md:mt-0 md:w-[600px]">
                       <div className="w-full flex items-center gap-2">
                         <div className="w-full">
@@ -327,75 +391,86 @@ const Industry_Type = ({ set_page }) => {
                             on_change={(e) => set_search_query(e.target.value)}
                           />
                         </div>
-                        <div className="relative" ref={filter_ref}>
-                          {/* <Button
-                            variant="white"
-                            width="w-[100px]"
-                            icon={SlidersHorizontal}
-                            icon_position="left"
-                            // loading
-                            on_click={() => set_show_filter((prev) => !prev)}
-                          >
-                            Filter
-                          </Button> */}
-
-                          {/* Filter Popover */}
-                          {/* {show_filter && (
-                            <React.Fragment>
-                              <div
-                                className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40"
-                                // onClick={() => set_show_filter(false)}
-                              ></div>
-                              <div className="absolute top-full mt-2 right-0 z-50 bg-white border rounded-lg shadow-md p-4 w-[260px]">
-                                <div>
-                                  <Date_Range_Field
-                                    label="Date Range"
-                                    ref={date_range_ref}
-                                  />
-                                </div>
-                                <div className="mt-4">
-                                  <Checkbox_Field
-                                    label="Is Draft?"
-                                    name="terms"
-                                    box_size={20}
-                                    icon_size={12}
-                                    //   checked={check}
-                                    //   on_change={(e) => set_check(e.target.checked)}
-                                    on_change={(e) => alert("Is Draft")}
-                                  />
-                                </div>
-
-                                <div className="flex justify-end gap-2 mt-4">
-                                  <Button
-                                    size="sm"
-                                    variant="primary"
-                                    on_click={() => set_show_filter(false)}
-                                  >
-                                    Apply
-                                  </Button>
-                                  <Button
-                                    size="sm"
-                                    variant="secondary"
-                                    on_click={() => set_show_filter(false)}
-                                  >
-                                    Cancel
-                                  </Button>
-                                </div>
-                              </div>
-                            </React.Fragment>
-                          )} */}
-                        </div>
+                        {/* + Filter Dropdown */}
+                        {HAS_FILTER ? (
+                          <React.Fragment>
+                            <div className="relative">
+                              <Button
+                                variant="white"
+                                width="w-[100px]"
+                                icon={SlidersHorizontal}
+                                icon_position="left"
+                                on_click={() =>
+                                  set_show_filter((prev) => !prev)
+                                }
+                              >
+                                Filter
+                              </Button>
+                              {/* + Filter Content */}
+                              {show_filter && (
+                                <React.Fragment>
+                                  <div
+                                    className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40"
+                                    onClick={() => set_show_filter(false)}
+                                  ></div>
+                                  <div className="absolute top-full mt-2 right-0 z-50 bg-white border rounded-lg shadow-md p-4 w-[260px]">
+                                    <div className="grid grid-cols-1 gap-2">
+                                      <div>
+                                        <Text_Field
+                                          label="Filter 1"
+                                          type={"text"}
+                                          disabled
+                                        />
+                                      </div>
+                                      <div>
+                                        <Text_Field
+                                          label="Filter 2"
+                                          type={"text"}
+                                          disabled
+                                        />
+                                      </div>
+                                      <div>
+                                        <Text_Field
+                                          label="Filter 3"
+                                          type={"text"}
+                                          disabled
+                                        />
+                                      </div>
+                                    </div>
+                                    <div className="flex justify-end gap-2 mt-4">
+                                      <Button
+                                        size="sm"
+                                        variant="primary"
+                                        on_click={() => set_show_filter(false)}
+                                      >
+                                        Apply
+                                      </Button>
+                                      <Button
+                                        size="sm"
+                                        variant="secondary"
+                                        on_click={() => set_show_filter(false)}
+                                      >
+                                        Cancel
+                                      </Button>
+                                    </div>
+                                  </div>
+                                </React.Fragment>
+                              )}
+                              {/* - Filter Content */}
+                            </div>
+                          </React.Fragment>
+                        ) : null}
+                        {/* - Filter Dropdown */}
                       </div>
                     </div>
                   </div>
-
-                  {/* Table */}
+                  {/* + Table */}
                   <div className="overflow-x-auto">
-                    {loading ? (
-                      <div className="p-6 text-center text-gray-500 text-sm">
-                        Loading...
+                    {loading_list ? (
+                      <div className="p-6 flex justify-center items-center text-gray-500 text-sm">
+                        <Spinner />
                       </div>
-                    ) : filtered_data.length === 0 ? (
+                    ) : filtered_industry_type_list.length === 0 ? (
                       <div className="p-6 text-center text-gray-500 text-sm">
                         No data found
                       </div>
@@ -447,7 +522,7 @@ const Industry_Type = ({ set_page }) => {
                           </tr>
                         </thead>
                         <tbody className="bg-white">
-                          {filtered_data.map((row, idx) => {
+                          {filtered_industry_type_list.map((row, idx) => {
                             // + Cell Renderer
                             const render_cell = (col, row) => {
                               const value = row[col.key];
@@ -470,22 +545,11 @@ const Industry_Type = ({ set_page }) => {
                               if (col.key === "actions") {
                                 return (
                                   <div className="flex gap-2">
-                                    {/* <div className="relative group flex jusity-center items-center">
-                                      <button
-                                        className="text-gray-500 hover:text-sky-600 text-[12px] outline-none"
-                                        // onClick={() => handle_view_ind_type(row.id)}
-                                      >
-                                        <View size={19} />
-                                      </button>
-                                      <span className="absolute bottom-full mb-1 left-1/2 transform -translate-x-1/2 px-2 py-1 text-xs text-white bg-sky-600 rounded opacity-0 group-hover:opacity-100 transition-opacity">
-                                        View Record
-                                      </span>
-                                    </div> */}
                                     <div className="relative group flex jusity-center items-center">
                                       <button
                                         className="text-gray-500 hover:text-sky-600 text-[12px] outline-none"
                                         onClick={() =>
-                                          handle_edit_ind_type(row)
+                                          handle_edit_industry_type(row)
                                         }
                                       >
                                         <Edit size={19} />
@@ -498,7 +562,7 @@ const Industry_Type = ({ set_page }) => {
                                       <button
                                         className="text-gray-500 hover:text-red-600 text-[12px] mb-[1px] outline-none"
                                         onClick={() =>
-                                          handle_delete_ind_type(row)
+                                          handle_delete_industry_type(row)
                                         }
                                       >
                                         <Trash size={19} />
@@ -541,7 +605,8 @@ const Industry_Type = ({ set_page }) => {
                       </table>
                     )}
                   </div>
-
+                  {/* - Table */}
+                  {/* + Pagination */}
                   {total_pages > 0 && (
                     <Pagination
                       current_page={current_page}
@@ -550,27 +615,49 @@ const Industry_Type = ({ set_page }) => {
                       variant="compact"
                     />
                   )}
+                  {/* - Pagination */}
                 </div>
               </div>
+              {/* - Section 1 */}
             </div>
           </div>
         </React.Fragment>
       )}
-      {sub_page === "create_new_ind_type" && (
-        <Create_PL_Status handle_go_back={handle_go_back} />
-      )}
-      {sub_page === "edit_ind_type" && (
-        <Edit_PL_Status
+      {sub_page === "create_new_industry_type" && (
+        <Create_Industry_Type
           handle_go_back={handle_go_back}
-          edit_data={edit_data}
-          set_edit_data={set_edit_data}
+          active_user={active_user}
+          reset_new_data={reset_new_data}
+          show_toast={show_toast}
+          new_data={new_data}
+          set_new_data={set_new_data}
+          set_industry_type_list={set_industry_type_list}
         />
       )}
-      <Delete_PL_Status
-        is_open={display_modal === "delete_ind_type"}
+      {sub_page === "edit_industry_type" && (
+        <Edit_Industry_Type
+          handle_go_back={handle_go_back}
+          active_user={active_user}
+          show_toast={show_toast}
+          edit_data={edit_data}
+          set_edit_data={set_edit_data}
+          set_industry_type_list={set_industry_type_list}
+        />
+      )}
+      {sub_page === "upload_industry_type" && (
+        <Upload_Industry_Type
+          handle_go_back={handle_go_back}
+          handle_get_industry_type_list={handle_get_industry_type_list}
+          show_toast={show_toast}
+        />
+      )}
+      <Delete_Industry_Type
+        is_open={display_modal === "delete_industry_type"}
         on_close={() => set_display_modal("")}
         width="max-w-[1000px]"
+        show_toast={show_toast}
         delete_data={delete_data}
+        set_industry_type_list={set_industry_type_list}
       />
     </React.Fragment>
   );

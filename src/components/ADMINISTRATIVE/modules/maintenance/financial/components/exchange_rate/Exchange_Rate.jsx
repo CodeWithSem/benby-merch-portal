@@ -1,4 +1,11 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
+import { Use_App } from "context/app_context";
+import { useToast } from "../../../../../layout/Toast_Provider";
+import { Get_TBL_INCREMENTAL_ID } from "api/real_time_db/incremental";
+import {
+  api_get_exchange_rate_list,
+  api_truncate_exchange_rate,
+} from "api/firestore_db/tbl_exchange_rate_api";
 import {
   Search,
   ChevronDown,
@@ -9,35 +16,67 @@ import {
   RefreshCw,
   FileUp,
   ChevronLeft,
+  SlidersHorizontal,
+  CheckCircle2,
+  Trash2,
 } from "lucide-react";
 import Icon_Field from "assets/elements/Icon_Field";
 import Select_Field from "assets/elements/Select_Field";
 import Pagination from "assets/elements/Pagination";
+import Text_Field from "assets/elements/Text_Field";
+import Spinner from "assets/elements/Spinner";
 import Button from "assets/elements/Button";
-import { useToast } from "../../../../../layout/Toast_Provider";
-import Create_Exc_Rate from "./functions/Create_Exc_Rate";
-import Edit_Exc_Rate from "./functions/Edit_Exc_Rate";
-import Delete_Exc_Rate from "./functions/Delete_Exc_Rate";
+import Create_E_Rate from "./functions/Create_E_Rate";
+import Edit_E_Rate from "./functions/Edit_E_Rate";
+import Delete_E_Rate from "./functions/Delete_E_Rate";
+import Upload_E_Rate from "./functions/Upload_E_Rate";
+
+const HAS_FILTER = true;
 
 const Exchange_Rate = ({ set_page }) => {
-  // + Variables
-  const filter_ref = useRef(null);
+  const { active_user } = Use_App();
+  const { show_toast } = useToast();
   const [sub_page, set_sub_page] = useState("main");
   const [display_modal, set_display_modal] = useState("");
-  const [edit_data, set_edit_data] = useState({
-    id: 0,
-    exchange_rate_code: "",
-    exchange_rate_desc: "",
-  });
-  const [delete_data, set_delete_data] = useState({
-    id: 0,
-    exchange_rate_code: "",
-    exchange_rate_desc: "",
-  });
-  // - Variables
+  const [show_filter, set_show_filter] = useState(false);
+  const [loading_list, set_loading_list] = useState(false);
+  const [truncate_loading, set_truncate_loading] = useState(false);
 
-  // Close dropdown on outside click
-  const { show_toast } = useToast();
+  const def_exchange_rate_data = {
+    id: null,
+    exchange_rate_code: "",
+    exchange_rate_desc: "",
+    creation_date: "",
+    created_by: "",
+    change_date: "",
+    change_by: "",
+  };
+
+  const [new_data, set_new_data] = useState({ ...def_exchange_rate_data });
+  const [edit_data, set_edit_data] = useState({ ...def_exchange_rate_data });
+  const [delete_data, set_delete_data] = useState({
+    ...def_exchange_rate_data,
+  });
+
+  const reset_new_data = () => {
+    set_new_data((prev) => ({
+      ...prev,
+      exchange_rate_desc: "",
+      created_by: "",
+      change_date: "",
+      change_by: "",
+    }));
+  };
+
+  useEffect(() => {
+    Get_TBL_INCREMENTAL_ID("TBL_EXCHANGE_RATE", (value) => {
+      set_new_data((prev) => ({
+        ...prev,
+        id: value,
+        exchange_rate_code: `ER-${String(value).padStart(2, "0")}`,
+      }));
+    });
+  }, []);
 
   const columns = [
     { key: "index", label: "#", sortable: true },
@@ -48,35 +87,71 @@ const Exchange_Rate = ({ set_page }) => {
       label: "Exchange Rate Description",
       sortable: true,
     },
-    { key: "created_by", label: "Created By", sortable: true },
     { key: "creation_date", label: "Creation Date", sortable: true },
-    { key: "updated_by", label: "Change By", sortable: true },
+    { key: "created_by", label: "Created By", sortable: true },
     { key: "change_date", label: "Change Date", sortable: true },
+    { key: "change_by", label: "Change By", sortable: true },
     { key: "actions", label: "", sortable: false },
   ];
 
-  // --- State ---
-  const [exchange_rate_list, set_exchange_rate_list] = useState([
-    {
-      id: 1,
-      exchange_rate_code: "USD-PH",
-      exchange_rate_desc: "US Dollar to Philippine Peso",
-      created_by: "Admin",
-      creation_date: "11-11-2025",
-      updated_by: "",
-      change_date: "",
-    },
-  ]);
-  const [filtered_data, set_filtered_data] = useState([]);
-  const [loading, set_loading] = useState(false);
+  const [exchange_rate_list, set_exchange_rate_list] = useState([]);
+  // ======================================================
+  // id: 1,
+  // exchange_rate_code: "PL-S-001",
+  // exchange_rate_desc: "Exchange Rate Description 1",
+  // created_by: "Admin",
+  // creation_date: "MM-DD-YYYY",
+  // change_by: "",
+  // change_date: "",
+  // ======================================================
+
+  const handle_get_exchange_rate_list = async () => {
+    set_loading_list(true);
+    const response = await api_get_exchange_rate_list();
+    if (response.success) {
+      set_exchange_rate_list(response.data);
+    } else {
+      console.error(response.message);
+    }
+    set_loading_list(false);
+  };
+
+  useEffect(() => {
+    handle_get_exchange_rate_list();
+  }, []);
+
+  const handle_truncate_exchange_rate_list = async () => {
+    set_truncate_loading(true);
+    const response = await api_truncate_exchange_rate();
+    if (response.success) {
+      show_toast({
+        type: "success",
+        title: "Truncated Successfully",
+        message: "You have deleted all the record.",
+        icon: <CheckCircle2 size={21} className="text-green-500" />,
+      });
+    } else {
+      show_toast({
+        type: "danger",
+        title: "Error",
+        message: "Something went wrong. Please try again.",
+      });
+      console.error(response.message);
+    }
+    handle_get_exchange_rate_list();
+    set_truncate_loading(false);
+  };
+
+  // + Client-Side Filtering
+  const [filtered_exchange_rate_list, set_filtered_exchange_rate_list] =
+    useState([]);
   const [select_option, set_select_option] = useState(5);
   const [current_page, set_current_page] = useState(1);
-  const [sort_by, set_sort_by] = useState("timestamp");
+  const [sort_by, set_sort_by] = useState("id");
   const [sort_order, set_sort_order] = useState("asc");
   const [search_query, set_search_query] = useState("");
   const [debounced_query, set_debounced_query] = useState("");
 
-  // --- Debounce search ---
   useEffect(() => {
     const timer = setTimeout(() => {
       set_debounced_query(search_query);
@@ -85,35 +160,9 @@ const Exchange_Rate = ({ set_page }) => {
     return () => clearTimeout(timer);
   }, [search_query]);
 
-  // --- Close dropdown outside click ---
-  useEffect(() => {
-    const handle_click_outside = (event) => {
-      if (filter_ref.current && !filter_ref.current.contains(event.target)) {
-        // optional: close filter
-      }
-    };
-    document.addEventListener("mousedown", handle_click_outside);
-    return () =>
-      document.removeEventListener("mousedown", handle_click_outside);
-  }, []);
-
-  // --- Load all data once ---
-  //   const load_data = async () => {
-  //     set_loading(true);
-  //     const data = await fetch_data_list();
-  //     set_exchange_rate_list(data);
-  //     set_loading(false);
-  //   };
-
-  //   useEffect(() => {
-  //     load_data();
-  //   }, []);
-
-  // + Client-side Filtering
   useEffect(() => {
     let temp = [...exchange_rate_list];
 
-    // + Column Filter
     if (debounced_query.trim() !== "") {
       const q = debounced_query.toLowerCase();
       temp = temp.filter((u) =>
@@ -124,9 +173,7 @@ const Exchange_Rate = ({ set_page }) => {
         })
       );
     }
-    // - Column Filter
 
-    // + Sort Function
     temp.sort((a, b) => {
       const val_a = a[sort_by];
       const val_b = b[sort_by];
@@ -138,13 +185,16 @@ const Exchange_Rate = ({ set_page }) => {
       if (val_a > val_b) return sort_order === "asc" ? 1 : -1;
       return 0;
     });
-    // - Sort Function
 
-    // + Pagination Function
     const start_idx = (current_page - 1) * select_option;
     const end_idx = start_idx + select_option;
-    // - Pagination Function
-    set_filtered_data(temp.slice(start_idx, end_idx));
+    const sliced = temp.slice(start_idx, end_idx);
+    const indexed_data = sliced.map((item, i) => ({
+      ...item,
+      index: start_idx + i + 1,
+    }));
+
+    set_filtered_exchange_rate_list(indexed_data);
   }, [
     exchange_rate_list,
     debounced_query,
@@ -153,9 +203,7 @@ const Exchange_Rate = ({ set_page }) => {
     current_page,
     select_option,
   ]);
-  // - Client-side Filtering
 
-  // + Total page of Pagination
   const total_pages = Math.ceil(
     (debounced_query
       ? exchange_rate_list.filter((u) =>
@@ -170,9 +218,7 @@ const Exchange_Rate = ({ set_page }) => {
         ).length
       : exchange_rate_list.length) / select_option
   );
-  // - Total page of Pagination
 
-  // + Sort Filtering
   const handle_sort = (column) => {
     if (sort_by === column)
       set_sort_order(sort_order === "asc" ? "desc" : "asc");
@@ -182,8 +228,9 @@ const Exchange_Rate = ({ set_page }) => {
     }
     set_current_page(1);
   };
-  // - Sort Filtering
+
   const handle_page_change = (page) => set_current_page(page);
+  // - Client-Side Filtering
 
   const handle_create_new_exchange_rate = () => {
     set_sub_page("create_new_exchange_rate");
@@ -196,6 +243,10 @@ const Exchange_Rate = ({ set_page }) => {
   const handle_delete_exchange_rate = (data) => {
     set_delete_data(data);
     set_display_modal("delete_exchange_rate");
+  };
+
+  const handle_upload_exchange_rate = () => {
+    set_sub_page("upload_exchange_rate");
   };
 
   const handle_go_back = (value) => {
@@ -212,10 +263,6 @@ const Exchange_Rate = ({ set_page }) => {
     }
   };
 
-  const go_back_to_main = () => {
-    set_page("main");
-  };
-
   // RETURN ORIGIN
   return (
     <React.Fragment>
@@ -224,6 +271,7 @@ const Exchange_Rate = ({ set_page }) => {
           <div className="w-full">
             <div className="flex flex-wrap items-center justify-between gap-3 py-5">
               <h1 className="text-xl">Maintenance</h1>
+              {/* + Breadcrumbs */}
               <nav>
                 <ol className="flex flex-wrap items-center gap-1.5">
                   <li>
@@ -246,7 +294,7 @@ const Exchange_Rate = ({ set_page }) => {
                   >
                     <span>/</span>
                     <a className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-sky-500 cursor-pointer">
-                      Financial
+                      General Structure
                     </a>
                   </li>
                   <li className="flex items-center gap-1.5 text-sm text-gray-500">
@@ -255,9 +303,10 @@ const Exchange_Rate = ({ set_page }) => {
                   </li>
                 </ol>
               </nav>
+              {/* - Breadcrumbs */}
             </div>
-
             <div className="w-full bg-white rounded-lg border">
+              {/* + Header */}
               <div className="flex flex-wrap items-center justify-between gap-3 p-5">
                 <div className="flex items-center gap-3">
                   <Button
@@ -265,12 +314,23 @@ const Exchange_Rate = ({ set_page }) => {
                     icon={ChevronLeft}
                     icon_position="left"
                     width="w-[20px]"
-                    on_click={go_back_to_main}
+                    on_click={() => handle_go_back("main")}
                   ></Button>
-                  {/* <ChevronLeft className="text-gray-500" size={24} /> */}
                   <h1 className="text-lg">Exchange Rate</h1>
                 </div>
                 <div className="flex gap-2">
+                  {active_user?.category === "DEV" && (
+                    <Button
+                      variant="danger"
+                      icon={Trash2}
+                      icon_position="left"
+                      width="w-[110px]"
+                      loading={truncate_loading}
+                      on_click={handle_truncate_exchange_rate_list}
+                    >
+                      Truncate
+                    </Button>
+                  )}
                   <Button
                     variant="primary"
                     icon={PlusCircle}
@@ -279,12 +339,18 @@ const Exchange_Rate = ({ set_page }) => {
                   >
                     Create New Data
                   </Button>
-                  <Button variant="primary" icon={FileUp} icon_position="left">
+                  <Button
+                    variant="primary"
+                    icon={FileUp}
+                    icon_position="left"
+                    on_click={handle_upload_exchange_rate}
+                  >
                     Upload
                   </Button>
                 </div>
               </div>
-
+              {/* - Header */}
+              {/* + Section 1 */}
               <div className="p-5 sm:p-6 border-t">
                 <div className="w-full border rounded-lg">
                   <div className="w-full md:flex md:justify-between p-4 gap-4">
@@ -310,10 +376,9 @@ const Exchange_Rate = ({ set_page }) => {
                         variant="white"
                         icon={RefreshCw}
                         icon_position="left"
-                        //   on_click={() => load_data()}
+                        on_click={handle_get_exchange_rate_list}
                       ></Button>
                     </div>
-
                     <div className="w-full mt-4 md:mt-0 md:w-[600px]">
                       <div className="w-full flex items-center gap-2">
                         <div className="w-full">
@@ -326,75 +391,86 @@ const Exchange_Rate = ({ set_page }) => {
                             on_change={(e) => set_search_query(e.target.value)}
                           />
                         </div>
-                        <div className="relative" ref={filter_ref}>
-                          {/* <Button
-                            variant="white"
-                            width="w-[100px]"
-                            icon={SlidersHorizontal}
-                            icon_position="left"
-                            // loading
-                            on_click={() => set_show_filter((prev) => !prev)}
-                          >
-                            Filter
-                          </Button> */}
-
-                          {/* Filter Popover */}
-                          {/* {show_filter && (
-                            <React.Fragment>
-                              <div
-                                className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40"
-                                // onClick={() => set_show_filter(false)}
-                              ></div>
-                              <div className="absolute top-full mt-2 right-0 z-50 bg-white border rounded-lg shadow-md p-4 w-[260px]">
-                                <div>
-                                  <Date_Range_Field
-                                    label="Date Range"
-                                    ref={date_range_ref}
-                                  />
-                                </div>
-                                <div className="mt-4">
-                                  <Checkbox_Field
-                                    label="Is Draft?"
-                                    name="terms"
-                                    box_size={20}
-                                    icon_size={12}
-                                    //   checked={check}
-                                    //   on_change={(e) => set_check(e.target.checked)}
-                                    on_change={(e) => alert("Is Draft")}
-                                  />
-                                </div>
-
-                                <div className="flex justify-end gap-2 mt-4">
-                                  <Button
-                                    size="sm"
-                                    variant="primary"
-                                    on_click={() => set_show_filter(false)}
-                                  >
-                                    Apply
-                                  </Button>
-                                  <Button
-                                    size="sm"
-                                    variant="secondary"
-                                    on_click={() => set_show_filter(false)}
-                                  >
-                                    Cancel
-                                  </Button>
-                                </div>
-                              </div>
-                            </React.Fragment>
-                          )} */}
-                        </div>
+                        {/* + Filter Dropdown */}
+                        {HAS_FILTER ? (
+                          <React.Fragment>
+                            <div className="relative">
+                              <Button
+                                variant="white"
+                                width="w-[100px]"
+                                icon={SlidersHorizontal}
+                                icon_position="left"
+                                on_click={() =>
+                                  set_show_filter((prev) => !prev)
+                                }
+                              >
+                                Filter
+                              </Button>
+                              {/* + Filter Content */}
+                              {show_filter && (
+                                <React.Fragment>
+                                  <div
+                                    className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40"
+                                    onClick={() => set_show_filter(false)}
+                                  ></div>
+                                  <div className="absolute top-full mt-2 right-0 z-50 bg-white border rounded-lg shadow-md p-4 w-[260px]">
+                                    <div className="grid grid-cols-1 gap-2">
+                                      <div>
+                                        <Text_Field
+                                          label="Filter 1"
+                                          type={"text"}
+                                          disabled
+                                        />
+                                      </div>
+                                      <div>
+                                        <Text_Field
+                                          label="Filter 2"
+                                          type={"text"}
+                                          disabled
+                                        />
+                                      </div>
+                                      <div>
+                                        <Text_Field
+                                          label="Filter 3"
+                                          type={"text"}
+                                          disabled
+                                        />
+                                      </div>
+                                    </div>
+                                    <div className="flex justify-end gap-2 mt-4">
+                                      <Button
+                                        size="sm"
+                                        variant="primary"
+                                        on_click={() => set_show_filter(false)}
+                                      >
+                                        Apply
+                                      </Button>
+                                      <Button
+                                        size="sm"
+                                        variant="secondary"
+                                        on_click={() => set_show_filter(false)}
+                                      >
+                                        Cancel
+                                      </Button>
+                                    </div>
+                                  </div>
+                                </React.Fragment>
+                              )}
+                              {/* - Filter Content */}
+                            </div>
+                          </React.Fragment>
+                        ) : null}
+                        {/* - Filter Dropdown */}
                       </div>
                     </div>
                   </div>
-
-                  {/* Table */}
+                  {/* + Table */}
                   <div className="overflow-x-auto">
-                    {loading ? (
-                      <div className="p-6 text-center text-gray-500 text-sm">
-                        Loading...
+                    {loading_list ? (
+                      <div className="p-6 flex justify-center items-center text-gray-500 text-sm">
+                        <Spinner />
                       </div>
-                    ) : filtered_data.length === 0 ? (
+                    ) : filtered_exchange_rate_list.length === 0 ? (
                       <div className="p-6 text-center text-gray-500 text-sm">
                         No data found
                       </div>
@@ -446,7 +522,7 @@ const Exchange_Rate = ({ set_page }) => {
                           </tr>
                         </thead>
                         <tbody className="bg-white">
-                          {filtered_data.map((row, idx) => {
+                          {filtered_exchange_rate_list.map((row, idx) => {
                             // + Cell Renderer
                             const render_cell = (col, row) => {
                               const value = row[col.key];
@@ -469,17 +545,6 @@ const Exchange_Rate = ({ set_page }) => {
                               if (col.key === "actions") {
                                 return (
                                   <div className="flex gap-2">
-                                    {/* <div className="relative group flex jusity-center items-center">
-                                      <button
-                                        className="text-gray-500 hover:text-sky-600 text-[12px] outline-none"
-                                        // onClick={() => handle_view_exchange_rate(row.id)}
-                                      >
-                                        <View size={19} />
-                                      </button>
-                                      <span className="absolute bottom-full mb-1 left-1/2 transform -translate-x-1/2 px-2 py-1 text-xs text-white bg-sky-600 rounded opacity-0 group-hover:opacity-100 transition-opacity">
-                                        View Record
-                                      </span>
-                                    </div> */}
                                     <div className="relative group flex jusity-center items-center">
                                       <button
                                         className="text-gray-500 hover:text-sky-600 text-[12px] outline-none"
@@ -540,7 +605,8 @@ const Exchange_Rate = ({ set_page }) => {
                       </table>
                     )}
                   </div>
-
+                  {/* - Table */}
+                  {/* + Pagination */}
                   {total_pages > 0 && (
                     <Pagination
                       current_page={current_page}
@@ -549,27 +615,49 @@ const Exchange_Rate = ({ set_page }) => {
                       variant="compact"
                     />
                   )}
+                  {/* - Pagination */}
                 </div>
               </div>
+              {/* - Section 1 */}
             </div>
           </div>
         </React.Fragment>
       )}
       {sub_page === "create_new_exchange_rate" && (
-        <Create_Exc_Rate handle_go_back={handle_go_back} />
-      )}
-      {sub_page === "edit_exchange_rate" && (
-        <Edit_Exc_Rate
+        <Create_E_Rate
           handle_go_back={handle_go_back}
-          edit_data={edit_data}
-          set_edit_data={set_edit_data}
+          active_user={active_user}
+          reset_new_data={reset_new_data}
+          show_toast={show_toast}
+          new_data={new_data}
+          set_new_data={set_new_data}
+          set_exchange_rate_list={set_exchange_rate_list}
         />
       )}
-      <Delete_Exc_Rate
+      {sub_page === "edit_exchange_rate" && (
+        <Edit_E_Rate
+          handle_go_back={handle_go_back}
+          active_user={active_user}
+          show_toast={show_toast}
+          edit_data={edit_data}
+          set_edit_data={set_edit_data}
+          set_exchange_rate_list={set_exchange_rate_list}
+        />
+      )}
+      {sub_page === "upload_exchange_rate" && (
+        <Upload_E_Rate
+          handle_go_back={handle_go_back}
+          handle_get_exchange_rate_list={handle_get_exchange_rate_list}
+          show_toast={show_toast}
+        />
+      )}
+      <Delete_E_Rate
         is_open={display_modal === "delete_exchange_rate"}
         on_close={() => set_display_modal("")}
         width="max-w-[1000px]"
+        show_toast={show_toast}
         delete_data={delete_data}
+        set_exchange_rate_list={set_exchange_rate_list}
       />
     </React.Fragment>
   );

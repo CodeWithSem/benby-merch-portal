@@ -26,10 +26,10 @@ import Pagination from "assets/elements/Pagination";
 import Text_Field from "assets/elements/Text_Field";
 import Spinner from "assets/elements/Spinner";
 import Button from "assets/elements/Button";
-import Create_PL_Status from "./functions/Create_Stock_Type";
-import Edit_PL_Status from "./functions/Edit_Stock_Type";
-import Delete_PL_Status from "./functions/Delete_Stock_Type";
-import Upload_PL_Status from "./functions/Upload_Stock_Type";
+import Create_Stock_Type from "./functions/Create_Stock_Type";
+import Edit_Stock_Type from "./functions/Edit_Stock_Type";
+import Delete_Stock_Type from "./functions/Delete_Stock_Type";
+import Upload_Stock_Type from "./functions/Upload_Stock_Type";
 
 const HAS_FILTER = true;
 
@@ -621,7 +621,7 @@ const Stock_Type = ({ set_page }) => {
         </React.Fragment>
       )}
       {sub_page === "create_new_stock_type" && (
-        <Create_PL_Status
+        <Create_Stock_Type
           handle_go_back={handle_go_back}
           active_user={active_user}
           reset_new_data={reset_new_data}
@@ -632,7 +632,7 @@ const Stock_Type = ({ set_page }) => {
         />
       )}
       {sub_page === "edit_stock_type" && (
-        <Edit_PL_Status
+        <Edit_Stock_Type
           handle_go_back={handle_go_back}
           active_user={active_user}
           show_toast={show_toast}
@@ -642,13 +642,13 @@ const Stock_Type = ({ set_page }) => {
         />
       )}
       {sub_page === "upload_stock_type" && (
-        <Upload_PL_Status
+        <Upload_Stock_Type
           handle_go_back={handle_go_back}
           handle_get_stock_type_list={handle_get_stock_type_list}
           show_toast={show_toast}
         />
       )}
-      <Delete_PL_Status
+      <Delete_Stock_Type
         is_open={display_modal === "delete_stock_type"}
         on_close={() => set_display_modal("")}
         width="max-w-[1000px]"
