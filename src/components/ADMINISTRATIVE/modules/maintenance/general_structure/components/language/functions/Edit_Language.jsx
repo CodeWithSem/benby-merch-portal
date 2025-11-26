@@ -1,16 +1,157 @@
+import React, { useState } from "react";
+import { api_update_language } from "api/firestore_db/tbl_language_api";
+import {
+  console_log,
+  format_date_1,
+  get_date_now,
+} from "assets/scripts/format";
+import {
+  CheckCircle2,
+  ChevronLeft,
+  CircleX,
+  RefreshCcwDot,
+} from "lucide-react";
 import Button from "assets/elements/Button";
-import Text_Code_Field from "assets/elements/Text_Code_Field";
 import Text_Field from "assets/elements/Text_Field";
-import { format_date_1, get_date_now } from "assets/scripts/format";
-import { ChevronLeft, CirclePlus, RefreshCcwDot } from "lucide-react";
-import React from "react";
 
-const Edit_Language = ({ handle_go_back, edit_data, set_edit_data }) => {
+const Edit_Language = ({
+  handle_go_back,
+  active_user,
+  show_toast,
+  edit_data,
+  set_edit_data,
+  set_language_list,
+}) => {
+  const [is_confirm_modal_open, set_is_confirm_modal_open] = useState(false);
+  const [update_loading, set_update_loading] = useState(false);
+
   const handle_change_language_desc = (value) => {
     set_edit_data({
       ...edit_data,
       language_desc: value,
     });
+  };
+
+  const validate_edit_data = () => {
+    if (!edit_data.language_code.trim()) {
+      show_toast({
+        type: "danger",
+        title: "Invalid",
+        message: "Code is required",
+        icon: <CircleX size={21} className="text-red-500" />,
+      });
+      return false;
+    }
+
+    if (!edit_data.language_desc.trim()) {
+      show_toast({
+        type: "danger",
+        title: "Invalid",
+        message: "Description is required",
+        icon: <CircleX size={21} className="text-red-500" />,
+      });
+      return false;
+    }
+
+    return true;
+  };
+
+  const handle_update_language = async () => {
+    if (!validate_edit_data()) {
+      close_confirm_modal();
+      return;
+    }
+    try {
+      set_update_loading(true);
+      const response = await api_update_language(
+        edit_data,
+        active_user?.username
+      );
+      if (response.success) {
+        console_log(response.data);
+        set_language_list((prev) =>
+          prev.map((item) =>
+            item.id === response.data.id ? response.data : item
+          )
+        );
+        show_status("success");
+        handle_go_back("sub_level");
+      } else {
+        show_status("error");
+      }
+    } catch (error) {
+      console.error("Failed to create language:", error);
+      show_status("error");
+    } finally {
+      close_confirm_modal();
+    }
+  };
+
+  const show_status = (status) => {
+    if (status === "success") {
+      show_toast({
+        type: "success",
+        title: "Updated Successfully",
+        message: "The record has been updated.",
+        icon: <CheckCircle2 size={21} className="text-green-500" />,
+      });
+    } else {
+      show_toast({
+        type: "danger",
+        title: "Error",
+        message: "Something went wrong. Please try again.",
+        icon: <CircleX size={21} className="text-red-500" />,
+      });
+    }
+  };
+
+  const close_confirm_modal = () => {
+    set_is_confirm_modal_open(false);
+    set_update_loading(false);
+  };
+
+  const Confirm_Modal = () => {
+    return (
+      <React.Fragment>
+        <div className="fixed inset-0 flex items-center justify-center z-[100]">
+          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm z-[101]"></div>
+          <div
+            className={`relative bg-white rounded-lg shadow-xl max-w-[500px] w-full p-10 m-5 z-[102]`}
+          >
+            <div className="w-full flex justify-center items-center text-lg md:text-xl font-bold mb-4">
+              Confirm Language Update
+            </div>
+            <p className="w-full text-center text-sm leading-6 text-gray-500 dark:text-gray-400 pt-4">
+              You are about to edit this Language. Once edited, it will be
+              updated to the database.
+            </p>
+            <p className="w-full text-center text-sm leading-6 text-gray-500 dark:text-gray-400 pt-4">
+              Please review all the details — before proceeding.
+            </p>
+            <p className="w-full text-center text-sm leading-6 text-gray-500 dark:text-gray-400 py-4">
+              Are you sure you want to continue?
+            </p>
+            <div className="flex justify-center gap-2 mt-4">
+              <Button
+                width="w-[100px]"
+                variant="primary"
+                loading={update_loading}
+                on_click={handle_update_language}
+              >
+                Yes
+              </Button>
+              <Button
+                width="w-[100px]"
+                variant="white"
+                on_click={() => set_is_confirm_modal_open(false)}
+              >
+                No
+              </Button>
+            </div>
+          </div>
+        </div>
+      </React.Fragment>
+    );
   };
 
   // RETURN ORIGIN
@@ -19,6 +160,7 @@ const Edit_Language = ({ handle_go_back, edit_data, set_edit_data }) => {
       <div className="w-full">
         <div className="flex flex-wrap items-center justify-between gap-3 py-5">
           <h1 className="text-xl">Maintenance</h1>
+          {/* + Breadcrumbs */}
           <nav>
             <ol className="flex flex-wrap items-center gap-1.5">
               <li>
@@ -59,9 +201,10 @@ const Edit_Language = ({ handle_go_back, edit_data, set_edit_data }) => {
               </li>
             </ol>
           </nav>
+          {/* - Breadcrumbs */}
         </div>
-
         <div className="w-full bg-white rounded-lg border">
+          {/* + Header */}
           <div className="flex flex-wrap items-center justify-between gap-3 p-5">
             <div className="flex items-center gap-3">
               <Button
@@ -77,6 +220,8 @@ const Edit_Language = ({ handle_go_back, edit_data, set_edit_data }) => {
               {format_date_1(get_date_now())}
             </div>
           </div>
+          {/* - Header */}
+          {/* + Section 1 */}
           <div className="p-5 sm:p-6 border-t">
             <div className="grid grid-cols-1 gap-x 0 lg:gap-x-5 gap-y-5 lg:grid-cols-3">
               <div>
@@ -84,7 +229,6 @@ const Edit_Language = ({ handle_go_back, edit_data, set_edit_data }) => {
                   label="Language Code"
                   type={"text"}
                   value={edit_data.language_code || "-"}
-                  pattern="[0-9]{1,}"
                   disabled
                 />
               </div>
@@ -92,36 +236,39 @@ const Edit_Language = ({ handle_go_back, edit_data, set_edit_data }) => {
                 <Text_Field
                   label="Language Description"
                   type={"text"}
+                  placeholder="Enter description"
                   value={edit_data.language_desc}
                   on_change={(e) => handle_change_language_desc(e.target.value)}
-                  placeholder="Enter description"
-                  pattern="[0-9]{1,}"
                 />
               </div>
             </div>
           </div>
+          {/* - Section 1 */}
+          {/* + Section 2 */}
           <div className="p-5 sm:p-6 border-t">
             <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
               <Button
                 variant="primary"
-                // width="w-[100px]"
                 icon={RefreshCcwDot}
                 icon_position="left"
-                // on_click={handle_save}
+                on_click={() => set_is_confirm_modal_open(true)}
               >
                 Update
               </Button>
               <Button
                 variant="white"
-                // width="w-[100px]"
                 on_click={() => handle_go_back("sub_level")}
               >
                 Cancel
               </Button>
             </div>
           </div>
+          {/* - Section 2 */}
         </div>
       </div>
+      {/* + Modals */}
+      {is_confirm_modal_open && <Confirm_Modal />}
+      {/* - Modals */}
     </React.Fragment>
   );
 };

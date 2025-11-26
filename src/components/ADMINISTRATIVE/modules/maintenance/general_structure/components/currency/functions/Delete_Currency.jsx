@@ -1,34 +1,73 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
+import { api_delete_currency } from "api/firestore_db/tbl_currency_api";
+import { format_date_1, get_date_now } from "assets/scripts/format";
+import { CheckCircle2, CircleX, X } from "lucide-react";
 import Text_Field from "assets/elements/Text_Field";
 import Button from "assets/elements/Button";
-import { X } from "lucide-react";
-import Text_Code_Field from "assets/elements/Text_Code_Field";
-import { format_date_1, get_date_now } from "assets/scripts/format";
 
 const Delete_Currency = ({
   is_open,
   on_close,
   width = "max-w-[700px]",
+  show_toast,
   delete_data,
+  set_currency_list,
 }) => {
   const [is_confirm_modal_open, set_is_confirm_modal_open] = useState(false);
+  const [delete_loading, set_delete_loading] = useState(false);
 
-  const handle_delete_currency = () => {
-    alert("Delete Currency");
+  const handle_delete_currency = async (id) => {
+    try {
+      set_delete_loading(true);
+
+      const response = await api_delete_currency(id);
+
+      if (response.success) {
+        set_currency_list((prev) => prev.filter((item) => item.id !== id));
+        show_status("success");
+        close_modal();
+      } else {
+        show_status("error");
+      }
+    } catch (error) {
+      console.error(error);
+      show_status("error");
+    } finally {
+      set_delete_loading(false);
+    }
+  };
+
+  const show_status = (status) => {
+    if (status === "success") {
+      show_toast({
+        type: "success",
+        title: "Deleted Successfully",
+        message: `The record has been delete.`,
+        icon: <CheckCircle2 size={21} className="text-green-500" />,
+      });
+    } else {
+      show_toast({
+        type: "danger",
+        title: "Error",
+        message: "Something went wrong. Please try again.",
+        icon: <CircleX size={21} className="text-red-500" />,
+      });
+    }
+  };
+
+  const close_modal = () => {
+    set_is_confirm_modal_open(false);
+    on_close();
   };
 
   const Confirm_Modal = () => {
     return (
       <React.Fragment>
         <div className="fixed inset-0 flex items-center justify-center z-[100]">
-          {/* + Blur */}
           <div className="absolute inset-0 bg-black/50 backdrop-blur-sm z-[101]"></div>
-          {/* - Blur */}
-          {/* + Modal Content */}
           <div
             className={`relative bg-white rounded-lg shadow-xl max-w-[500px] w-full p-10 m-5 z-[102]`}
           >
-            {/* Modal Body */}
             <div className="w-full flex justify-center items-center text-lg md:text-xl font-bold mb-4">
               Delete Currency
             </div>
@@ -46,7 +85,8 @@ const Delete_Currency = ({
               <Button
                 width="w-[100px]"
                 variant="danger"
-                on_click={handle_delete_currency}
+                loading={delete_loading}
+                on_click={() => handle_delete_currency(delete_data.id)}
               >
                 Yes
               </Button>
@@ -59,7 +99,6 @@ const Delete_Currency = ({
               </Button>
             </div>
           </div>
-          {/* - Modal Content */}
         </div>
       </React.Fragment>
     );
@@ -107,7 +146,6 @@ const Delete_Currency = ({
                         label="Currency Code"
                         type={"text"}
                         value={delete_data.currency_code}
-                        pattern="[A-Za-z]{1,}"
                         disabled
                       />
                     </div>
@@ -116,7 +154,6 @@ const Delete_Currency = ({
                         label="Currency Description"
                         type={"text"}
                         value={delete_data.currency_desc}
-                        pattern="[A-Za-z]{1,}"
                         disabled
                       />
                     </div>
@@ -144,7 +181,9 @@ const Delete_Currency = ({
 
         {/* - Modal Content */}
       </div>
+      {/* + Modals */}
       {is_confirm_modal_open && <Confirm_Modal />}
+      {/* - Modals */}
     </React.Fragment>
   ) : null;
 };
