@@ -51,7 +51,7 @@ const Plant_Data = ({
   return (
     <React.Fragment>
       {/* + Section 1 */}
-      <div className="rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6 dark:border-gray-800 dark:bg-gray-900 whitespace-nowrap">
+      <div className="rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6 whitespace-nowrap">
         <h1 className="mb-5 font-semibold text-sky-700">Plant Extension</h1>
         <div className="grid grid-cols-1 gap-5">
           {/* + Table */}
@@ -130,7 +130,7 @@ const Plant_Data = ({
       </div>
       {/* - Section 1 */}
       {/* + Section 2 */}
-      <div className="mt-5 rounded-lg border border-gray-100 bg-gray-50 p-4 sm:p-6 dark:border-gray-800 dark:bg-gray-900 whitespace-nowrap">
+      <div className="mt-5 rounded-lg border border-gray-100 bg-gray-50 p-4 sm:p-6 whitespace-nowrap">
         <div className="grid grid-cols-1 gap-5">
           <div>
             <Text_Code_Field
@@ -180,7 +180,7 @@ const Plant_Data = ({
       </div>
       {/* - Section 2 */}
       {/* + Section 3 */}
-      <div className="mt-5 rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6 dark:border-gray-800 dark:bg-gray-900">
+      <div className="mt-5 rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6">
         <h1 className="mb-5 font-semibold text-sky-700">General Data</h1>
         <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
           <div>
@@ -216,7 +216,7 @@ const Plant_Data = ({
       </div>
       {/* - Section 3 */}
       {/* + Section 4 */}
-      <div className="mt-5 rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6 dark:border-gray-800 dark:bg-gray-900">
+      <div className="mt-5 rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6">
         <h1 className="mb-5 font-semibold text-sky-700">
           Shell Life / Best Before Details
         </h1>
@@ -263,7 +263,7 @@ const Plant_Data = ({
       </div>
       {/* - Section 4 */}
       {/* + Section 5 */}
-      <div className="mt-5 rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6 dark:border-gray-800 dark:bg-gray-900">
+      <div className="mt-5 rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6">
         <h1 className="mb-5 font-semibold text-sky-700">
           General Plant Inventory Account Details
         </h1>

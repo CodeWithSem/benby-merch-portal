@@ -29,45 +29,32 @@ const Create_Company_H = ({
   const [is_confirm_modal_open, set_is_confirm_modal_open] = useState(false);
   const [create_loading, set_create_loading] = useState(false);
 
-  //   const handle_change_company_desc = (value) => {
-  //     set_new_data((prev) => ({
-  //       ...prev,
-  //       company_desc: value,
-  //     }));
-  //   };
-
   const validate_new_data = () => {
     if (!new_data.company_code.trim()) {
-      show_toast({
-        type: "danger",
-        title: "Invalid",
-        message: "Company is required",
-        icon: <CircleX size={21} className="text-red-500" />,
-      });
+      show_toast_error("Company");
       return false;
     }
 
     if (!new_data.purc_org_code.trim()) {
-      show_toast({
-        type: "danger",
-        title: "Invalid",
-        message: "Purchasing Organization is required",
-        icon: <CircleX size={21} className="text-red-500" />,
-      });
+      show_toast_error("Purchasing Organization");
       return false;
     }
 
     if (!new_data.purc_group_code.trim()) {
-      show_toast({
-        type: "danger",
-        title: "Invalid",
-        message: "Purchasing Group is required",
-        icon: <CircleX size={21} className="text-red-500" />,
-      });
+      show_toast_error("Purchasing Group");
       return false;
     }
 
     return true;
+  };
+
+  const show_toast_error = (field_name) => {
+    show_toast({
+      type: "danger",
+      title: "Invalid",
+      message: `${field_name} is required`,
+      icon: <CircleX size={21} className="text-red-500" />,
+    });
   };
 
   const handle_create_company_hierarchy = async () => {

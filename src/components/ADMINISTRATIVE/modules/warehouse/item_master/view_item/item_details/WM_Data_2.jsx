@@ -43,7 +43,7 @@ const WM_Data_2 = ({ branch_list, plant_list, sloc_list, stype_list }) => {
   return (
     <React.Fragment>
       {/* + Section 1 */}
-      <div className="rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6 dark:border-gray-800 dark:bg-gray-900 whitespace-nowrap">
+      <div className="rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6 whitespace-nowrap">
         <h1 className="mb-5 font-semibold text-sky-700">Plant Extension</h1>
         <div className="grid grid-cols-1 gap-5">
           {/* + Table */}
@@ -123,7 +123,7 @@ const WM_Data_2 = ({ branch_list, plant_list, sloc_list, stype_list }) => {
       {/* - Section 1 */}
       {/* + Section 2 */}
       <div className="mt-5 grid grid-cols-1 gap-5 md:grid-cols-2">
-        <div className="rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6 dark:border-gray-800 dark:bg-gray-900 whitespace-nowrap">
+        <div className="rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6 whitespace-nowrap">
           <h1 className="mb-5 font-semibold text-sky-700">Stacking Details</h1>
           <div className="grid grid-cols-1 gap-5">
             <div className="grid grid-cols-1 gap-2 lg:grid-cols-3">
@@ -161,7 +161,7 @@ const WM_Data_2 = ({ branch_list, plant_list, sloc_list, stype_list }) => {
             </div>
           </div>
         </div>
-        <div className="rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6 dark:border-gray-800 dark:bg-gray-900 whitespace-nowrap">
+        <div className="rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6 whitespace-nowrap">
           <h1 className="mb-5 font-semibold text-sky-700">
             Stacking / Pallet Configuration
           </h1>
@@ -192,7 +192,7 @@ const WM_Data_2 = ({ branch_list, plant_list, sloc_list, stype_list }) => {
       </div>
       {/* - Section 2 */}
       {/* + Section 3 */}
-      <div className="mt-5 rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6 dark:border-gray-800 dark:bg-gray-900 whitespace-nowrap">
+      <div className="mt-5 rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6 whitespace-nowrap">
         <h1 className="mb-5 font-semibold text-sky-700">Storage Bin Data</h1>
         <div className="grid grid-cols-1 w-full gap-5 lg:w-[600px]">
           <div className="flex gap-2">

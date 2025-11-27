@@ -10,7 +10,7 @@ const Standard_Data = ({ set_display_modal }) => {
   return (
     <React.Fragment>
       {/* + Section 1 */}
-      <div className="rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6 dark:border-gray-800 dark:bg-gray-900">
+      <div className="rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6">
         <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
           <div>
             <Text_Field
@@ -34,7 +34,7 @@ const Standard_Data = ({ set_display_modal }) => {
       </div>
       {/* - Section 1 */}
       {/* + Section 2 */}
-      <div className="mt-5 rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6 dark:border-gray-800 dark:bg-gray-900">
+      <div className="mt-5 rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6">
         <h1 className="mb-5 font-semibold text-sky-700">
           General Item Details
         </h1>
@@ -50,10 +50,10 @@ const Standard_Data = ({ set_display_modal }) => {
           </div>
           <div>
             <Find_Field
-              label="Gen. Item Group Category"
+              label="Item Group Category"
               // value={data}
               // on_change={(e) => handle_data_change(e.target.value)}
-              on_click={() => set_display_modal("select_gen_item_group_cat")}
+              on_click={() => set_display_modal("select_item_group_category")}
               disabled
             />
           </div>
@@ -113,7 +113,7 @@ const Standard_Data = ({ set_display_modal }) => {
       </div>
       {/* - Section 2 */}
       {/* + Section 3 */}
-      <div className="mt-5 rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6 dark:border-gray-800 dark:bg-gray-900">
+      <div className="mt-5 rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6">
         <h1 className="mb-5 font-semibold text-sky-700">
           Item Dimension Details
         </h1>

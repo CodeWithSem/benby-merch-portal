@@ -3,9 +3,9 @@ import { Use_App } from "context/app_context";
 import { useToast } from "../../../../../layout/Toast_Provider";
 import { Get_TBL_INCREMENTAL_ID } from "api/real_time_db/incremental";
 import {
-  api_get_item_group_list,
-  api_truncate_item_group,
-} from "api/firestore_db/tbl_item_group_api";
+  api_get_stype_list,
+  api_truncate_stype,
+} from "api/firestore_db/tbl_stype_api";
 import {
   Search,
   ChevronDown,
@@ -26,14 +26,14 @@ import Pagination from "assets/elements/Pagination";
 import Text_Field from "assets/elements/Text_Field";
 import Spinner from "assets/elements/Spinner";
 import Button from "assets/elements/Button";
-import Create_Item_Group from "./functions/Create_Item_Group";
-import Edit_Item_Group from "./functions/Edit_Item_Group";
-import Delete_Item_Group from "./functions/Delete_Item_Group";
-import Upload_Item_Group from "./functions/Upload_Item_Group";
+import Create_STYPE from "./functions/Create_STYPE";
+import Edit_STYPE from "./functions/Edit_STYPE";
+import Delete_STYPE from "./functions/Delete_STYPE";
+import Upload_STYPE from "./functions/Upload_STYPE";
 
 const HAS_FILTER = true;
 
-const Gen_Item_Group = ({ set_page }) => {
+const Storage_Type = ({ set_page }) => {
   const { active_user } = Use_App();
   const { show_toast } = useToast();
   const [sub_page, set_sub_page] = useState("main");
@@ -42,24 +42,24 @@ const Gen_Item_Group = ({ set_page }) => {
   const [loading_list, set_loading_list] = useState(false);
   const [truncate_loading, set_truncate_loading] = useState(false);
 
-  const def_item_group_data = {
+  const def_stype_data = {
     id: null,
-    item_group_code: "",
-    item_group_desc: "",
+    stype_code: "",
+    stype_desc: "",
     creation_date: "",
     created_by: "",
     change_date: "",
     change_by: "",
   };
 
-  const [new_data, set_new_data] = useState({ ...def_item_group_data });
-  const [edit_data, set_edit_data] = useState({ ...def_item_group_data });
-  const [delete_data, set_delete_data] = useState({ ...def_item_group_data });
+  const [new_data, set_new_data] = useState({ ...def_stype_data });
+  const [edit_data, set_edit_data] = useState({ ...def_stype_data });
+  const [delete_data, set_delete_data] = useState({ ...def_stype_data });
 
   const reset_new_data = () => {
     set_new_data((prev) => ({
       ...prev,
-      item_group_desc: "",
+      stype_desc: "",
       created_by: "",
       change_date: "",
       change_by: "",
@@ -67,11 +67,11 @@ const Gen_Item_Group = ({ set_page }) => {
   };
 
   useEffect(() => {
-    Get_TBL_INCREMENTAL_ID("TBL_ITEM_GROUP", (value) => {
+    Get_TBL_INCREMENTAL_ID("TBL_STORAGE_TYPE", (value) => {
       set_new_data((prev) => ({
         ...prev,
         id: value,
-        item_group_code: `ITM-G-${String(value).padStart(3, "0")}`,
+        stype_code: `STYPE-${String(value).padStart(3, "0")}`,
       }));
     });
   }, []);
@@ -79,10 +79,10 @@ const Gen_Item_Group = ({ set_page }) => {
   const columns = [
     { key: "index", label: "#", sortable: true },
     { key: "id", label: "ID", sortable: true },
-    { key: "item_group_code", label: "Item Group Code", sortable: true },
+    { key: "stype_code", label: "Storage Type Code", sortable: true },
     {
-      key: "item_group_desc",
-      label: "Item Group Description",
+      key: "stype_desc",
+      label: "Storage Type Description",
       sortable: true,
     },
     { key: "creation_date", label: "Creation Date", sortable: true },
@@ -92,22 +92,22 @@ const Gen_Item_Group = ({ set_page }) => {
     { key: "actions", label: "", sortable: false },
   ];
 
-  const [item_group_list, set_item_group_list] = useState([]);
+  const [stype_list, set_stype_list] = useState([]);
   // ======================================================
   // id: 1,
-  // item_group_code: "PL-S-001",
-  // item_group_desc: "Item Group Description 1",
+  // stype_code: "STYPE-001",
+  // stype_desc: "Storage Type Description 1",
   // created_by: "Admin",
   // creation_date: "MM-DD-YYYY",
   // change_by: "",
   // change_date: "",
   // ======================================================
 
-  const handle_get_item_group_list = async () => {
+  const handle_get_stype_list = async () => {
     set_loading_list(true);
-    const response = await api_get_item_group_list();
+    const response = await api_get_stype_list();
     if (response.success) {
-      set_item_group_list(response.data);
+      set_stype_list(response.data);
     } else {
       console.error(response.message);
     }
@@ -115,12 +115,12 @@ const Gen_Item_Group = ({ set_page }) => {
   };
 
   useEffect(() => {
-    handle_get_item_group_list();
+    handle_get_stype_list();
   }, []);
 
-  const handle_truncate_item_group_list = async () => {
+  const handle_truncate_stype_list = async () => {
     set_truncate_loading(true);
-    const response = await api_truncate_item_group();
+    const response = await api_truncate_stype();
     if (response.success) {
       show_toast({
         type: "success",
@@ -136,12 +136,12 @@ const Gen_Item_Group = ({ set_page }) => {
       });
       console.error(response.message);
     }
-    handle_get_item_group_list();
+    handle_get_stype_list();
     set_truncate_loading(false);
   };
 
   // + Client-Side Filtering
-  const [filtered_item_group_list, set_filtered_item_group_list] = useState([]);
+  const [filtered_stype_list, set_filtered_stype_list] = useState([]);
   const [select_option, set_select_option] = useState(5);
   const [current_page, set_current_page] = useState(1);
   const [sort_by, set_sort_by] = useState("id");
@@ -158,7 +158,7 @@ const Gen_Item_Group = ({ set_page }) => {
   }, [search_query]);
 
   useEffect(() => {
-    let temp = [...item_group_list];
+    let temp = [...stype_list];
 
     if (debounced_query.trim() !== "") {
       const q = debounced_query.toLowerCase();
@@ -191,9 +191,9 @@ const Gen_Item_Group = ({ set_page }) => {
       index: start_idx + i + 1,
     }));
 
-    set_filtered_item_group_list(indexed_data);
+    set_filtered_stype_list(indexed_data);
   }, [
-    item_group_list,
+    stype_list,
     debounced_query,
     sort_by,
     sort_order,
@@ -203,7 +203,7 @@ const Gen_Item_Group = ({ set_page }) => {
 
   const total_pages = Math.ceil(
     (debounced_query
-      ? item_group_list.filter((u) =>
+      ? stype_list.filter((u) =>
           columns.some((col) => {
             if (col.key === "actions") return false;
             const val = u[col.key];
@@ -213,7 +213,7 @@ const Gen_Item_Group = ({ set_page }) => {
               .includes(debounced_query.toLowerCase());
           })
         ).length
-      : item_group_list.length) / select_option
+      : stype_list.length) / select_option
   );
 
   const handle_sort = (column) => {
@@ -229,21 +229,21 @@ const Gen_Item_Group = ({ set_page }) => {
   const handle_page_change = (page) => set_current_page(page);
   // - Client-Side Filtering
 
-  const handle_create_new_item_group = () => {
-    set_sub_page("create_new_item_group");
+  const handle_create_new_stype = () => {
+    set_sub_page("create_new_stype");
   };
 
-  const handle_edit_item_group = (data) => {
+  const handle_edit_stype = (data) => {
     set_edit_data(data);
-    set_sub_page("edit_item_group");
+    set_sub_page("edit_stype");
   };
-  const handle_delete_item_group = (data) => {
+  const handle_delete_stype = (data) => {
     set_delete_data(data);
-    set_display_modal("delete_item_group");
+    set_display_modal("delete_stype");
   };
 
-  const handle_upload_item_group = () => {
-    set_sub_page("upload_item_group");
+  const handle_upload_stype = () => {
+    set_sub_page("upload_stype");
   };
 
   const handle_go_back = (value) => {
@@ -296,7 +296,7 @@ const Gen_Item_Group = ({ set_page }) => {
                   </li>
                   <li className="flex items-center gap-1.5 text-sm text-gray-500">
                     <span>/</span>
-                    <span className="text-gray-800">Item Group</span>
+                    <span className="text-gray-800">Storage Type</span>
                   </li>
                 </ol>
               </nav>
@@ -313,7 +313,7 @@ const Gen_Item_Group = ({ set_page }) => {
                     width="w-[20px]"
                     on_click={() => handle_go_back("main")}
                   ></Button>
-                  <h1 className="text-lg">Item Group</h1>
+                  <h1 className="text-lg">Storage Type</h1>
                 </div>
                 <div className="flex gap-2">
                   {active_user?.category === "DEV" && (
@@ -323,7 +323,7 @@ const Gen_Item_Group = ({ set_page }) => {
                       icon_position="left"
                       width="w-[110px]"
                       loading={truncate_loading}
-                      on_click={handle_truncate_item_group_list}
+                      on_click={handle_truncate_stype_list}
                     >
                       Truncate
                     </Button>
@@ -332,7 +332,7 @@ const Gen_Item_Group = ({ set_page }) => {
                     variant="primary"
                     icon={PlusCircle}
                     icon_position="left"
-                    on_click={handle_create_new_item_group}
+                    on_click={handle_create_new_stype}
                   >
                     Create New Data
                   </Button>
@@ -340,7 +340,7 @@ const Gen_Item_Group = ({ set_page }) => {
                     variant="primary"
                     icon={FileUp}
                     icon_position="left"
-                    on_click={handle_upload_item_group}
+                    on_click={handle_upload_stype}
                   >
                     Upload
                   </Button>
@@ -373,7 +373,7 @@ const Gen_Item_Group = ({ set_page }) => {
                         variant="white"
                         icon={RefreshCw}
                         icon_position="left"
-                        on_click={handle_get_item_group_list}
+                        on_click={handle_get_stype_list}
                       ></Button>
                     </div>
                     <div className="w-full mt-4 md:mt-0 md:w-[600px]">
@@ -467,7 +467,7 @@ const Gen_Item_Group = ({ set_page }) => {
                       <div className="p-6 flex justify-center items-center text-gray-500 text-sm">
                         <Spinner />
                       </div>
-                    ) : filtered_item_group_list.length === 0 ? (
+                    ) : filtered_stype_list.length === 0 ? (
                       <div className="p-6 text-center text-gray-500 text-sm">
                         No data found
                       </div>
@@ -519,7 +519,7 @@ const Gen_Item_Group = ({ set_page }) => {
                           </tr>
                         </thead>
                         <tbody className="bg-white">
-                          {filtered_item_group_list.map((row, idx) => {
+                          {filtered_stype_list.map((row, idx) => {
                             // + Cell Renderer
                             const render_cell = (col, row) => {
                               const value = row[col.key];
@@ -545,9 +545,7 @@ const Gen_Item_Group = ({ set_page }) => {
                                     <div className="relative group flex jusity-center items-center">
                                       <button
                                         className="text-gray-500 hover:text-sky-600 text-[12px] outline-none"
-                                        onClick={() =>
-                                          handle_edit_item_group(row)
-                                        }
+                                        onClick={() => handle_edit_stype(row)}
                                       >
                                         <Edit size={19} />
                                       </button>
@@ -558,9 +556,7 @@ const Gen_Item_Group = ({ set_page }) => {
                                     <div className="relative group flex jusity-center items-center">
                                       <button
                                         className="text-gray-500 hover:text-red-600 text-[12px] mb-[1px] outline-none"
-                                        onClick={() =>
-                                          handle_delete_item_group(row)
-                                        }
+                                        onClick={() => handle_delete_stype(row)}
                                       >
                                         <Trash size={19} />
                                       </button>
@@ -620,44 +616,44 @@ const Gen_Item_Group = ({ set_page }) => {
           </div>
         </React.Fragment>
       )}
-      {sub_page === "create_new_item_group" && (
-        <Create_Item_Group
+      {sub_page === "create_new_stype" && (
+        <Create_STYPE
           handle_go_back={handle_go_back}
           active_user={active_user}
           reset_new_data={reset_new_data}
           show_toast={show_toast}
           new_data={new_data}
           set_new_data={set_new_data}
-          set_item_group_list={set_item_group_list}
+          set_stype_list={set_stype_list}
         />
       )}
-      {sub_page === "edit_item_group" && (
-        <Edit_Item_Group
+      {sub_page === "edit_stype" && (
+        <Edit_STYPE
           handle_go_back={handle_go_back}
           active_user={active_user}
           show_toast={show_toast}
           edit_data={edit_data}
           set_edit_data={set_edit_data}
-          set_item_group_list={set_item_group_list}
+          set_stype_list={set_stype_list}
         />
       )}
-      {sub_page === "upload_item_group" && (
-        <Upload_Item_Group
+      {sub_page === "upload_stype" && (
+        <Upload_STYPE
           handle_go_back={handle_go_back}
-          handle_get_item_group_list={handle_get_item_group_list}
+          handle_get_stype_list={handle_get_stype_list}
           show_toast={show_toast}
         />
       )}
-      <Delete_Item_Group
-        is_open={display_modal === "delete_item_group"}
+      <Delete_STYPE
+        is_open={display_modal === "delete_stype"}
         on_close={() => set_display_modal("")}
         width="max-w-[1000px]"
         show_toast={show_toast}
         delete_data={delete_data}
-        set_item_group_list={set_item_group_list}
+        set_stype_list={set_stype_list}
       />
     </React.Fragment>
   );
 };
 
-export default Gen_Item_Group;
+export default Storage_Type;

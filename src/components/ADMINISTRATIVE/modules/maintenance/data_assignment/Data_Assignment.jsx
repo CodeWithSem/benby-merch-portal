@@ -2,6 +2,9 @@ import Icon_Field from "assets/elements/Icon_Field";
 import { Link, Search } from "lucide-react";
 import React, { useState } from "react";
 import Company_Hierarchy from "./components/company_hierarchy/Company_Hierarchy";
+import Branch_Hierarchy from "./components/branch_hierarchy/Branch_Hierarchy";
+import Plant_Hierarchy from "./components/plant_hierarchy/Plant_Hierarchy";
+import PO_Type_Hierarchy from "./components/po_type_hierarchy/PO_Type_Hierarchy";
 
 const Data_Assignment = () => {
   const [page, set_page] = useState("main");
@@ -148,6 +151,11 @@ const Data_Assignment = () => {
       )}
       {page === "company_hierarchy" && (
         <Company_Hierarchy set_page={set_page} />
+      )}
+      {page === "branch_hierarchy" && <Branch_Hierarchy set_page={set_page} />}
+      {page === "plant_hierarchy" && <Plant_Hierarchy set_page={set_page} />}
+      {page === "po_type_hierarchy" && (
+        <PO_Type_Hierarchy set_page={set_page} />
       )}
     </React.Fragment>
   );

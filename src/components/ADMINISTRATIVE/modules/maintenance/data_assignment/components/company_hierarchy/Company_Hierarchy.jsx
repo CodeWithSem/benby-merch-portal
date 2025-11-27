@@ -6,6 +6,10 @@ import {
   api_truncate_company_hierarchy,
 } from "api/firestore_db/tbl_company_hierarchy_api";
 import { Get_TBL_INCREMENTAL_ID } from "api/real_time_db/incremental";
+import { api_get_company_list } from "api/firestore_db/tbl_company_api";
+import { api_get_purc_org_list } from "api/firestore_db/tbl_purc_org_api";
+import { api_get_purc_group_list } from "api/firestore_db/tbl_purc_group_api";
+import { get_description } from "assets/scripts/functions/get_description";
 import {
   Search,
   ChevronDown,
@@ -27,16 +31,11 @@ import Pagination from "assets/elements/Pagination";
 import Button from "assets/elements/Button";
 import Spinner from "assets/elements/Spinner";
 import Text_Field from "assets/elements/Text_Field";
-import Create_Company_H from "./functions/Create_Company_H";
-import { api_get_company_list } from "api/firestore_db/tbl_company_api";
-import { api_get_purc_org_list } from "api/firestore_db/tbl_purc_org_api";
-import { api_get_purc_group_list } from "api/firestore_db/tbl_purc_group_api";
 import Load_Screen from "./modals/Load_Screen";
-import { console_log } from "assets/scripts/format";
-import { get_description } from "assets/scripts/functions/get_description";
-// import Edit_Company_H from "./functions/Edit_Company_H";
-// import Delete_Company_H from "./functions/Delete_Company_H";
-// import Upload_Company_H from "./functions/Upload_Company_H";
+import Create_Company_H from "./functions/Create_Company_H";
+import Edit_Company_H from "./functions/Edit_Company_H";
+import Delete_Company_H from "./functions/Delete_Company_H";
+import Upload_Company_H from "./functions/Upload_Company_H";
 
 const HAS_FILTER = true;
 
@@ -200,7 +199,6 @@ const Company_Hierarchy = ({ set_page }) => {
   // + Client-Side Filtering
   const [filtered_company_hierarchy_list, set_filtered_company_hierarchy_list] =
     useState([]);
-  const [loading, set_loading] = useState(false);
   const [select_option, set_select_option] = useState(5);
   const [current_page, set_current_page] = useState(1);
   const [sort_by, set_sort_by] = useState("id");
@@ -239,12 +237,11 @@ const Company_Hierarchy = ({ set_page }) => {
         columns.some((col) => {
           if (col.key === "actions") return false;
           const val = u[col.key];
-          // 🔑 1a. Check against original code/value (Current functionality)
+
           if (val?.toString().toLowerCase().includes(q)) {
             return true;
           }
 
-          // 🔑 1b. Check against the description value for key columns
           const lookup = lookup_columns.find((lc) => lc.code_key === col.key);
 
           if (lookup) {
@@ -296,26 +293,21 @@ const Company_Hierarchy = ({ set_page }) => {
   ]);
 
   const total_pages = Math.ceil(
-    // Check if a query is present
     (debounced_query
       ? company_hierarchy_list.filter((u) => {
           const q = debounced_query.toLowerCase();
 
-          // Check if ANY column (code OR description) matches the query 'q'
           return columns.some((col) => {
             if (col.key === "actions") return false;
 
-            // --- 1. Check against the original code/value (Current functionality) ---
             const code_val = u[col.key];
             if (code_val?.toString().toLowerCase().includes(q)) {
               return true;
             }
 
-            // --- 2. Check against the description value for key columns ---
             const lookup = lookup_columns.find((lc) => lc.code_key === col.key);
 
             if (lookup) {
-              // Use the generic function to find the description
               const desc_val = get_description(
                 u[lookup.code_key],
                 lookup.list,
@@ -328,12 +320,10 @@ const Company_Hierarchy = ({ set_page }) => {
               }
             }
 
-            // If neither code nor description matched for this column
             return false;
           });
-        }).length // <-- Get the length of the filtered list
-      : company_hierarchy_list.length) / // <-- Use full list length if no query
-      select_option // <-- Divide by items per page
+        }).length
+      : company_hierarchy_list.length) / select_option
   );
 
   const handle_sort = (column) => {
@@ -435,7 +425,6 @@ const Company_Hierarchy = ({ set_page }) => {
                     width="w-[20px]"
                     on_click={() => handle_go_back("main")}
                   ></Button>
-                  {/* <ChevronLeft className="text-gray-500" size={24} /> */}
                   <h1 className="text-lg">Company Hierarchy</h1>
                 </div>
                 <div className="flex gap-2">
@@ -802,7 +791,7 @@ const Company_Hierarchy = ({ set_page }) => {
           purc_group_list={purc_group_list}
         />
       )}
-      {/* {sub_page === "edit_company_hierarchy" && (
+      {sub_page === "edit_company_hierarchy" && (
         <Edit_Company_H
           handle_go_back={handle_go_back}
           active_user={active_user}
@@ -810,6 +799,9 @@ const Company_Hierarchy = ({ set_page }) => {
           edit_data={edit_data}
           set_edit_data={set_edit_data}
           set_company_hierarchy_list={set_company_hierarchy_list}
+          company_list={company_list}
+          purc_org_list={purc_org_list}
+          purc_group_list={purc_group_list}
         />
       )}
       {sub_page === "upload_company_hierarchy" && (
@@ -817,6 +809,9 @@ const Company_Hierarchy = ({ set_page }) => {
           handle_go_back={handle_go_back}
           handle_get_company_hierarchy_list={handle_get_company_hierarchy_list}
           show_toast={show_toast}
+          company_list={company_list}
+          purc_org_list={purc_org_list}
+          purc_group_list={purc_group_list}
         />
       )}
       <Delete_Company_H
@@ -826,7 +821,10 @@ const Company_Hierarchy = ({ set_page }) => {
         show_toast={show_toast}
         delete_data={delete_data}
         set_company_hierarchy_list={set_company_hierarchy_list}
-      /> */}
+        company_list={company_list}
+        purc_org_list={purc_org_list}
+        purc_group_list={purc_group_list}
+      />
       <Load_Screen
         is_open={display_modal === "load_screen"}
         on_close={() => {

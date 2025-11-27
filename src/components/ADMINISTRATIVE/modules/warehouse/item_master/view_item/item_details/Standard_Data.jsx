@@ -7,7 +7,7 @@ const Standard_Data = () => {
   return (
     <React.Fragment>
       {/* + Section 1 */}
-      <div className="rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6 dark:border-gray-800 dark:bg-gray-900">
+      <div className="rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6">
         <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
           <div>
             <Text_Field label="LTC Standard Code" type={"text"} disabled />
@@ -19,7 +19,7 @@ const Standard_Data = () => {
       </div>
       {/* - Section 1 */}
       {/* + Section 2 */}
-      <div className="mt-5 rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6 dark:border-gray-800 dark:bg-gray-900">
+      <div className="mt-5 rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6">
         <h1 className="mb-5 font-semibold text-sky-700">
           General Item Details
         </h1>
@@ -28,11 +28,7 @@ const Standard_Data = () => {
             <Text_Field label="Item Group" type={"text"} disabled />
           </div>
           <div>
-            <Text_Field
-              label="Gen. Item Group Category"
-              type={"text"}
-              disabled
-            />
+            <Text_Field label="Item Group Category" type={"text"} disabled />
           </div>
           <div>
             <Text_Field label="Item Division" type={"text"} disabled />
@@ -66,7 +62,7 @@ const Standard_Data = () => {
       </div>
       {/* - Section 2 */}
       {/* + Section 3 */}
-      <div className="mt-5 rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6 dark:border-gray-800 dark:bg-gray-900">
+      <div className="mt-5 rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6">
         <h1 className="mb-5 font-semibold text-sky-700">
           Item Dimension Details
         </h1>

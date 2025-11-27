@@ -20,7 +20,7 @@ const Case_Config_2 = () => {
   return (
     <React.Fragment>
       {/* + Section 1 */}
-      <div className="rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6 dark:border-gray-800 dark:bg-gray-900">
+      <div className="rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6">
         <h1 className="mb-5 font-semibold text-sky-700">
           General Item Details
         </h1>
@@ -61,7 +61,7 @@ const Case_Config_2 = () => {
       </div>
       {/* - Section 1 */}
       {/* + Section 2 */}
-      <div className="mt-5 rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6 dark:border-gray-800 dark:bg-gray-900">
+      <div className="mt-5 rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6">
         <div className="grid grid-cols-1 gap-5">
           <div>
             <Textarea_Field

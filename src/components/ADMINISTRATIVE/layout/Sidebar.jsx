@@ -78,8 +78,19 @@ const Sidebar = ({
       sub_items: [
         "General Structure",
         "Financial",
+        "Item",
+        "Distribution",
         "Vendor",
+        "Customer",
+        "Warehouse",
         "Purchase Order",
+        "Sales Order",
+        "Pricing",
+        "Batch",
+        "Personnel",
+        "Truck",
+        "Shipment",
+        "User",
         "Data Assignment",
       ],
     },
@@ -111,7 +122,13 @@ const Sidebar = ({
     if (is_collapsed && is_desktop) {
       return (
         open_dropdowns[key] && (
-          <div className="absolute left-full top-0 ml-2 bg-white rounded border py-2 z-50 w-40 shadow-lg">
+          <div
+            className={`absolute left-full top-0 ml-2 bg-white rounded border py-2 z-50 w-40 shadow-lg ${
+              key === "Maintenance"
+                ? "max-h-[305px] overflow-y-auto scrollbar-custom"
+                : ""
+            }`}
+          >
             {items.map((item, idx) => {
               const sub_key = `${key}-${item}`;
               const is_active = active_item === sub_key;
@@ -138,9 +155,9 @@ const Sidebar = ({
       <div
         className={`ml-9 mt-1 flex flex-col overflow-hidden transition-[max-height,opacity] duration-300 ${
           open_dropdowns[key]
-            ? "max-h-[300px] opacity-100"
+            ? "max-h-[200px] 2xl:max-h-[400px] opacity-100"
             : "max-h-0 opacity-0"
-        }`}
+        } ${key === "Maintenance" ? "overflow-y-auto scrollbar-custom" : ""}`}
       >
         {items.map((item, idx) => {
           const sub_key = `${key}-${item}`;

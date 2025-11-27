@@ -37,7 +37,7 @@ const Sales_Data = ({ sales_org_list, dist_channel_list }) => {
   return (
     <React.Fragment>
       {/* + Section 1 */}
-      <div className="rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6 dark:border-gray-800 dark:bg-gray-900 whitespace-nowrap">
+      <div className="rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6 whitespace-nowrap">
         <h1 className="mb-5 font-semibold text-sky-700">
           Sales Organization Extension
         </h1>
@@ -94,7 +94,7 @@ const Sales_Data = ({ sales_org_list, dist_channel_list }) => {
       </div>
       {/* - Section 1 */}
       {/* + Section 2 */}
-      <div className="mt-5 rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6 dark:border-gray-800 dark:bg-gray-900">
+      <div className="mt-5 rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6">
         <h1 className="mb-5 font-semibold text-sky-700">
           General Sales Details
         </h1>
@@ -103,11 +103,7 @@ const Sales_Data = ({ sales_org_list, dist_channel_list }) => {
             <Text_Field label="Item Group" type={"text"} disabled />
           </div>
           <div>
-            <Text_Field
-              label="Gen. Item Group Category"
-              type={"text"}
-              disabled
-            />
+            <Text_Field label="Item Group Category" type={"text"} disabled />
           </div>
           <div>
             <Text_Field label="Item Division" type={"text"} disabled />
@@ -165,7 +161,7 @@ export default Sales_Data;
 const Item_Group = () => {
   return (
     <React.Fragment>
-      <div className="rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6 dark:border-gray-800 dark:bg-gray-900">
+      <div className="rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6">
         <div className="grid grid-cols-1 gap-5">
           <div>
             <Text_Code_Field
@@ -215,7 +211,7 @@ const Item_Group = () => {
 const Product_Class = () => {
   return (
     <React.Fragment>
-      <div className="rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6 dark:border-gray-800 dark:bg-gray-900">
+      <div className="rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6">
         <div className="grid grid-cols-1 gap-5">
           <div>
             <Text_Code_Field

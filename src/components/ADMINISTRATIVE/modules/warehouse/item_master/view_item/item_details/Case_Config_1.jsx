@@ -8,7 +8,7 @@ const Case_Config_1 = () => {
     <React.Fragment>
       <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
         {/* + Section 1 */}
-        <div className="rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6 dark:border-gray-800 dark:bg-gray-900">
+        <div className="rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6">
           <h1 className="mb-5 font-semibold text-sky-700">
             Active Case Configurations
           </h1>
@@ -77,7 +77,7 @@ const Case_Config_1 = () => {
         </div>
         {/* - Section 1 */}
         {/* + Section 2 */}
-        <div className="rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6 dark:border-gray-800 dark:bg-gray-900">
+        <div className="rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6">
           <h1 className="mb-5 font-semibold text-sky-700">
             Active Case Codes / Barcodes
           </h1>
@@ -100,7 +100,7 @@ const Case_Config_1 = () => {
       </div>
       <div className="mt-5 grid grid-cols-1 gap-5 md:grid-cols-2">
         {/* + Section 3 */}
-        <div className="rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6 dark:border-gray-800 dark:bg-gray-900">
+        <div className="rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6">
           <h1 className="mb-5 font-semibold text-sky-700">
             Inactive Case Configurations
           </h1>
@@ -169,7 +169,7 @@ const Case_Config_1 = () => {
         </div>
         {/* - Section 3 */}
         {/* + Section 4 */}
-        <div className="rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6 dark:border-gray-800 dark:bg-gray-900">
+        <div className="rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6">
           <h1 className="mb-5 font-semibold text-sky-700">
             Inactive Case Codes / Barcodes
           </h1>
