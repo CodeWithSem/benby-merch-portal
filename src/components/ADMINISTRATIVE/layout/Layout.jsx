@@ -25,6 +25,8 @@ import Customer from "../modules/outbound/customer/Customer";
 import Truck from "../modules/outbound/truck/Truck";
 import Data_Assignment from "../modules/maintenance/data_assignment/Data_Assignment";
 import Vendor from "../modules/inbound/vendor/Vendor";
+import Item from "../modules/maintenance/item/Item";
+import Warehouse_Maint from "../modules/maintenance/warehouse/Warehouse_Maint";
 
 const Layout = () => {
   const [active_item, set_active_item] = useState(() => {
@@ -95,8 +97,12 @@ const Layout = () => {
         return <General_Structure />;
       case "Maintenance-Financial":
         return <Financial />;
+      case "Maintenance-Item":
+        return <Item />;
       case "Maintenance-Vendor":
         return <Vendor_Maint />;
+      case "Maintenance-Warehouse":
+        return <Warehouse_Maint />;
       case "Maintenance-Purchase Order":
         return <Purchase_Order_Maint />;
       case "Maintenance-Data Assignment":

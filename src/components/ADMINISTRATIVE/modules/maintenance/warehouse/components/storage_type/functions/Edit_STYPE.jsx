@@ -194,7 +194,7 @@ const Edit_STYPE = ({
               </li>
               <li className="flex items-center gap-1.5 text-sm text-gray-500">
                 <span>/</span>
-                <span className="text-gray-800">Edit Storage Type</span>
+                <span className="text-gray-800">Edit</span>
               </li>
             </ol>
           </nav>

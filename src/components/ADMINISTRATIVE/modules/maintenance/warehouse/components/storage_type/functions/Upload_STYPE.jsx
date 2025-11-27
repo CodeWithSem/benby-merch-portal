@@ -280,7 +280,7 @@ const Upload_STYPE = ({
               </li>
               <li className="flex items-center gap-1.5 text-sm text-gray-500">
                 <span>/</span>
-                <span className="text-gray-800">Upload Storage Type</span>
+                <span className="text-gray-800">Upload</span>
               </li>
             </ol>
           </nav>

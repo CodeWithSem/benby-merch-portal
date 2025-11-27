@@ -26,7 +26,6 @@ import Plant from "./components/plant/Plant";
 import Storage_Location from "./components/storage_location/Storage_Location";
 import Plant_Status from "./components/plant_status/Plant_Status";
 import Storage_Condition from "./components/storage_condition/Storage_Condition";
-import Storage_Type from "./components/storage_type/Storage_Type";
 import Stock_Type from "./components/stock_type/Stock_Type";
 import UoM from "./components/uom/UoM";
 import Currency from "./components/currency/Currency";
@@ -35,9 +34,7 @@ import City from "./components/city/City";
 import Region from "./components/region/Region";
 import District from "./components/district/District";
 import Country from "./components/country/Country";
-import Item_Group from "./components/item_group/Item_Group";
 import Industry_Type from "./components/industry_type/Industry_Type";
-import Item_Group_Category from "./components/item_group_category/Item_Group_Category";
 
 const General_Structure = () => {
   const [page, set_page] = useState("main");
@@ -56,8 +53,6 @@ const General_Structure = () => {
     { key: "sloc", icon: Archive, title: "Storage Location" },
     { key: "plant_status", icon: HousePlug, title: "Plant Status" },
     { key: "scon", icon: PackageCheck, title: "Storage Condition" },
-    // |---------------> Lilipat sa maintenance > warehouse
-    // { key: "stype", icon: PackageCheck, title: "Storage Type" },
     { key: "stock_type", icon: ChartBarStacked, title: "Stock Type" },
     { key: "uom", icon: Ruler, title: "Unit of Measure (UoM)" },
     { key: "currency", icon: Coins, title: "Currency" },
@@ -66,13 +61,6 @@ const General_Structure = () => {
     { key: "region", icon: MapPin, title: "Region" },
     { key: "district", icon: MapPin, title: "Disctrict" },
     { key: "country", icon: MapPin, title: "Country" },
-    // |---------------> Lilipat sa maintenance > item
-    // { key: "item_group", icon: LayoutList, title: "Item Group" },
-    // {
-    //   key: "item_group_category",
-    //   icon: LayoutList,
-    //   title: "Item Group Category",
-    // },
     { key: "industry_type", icon: List, title: "Industry Type" },
   ];
 
@@ -174,7 +162,6 @@ const General_Structure = () => {
       {page === "sloc" && <Storage_Location set_page={set_page} />}
       {page === "plant_status" && <Plant_Status set_page={set_page} />}
       {page === "scon" && <Storage_Condition set_page={set_page} />}
-      {page === "stype" && <Storage_Type set_page={set_page} />}
       {page === "stock_type" && <Stock_Type set_page={set_page} />}
       {page === "uom" && <UoM set_page={set_page} />}
       {page === "currency" && <Currency set_page={set_page} />}
@@ -183,10 +170,6 @@ const General_Structure = () => {
       {page === "region" && <Region set_page={set_page} />}
       {page === "district" && <District set_page={set_page} />}
       {page === "country" && <Country set_page={set_page} />}
-      {page === "item_group" && <Item_Group set_page={set_page} />}
-      {page === "item_group_category" && (
-        <Item_Group_Category set_page={set_page} />
-      )}
       {page === "industry_type" && <Industry_Type set_page={set_page} />}
       {/* - Pages */}
     </React.Fragment>

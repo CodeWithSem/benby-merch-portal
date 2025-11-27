@@ -90,15 +90,6 @@ const Company = ({ set_page }) => {
   ];
 
   const [company_list, set_company_list] = useState([]);
-  // ======================================================
-  //   id: 1,
-  //   company_code: "COM-001",
-  //   company_desc: "Company Description 1",
-  //   created_by: "Admin",
-  //   creation_date: "MM-DD-YYYY",
-  //   change_by: "",
-  //   change_date: "",
-  // ======================================================
 
   const handle_get_company_list = async () => {
     set_loading_list(true);

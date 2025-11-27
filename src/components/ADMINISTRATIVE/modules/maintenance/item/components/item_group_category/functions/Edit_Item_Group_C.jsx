@@ -183,7 +183,7 @@ const Edit_Item_Group_C = ({
               >
                 <span>/</span>
                 <a className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-sky-500 cursor-pointer">
-                  General Structure
+                  Item
                 </a>
               </li>
               <li
@@ -197,7 +197,7 @@ const Edit_Item_Group_C = ({
               </li>
               <li className="flex items-center gap-1.5 text-sm text-gray-500">
                 <span>/</span>
-                <span className="text-gray-800">Edit Item Group Category</span>
+                <span className="text-gray-800">Edit</span>
               </li>
             </ol>
           </nav>
