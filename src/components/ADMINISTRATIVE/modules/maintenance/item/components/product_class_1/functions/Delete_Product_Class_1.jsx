@@ -4,7 +4,7 @@
 // Title Name: Product Class 1
 
 import React, { useState } from "react";
-import { api_delete_product_class_1 } from "api/firestore_db/tbl_product_class_1_api";
+import { api_delete_product_class_1 } from "api/firestore_db/maintenance/item/tbl_product_class_1_api";
 import { format_date_1, get_date_now } from "assets/scripts/format";
 import { CheckCircle2, CircleX, X } from "lucide-react";
 import Text_Field from "assets/elements/Text_Field";

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { api_create_plant_status } from "api/firestore_db/tbl_plant_status_api";
+import { api_create_plant_status } from "api/firestore_db/maintenance/general_structure/tbl_plant_status_api";
 import {
   console_log,
   format_date_1,
@@ -190,7 +190,7 @@ const Create_PL_Status = ({
               </li>
               <li className="flex items-center gap-1.5 text-sm text-gray-500">
                 <span>/</span>
-                <span className="text-gray-800">Create New Plant Status</span>
+                <span className="text-gray-800">Create</span>
               </li>
             </ol>
           </nav>

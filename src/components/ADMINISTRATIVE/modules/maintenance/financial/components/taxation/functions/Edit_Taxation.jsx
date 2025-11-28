@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { api_update_taxation } from "api/firestore_db/tbl_taxation_api";
+import { api_update_taxation } from "api/firestore_db/maintenance/financial/tbl_taxation_api";
 import {
   console_log,
   format_date_1,
@@ -197,7 +197,7 @@ const Edit_Taxation = ({
               </li>
               <li className="flex items-center gap-1.5 text-sm text-gray-500">
                 <span>/</span>
-                <span className="text-gray-800">Edit Taxation</span>
+                <span className="text-gray-800">Edit</span>
               </li>
             </ol>
           </nav>

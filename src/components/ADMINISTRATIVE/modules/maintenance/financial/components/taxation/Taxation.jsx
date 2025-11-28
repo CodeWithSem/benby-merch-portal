@@ -5,7 +5,7 @@ import { Get_TBL_INCREMENTAL_ID } from "api/real_time_db/incremental";
 import {
   api_get_taxation_list,
   api_truncate_taxation,
-} from "api/firestore_db/tbl_taxation_api";
+} from "api/firestore_db/maintenance/financial/tbl_taxation_api";
 import {
   Search,
   ChevronDown,

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { api_bulk_upload_item_group_category } from "api/firestore_db/tbl_item_group_category_api";
+import { api_bulk_upload_item_group_category } from "api/firestore_db/maintenance/item/tbl_item_group_category_api";
 import { handle_excel_upload_generic } from "assets/scripts/functions/upload_excel";
 import { format_date_1, get_date_now } from "assets/scripts/format";
 import {

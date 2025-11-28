@@ -13,7 +13,7 @@ import { Use_App } from "context/app_context";
 import {
   api_get_product_class_2_list,
   api_truncate_product_class_2,
-} from "api/firestore_db/tbl_product_class_2_api";
+} from "api/firestore_db/maintenance/item/tbl_product_class_2_api";
 import { Get_TBL_INCREMENTAL_ID } from "api/real_time_db/incremental";
 import {
   Search,

@@ -1,31 +1,28 @@
 import React, { useState } from "react";
-import {
-  Archive,
-  Building2,
-  ChartBarStacked,
-  Coins,
-  Component,
-  Factory,
-  HousePlug,
-  Languages,
-  LayoutList,
-  List,
-  MapPin,
-  PackageCheck,
-  Ruler,
-  Search,
-  Users,
-  Warehouse,
-} from "lucide-react";
+import { Archive, Search, Warehouse } from "lucide-react";
 import Icon_Field from "assets/elements/Icon_Field";
+import Warehouse_Sub from "./components/warehouse/Warehouse";
 import Storage_Type from "./components/storage_type/Storage_Type";
+import Storage_Unit_Type from "./components/storage_unit_type/Storage_Unit_Type";
+import Storage_Section from "./components/storage_section/Storage_Section";
+import Storage_Section_Ind from "./components/storage_section_ind/Storage_Section_Ind";
+import Storage_Bin_Type from "./components/storage_bin_type/Storage_Bin_Type";
+import Storage_Bin_Type_Ind from "./components/storage_bin_type_ind/Storage_Bin_Type_Ind";
+import Picking_Area from "./components/picking_area/Picking_Area";
 
 const Warehouse_Maint = () => {
   const [page, set_page] = useState("main");
   const [search_query, set_search_query] = useState("");
 
   const structure_list = [
-    { key: "stype", icon: PackageCheck, title: "Storage Type" },
+    { key: "warehouse", icon: Warehouse, title: "Warehouse" },
+    { key: "stype", icon: Archive, title: "Storage Type" },
+    { key: "sutype", icon: Archive, title: "Storage Unit Type" },
+    { key: "ssec", icon: Archive, title: "Storage Section" },
+    { key: "ssec_ind", icon: Archive, title: "Storage Section Indicator" },
+    { key: "sbtype", icon: Archive, title: "Storage Bin Type" },
+    { key: "sbtype_ind", icon: Archive, title: "Storage Bin Type Indicator" },
+    { key: "pick_area", icon: Archive, title: "Picking Area" },
   ];
 
   const filtered_list = structure_list.filter((item) => {
@@ -118,7 +115,14 @@ const Warehouse_Maint = () => {
         </React.Fragment>
       )}
       {/* + Pages */}
+      {page === "warehouse" && <Warehouse_Sub set_page={set_page} />}
       {page === "stype" && <Storage_Type set_page={set_page} />}
+      {page === "sutype" && <Storage_Unit_Type set_page={set_page} />}
+      {page === "ssec" && <Storage_Section set_page={set_page} />}
+      {page === "ssec_ind" && <Storage_Section_Ind set_page={set_page} />}
+      {page === "sbtype" && <Storage_Bin_Type set_page={set_page} />}
+      {page === "sbtype_ind" && <Storage_Bin_Type_Ind set_page={set_page} />}
+      {page === "pick_area" && <Picking_Area set_page={set_page} />}
       {/* - Pages */}
     </React.Fragment>
   );

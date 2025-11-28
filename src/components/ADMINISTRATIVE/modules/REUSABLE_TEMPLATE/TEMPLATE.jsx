@@ -2,9 +2,9 @@
 // Function Name: FUNCTION_NAME
 // Data Name: data_name
 // Column Name: COLUMN_NAME
-// Table Name: TBL_NAME
 // Title Name: TITLE_NAME
 // Sub-module Name: SUB_MODULE_NAME
+// Table Name: TBL_NAME
 // Default Code: DEFAULT_CODE
 
 import React, { useEffect, useState } from "react";

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { api_update_payment_method } from "api/firestore_db/tbl_payment_method_api";
+import { api_update_payment_method } from "api/firestore_db/maintenance/financial/tbl_payment_method_api";
 import {
   console_log,
   format_date_1,
@@ -197,7 +197,7 @@ const Edit_P_Term = ({
               </li>
               <li className="flex items-center gap-1.5 text-sm text-gray-500">
                 <span>/</span>
-                <span className="text-gray-800">Edit Payment Method</span>
+                <span className="text-gray-800">Edit</span>
               </li>
             </ol>
           </nav>

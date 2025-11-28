@@ -5,7 +5,7 @@ import { Get_TBL_INCREMENTAL_ID } from "api/real_time_db/incremental";
 import {
   api_get_exchange_rate_list,
   api_truncate_exchange_rate,
-} from "api/firestore_db/tbl_exchange_rate_api";
+} from "api/firestore_db/maintenance/financial/tbl_exchange_rate_api";
 import {
   Search,
   ChevronDown,

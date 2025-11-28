@@ -4,7 +4,7 @@
 // Title Name: Item Group 4
 
 import React, { useState } from "react";
-import { api_delete_item_group_4 } from "api/firestore_db/tbl_item_group_4_api";
+import { api_delete_item_group_4 } from "api/firestore_db/maintenance/item/tbl_item_group_4_api";
 import { format_date_1, get_date_now } from "assets/scripts/format";
 import { CheckCircle2, CircleX, X } from "lucide-react";
 import Text_Field from "assets/elements/Text_Field";

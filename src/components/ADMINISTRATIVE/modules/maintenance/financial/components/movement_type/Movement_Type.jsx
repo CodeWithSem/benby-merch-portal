@@ -5,7 +5,7 @@ import { Get_TBL_INCREMENTAL_ID } from "api/real_time_db/incremental";
 import {
   api_get_movement_type_list,
   api_truncate_movement_type,
-} from "api/firestore_db/tbl_movement_type_api";
+} from "api/firestore_db/maintenance/financial/tbl_movement_type_api";
 import {
   Search,
   ChevronDown,

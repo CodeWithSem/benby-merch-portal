@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { api_bulk_upload_scon } from "api/firestore_db/tbl_scon_api";
+import { api_bulk_upload_scon } from "api/firestore_db/maintenance/general_structure/tbl_scon_api";
 import { handle_excel_upload_generic } from "assets/scripts/functions/upload_excel";
 import { format_date_1, get_date_now } from "assets/scripts/format";
 import {
@@ -276,7 +276,7 @@ const Upload_SCON = ({ handle_go_back, handle_get_scon_list, show_toast }) => {
               </li>
               <li className="flex items-center gap-1.5 text-sm text-gray-500">
                 <span>/</span>
-                <span className="text-gray-800">Upload Storage Condition</span>
+                <span className="text-gray-800">Upload</span>
               </li>
             </ol>
           </nav>

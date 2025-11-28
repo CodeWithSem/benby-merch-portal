@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { api_update_sloc } from "api/firestore_db/tbl_sloc_api";
+import { api_update_sloc } from "api/firestore_db/maintenance/general_structure/tbl_sloc_api";
 import {
   console_log,
   format_date_1,
@@ -194,7 +194,7 @@ const Edit_SLOC = ({
               </li>
               <li className="flex items-center gap-1.5 text-sm text-gray-500">
                 <span>/</span>
-                <span className="text-gray-800">Edit Storage Location</span>
+                <span className="text-gray-800">Edit</span>
               </li>
             </ol>
           </nav>

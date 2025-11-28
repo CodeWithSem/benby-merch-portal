@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { api_create_country } from "api/firestore_db/tbl_country_api";
+import { api_create_country } from "api/firestore_db/maintenance/general_structure/tbl_country_api";
 import {
   console_log,
   format_date_1,
@@ -197,7 +197,7 @@ const Create_Country = ({
               </li>
               <li className="flex items-center gap-1.5 text-sm text-gray-500">
                 <span>/</span>
-                <span className="text-gray-800">Create New Country</span>
+                <span className="text-gray-800">Create</span>
               </li>
             </ol>
           </nav>

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { api_create_source_hub } from "api/firestore_db/tbl_source_hub_api";
+import { api_create_source_hub } from "api/firestore_db/maintenance/vendor/tbl_source_hub_api";
 import {
   console_log,
   format_date_1,
@@ -176,7 +176,7 @@ const Create_Source_Hub = ({
               >
                 <span>/</span>
                 <a className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-sky-500 cursor-pointer">
-                  General Structure
+                  Vendor
                 </a>
               </li>
               <li
@@ -190,7 +190,7 @@ const Create_Source_Hub = ({
               </li>
               <li className="flex items-center gap-1.5 text-sm text-gray-500">
                 <span>/</span>
-                <span className="text-gray-800">Create New Source Hub</span>
+                <span className="text-gray-800">Create</span>
               </li>
             </ol>
           </nav>

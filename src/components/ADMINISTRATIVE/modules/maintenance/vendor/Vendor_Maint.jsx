@@ -1,16 +1,16 @@
 import Icon_Field from "assets/elements/Icon_Field";
 import { BanknoteArrowUp, BookText, ContactRound, Search } from "lucide-react";
 import React, { useState } from "react";
-import Vendor from "./components/vendor/Vendor";
 import Incoterms from "./components/incoterms/Incoterms";
 import Source_Hub from "./components/source_hub/Source_Hub";
+import Vendor_Class from "./components/vendor_class/Vendor_Class";
 
 const Vendor_Maint = () => {
   const [page, set_page] = useState("main");
   const [search_query, set_search_query] = useState("");
 
   const structure_list = [
-    // { key: "vendor", icon: ContactRound, title: "Vendor" },
+    { key: "vendor_class", icon: ContactRound, title: "Vendor Class" },
     { key: "incoterms", icon: BanknoteArrowUp, title: "Incoterms" },
     { key: "source_hub", icon: BookText, title: "Source Hub" },
   ];
@@ -107,11 +107,12 @@ const Vendor_Maint = () => {
           </div>
         </React.Fragment>
       )}
-      {page === "vendor" && <Vendor set_page={set_page} />}
+      {page === "vendor_class" && <Vendor_Class set_page={set_page} />}
       {page === "incoterms" && <Incoterms set_page={set_page} />}
       {page === "source_hub" && <Source_Hub set_page={set_page} />}
     </React.Fragment>
   );
+  sda;
 };
 
 export default Vendor_Maint;

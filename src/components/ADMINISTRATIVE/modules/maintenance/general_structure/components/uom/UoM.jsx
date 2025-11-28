@@ -5,7 +5,7 @@ import { Get_TBL_INCREMENTAL_ID } from "api/real_time_db/incremental";
 import {
   api_get_uom_list,
   api_truncate_uom,
-} from "api/firestore_db/tbl_uom_api";
+} from "api/firestore_db/maintenance/general_structure/tbl_uom_api";
 import {
   Search,
   ChevronDown,

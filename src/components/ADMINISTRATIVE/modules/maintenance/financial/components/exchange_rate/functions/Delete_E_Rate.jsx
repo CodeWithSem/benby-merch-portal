@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { api_delete_exchange_rate } from "api/firestore_db/tbl_exchange_rate_api";
+import { api_delete_exchange_rate } from "api/firestore_db/maintenance/financial/tbl_exchange_rate_api";
 import { format_date_1, get_date_now } from "assets/scripts/format";
 import { CheckCircle2, CircleX, X } from "lucide-react";
 import Text_Field from "assets/elements/Text_Field";

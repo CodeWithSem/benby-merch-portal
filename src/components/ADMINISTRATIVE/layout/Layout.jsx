@@ -27,6 +27,9 @@ import Data_Assignment from "../modules/maintenance/data_assignment/Data_Assignm
 import Vendor from "../modules/inbound/vendor/Vendor";
 import Item from "../modules/maintenance/item/Item";
 import Warehouse_Maint from "../modules/maintenance/warehouse/Warehouse_Maint";
+import Distribution from "../modules/maintenance/distribution/Distribution";
+import Customer_Maint from "../modules/maintenance/customer/Customer_Maint";
+import Sales_Order_Maint from "../modules/maintenance/sales_order/Sales_Order_Maint";
 
 const Layout = () => {
   const [active_item, set_active_item] = useState(() => {
@@ -99,12 +102,18 @@ const Layout = () => {
         return <Financial />;
       case "Maintenance-Item":
         return <Item />;
+      case "Maintenance-Distribution":
+        return <Distribution />;
       case "Maintenance-Vendor":
         return <Vendor_Maint />;
+      case "Maintenance-Customer":
+        return <Customer_Maint />;
       case "Maintenance-Warehouse":
         return <Warehouse_Maint />;
       case "Maintenance-Purchase Order":
         return <Purchase_Order_Maint />;
+      case "Maintenance-Sales Order":
+        return <Sales_Order_Maint />;
       case "Maintenance-Data Assignment":
         return <Data_Assignment />;
       case "Templates-Form Elements":

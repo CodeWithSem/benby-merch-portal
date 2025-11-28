@@ -5,7 +5,7 @@ import { Get_TBL_INCREMENTAL_ID } from "api/real_time_db/incremental";
 import {
   api_get_plant_status_list,
   api_truncate_plant_status,
-} from "api/firestore_db/tbl_plant_status_api";
+} from "api/firestore_db/maintenance/general_structure/tbl_plant_status_api";
 import {
   Search,
   ChevronDown,

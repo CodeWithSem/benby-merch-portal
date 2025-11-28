@@ -4,7 +4,7 @@ import { Use_App } from "context/app_context";
 import {
   api_get_company_list,
   api_truncate_company,
-} from "api/firestore_db/tbl_company_api";
+} from "api/firestore_db/maintenance/general_structure/tbl_company_api";
 import { Get_TBL_INCREMENTAL_ID } from "api/real_time_db/incremental";
 import {
   Search,

@@ -5,7 +5,7 @@ import { Get_TBL_INCREMENTAL_ID } from "api/real_time_db/incremental";
 import {
   api_get_purc_org_list,
   api_truncate_purc_org,
-} from "api/firestore_db/tbl_purc_org_api";
+} from "api/firestore_db/maintenance/general_structure/tbl_purc_org_api";
 import {
   Search,
   ChevronDown,

@@ -1,14 +1,8 @@
 import Icon_Field from "assets/elements/Icon_Field";
-import {
-  BanknoteArrowUp,
-  BookText,
-  ContactRound,
-  Link,
-  Search,
-  ShoppingCart,
-} from "lucide-react";
+import { NotebookPen, Search, ShoppingCart } from "lucide-react";
 import React, { useState } from "react";
 import PO_Type from "./components/po_type/PO_Type";
+import PO_Unserved_Reason from "./components/po_unserved_reason/PO_Unserved_Reason";
 
 const Purchase_Order_Maint = () => {
   const [page, set_page] = useState("main");
@@ -16,6 +10,7 @@ const Purchase_Order_Maint = () => {
 
   const structure_list = [
     { key: "po_type", icon: ShoppingCart, title: "Purchase Order Type" },
+    { key: "po_uns_reason", icon: NotebookPen, title: "PO Unserved Reason" },
   ];
 
   // ✅ Filter based on search query
@@ -110,7 +105,10 @@ const Purchase_Order_Maint = () => {
           </div>
         </React.Fragment>
       )}
+      {/* + Pages */}
       {page === "po_type" && <PO_Type set_page={set_page} />}
+      {page === "po_uns_reason" && <PO_Unserved_Reason set_page={set_page} />}
+      {/* - Pages */}
     </React.Fragment>
   );
 };

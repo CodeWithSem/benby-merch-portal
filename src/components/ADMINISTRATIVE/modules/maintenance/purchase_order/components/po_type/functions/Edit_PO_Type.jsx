@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { api_update_po_type } from "api/firestore_db/tbl_po_type_api";
+import { api_update_po_type } from "api/firestore_db/maintenance/purchase_order/tbl_po_type_api";
 import {
   console_log,
   format_date_1,
@@ -183,7 +183,7 @@ const Edit_PO_Type = ({
               >
                 <span>/</span>
                 <a className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-sky-500 cursor-pointer">
-                  General Structure
+                  Purchase Order
                 </a>
               </li>
               <li
@@ -197,7 +197,7 @@ const Edit_PO_Type = ({
               </li>
               <li className="flex items-center gap-1.5 text-sm text-gray-500">
                 <span>/</span>
-                <span className="text-gray-800">Edit Purchase Order Type</span>
+                <span className="text-gray-800">Edit</span>
               </li>
             </ol>
           </nav>

@@ -5,7 +5,7 @@ import { Get_TBL_INCREMENTAL_ID } from "api/real_time_db/incremental";
 import {
   api_get_inv_acc_center_list,
   api_truncate_inv_acc_center,
-} from "api/firestore_db/tbl_inv_acc_center_api";
+} from "api/firestore_db/maintenance/financial/tbl_inv_acc_center_api";
 import {
   Search,
   ChevronDown,

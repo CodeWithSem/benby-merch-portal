@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { api_bulk_upload_business_area } from "api/firestore_db/tbl_business_area_api";
+import { api_bulk_upload_business_area } from "api/firestore_db/maintenance/financial/tbl_business_area_api";
 import { handle_excel_upload_generic } from "assets/scripts/functions/upload_excel";
 import { format_date_1, get_date_now } from "assets/scripts/format";
 import {
@@ -285,7 +285,7 @@ const Upload_B_Area = ({
               </li>
               <li className="flex items-center gap-1.5 text-sm text-gray-500">
                 <span>/</span>
-                <span className="text-gray-800">Upload Business Area</span>
+                <span className="text-gray-800">Upload</span>
               </li>
             </ol>
           </nav>

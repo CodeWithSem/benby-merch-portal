@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { api_create_plant_hierarchy } from "api/firestore_db/tbl_plant_hierarchy_api";
+import { api_create_plant_hierarchy } from "api/firestore_db/maintenance/data_assignment/tbl_plant_hierarchy_api";
 import { get_description } from "assets/scripts/functions/get_description";
 import {
   console_log,
@@ -189,9 +189,7 @@ const Create_Plant_H = ({
               </li>
               <li className="flex items-center gap-1.5 text-sm text-gray-500">
                 <span>/</span>
-                <span className="text-gray-800">
-                  Create New Plant Hierarchy
-                </span>
+                <span className="text-gray-800">Create</span>
               </li>
             </ol>
           </nav>

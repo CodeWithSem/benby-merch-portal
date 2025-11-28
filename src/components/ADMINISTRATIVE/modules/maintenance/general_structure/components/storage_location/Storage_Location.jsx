@@ -5,7 +5,7 @@ import { Get_TBL_INCREMENTAL_ID } from "api/real_time_db/incremental";
 import {
   api_get_sloc_list,
   api_truncate_sloc,
-} from "api/firestore_db/tbl_sloc_api";
+} from "api/firestore_db/maintenance/general_structure/tbl_sloc_api";
 import {
   Search,
   ChevronDown,

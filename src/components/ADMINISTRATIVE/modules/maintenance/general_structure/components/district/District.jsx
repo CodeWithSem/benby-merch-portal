@@ -5,7 +5,7 @@ import { Get_TBL_INCREMENTAL_ID } from "api/real_time_db/incremental";
 import {
   api_get_district_list,
   api_truncate_district,
-} from "api/firestore_db/tbl_district_api";
+} from "api/firestore_db/maintenance/general_structure/tbl_district_api";
 import {
   Search,
   ChevronDown,

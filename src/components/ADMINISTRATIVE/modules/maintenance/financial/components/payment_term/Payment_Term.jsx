@@ -5,7 +5,7 @@ import { Get_TBL_INCREMENTAL_ID } from "api/real_time_db/incremental";
 import {
   api_get_payment_term_list,
   api_truncate_payment_term,
-} from "api/firestore_db/tbl_payment_term_api";
+} from "api/firestore_db/maintenance/financial/tbl_payment_term_api";
 import {
   Search,
   ChevronDown,

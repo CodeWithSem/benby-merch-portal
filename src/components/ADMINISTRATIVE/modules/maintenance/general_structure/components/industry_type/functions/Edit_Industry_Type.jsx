@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { api_update_industry_type } from "api/firestore_db/tbl_industry_type_api";
+import { api_update_industry_type } from "api/firestore_db/maintenance/general_structure/tbl_industry_type_api";
 import {
   console_log,
   format_date_1,
@@ -197,7 +197,7 @@ const Edit_Industry_Type = ({
               </li>
               <li className="flex items-center gap-1.5 text-sm text-gray-500">
                 <span>/</span>
-                <span className="text-gray-800">Edit Industry Type</span>
+                <span className="text-gray-800">Edit</span>
               </li>
             </ol>
           </nav>

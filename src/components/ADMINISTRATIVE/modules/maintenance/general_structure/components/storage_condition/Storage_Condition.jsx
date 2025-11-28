@@ -5,7 +5,7 @@ import { Get_TBL_INCREMENTAL_ID } from "api/real_time_db/incremental";
 import {
   api_get_scon_list,
   api_truncate_scon,
-} from "api/firestore_db/tbl_scon_api";
+} from "api/firestore_db/maintenance/general_structure/tbl_scon_api";
 import {
   Search,
   ChevronDown,

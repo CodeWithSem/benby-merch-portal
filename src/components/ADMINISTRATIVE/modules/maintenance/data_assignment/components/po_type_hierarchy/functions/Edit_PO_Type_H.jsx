@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { api_update_po_type_hierarchy } from "api/firestore_db/tbl_po_type_hierarchy_api";
+import { api_update_po_type_hierarchy } from "api/firestore_db/maintenance/data_assignment/tbl_po_type_hierarchy_api";
 import { get_description } from "assets/scripts/functions/get_description";
 import {
   console_log,
@@ -209,7 +209,7 @@ const Edit_PO_Type_H = ({
               </li>
               <li className="flex items-center gap-1.5 text-sm text-gray-500">
                 <span>/</span>
-                <span className="text-gray-800">Edit PO Type Hierarchy</span>
+                <span className="text-gray-800">Edit</span>
               </li>
             </ol>
           </nav>

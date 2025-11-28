@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { api_delete_company } from "api/firestore_db/tbl_company_api";
+import { api_delete_company } from "api/firestore_db/maintenance/general_structure/tbl_company_api";
 import { format_date_1, get_date_now } from "assets/scripts/format";
 import { CheckCircle2, CircleX, X } from "lucide-react";
 import Text_Field from "assets/elements/Text_Field";

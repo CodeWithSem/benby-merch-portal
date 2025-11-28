@@ -5,7 +5,7 @@
 // Sub-module Name: Item
 
 import React, { useState, useEffect } from "react";
-import { api_bulk_upload_product_class_5 } from "api/firestore_db/tbl_product_class_5_api";
+import { api_bulk_upload_product_class_5 } from "api/firestore_db/maintenance/item/tbl_product_class_5_api";
 import { handle_excel_upload_generic } from "assets/scripts/functions/upload_excel";
 import { format_date_1, get_date_now } from "assets/scripts/format";
 import {

@@ -5,7 +5,7 @@ import { Get_TBL_INCREMENTAL_ID } from "api/real_time_db/incremental";
 import {
   api_get_source_hub_list,
   api_truncate_source_hub,
-} from "api/firestore_db/tbl_source_hub_api";
+} from "api/firestore_db/maintenance/vendor/tbl_source_hub_api";
 import {
   Search,
   ChevronDown,
@@ -291,7 +291,7 @@ const Source_Hub = ({ set_page }) => {
                   >
                     <span>/</span>
                     <a className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-sky-500 cursor-pointer">
-                      General Structure
+                      Vendor
                     </a>
                   </li>
                   <li className="flex items-center gap-1.5 text-sm text-gray-500">

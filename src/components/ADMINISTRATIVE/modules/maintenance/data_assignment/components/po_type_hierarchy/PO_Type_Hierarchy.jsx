@@ -4,10 +4,10 @@ import { Use_App } from "context/app_context";
 import {
   api_get_po_type_hierarchy_list,
   api_truncate_po_type_hierarchy,
-} from "api/firestore_db/tbl_po_type_hierarchy_api";
+} from "api/firestore_db/maintenance/data_assignment/tbl_po_type_hierarchy_api";
 import { Get_TBL_INCREMENTAL_ID } from "api/real_time_db/incremental";
-import { api_get_po_type_list } from "api/firestore_db/tbl_po_type_api";
-import { api_get_company_hierarchy_list } from "api/firestore_db/tbl_company_hierarchy_api";
+import { api_get_po_type_list } from "api/firestore_db/maintenance/purchase_order/tbl_po_type_api";
+import { api_get_company_hierarchy_list } from "api/firestore_db/maintenance/data_assignment/tbl_company_hierarchy_api";
 import { get_description } from "assets/scripts/functions/get_description";
 import {
   Search,
@@ -35,9 +35,9 @@ import Create_PO_Type_H from "./functions/Create_PO_Type_H";
 import Edit_PO_Type_H from "./functions/Edit_PO_Type_H";
 import Delete_PO_Type_H from "./functions/Delete_PO_Type_H";
 import Upload_PO_Type_H from "./functions/Upload_PO_Type_H";
-import { api_get_company_list } from "api/firestore_db/tbl_company_api";
-import { api_get_purc_org_list } from "api/firestore_db/tbl_purc_org_api";
-import { api_get_purc_group_list } from "api/firestore_db/tbl_purc_group_api";
+import { api_get_company_list } from "api/firestore_db/maintenance/general_structure/tbl_company_api";
+import { api_get_purc_org_list } from "api/firestore_db/maintenance/general_structure/tbl_purc_org_api";
+import { api_get_purc_group_list } from "api/firestore_db/maintenance/general_structure/tbl_purc_group_api";
 
 const HAS_FILTER = true;
 

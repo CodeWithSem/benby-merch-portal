@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { api_update_incoterms } from "api/firestore_db/tbl_incoterms_api";
+import { api_update_incoterms } from "api/firestore_db/maintenance/vendor/tbl_incoterms_api";
 import {
   console_log,
   format_date_1,
@@ -183,7 +183,7 @@ const Edit_Incoterms = ({
               >
                 <span>/</span>
                 <a className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-sky-500 cursor-pointer">
-                  General Structure
+                  Vendor
                 </a>
               </li>
               <li
@@ -197,7 +197,7 @@ const Edit_Incoterms = ({
               </li>
               <li className="flex items-center gap-1.5 text-sm text-gray-500">
                 <span>/</span>
-                <span className="text-gray-800">Edit Incoterms</span>
+                <span className="text-gray-800">Edit</span>
               </li>
             </ol>
           </nav>

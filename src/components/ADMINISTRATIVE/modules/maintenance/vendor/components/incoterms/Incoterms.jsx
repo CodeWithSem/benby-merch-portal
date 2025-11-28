@@ -4,7 +4,7 @@ import { Use_App } from "context/app_context";
 import {
   api_get_incoterms_list,
   api_truncate_incoterms,
-} from "api/firestore_db/tbl_incoterms_api";
+} from "api/firestore_db/maintenance/vendor/tbl_incoterms_api";
 import { Get_TBL_INCREMENTAL_ID } from "api/real_time_db/incremental";
 import {
   Search,
@@ -290,7 +290,7 @@ const Incoterms = ({ set_page }) => {
                   >
                     <span>/</span>
                     <a className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-sky-500 cursor-pointer">
-                      General Structure
+                      Vendor
                     </a>
                   </li>
                   <li className="flex items-center gap-1.5 text-sm text-gray-500">

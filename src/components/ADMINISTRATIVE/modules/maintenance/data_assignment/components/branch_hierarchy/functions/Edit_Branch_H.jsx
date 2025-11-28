@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { api_update_branch_hierarchy } from "api/firestore_db/tbl_branch_hierarchy_api";
+import { api_update_branch_hierarchy } from "api/firestore_db/maintenance/data_assignment/tbl_branch_hierarchy_api";
 import { get_description } from "assets/scripts/functions/get_description";
 import {
   console_log,
@@ -196,7 +196,7 @@ const Edit_Branch_H = ({
               </li>
               <li className="flex items-center gap-1.5 text-sm text-gray-500">
                 <span>/</span>
-                <span className="text-gray-800">Edit Branch Hierarchy</span>
+                <span className="text-gray-800">Edit</span>
               </li>
             </ol>
           </nav>

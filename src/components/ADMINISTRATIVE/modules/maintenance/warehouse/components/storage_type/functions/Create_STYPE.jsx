@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { api_create_stype } from "api/firestore_db/tbl_stype_api";
+import { api_create_stype } from "api/firestore_db/maintenance/warehouse/tbl_stype_api";
 import {
   console_log,
   format_date_1,
@@ -173,7 +173,7 @@ const Create_STYPE = ({
               >
                 <span>/</span>
                 <a className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-sky-500 cursor-pointer">
-                  General Structure
+                  Warehouse
                 </a>
               </li>
               <li

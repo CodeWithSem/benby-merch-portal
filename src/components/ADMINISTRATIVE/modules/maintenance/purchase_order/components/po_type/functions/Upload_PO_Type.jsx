@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { api_bulk_upload_po_type } from "api/firestore_db/tbl_po_type_api";
+import { api_bulk_upload_po_type } from "api/firestore_db/maintenance/purchase_order/tbl_po_type_api";
 import { handle_excel_upload_generic } from "assets/scripts/functions/upload_excel";
 import { format_date_1, get_date_now } from "assets/scripts/format";
 import {
@@ -265,7 +265,7 @@ const Upload_PO_Type = ({
               >
                 <span>/</span>
                 <a className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-sky-500 cursor-pointer">
-                  General Structure
+                  Purchase Order
                 </a>
               </li>
               <li
@@ -279,9 +279,7 @@ const Upload_PO_Type = ({
               </li>
               <li className="flex items-center gap-1.5 text-sm text-gray-500">
                 <span>/</span>
-                <span className="text-gray-800">
-                  Upload Purchase Order Type
-                </span>
+                <span className="text-gray-800">Upload</span>
               </li>
             </ol>
           </nav>

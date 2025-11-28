@@ -5,7 +5,7 @@ import { Get_TBL_INCREMENTAL_ID } from "api/real_time_db/incremental";
 import {
   api_get_po_type_list,
   api_truncate_po_type,
-} from "api/firestore_db/tbl_po_type_api";
+} from "api/firestore_db/maintenance/purchase_order/tbl_po_type_api";
 import {
   Search,
   ChevronDown,
@@ -291,7 +291,7 @@ const PO_Type = ({ set_page }) => {
                   >
                     <span>/</span>
                     <a className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-sky-500 cursor-pointer">
-                      General Structure
+                      Purchase Order
                     </a>
                   </li>
                   <li className="flex items-center gap-1.5 text-sm text-gray-500">

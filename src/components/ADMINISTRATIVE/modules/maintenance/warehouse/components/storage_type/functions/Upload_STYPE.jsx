@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { api_bulk_upload_stype } from "api/firestore_db/tbl_stype_api";
+import { api_bulk_upload_stype } from "api/firestore_db/maintenance/warehouse/tbl_stype_api";
 import { handle_excel_upload_generic } from "assets/scripts/functions/upload_excel";
 import { format_date_1, get_date_now } from "assets/scripts/format";
 import {
@@ -266,7 +266,7 @@ const Upload_STYPE = ({
               >
                 <span>/</span>
                 <a className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-sky-500 cursor-pointer">
-                  General Structure
+                  Warehouse
                 </a>
               </li>
               <li

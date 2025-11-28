@@ -4,10 +4,10 @@ import { Use_App } from "context/app_context";
 import {
   api_get_plant_hierarchy_list,
   api_truncate_plant_hierarchy,
-} from "api/firestore_db/tbl_plant_hierarchy_api";
+} from "api/firestore_db/maintenance/data_assignment/tbl_plant_hierarchy_api";
 import { Get_TBL_INCREMENTAL_ID } from "api/real_time_db/incremental";
-import { api_get_plant_list } from "api/firestore_db/tbl_plant_api";
-import { api_get_sloc_list } from "api/firestore_db/tbl_sloc_api";
+import { api_get_plant_list } from "api/firestore_db/maintenance/general_structure/tbl_plant_api";
+import { api_get_sloc_list } from "api/firestore_db/maintenance/general_structure/tbl_sloc_api";
 import { get_description } from "assets/scripts/functions/get_description";
 import {
   Search,

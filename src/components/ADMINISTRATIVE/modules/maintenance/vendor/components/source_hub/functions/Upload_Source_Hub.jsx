@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { api_bulk_upload_source_hub } from "api/firestore_db/tbl_source_hub_api";
+import { api_bulk_upload_source_hub } from "api/firestore_db/maintenance/vendor/tbl_source_hub_api";
 import { handle_excel_upload_generic } from "assets/scripts/functions/upload_excel";
 import { format_date_1, get_date_now } from "assets/scripts/format";
 import {
@@ -265,7 +265,7 @@ const Upload_Source_Hub = ({
               >
                 <span>/</span>
                 <a className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-sky-500 cursor-pointer">
-                  General Structure
+                  Vendor
                 </a>
               </li>
               <li
@@ -279,7 +279,7 @@ const Upload_Source_Hub = ({
               </li>
               <li className="flex items-center gap-1.5 text-sm text-gray-500">
                 <span>/</span>
-                <span className="text-gray-800">Upload Source Hub</span>
+                <span className="text-gray-800">Upload</span>
               </li>
             </ol>
           </nav>

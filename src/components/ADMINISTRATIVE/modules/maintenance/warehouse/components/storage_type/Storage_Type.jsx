@@ -5,7 +5,7 @@ import { Get_TBL_INCREMENTAL_ID } from "api/real_time_db/incremental";
 import {
   api_get_stype_list,
   api_truncate_stype,
-} from "api/firestore_db/tbl_stype_api";
+} from "api/firestore_db/maintenance/warehouse/tbl_stype_api";
 import {
   Search,
   ChevronDown,
@@ -291,7 +291,7 @@ const Storage_Type = ({ set_page }) => {
                   >
                     <span>/</span>
                     <a className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-sky-500 cursor-pointer">
-                      General Structure
+                      Warehouse
                     </a>
                   </li>
                   <li className="flex items-center gap-1.5 text-sm text-gray-500">

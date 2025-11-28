@@ -5,7 +5,7 @@
 // Sub-module Name: Item
 
 import React, { useState } from "react";
-import { api_create_item_division } from "api/firestore_db/tbl_item_division_api";
+import { api_create_item_division } from "api/firestore_db/maintenance/item/tbl_item_division_api";
 import {
   console_log,
   format_date_1,
