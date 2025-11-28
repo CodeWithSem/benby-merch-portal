@@ -30,6 +30,7 @@ import Warehouse_Maint from "../modules/maintenance/warehouse/Warehouse_Maint";
 import Distribution from "../modules/maintenance/distribution/Distribution";
 import Customer_Maint from "../modules/maintenance/customer/Customer_Maint";
 import Sales_Order_Maint from "../modules/maintenance/sales_order/Sales_Order_Maint";
+import Pricing_Maint from "../modules/maintenance/pricing/Pricing_Maint";
 
 const Layout = () => {
   const [active_item, set_active_item] = useState(() => {
@@ -114,6 +115,8 @@ const Layout = () => {
         return <Purchase_Order_Maint />;
       case "Maintenance-Sales Order":
         return <Sales_Order_Maint />;
+      case "Maintenance-Pricing":
+        return <Pricing_Maint />;
       case "Maintenance-Data Assignment":
         return <Data_Assignment />;
       case "Templates-Form Elements":

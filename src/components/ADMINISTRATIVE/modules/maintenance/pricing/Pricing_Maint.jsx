@@ -1,48 +1,27 @@
 import Icon_Field from "assets/elements/Icon_Field";
 import {
   BanknoteX,
+  Coins,
   FileText,
+  HandCoins,
   MessageSquareQuote,
   Search,
   ShoppingCart,
 } from "lucide-react";
 import React, { useState } from "react";
-import SO_Type from "./components/so_type/SO_Type";
-import Deliv_Doc_Type from "./components/deliv_doc_type/Deliv_Doc_Type";
-import Bill_Doc_Type from "./components/bill_doc_type/Bill_Doc_Type";
-import Bill_Cancel from "./components/billing_cancellation/Bill_Cancel";
-import Order_Reason from "./components/ordering_reason/Order_Reason";
-import Reject_Reason from "./components/rejection_reason/Reject_Reason";
-import Item_Return_Reason from "./components/item_return_reason/Item_Return_Reason";
 
-const Sales_Order_Maint = () => {
+const Pricing_Maint = () => {
   const [page, set_page] = useState("main");
   const [search_query, set_search_query] = useState("");
 
   const structure_list = [
-    { key: "so_type", icon: ShoppingCart, title: "Sales Order Type" },
+    { key: "price_type", icon: Coins, title: "Pricing Type" },
     {
-      key: "deliv_doc_type",
-      icon: FileText,
-      title: "Delivery Document Type",
+      key: "customer_price_proc",
+      icon: HandCoins,
+      title: "Customer Pricing Procedure",
     },
-    {
-      key: "bill_doc_type",
-      icon: FileText,
-      title: "Billing Document Type",
-    },
-    { key: "bill_cancel", icon: BanknoteX, title: "Billing Cancellation" },
-    { key: "order_reason", icon: MessageSquareQuote, title: "Ordering Reason" },
-    {
-      key: "reject_reason",
-      icon: MessageSquareQuote,
-      title: "Rejection Reason",
-    },
-    {
-      key: "item_return_reason",
-      icon: MessageSquareQuote,
-      title: "Item Return Reason",
-    },
+    { key: "purchase_price", icon: HandCoins, title: "Purchase Pricing" },
   ];
 
   // ✅ Filter based on search query
@@ -138,18 +117,10 @@ const Sales_Order_Maint = () => {
         </React.Fragment>
       )}
       {/* + Pages */}
-      {page === "so_type" && <SO_Type set_page={set_page} />}
-      {page === "deliv_doc_type" && <Deliv_Doc_Type set_page={set_page} />}
-      {page === "bill_doc_type" && <Bill_Doc_Type set_page={set_page} />}
-      {page === "bill_cancel" && <Bill_Cancel set_page={set_page} />}
-      {page === "order_reason" && <Order_Reason set_page={set_page} />}
-      {page === "reject_reason" && <Reject_Reason set_page={set_page} />}
-      {page === "item_return_reason" && (
-        <Item_Return_Reason set_page={set_page} />
-      )}
+      {/* {page === "so_type" && <SO_Type set_page={set_page} />} */}
       {/* - Pages */}
     </React.Fragment>
   );
 };
 
-export default Sales_Order_Maint;
+export default Pricing_Maint;
