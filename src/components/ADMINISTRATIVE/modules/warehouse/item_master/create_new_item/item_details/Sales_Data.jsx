@@ -62,9 +62,8 @@ const Sales_Data = ({ set_display_modal }) => {
           <div>
             <Find_Field
               label="Sales Specific Status"
-              // value={data}
-              // on_change={(e) => handle_data_change(e.target.value)}
-              on_click={() => set_display_modal("select_sd_s_spec_status")}
+              // value={} //--> sd_sales_status_code
+              on_click={() => set_display_modal("select_sd_sales_status")}
               disabled
             />
           </div>
@@ -72,16 +71,16 @@ const Sales_Data = ({ set_display_modal }) => {
             <Date_Field
               label="Validity From"
               placeholder="MM-DD-YYYY"
-              // value={selected_data}
-              on_change={(e) => alert(e.target.value)}
+              // value={} //--> sd_valid_from
+              // on_change={}
             />
           </div>
           <div>
             <Date_Field
               label="Validity To"
               placeholder="MM-DD-YYYY"
-              // value={selected_data}
-              on_change={(e) => alert(e.target.value)}
+              // value={} //--> sd_valid_to
+              // on_change={}
             />
           </div>
           <div>
@@ -89,8 +88,8 @@ const Sales_Data = ({ set_display_modal }) => {
               label="Sales Unit"
               placeholder="Select Option"
               // options={options}
-              // value={selected_data}
-              // on_change={handle_option_change}
+              // value={} //--> sd_sales_uom
+              // on_change={}
             />
           </div>
         </div>

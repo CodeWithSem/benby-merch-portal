@@ -5,6 +5,10 @@ import Company_Hierarchy from "./components/company_hierarchy/Company_Hierarchy"
 import Branch_Hierarchy from "./components/branch_hierarchy/Branch_Hierarchy";
 import Plant_Hierarchy from "./components/plant_hierarchy/Plant_Hierarchy";
 import PO_Type_Hierarchy from "./components/po_type_hierarchy/PO_Type_Hierarchy";
+import Sales_Org_Hierarchy from "./components/sales_org_hierarchy/Sales_Org_Hierarchy";
+import SO_Type_Hierarchy from "./components/so_type_hierarchy/SO_Type_Hierarchy";
+import Bill_Doc_Type_Hierarchy from "./components/bill_doc_type_hierarchy/Bill_Doc_Type_Hierarchy";
+import Deliv_Doc_Type_Hierarchy from "./components/deliv_doc_type_hierarchy/Deliv_Doc_Type_Hierarchy";
 
 const Data_Assignment = () => {
   const [page, set_page] = useState("main");
@@ -17,7 +21,9 @@ const Data_Assignment = () => {
       title: (
         <>
           Company Hierarchy <br />
-          (Company &gt; Organization &gt; Group)
+          <div className="text-[12px]">
+            (Company &gt; Organization &gt; Group)
+          </div>
         </>
       ),
       plain_title: "Company Hierarchy (Company > Organization > Group)",
@@ -28,7 +34,7 @@ const Data_Assignment = () => {
       title: (
         <>
           Branch Hierarchy <br />
-          (Branch &gt; Plant)
+          <div className="text-[12px]">(Branch &gt; Plant)</div>
         </>
       ),
       plain_title: "Branch Hierarchy (Branch > Plant)", // 👈 for searching
@@ -39,7 +45,7 @@ const Data_Assignment = () => {
       title: (
         <>
           Plant Hierarchy <br />
-          (Plant &gt; Storage Location)
+          <div className="text-[12px]">(Plant &gt; Storage Location)</div>
         </>
       ),
       plain_title: "Plant Hierarchy (Plant > Storage Location)", // 👈 for searching
@@ -50,10 +56,59 @@ const Data_Assignment = () => {
       title: (
         <>
           PO Type Hierarchy <br />
-          (Purchase Order Type &gt; Company)
+          <div className="text-[12px]">(Company &gt; PO Type)</div>
         </>
       ),
-      plain_title: "PO Type Hierarchy (Purchase Order Type > Company)",
+      plain_title: "PO Type Hierarchy (Company > PO Type)",
+    },
+    {
+      key: "sales_org_hierarchy",
+      icon: Link,
+      title: (
+        <>
+          Sales Organization Hierarchy <br />
+          <div className="text-[12px]">
+            (Organization &gt; Distribution Channel)
+          </div>
+        </>
+      ),
+      plain_title: "Branch Hierarchy (Branch > Plant)", // 👈 for searching
+    },
+    {
+      key: "so_type_hierarchy",
+      icon: Link,
+      title: (
+        <>
+          SO Type Hierarchy <br />
+          <div className="text-[12px]">(Organization &gt; SO Type)</div>
+        </>
+      ),
+      plain_title: "SO Type Hierarchy (Organization > SO Type)",
+    },
+    {
+      key: "bill_doc_type_hierarchy",
+      icon: Link,
+      title: (
+        <>
+          Billing Doc Type Hierarchy <br />
+          <div className="text-[12px]">
+            (Delivery Doc Type &gt; Billing Doc Type &gt; Cancellation)
+          </div>
+        </>
+      ),
+      plain_title:
+        "Billing Doc Type Hierarchy (Delivery Doc Type > Bill Doc Type > Cancellation)",
+    },
+    {
+      key: "deliv_doc_type_hierarchy",
+      icon: Link,
+      title: (
+        <>
+          Delivery Doc Type Hierarchy <br />
+          <div className="text-[12px]">(Delivery Doc Type &gt; SO Type)</div>
+        </>
+      ),
+      plain_title: "Delivery Doc Type Hierarchy (Delivery Doc Type > SO Type)",
     },
   ];
 
@@ -156,6 +211,18 @@ const Data_Assignment = () => {
       {page === "plant_hierarchy" && <Plant_Hierarchy set_page={set_page} />}
       {page === "po_type_hierarchy" && (
         <PO_Type_Hierarchy set_page={set_page} />
+      )}
+      {page === "sales_org_hierarchy" && (
+        <Sales_Org_Hierarchy set_page={set_page} />
+      )}
+      {page === "so_type_hierarchy" && (
+        <SO_Type_Hierarchy set_page={set_page} />
+      )}
+      {page === "bill_doc_type_hierarchy" && (
+        <Bill_Doc_Type_Hierarchy set_page={set_page} />
+      )}
+      {page === "deliv_doc_type_hierarchy" && (
+        <Deliv_Doc_Type_Hierarchy set_page={set_page} />
       )}
     </React.Fragment>
   );

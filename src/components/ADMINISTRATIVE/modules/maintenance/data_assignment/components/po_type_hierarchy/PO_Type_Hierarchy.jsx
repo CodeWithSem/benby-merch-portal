@@ -159,9 +159,9 @@ const PO_Type_Hierarchy = ({ set_page }) => {
     { key: "purc_org_code", label: "Purchasing Organization", sortable: true },
     { key: "purc_group_code", label: "Purchasing Group", sortable: true },
     { key: "creation_date", label: "Creation Date", sortable: true },
-    { key: "created_by", label: "Created By", sortable: true },
-    { key: "change_date", label: "Change Date", sortable: true },
-    { key: "change_by", label: "Change By", sortable: true },
+    // { key: "created_by", label: "Created By", sortable: true },
+    // { key: "change_date", label: "Change Date", sortable: true },
+    // { key: "change_by", label: "Change By", sortable: true },
     { key: "actions", label: "", sortable: false },
   ];
 
@@ -415,7 +415,7 @@ const PO_Type_Hierarchy = ({ set_page }) => {
                   >
                     <span>/</span>
                     <a className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-sky-500 cursor-pointer">
-                      General Structure
+                      Data Assignment
                     </a>
                   </li>
                   <li className="flex items-center gap-1.5 text-sm text-gray-500">

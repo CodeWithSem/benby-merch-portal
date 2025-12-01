@@ -195,7 +195,7 @@ const Edit_PO_Type_H = ({
               >
                 <span>/</span>
                 <a className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-sky-500 cursor-pointer">
-                  General Structure
+                  Data Assignment
                 </a>
               </li>
               <li
@@ -236,22 +236,6 @@ const Edit_PO_Type_H = ({
           {/* + Section 1 */}
           <div className="p-5 sm:p-6 border-t">
             <div className="grid grid-cols-1 gap-5">
-              <div>
-                <Text_Code_Field
-                  label="PO Type"
-                  code_width="150px"
-                  show_search_button={true}
-                  code_value={edit_data.po_type_code}
-                  text_value={get_description(
-                    edit_data.po_type_code,
-                    po_type_list,
-                    "po_type_code",
-                    "po_type_desc"
-                  )}
-                  on_click={() => set_display_sub_modal("select_po_type")}
-                  disabled
-                />
-              </div>
               <div>
                 <Text_Code_Field
                   label="Company"
@@ -295,6 +279,22 @@ const Edit_PO_Type_H = ({
                     "purc_group_code",
                     "purc_group_desc"
                   )}
+                  disabled
+                />
+              </div>
+              <div>
+                <Text_Code_Field
+                  label="PO Type"
+                  code_width="150px"
+                  show_search_button={true}
+                  code_value={edit_data.po_type_code}
+                  text_value={get_description(
+                    edit_data.po_type_code,
+                    po_type_list,
+                    "po_type_code",
+                    "po_type_desc"
+                  )}
+                  on_click={() => set_display_sub_modal("select_po_type")}
                   disabled
                 />
               </div>

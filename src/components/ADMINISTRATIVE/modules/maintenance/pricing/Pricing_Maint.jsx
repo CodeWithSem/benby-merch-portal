@@ -1,14 +1,9 @@
 import Icon_Field from "assets/elements/Icon_Field";
-import {
-  BanknoteX,
-  Coins,
-  FileText,
-  HandCoins,
-  MessageSquareQuote,
-  Search,
-  ShoppingCart,
-} from "lucide-react";
+import { Coins, HandCoins, Search } from "lucide-react";
 import React, { useState } from "react";
+import Pricing_Type from "./components/pricing_type/Pricing_Type";
+import Customer_Price_Proc from "./components/customer_price_proc/Customer_Price_Proc";
+import Purchase_Price from "./components/purchase_pricing/Purchase_Price";
 
 const Pricing_Maint = () => {
   const [page, set_page] = useState("main");
@@ -57,7 +52,7 @@ const Pricing_Maint = () => {
                   </li>
                   <li className="flex items-center gap-1.5 text-sm text-gray-500">
                     <span>/</span>
-                    <span className="text-gray-800">Sales Order</span>
+                    <span className="text-gray-800">Pricing</span>
                   </li>
                 </ol>
               </nav>
@@ -68,7 +63,7 @@ const Pricing_Maint = () => {
             <div className="w-full bg-white rounded-lg border">
               {/* + Title */}
               <div className="flex flex-wrap items-center justify-between gap-3 p-5">
-                <h1 className="text-lg">Sales Order</h1>
+                <h1 className="text-lg">Pricing</h1>
               </div>
               {/* - Title */}
 
@@ -117,7 +112,11 @@ const Pricing_Maint = () => {
         </React.Fragment>
       )}
       {/* + Pages */}
-      {/* {page === "so_type" && <SO_Type set_page={set_page} />} */}
+      {page === "price_type" && <Pricing_Type set_page={set_page} />}
+      {page === "customer_price_proc" && (
+        <Customer_Price_Proc set_page={set_page} />
+      )}
+      {page === "purchase_price" && <Purchase_Price set_page={set_page} />}
       {/* - Pages */}
     </React.Fragment>
   );

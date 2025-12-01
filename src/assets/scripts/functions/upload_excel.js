@@ -339,7 +339,7 @@ export const handle_excel_upload_3_hierarchy = ({
             icon: <CircleX size={21} className="text-red-500" />,
           })
         );
-        continue; // continue instead of return to process remaining rows
+        return; // continue instead of return to process remaining rows
       }
 
       // --- Duplicate ID check ---
@@ -352,7 +352,7 @@ export const handle_excel_upload_3_hierarchy = ({
           message: `Duplicate ID at row ${row_num}`,
           icon: <CircleX size={21} className="text-red-500" />,
         });
-        continue;
+        return;
       }
 
       id_set.add(id_value);
@@ -467,7 +467,7 @@ export const handle_excel_upload_4_hierarchy = ({
             icon: <CircleX size={21} className="text-red-500" />,
           })
         );
-        continue;
+        return;
       }
 
       // --- Duplicate ID prevention ---
@@ -480,7 +480,7 @@ export const handle_excel_upload_4_hierarchy = ({
           message: `Duplicate ID at row ${row_num}`,
           icon: <CircleX size={21} className="text-red-500" />,
         });
-        continue;
+        return;
       }
 
       id_set.add(id_value);

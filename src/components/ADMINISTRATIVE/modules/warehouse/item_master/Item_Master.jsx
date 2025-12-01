@@ -42,6 +42,8 @@ const Item_Master = () => {
     { key: "actions", label: "", sortable: false },
   ];
 
+  const [new_item_data, set_new_item_data] = useState({});
+
   const [item_list, set_item_list] = useState([
     {
       id: 1,
@@ -485,7 +487,13 @@ const Item_Master = () => {
         </React.Fragment>
       )}
       {/* + Pages */}
-      {page === "item_creation" && <Create_New_Item set_page={set_page} />}
+      {page === "item_creation" && (
+        <Create_New_Item
+          set_page={set_page}
+          new_item_data={new_item_data}
+          set_new_item_data={set_new_item_data}
+        />
+      )}
       {page === "edit_item" && <Edit_Item set_page={set_page} />}
       {page === "view_item" && <View_Item set_page={set_page} />}
       {/* - Pages */}

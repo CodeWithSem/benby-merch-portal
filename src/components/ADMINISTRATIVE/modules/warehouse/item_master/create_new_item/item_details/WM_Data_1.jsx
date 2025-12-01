@@ -184,10 +184,10 @@ const WM_Data_1 = ({ set_display_modal }) => {
           </div>
           <div>
             <Find_Field
-              label="Indicator-Storage Section"
+              label="Storage Section Indicator"
               // value={data}
               // on_change={(e) => handle_data_change(e.target.value)}
-              on_click={() => set_display_modal("select_wm1_ind_storage_sec")}
+              on_click={() => set_display_modal("select_wm1_ssec_ind")}
               disabled
             />
             {/* <Select_Field

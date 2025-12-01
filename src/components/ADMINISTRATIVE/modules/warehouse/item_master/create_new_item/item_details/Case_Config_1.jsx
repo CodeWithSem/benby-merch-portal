@@ -19,8 +19,8 @@ const Case_Config_1 = () => {
                 adornment="PC / PC"
                 adornment_position="right"
                 adornment_width="w-[120px]"
-                // value={data}
-                // on_change={(e) => handle_data_change(e.target.value)}
+                // value={} //--> cc1_ac_pc_pc
+                // on_change={}
               />
             </div>
             <div>
@@ -30,8 +30,8 @@ const Case_Config_1 = () => {
                 adornment="PC / PAC"
                 adornment_position="right"
                 adornment_width="w-[120px]"
-                // value={data}
-                // on_change={(e) => handle_data_change(e.target.value)}
+                // value={} //--> cc1_ac_pc_pac
+                // on_change={}
               />
             </div>
             <div>
@@ -41,8 +41,8 @@ const Case_Config_1 = () => {
                 adornment="PC / IBX"
                 adornment_position="right"
                 adornment_width="w-[120px]"
-                // value={data}
-                // on_change={(e) => handle_data_change(e.target.value)}
+                // value={} //--> cc1_ac_pc_ibx
+                // on_change={}
               />
             </div>
             <div>
@@ -52,8 +52,8 @@ const Case_Config_1 = () => {
                 adornment="PC / CS"
                 adornment_position="right"
                 adornment_width="w-[120px]"
-                // value={data}
-                // on_change={(e) => handle_data_change(e.target.value)}
+                // value={} //--> cc1_ac_pc_cs
+                // on_change={}
               />
             </div>
             <div>
@@ -63,8 +63,8 @@ const Case_Config_1 = () => {
                 adornment="# of PACS / CS"
                 adornment_position="right"
                 adornment_width="w-[120px]"
-                // value={data}
-                // on_change={(e) => handle_data_change(e.target.value)}
+                // value={} //--> cc1_ac_pacs_cs
+                // on_change={}
               />
             </div>
             <div>
@@ -74,8 +74,8 @@ const Case_Config_1 = () => {
                 adornment="# of IBX / CS"
                 adornment_position="right"
                 adornment_width="w-[120px]"
-                // value={data}
-                // on_change={(e) => handle_data_change(e.target.value)}
+                // value={} //--> cc1_ac_no_ibx_cs
+                // on_change={}
               />
             </div>
           </div>
@@ -88,16 +88,32 @@ const Case_Config_1 = () => {
           </h1>
           <div className="grid grid-cols-1 gap-5">
             <div className="mt-[4px]">
-              <Text_Field type={"text"} disabled />
+              <Text_Field
+                type={"text"}
+                // value={} //--> cc1_ac_barcode_pc_pc
+                disabled
+              />
             </div>
             <div className="mt-[4px]">
-              <Text_Field type={"text"} disabled />
+              <Text_Field
+                type={"text"}
+                // value={} //--> cc1_ac_barcode_pc_pac
+                disabled
+              />
             </div>
             <div className="mt-[4px]">
-              <Text_Field type={"text"} disabled />
+              <Text_Field
+                type={"text"}
+                // value={} //--> cc1_ac_barcode_pc_ibx
+                disabled
+              />
             </div>
             <div className="mt-[4px]">
-              <Text_Field type={"text"} disabled />
+              <Text_Field
+                type={"text"}
+                // value={} //--> cc1_ac_barcode_pc_cs
+                disabled
+              />
             </div>
           </div>
         </div>
@@ -116,8 +132,8 @@ const Case_Config_1 = () => {
                 adornment="PC / PC"
                 adornment_position="right"
                 adornment_width="w-[120px]"
-                // value={data}
-                // on_change={(e) => handle_data_change(e.target.value)}
+                // value={}
+                // on_change={}
                 disabled
               />
             </div>
@@ -127,8 +143,8 @@ const Case_Config_1 = () => {
                 adornment="PC / PAC"
                 adornment_position="right"
                 adornment_width="w-[120px]"
-                // value={data}
-                // on_change={(e) => handle_data_change(e.target.value)}
+                // value={}
+                // on_change={}
                 disabled
               />
             </div>
@@ -138,8 +154,8 @@ const Case_Config_1 = () => {
                 adornment="PC / IBX"
                 adornment_position="right"
                 adornment_width="w-[120px]"
-                // value={data}
-                // on_change={(e) => handle_data_change(e.target.value)}
+                // value={}
+                // on_change={}
                 disabled
               />
             </div>
@@ -149,8 +165,8 @@ const Case_Config_1 = () => {
                 adornment="PC / CS"
                 adornment_position="right"
                 adornment_width="w-[120px]"
-                // value={data}
-                // on_change={(e) => handle_data_change(e.target.value)}
+                // value={}
+                // on_change={}
                 disabled
               />
             </div>
@@ -160,8 +176,8 @@ const Case_Config_1 = () => {
                 adornment="# of PACS / CS"
                 adornment_position="right"
                 adornment_width="w-[120px]"
-                // value={data}
-                // on_change={(e) => handle_data_change(e.target.value)}
+                // value={}
+                // on_change={}
                 disabled
               />
             </div>
@@ -171,8 +187,8 @@ const Case_Config_1 = () => {
                 adornment="# of IBX / CS"
                 adornment_position="right"
                 adornment_width="w-[120px]"
-                // value={data}
-                // on_change={(e) => handle_data_change(e.target.value)}
+                // value={}
+                // on_change={}
                 disabled
               />
             </div>

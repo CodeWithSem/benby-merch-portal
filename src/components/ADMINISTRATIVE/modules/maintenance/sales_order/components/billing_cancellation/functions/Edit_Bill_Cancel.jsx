@@ -31,6 +31,13 @@ const Edit_Bill_Cancel = ({
   const [is_confirm_modal_open, set_is_confirm_modal_open] = useState(false);
   const [update_loading, set_update_loading] = useState(false);
 
+  const handle_change_bill_cancel_code = (value) => {
+    set_edit_data({
+      ...edit_data,
+      bill_cancel_code: value,
+    });
+  };
+
   const handle_change_bill_cancel_desc = (value) => {
     set_edit_data({
       ...edit_data,
@@ -234,8 +241,11 @@ const Edit_Bill_Cancel = ({
                 <Text_Field
                   label="Billing Cancellation Code"
                   type={"text"}
+                  placeholder="Enter code"
                   value={edit_data.bill_cancel_code || "-"}
-                  disabled
+                  on_change={(e) =>
+                    handle_change_bill_cancel_code(e.target.value)
+                  }
                 />
               </div>
               <div className="col-span-2">

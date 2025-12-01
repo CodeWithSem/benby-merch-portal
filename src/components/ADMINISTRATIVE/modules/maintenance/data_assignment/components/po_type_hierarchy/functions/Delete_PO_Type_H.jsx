@@ -145,24 +145,8 @@ const Delete_PO_Type_H = ({
                     </div>
                   </div>
                 </div>
-
                 <div className="p-5 sm:p-6 border-t">
                   <div className="grid grid-cols-1 gap-5">
-                    <div>
-                      <Text_Code_Field
-                        label="PO Type"
-                        code_width="150px"
-                        show_search_button={false}
-                        code_value={delete_data.po_type_code}
-                        text_value={get_description(
-                          delete_data.po_type_code,
-                          po_type_list,
-                          "po_type_code",
-                          "po_type_desc"
-                        )}
-                        disabled
-                      />
-                    </div>
                     <div>
                       <Text_Code_Field
                         label="Company"
@@ -204,6 +188,21 @@ const Delete_PO_Type_H = ({
                           purc_group_list,
                           "purc_group_code",
                           "purc_group_desc"
+                        )}
+                        disabled
+                      />
+                    </div>
+                    <div>
+                      <Text_Code_Field
+                        label="PO Type"
+                        code_width="150px"
+                        show_search_button={false}
+                        code_value={delete_data.po_type_code}
+                        text_value={get_description(
+                          delete_data.po_type_code,
+                          po_type_list,
+                          "po_type_code",
+                          "po_type_desc"
                         )}
                         disabled
                       />

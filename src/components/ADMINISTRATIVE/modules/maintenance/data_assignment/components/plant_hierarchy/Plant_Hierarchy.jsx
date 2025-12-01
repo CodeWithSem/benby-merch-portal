@@ -383,7 +383,7 @@ const Plant_Hierarchy = ({ set_page }) => {
                   >
                     <span>/</span>
                     <a className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-sky-500 cursor-pointer">
-                      General Structure
+                      Data Assignment
                     </a>
                   </li>
                   <li className="flex items-center gap-1.5 text-sm text-gray-500">

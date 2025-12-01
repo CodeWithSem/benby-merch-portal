@@ -331,7 +331,8 @@ const WM_Data_2 = ({
               <Text_Field
                 label="Pickline Bin"
                 type={"text"}
-                placeholder="Enter pickline bin"
+                // placeholder="Enter pickline bin"
+                disabled
               />
             </div>
             <div className="text-gray-500 text-2xl pt-[25px]">/</div>
@@ -341,6 +342,7 @@ const WM_Data_2 = ({
                 // options={options}
                 // value={selected_data}
                 // on_change={handle_option_change}
+                disabled
               />
             </div>
           </div>

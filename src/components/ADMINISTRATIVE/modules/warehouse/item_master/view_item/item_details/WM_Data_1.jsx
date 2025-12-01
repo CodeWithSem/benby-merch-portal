@@ -199,7 +199,7 @@ const WM_Data_1 = ({ branch_list, plant_list, sloc_list }) => {
           </div>
           <div>
             <Text_Field
-              label="Indicator Storage Section"
+              label="Storage Section Indicator"
               type={"text"}
               disabled
             />

@@ -69,8 +69,8 @@ const Case_Config_2 = () => {
               name="inspection_remarks"
               placeholder="Enter your remarks..."
               height="120px"
-              // value={data}
-              // on_change={(e) => handle_data_change(e.target.value)}
+              // value={} //--> cc2_inspect_remarks
+              // on_change={}
             />
           </div>
           <div>
@@ -79,8 +79,8 @@ const Case_Config_2 = () => {
               name="internal_comments"
               placeholder="Enter your comments..."
               height="120px"
-              // value={data}
-              // on_change={(e) => handle_data_change(e.target.value)}
+              // value={} //--> cc2_internal_comments
+              // on_change={}
             />
           </div>
           <div>
@@ -89,8 +89,8 @@ const Case_Config_2 = () => {
               name="base_case_config_notes"
               placeholder="Enter your notes..."
               height="120px"
-              // value={data}
-              // on_change={(e) => handle_data_change(e.target.value)}
+              // value={} //--> cc2_base_cs_config_notes
+              // on_change={}
             />
           </div>
         </div>

@@ -1,5 +1,9 @@
 import React, { useState } from "react";
-import { format_date_1, get_date_now } from "assets/scripts/format";
+import {
+  console_log,
+  format_date_1,
+  get_date_now,
+} from "assets/scripts/format";
 import { ChevronLeft, CirclePlus } from "lucide-react";
 import Text_Field from "assets/elements/Text_Field";
 import Button from "assets/elements/Button";
@@ -77,10 +81,12 @@ import Select_SDP_Load_Group from "../modals/sales_data_plant/Select_SDP_Load_Gr
 import Select_PU_P_Group from "../modals/purchasing/Select_PU_P_Group";
 import Select_PU_PL_Spec_Status from "../modals/purchasing/Select_PU_PL_Spec_Status";
 import Select_PD_SCON from "../modals/plant_data/Select_PD_SCON";
+import Select_Generic from "../modals/select_generic/Select_Generic";
 
-const Create_New_Item = ({ set_page }) => {
+const Create_New_Item = ({ set_page, new_item_data, set_new_item_data }) => {
   const [active_tab, set_active_tab] = useState("standard_data");
   const [display_modal, set_display_modal] = useState("");
+  const [new_item, set_new_item] = useState({});
 
   const tabs = [
     { key: "standard_data", title: "Standard Data" },
@@ -103,7 +109,8 @@ const Create_New_Item = ({ set_page }) => {
   };
 
   const handle_create_item = () => {
-    alert("Create Item");
+    // alert("Create Item");
+    console_log(new_item);
   };
 
   const handle_go_back = () => {
@@ -178,7 +185,7 @@ const Create_New_Item = ({ set_page }) => {
                 <Text_Field
                   label="Item Code"
                   type={"text"}
-                  value={"AUTO GENERATED"}
+                  value={"AUTO GENERATED"} //--> item_code
                   // on_change={handle_text_change}
                   pattern="[A-Za-z]{1,}"
                   disabled
@@ -189,6 +196,7 @@ const Create_New_Item = ({ set_page }) => {
                   label="Item Description"
                   type={"text"}
                   placeholder={"Enter item description"}
+                  // value={} //--> item_desc
                   // on_change={handle_text_change}
                   pattern="[A-Za-z]{1,}"
                 />
@@ -221,7 +229,11 @@ const Create_New_Item = ({ set_page }) => {
               {/* + Tab Content */}
               <div className="p-6">
                 {active_tab === "standard_data" && (
-                  <Standard_Data set_display_modal={set_display_modal} />
+                  <Standard_Data
+                    set_display_modal={set_display_modal}
+                    item_group_list={item_group_list}
+                    new_item_data={new_item_data}
+                  />
                 )}
                 {active_tab === "purchasing" && (
                   <Purchasing set_display_modal={set_display_modal} />
@@ -457,13 +469,13 @@ const Create_New_Item = ({ set_page }) => {
         height="max-h-[700px]"
         item_status_list={item_status_list}
       />
-      <Select_Item_Group
+      {/* <Select_Item_Group
         is_open={display_modal === "select_item_group"}
         on_close={() => set_display_modal("")}
         width="max-w-[1000px]"
         height="max-h-[700px]"
         item_group_list={item_group_list}
-      />
+      /> */}
       <Select_Item_Group_1
         is_open={display_modal === "select_item_group_1"}
         on_close={() => set_display_modal("")}
@@ -533,6 +545,20 @@ const Create_New_Item = ({ set_page }) => {
         width="max-w-[1000px]"
         height="max-h-[700px]"
         product_class_5_list={product_class_5_list}
+      />
+
+      <Select_Generic
+        is_open={display_modal === "select_std_item_group"}
+        on_close={() => set_display_modal("")}
+        width="max-w-[1000px]"
+        height="max-h-[700px]"
+        modal_label="Item Group"
+        source_list={item_group_list}
+        source_code="item_group_code"
+        source_desc="item_group_desc"
+        target_field="std_item_group_code"
+        // target_field={["item_group_code", "item_group_1_code"]}
+        set_data={set_new_item_data}
       />
       {/* - Modals */}
     </React.Fragment>

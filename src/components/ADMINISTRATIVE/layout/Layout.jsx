@@ -31,6 +31,11 @@ import Distribution from "../modules/maintenance/distribution/Distribution";
 import Customer_Maint from "../modules/maintenance/customer/Customer_Maint";
 import Sales_Order_Maint from "../modules/maintenance/sales_order/Sales_Order_Maint";
 import Pricing_Maint from "../modules/maintenance/pricing/Pricing_Maint";
+import Batch_Maint from "../modules/maintenance/batch/Batch_Maint";
+import Personnel_Maint from "../modules/maintenance/personnel/Personnel_Maint";
+import Truck_Maint from "../modules/maintenance/truck/Truck_Maint";
+import Shipment_Maint from "../modules/maintenance/shipment/Shipment_Maint";
+import User_Maint from "../modules/maintenance/user/User_Maint";
 
 const Layout = () => {
   const [active_item, set_active_item] = useState(() => {
@@ -117,6 +122,16 @@ const Layout = () => {
         return <Sales_Order_Maint />;
       case "Maintenance-Pricing":
         return <Pricing_Maint />;
+      case "Maintenance-Batch":
+        return <Batch_Maint />;
+      case "Maintenance-Personnel":
+        return <Personnel_Maint />;
+      case "Maintenance-Truck":
+        return <Truck_Maint />;
+      case "Maintenance-Shipment":
+        return <Shipment_Maint />;
+      case "Maintenance-User":
+        return <User_Maint />;
       case "Maintenance-Data Assignment":
         return <Data_Assignment />;
       case "Templates-Form Elements":

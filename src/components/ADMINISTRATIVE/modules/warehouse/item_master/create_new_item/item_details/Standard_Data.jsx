@@ -4,8 +4,13 @@ import Date_Field from "assets/elements/Date_Field";
 import Select_Field from "assets/elements/Select_Field";
 import Text_Field from "assets/elements/Text_Field";
 import Find_Field from "assets/elements/Find_Field";
+import { get_description } from "assets/scripts/functions/get_description";
 
-const Standard_Data = ({ set_display_modal }) => {
+const Standard_Data = ({
+  set_display_modal,
+  item_group_list,
+  new_item_data,
+}) => {
   // RETURN ORIGIN
   return (
     <React.Fragment>
@@ -17,7 +22,7 @@ const Standard_Data = ({ set_display_modal }) => {
               label="LTC Standard Code"
               type={"text"}
               placeholder="Enter code"
-              // value={}
+              // value={} //--> std_ltc_std_code
               // on_change={}
             />
           </div>
@@ -26,7 +31,7 @@ const Standard_Data = ({ set_display_modal }) => {
               label="Industry Std. Code"
               type={"text"}
               placeholder="Enter code"
-              // value={}
+              // value={} //--> std_ind_std_code
               // on_change={}
             />
           </div>
@@ -42,36 +47,40 @@ const Standard_Data = ({ set_display_modal }) => {
           <div>
             <Find_Field
               label="Item Group"
-              // value={data}
-              // on_change={(e) => handle_data_change(e.target.value)}
-              on_click={() => set_display_modal("select_item_group")}
+              value={get_description(
+                new_item_data.std_item_group_code,
+                item_group_list,
+                "item_group_code",
+                "item_group_desc"
+              )} //--> std_item_group_code
+              on_click={() => set_display_modal("select_std_item_group")}
               disabled
             />
           </div>
           <div>
             <Find_Field
               label="Item Group Category"
-              // value={data}
+              // value={} //--> std_item_group_category_code
               // on_change={(e) => handle_data_change(e.target.value)}
-              on_click={() => set_display_modal("select_item_group_category")}
+              on_click={() =>
+                set_display_modal("select_std_item_group_category")
+              }
               disabled
             />
           </div>
           <div>
             <Find_Field
               label="Item Division"
-              // value={data}
-              // on_change={(e) => handle_data_change(e.target.value)}
-              on_click={() => set_display_modal("select_item_division")}
+              // value={} //--> std_item_division_code
+              on_click={() => set_display_modal("select_std_item_division")}
               disabled
             />
           </div>
           <div>
             <Find_Field
               label="Item Status"
-              // value={data}
-              // on_change={(e) => handle_data_change(e.target.value)}
-              on_click={() => set_display_modal("select_item_status")}
+              // value={} //--> std_item_status_code
+              on_click={() => set_display_modal("select_std_item_status")}
               disabled
             />
           </div>
@@ -79,7 +88,7 @@ const Standard_Data = ({ set_display_modal }) => {
             <Date_Field
               label="Validity From"
               placeholder="MM-DD-YYYY"
-              // value={selected_data}
+              // value={} //--> std_valid_from
               on_change={(e) => console.log(e.target.value)}
             />
           </div>
@@ -87,7 +96,7 @@ const Standard_Data = ({ set_display_modal }) => {
             <Date_Field
               label="Validity To"
               placeholder="MM-DD-YYYY"
-              // value={selected_data}
+              // value={} //--> std_valid_to
               on_change={(e) => console.log(e.target.value)}
             />
           </div>
@@ -96,7 +105,7 @@ const Standard_Data = ({ set_display_modal }) => {
               label="Base Unit of Measure (UoM)"
               placeholder="Select Option"
               // options={options}
-              // value={selected_data}
+              // value={} //--> std_base_uom
               // on_change={handle_option_change}
             />
           </div>
@@ -105,7 +114,7 @@ const Standard_Data = ({ set_display_modal }) => {
               label="Batch Management"
               box_size={24}
               icon_size={14}
-              checked={false}
+              checked={false} //--> std_batch_management
               on_change={(e) => alert(e.target.checked)}
             />
           </div>
@@ -123,7 +132,7 @@ const Standard_Data = ({ set_display_modal }) => {
               label="Gross Weight"
               type={"number"}
               placeholder="0"
-              // value={}
+              // value={} //--> std_gross_weight
               // on_change={}
             />
           </div>
@@ -132,31 +141,43 @@ const Standard_Data = ({ set_display_modal }) => {
               label="Gross Weight Measurement"
               placeholder="Select Option"
               // options={options}
-              // value={selected_data}
+              // value={} //--> std_gross_weight_uom
               // on_change={handle_option_change}
             />
           </div>
           <div>
-            <Text_Field label="Net Weight" type={"number"} placeholder="0" />
+            <Text_Field
+              label="Net Weight"
+              type={"number"}
+              placeholder="0"
+              // value={} //--> std_net_weight
+              // on_change={}
+            />
           </div>
           <div>
             <Select_Field
               label="Net Weight Measurement"
               placeholder="Select Option"
               // options={options}
-              // value={selected_data}
+              // value={} //--> std_gross_weight
               // on_change={handle_option_change}
             />
           </div>
           <div>
-            <Text_Field label="Item Volume" type={"number"} placeholder="0" />
+            <Text_Field
+              label="Item Volume"
+              type={"number"}
+              placeholder="0"
+              // value={} //--> std_item_volume
+              // on_change={}
+            />
           </div>
           <div>
             <Select_Field
               label="Item Volume Measurement"
               placeholder="Select Option"
               // options={options}
-              // value={selected_data}
+              // value={} //--> std_item_volume_uom
               // on_change={handle_option_change}
             />
           </div>
@@ -166,7 +187,7 @@ const Standard_Data = ({ set_display_modal }) => {
               type={"number"}
               placeholder="0"
               int_only={true}
-              // value={}
+              // value={} //--> std_size_packing
               // on_change={}
             />
           </div>
@@ -175,7 +196,7 @@ const Standard_Data = ({ set_display_modal }) => {
               label="Total Item Unit per Liters"
               type={"number"}
               placeholder="0"
-              // value={}
+              // value={} //--> std_item_unit_per_liter
               // on_change={}
             />
           </div>

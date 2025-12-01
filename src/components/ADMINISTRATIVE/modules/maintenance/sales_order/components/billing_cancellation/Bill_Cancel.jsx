@@ -68,6 +68,7 @@ const Bill_Cancel = ({ set_page }) => {
   const reset_new_data = () => {
     set_new_data((prev) => ({
       ...prev,
+      bill_cancel_code: "",
       bill_cancel_desc: "",
       creation_date: "",
       created_by: "",
@@ -81,7 +82,6 @@ const Bill_Cancel = ({ set_page }) => {
       set_new_data((prev) => ({
         ...prev,
         id: value,
-        bill_cancel_code: `BC-${String(value).padStart(2, "0")}`,
       }));
     });
   }, []);
