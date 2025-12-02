@@ -6,7 +6,7 @@ const Text_Field = ({
   placeholder,
   pattern,
   value,
-  on_change,
+  on_change = () => {},
   disabled = false,
   error_message,
   name,
@@ -53,7 +53,7 @@ const Text_Field = ({
         type={type}
         placeholder={placeholder}
         pattern={pattern}
-        value={value}
+        value={value !== undefined && value !== null ? value : ""}
         onChange={on_change}
         name={name}
         disabled={disabled}

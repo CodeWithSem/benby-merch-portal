@@ -12,16 +12,20 @@ import {
   RefreshCw,
   SlidersHorizontal,
   FileUp,
+  Warehouse,
 } from "lucide-react";
 import Icon_Field from "assets/elements/Icon_Field";
 import Select_Field from "assets/elements/Select_Field";
 import Pagination from "assets/elements/Pagination";
 import Button from "assets/elements/Button";
 import Create_New_Item from "./create_new_item/Create_New_Item";
-import Edit_Item from "./edit_item/Edit_Item";
-import View_Item from "./view_item/View_Item";
+// import Edit_Item from "./edit_item/Edit_Item";
+// import View_Item from "./view_item/View_Item";
 import Delete_Item from "./modals/delete_item/Delete_Item";
 import Button_Action from "assets/elements/Button_Action";
+import Text_Field from "assets/elements/Text_Field";
+
+const HAS_FILTER = true;
 
 const Item_Master = () => {
   const { show_toast } = useToast();
@@ -42,7 +46,113 @@ const Item_Master = () => {
     { key: "actions", label: "", sortable: false },
   ];
 
-  const [new_item_data, set_new_item_data] = useState({});
+  const def_item_data = {
+    id: 0,
+    item_code: "ITM-00000",
+    item_desc: "",
+    std_ltc_std_code: "",
+    std_industry_std_code: "",
+    std_item_group_code: "",
+    std_item_group_category_code: "",
+    std_item_division_code: "",
+    std_item_status_code: "",
+    std_valid_from: "",
+    std_valid_to: "",
+    std_base_uom: "",
+    std_batch_management: false,
+    std_gross_weight: "",
+    std_gross_weight_uom: "",
+    std_net_weight: "",
+    std_net_weight_uom: "",
+    std_item_volume: "",
+    std_item_volume_uom: "",
+    std_size_packing: "",
+    std_item_unit_per_liter: "",
+    cc1_ac_pc_pc: "",
+    cc1_ac_pc_pac: "",
+    cc1_ac_pc_ibx: "",
+    cc1_ac_pc_cs: "",
+    cc1_ac_pacs_cs: "",
+    cc1_ac_no_ibx_cs: "",
+    cc1_ac_barcode_pc_pc: "",
+    cc1_ac_barcode_pc_pac: "",
+    cc1_ac_barcode_pc_ibx: "",
+    cc1_ac_barcode_pc_cs: "",
+    cc2_inspect_remarks: "",
+    cc2_internal_comments: "",
+    cc2_base_cs_config_notes: "",
+    sd_sales_status_code: "",
+    sd_valid_from: "",
+    sd_valid_to: "",
+    sd_sales_uom: "",
+    sd_item_group_1_code: "",
+    sd_item_group_2_code: "",
+    sd_item_group_3_code: "",
+    sd_item_group_4_code: "",
+    sd_item_group_5_code: "",
+    sd_product_class_1_code: "",
+    sd_product_class_2_code: "",
+    sd_product_class_3_code: "",
+    sd_product_class_4_code: "",
+    sd_product_class_5_code: "",
+    sdp_stock_availability: false,
+    sdp_trans_group_code: "",
+    sdp_load_group_code: "",
+    sdp_sales_text: "",
+    sdp_inv_acc_center_code: "",
+    pu_purc_group_code: "",
+    pu_ordering_uom: "",
+    pu_valid_from: "",
+    pu_valid_to: "",
+    pu_plant_status_code: "",
+    pu_quality_inspection: "",
+    pu_source_hub_code: "",
+    pu_purchasing_text: "",
+    pd_scon_code: "",
+    pd_max_shelf_life: "",
+    pd_max_shelf_life_ind: "",
+    pd_min_shelf_life: "",
+    pd_min_shelf_life_ind: "",
+    pd_inv_acc_center_code: "",
+    wm1_wm_uom: "",
+    wm1_issue_uom: "",
+    wm1_proposed_uom: "",
+    wm1_cap_usage: "",
+    wm1_cap_usage_uom: "",
+    wm1_picking_stype: "",
+    wm1_picking_stype_uom: "",
+    wm1_stock_source_code: "",
+    wm1_stock_dest_code: "",
+    wm1_ssec_ind_code: "",
+    wm1_picking_type: false,
+    wm1_permit_add_stock: false,
+    wm2_pallet_load_1: "",
+    wm2_pallet_load_1_uom: "",
+    wm2_pallet_load_1_sutype: "",
+    wm2_pallet_load_2: "",
+    wm2_pallet_load_2_uom: "",
+    wm2_pallet_load_2_sutype: "",
+    wm2_pallet_load_3: "",
+    wm2_pallet_load_3_uom: "",
+    wm2_pallet_load_3_sutype: "",
+    wm2_pallet_config_1: "",
+    wm2_pallet_config_2: "",
+    wm2_pallet_config_3: "",
+    // wm2_pickline_bin: "",
+    // wm2_pickline_bin_?
+    wm2_max_qty: "",
+    wm2_max_qty_uom: "CS",
+    wm2_min_qty: "",
+    wm2_min_qty_uom: "CS",
+    wm2_replenish_qty: "",
+    wm2_replenish_qty_uom: "CS",
+    wm2_control_qty: "",
+    wm2_control_qty_uom: "CS",
+    wm2_round_qty: "",
+    wm2_round_qty_uom: "CS",
+  };
+
+  const [new_item_data, set_new_item_data] = useState(def_item_data);
 
   const [item_list, set_item_list] = useState([
     {
@@ -189,9 +299,9 @@ const Item_Master = () => {
     sales_dist_channel: dist_channel_list,
   };
 
-  useEffect(() => {
-    console.log(data_map_object);
-  }, []);
+  // useEffect(() => {
+  //   console.log(data_map_object);
+  // }, []);
 
   // RETURN ORIGIN
   return (
@@ -289,48 +399,76 @@ const Item_Master = () => {
                             on_change={(e) => set_search_query(e.target.value)}
                           />
                         </div>
-                        {/* + Dropdown Filter */}
-                        <div className="relative">
-                          <Button
-                            variant="white"
-                            width="w-[100px]"
-                            icon={SlidersHorizontal}
-                            icon_itemsition="left"
-                            on_click={() => set_show_filter((prev) => !prev)}
-                          >
-                            Filter
-                          </Button>
-
-                          {/* + Dropdown Content */}
-                          {show_filter && (
-                            <React.Fragment>
-                              <div
-                                className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40"
-                                onClick={() => set_show_filter(false)}
-                              ></div>
-                              <div className="absolute top-full mt-2 right-0 z-50 bg-white border rounded-lg shadow-md p-4 w-[260px]">
-                                <div className="flex justify-end gap-2 mt-4">
-                                  <Button
-                                    size="sm"
-                                    variant="primary"
-                                    on_click={() => set_show_filter(false)}
-                                  >
-                                    Apply
-                                  </Button>
-                                  <Button
-                                    size="sm"
-                                    variant="secondary"
-                                    on_click={() => set_show_filter(false)}
-                                  >
-                                    Cancel
-                                  </Button>
-                                </div>
-                              </div>
-                            </React.Fragment>
-                          )}
-                          {/* - Dropdown Content */}
-                        </div>
-                        {/* - Dropdown Filter */}
+                        {/* + Filter Dropdown */}
+                        {HAS_FILTER ? (
+                          <React.Fragment>
+                            <div className="relative">
+                              <Button
+                                variant="white"
+                                width="w-[100px]"
+                                icon={SlidersHorizontal}
+                                icon_position="left"
+                                on_click={() =>
+                                  set_show_filter((prev) => !prev)
+                                }
+                              >
+                                Filter
+                              </Button>
+                              {/* + Filter Content */}
+                              {show_filter && (
+                                <React.Fragment>
+                                  <div
+                                    className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40"
+                                    onClick={() => set_show_filter(false)}
+                                  ></div>
+                                  <div className="absolute top-full mt-2 right-0 z-50 bg-white border rounded-lg shadow-md p-4 w-[260px]">
+                                    <div className="grid grid-cols-1 gap-2">
+                                      <div>
+                                        <Text_Field
+                                          label="Filter 1"
+                                          type={"text"}
+                                          disabled
+                                        />
+                                      </div>
+                                      <div>
+                                        <Text_Field
+                                          label="Filter 2"
+                                          type={"text"}
+                                          disabled
+                                        />
+                                      </div>
+                                      <div>
+                                        <Text_Field
+                                          label="Filter 3"
+                                          type={"text"}
+                                          disabled
+                                        />
+                                      </div>
+                                    </div>
+                                    <div className="flex justify-end gap-2 mt-4">
+                                      <Button
+                                        size="sm"
+                                        variant="primary"
+                                        on_click={() => set_show_filter(false)}
+                                      >
+                                        Apply
+                                      </Button>
+                                      <Button
+                                        size="sm"
+                                        variant="secondary"
+                                        on_click={() => set_show_filter(false)}
+                                      >
+                                        Cancel
+                                      </Button>
+                                    </div>
+                                  </div>
+                                </React.Fragment>
+                              )}
+                              {/* - Filter Content */}
+                            </div>
+                          </React.Fragment>
+                        ) : null}
+                        {/* - Filter Dropdown */}
                       </div>
                     </div>
                   </div>
@@ -427,6 +565,16 @@ const Item_Master = () => {
                                     <div className="relative group flex jusity-center items-center">
                                       <Button_Action
                                         class_name="mb-[1px]"
+                                        icon={Warehouse}
+                                        tooltip="Item Extension"
+                                        // on_click={() =>
+                                        //   handle_edit_item(row.id)
+                                        // }
+                                      />
+                                    </div>
+                                    <div className="relative group flex jusity-center items-center">
+                                      <Button_Action
+                                        class_name="mb-[1px]"
                                         icon={Trash}
                                         variant="danger"
                                         tooltip="Delete Item"
@@ -494,8 +642,8 @@ const Item_Master = () => {
           set_new_item_data={set_new_item_data}
         />
       )}
-      {page === "edit_item" && <Edit_Item set_page={set_page} />}
-      {page === "view_item" && <View_Item set_page={set_page} />}
+      {/* {page === "edit_item" && <Edit_Item set_page={set_page} />} */}
+      {/* {page === "view_item" && <View_Item set_page={set_page} />} */}
       {/* - Pages */}
       {/* + Modals */}
       <Delete_Item

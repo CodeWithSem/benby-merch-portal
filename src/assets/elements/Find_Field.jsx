@@ -10,13 +10,15 @@ const Find_Field = ({
   error_message,
   on_click,
   placeholder = "",
+  bg_dis_color = "bg-white", // this can be bg-slate-50 if totally disabled
+  text_dis_color = "", // this can be text-slate-500 if totally disabled
 }) => {
   const wrapper_class = `mt-1 flex rounded-md shadow-sm border text-sm
     ${error_message ? "border-pink-500" : "border-slate-300"}
     ${
       disabled
-        ? "bg-slate-50 text-slate-700 focus-within:ring-0 focus-within:border-slate-300"
-        : "bg-white text-slate-700 border-slate-300 focus-within:ring-1"
+        ? `${bg_dis_color} ${text_dis_color} focus-within:ring-0 focus-within:border-slate-300`
+        : "bg-white border-slate-300 focus-within:ring-1"
     }
      ${
        error_message
@@ -42,7 +44,7 @@ const Find_Field = ({
           type="text"
           placeholder={placeholder}
           name={name}
-          value={value}
+          value={value !== undefined && value !== null ? value : ""}
           onChange={on_change}
           disabled={disabled}
           className={input_class}

@@ -19,6 +19,8 @@ const Text_Code_Field = ({
   required = false,
   show_search_button = true,
   has_clear_button = false,
+  bg_dis_color = "bg-white", // this can be bg-slate-50 if totally disabled
+  text_dis_color = "", // this can be text-slate-500 if totally disabled
   on_clear,
   min,
   max,
@@ -26,7 +28,7 @@ const Text_Code_Field = ({
   const input_class = `block w-full ${
     label ? "mt-1" : ""
   } px-3 py-2 bg-white border rounded-md text-sm shadow-sm placeholder-slate-400 focus:ring-1 
-    ${disabled ? "disabled:bg-slate-50 disabled:text-slate-500" : ""}
+    ${disabled ? `${bg_dis_color} ${text_dis_color}` : ""}
     ${error_message ? "border-pink-500 text-pink-600" : "border-slate-300"}
     ${
       error_message
@@ -47,7 +49,7 @@ const Text_Code_Field = ({
     ${error_message ? "border-pink-500" : "border-slate-300"}
     ${
       disabled
-        ? "bg-slate-50 focus-within:border-slate-300 text-slate-500 focus-within:ring-0"
+        ? `${bg_dis_color} ${text_dis_color} focus-within:border-slate-300 focus-within:ring-0`
         : "bg-white text-slate-700 focus-within:ring-1 border-slate-300"
     }
      ${
@@ -75,7 +77,9 @@ const Text_Code_Field = ({
             type={type}
             placeholder={placeholder}
             pattern={pattern}
-            value={code_value}
+            value={
+              code_value !== undefined && code_value !== null ? code_value : ""
+            }
             onChange={on_code_change}
             name={code_name}
             disabled={disabled}
@@ -95,7 +99,9 @@ const Text_Code_Field = ({
             type="text"
             placeholder={placeholder}
             name={text_name}
-            value={text_value}
+            value={
+              text_value !== undefined && text_value !== null ? text_value : ""
+            }
             onChange={on_text_change}
             disabled={disabled}
             className={input_class_text}

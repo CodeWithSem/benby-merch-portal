@@ -1,7 +1,8 @@
 import React from "react";
 import Textarea_Field from "assets/elements/Textarea_Field";
+import { handle_text_change_function } from "assets/scripts/functions/input_functions";
 
-const Case_Config_2 = () => {
+const Case_Config_2 = ({ new_item_data, set_new_item_data }) => {
   const columns = [
     { key: "id", label: "ID" },
     { key: "customer_code", label: "Customer Code" },
@@ -15,6 +16,8 @@ const Case_Config_2 = () => {
       customer_desc: "QS IT SERVICE",
     },
   ];
+
+  const handle_text_change = handle_text_change_function(set_new_item_data);
 
   // RETURN ORIGIN
   return (
@@ -66,11 +69,10 @@ const Case_Config_2 = () => {
           <div>
             <Textarea_Field
               label="Inspection Remarks"
-              name="inspection_remarks"
               placeholder="Enter your remarks..."
               height="120px"
-              // value={} //--> cc2_inspect_remarks
-              // on_change={}
+              value={new_item_data.cc2_inspect_remarks} //--> cc2_inspect_remarks
+              on_change={handle_text_change("cc2_inspect_remarks")}
             />
           </div>
           <div>
@@ -79,8 +81,8 @@ const Case_Config_2 = () => {
               name="internal_comments"
               placeholder="Enter your comments..."
               height="120px"
-              // value={} //--> cc2_internal_comments
-              // on_change={}
+              value={new_item_data.cc2_internal_comments} //--> cc2_internal_comments
+              on_change={handle_text_change("cc2_internal_comments")}
             />
           </div>
           <div>
@@ -89,8 +91,8 @@ const Case_Config_2 = () => {
               name="base_case_config_notes"
               placeholder="Enter your notes..."
               height="120px"
-              // value={} //--> cc2_base_cs_config_notes
-              // on_change={}
+              value={new_item_data.cc2_base_cs_config_notes} //--> cc2_base_cs_config_notes
+              on_change={handle_text_change("cc2_base_cs_config_notes")}
             />
           </div>
         </div>

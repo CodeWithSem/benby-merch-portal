@@ -68,6 +68,7 @@ const Storage_Unit_Type = ({ set_page }) => {
   const reset_new_data = () => {
     set_new_data((prev) => ({
       ...prev,
+      sutype_code: "",
       sutype_desc: "",
       creation_date: "",
       created_by: "",
@@ -81,7 +82,6 @@ const Storage_Unit_Type = ({ set_page }) => {
       set_new_data((prev) => ({
         ...prev,
         id: value,
-        sutype_code: `SUTYPE-${String(value).padStart(2, "0")}`,
       }));
     });
   }, []);

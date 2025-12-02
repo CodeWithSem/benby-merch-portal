@@ -7,7 +7,7 @@ const Date_Field = ({
   label,
   name,
   value,
-  on_change,
+  on_change = () => {},
   placeholder = "Select a date",
   disabled = false,
   required = false,
@@ -50,7 +50,7 @@ const Date_Field = ({
       <div className="relative">
         <Flatpickr
           name={name}
-          value={value}
+          value={value !== undefined && value !== null ? value : ""}
           onChange={handleChange}
           disabled={disabled}
           required={required}

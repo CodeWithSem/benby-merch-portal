@@ -1,9 +1,23 @@
 import Select_Field from "assets/elements/Select_Field";
 import Text_Code_Field from "assets/elements/Text_Code_Field";
 import Text_Field from "assets/elements/Text_Field";
+import {
+  handle_select_change_function,
+  handle_text_change_function,
+  make_options,
+} from "assets/scripts/functions/input_functions";
 import React from "react";
 
-const WM_Data_2 = ({ set_display_modal }) => {
+const WM_Data_2 = ({
+  new_item_data,
+  set_new_item_data,
+  uom_list,
+  sutype_list,
+}) => {
+  const sutype_options = make_options(sutype_list, "sutype_code");
+  const uom_options = make_options(uom_list, "uom_code");
+  const handle_select_change = handle_select_change_function(set_new_item_data);
+  const handle_text_change = handle_text_change_function(set_new_item_data);
   // RETURN ORIGIN
   return (
     <React.Fragment>
@@ -68,23 +82,23 @@ const WM_Data_2 = ({ set_display_modal }) => {
                   label="Pallet Load 1"
                   type={"number"}
                   placeholder="0"
-                  int_only={true}
+                  // int_only={true}
+                  value={new_item_data.wm2_pallet_load_1} //--> wm2_pallet_load_1
+                  on_change={handle_text_change("wm2_pallet_load_1", "number")}
                 />
               </div>
               <div className="pt-[24px]">
                 <Select_Field
-                  placeholder="Select Option"
-                  // options={options}
-                  // value={selected_data}
-                  // on_change={handle_option_change}
+                  options={uom_options}
+                  value={new_item_data.wm2_pallet_load_1_uom || ""} //--> wm2_pallet_load_1_uom
+                  on_change={handle_select_change("wm2_pallet_load_1_uom")}
                 />
               </div>
               <div className="pt-[24px]">
                 <Select_Field
-                  placeholder="Select Option"
-                  // options={options}
-                  // value={selected_data}
-                  // on_change={handle_option_change}
+                  options={sutype_options}
+                  value={new_item_data.wm2_pallet_load_1_sutype || ""} //--> wm2_pallet_load_1_sutype
+                  on_change={handle_select_change("wm2_pallet_load_1_sutype")}
                 />
               </div>
             </div>
@@ -94,23 +108,23 @@ const WM_Data_2 = ({ set_display_modal }) => {
                   label="Pallet Load 2"
                   type={"number"}
                   placeholder="0"
-                  int_only={true}
+                  // int_only={true}
+                  value={new_item_data.wm2_pallet_load_2} //--> wm2_pallet_load_2
+                  on_change={handle_text_change("wm2_pallet_load_2", "number")}
                 />
               </div>
               <div className="pt-[24px]">
                 <Select_Field
-                  placeholder="Select Option"
-                  // options={options}
-                  // value={selected_data}
-                  // on_change={handle_option_change}
+                  options={uom_options}
+                  value={new_item_data.wm2_pallet_load_2_uom || ""} //--> wm2_pallet_load_2_uom
+                  on_change={handle_select_change("wm2_pallet_load_2_uom")}
                 />
               </div>
               <div className="pt-[24px]">
                 <Select_Field
-                  placeholder="Select Option"
-                  // options={options}
-                  // value={selected_data}
-                  // on_change={handle_option_change}
+                  options={sutype_options}
+                  value={new_item_data.wm2_pallet_load_2_sutype || ""} //--> wm2_pallet_load_2_sutype
+                  on_change={handle_select_change("wm2_pallet_load_2_sutype")}
                 />
               </div>
             </div>
@@ -120,23 +134,23 @@ const WM_Data_2 = ({ set_display_modal }) => {
                   label="Pallet Load 3"
                   type={"number"}
                   placeholder="0"
-                  int_only={true}
+                  // int_only={true}
+                  value={new_item_data.wm2_pallet_load_3} //--> wm2_pallet_load_3
+                  on_change={handle_text_change("wm2_pallet_load_3", "number")}
                 />
               </div>
               <div className="pt-[24px]">
                 <Select_Field
-                  placeholder="Select Option"
-                  // options={options}
-                  // value={selected_data}
-                  // on_change={handle_option_change}
+                  options={uom_options}
+                  value={new_item_data.wm2_pallet_load_3_uom || ""} //--> wm2_pallet_load_3_uom
+                  on_change={handle_select_change("wm2_pallet_load_3_uom")}
                 />
               </div>
               <div className="pt-[24px]">
                 <Select_Field
-                  placeholder="Select Option"
-                  // options={options}
-                  // value={selected_data}
-                  // on_change={handle_option_change}
+                  options={sutype_options}
+                  value={new_item_data.wm2_pallet_load_3_sutype || ""} //--> wm2_pallet_load_3_sutype
+                  on_change={handle_select_change("wm2_pallet_load_3_sutype")}
                 />
               </div>
             </div>
@@ -152,6 +166,8 @@ const WM_Data_2 = ({ set_display_modal }) => {
                 label="Pallet Configuration 1"
                 type={"text"}
                 placeholder="Enter pallet config 1"
+                value={new_item_data.wm2_pallet_config_1} //--> wm2_pallet_config_1
+                on_change={handle_text_change("wm2_pallet_config_1")}
               />
             </div>
             <div>
@@ -159,6 +175,8 @@ const WM_Data_2 = ({ set_display_modal }) => {
                 label="Pallet Configuration 2"
                 type={"text"}
                 placeholder="Enter pallet config 2"
+                value={new_item_data.wm2_pallet_config_2} //--> wm2_pallet_config_2
+                on_change={handle_text_change("wm2_pallet_config_2")}
               />
             </div>
             <div>
@@ -166,6 +184,8 @@ const WM_Data_2 = ({ set_display_modal }) => {
                 label="Pallet Configuration 3"
                 type={"text"}
                 placeholder="Enter pallet config 3"
+                value={new_item_data.wm2_pallet_config_3} //--> wm2_pallet_config_3
+                on_change={handle_text_change("wm2_pallet_config_3")}
               />
             </div>
           </div>
@@ -188,7 +208,6 @@ const WM_Data_2 = ({ set_display_modal }) => {
             <div className="text-gray-500 text-2xl pt-[25px]">/</div>
             <div className="pt-[24px] w-[250px]">
               <Select_Field
-                placeholder="Select Option"
                 // options={options}
                 // value={selected_data}
                 // on_change={handle_option_change}
@@ -203,11 +222,17 @@ const WM_Data_2 = ({ set_display_modal }) => {
                 type={"number"}
                 placeholder="0"
                 int_only={true}
+                value={new_item_data.wm2_max_qty} //--> wm2_max_qty
+                on_change={handle_text_change("wm2_max_qty", "number")}
               />
             </div>
             <div className="text-gray-500 text-2xl pt-[25px]">/</div>
             <div className="pt-[24px] w-[250px]">
-              <Text_Field type={"text"} disabled />
+              <Text_Field
+                type={"text"}
+                value={new_item_data.wm2_max_qty_uom} //--> wm2_max_qty_uom
+                disabled
+              />
             </div>
           </div>
           <div className="flex gap-2">
@@ -217,11 +242,17 @@ const WM_Data_2 = ({ set_display_modal }) => {
                 type={"number"}
                 placeholder="0"
                 int_only={true}
+                value={new_item_data.wm2_min_qty} //--> wm2_min_qty
+                on_change={handle_text_change("wm2_min_qty", "number")}
               />
             </div>
             <div className="text-gray-500 text-2xl pt-[25px]">/</div>
             <div className="pt-[24px] w-[250px]">
-              <Text_Field type={"text"} disabled />
+              <Text_Field
+                type={"text"}
+                value={new_item_data.wm2_min_qty_uom} //--> wm2_min_qty_uom
+                disabled
+              />
             </div>
           </div>
           <div className="flex gap-2">
@@ -231,11 +262,17 @@ const WM_Data_2 = ({ set_display_modal }) => {
                 type={"number"}
                 placeholder="0"
                 int_only={true}
+                value={new_item_data.wm2_replenish_qty} //--> wm2_replenish_qty
+                on_change={handle_text_change("wm2_replenish_qty", "number")}
               />
             </div>
             <div className="text-gray-500 text-2xl pt-[25px]">/</div>
             <div className="pt-[24px] w-[250px]">
-              <Text_Field type={"text"} disabled />
+              <Text_Field
+                type={"text"}
+                value={new_item_data.wm2_replenish_qty_uom} //--> wm2_replenish_qty_uom
+                disabled
+              />
             </div>
           </div>
           <div className="flex gap-2">
@@ -245,11 +282,17 @@ const WM_Data_2 = ({ set_display_modal }) => {
                 type={"number"}
                 placeholder="0"
                 int_only={true}
+                value={new_item_data.wm2_control_qty} //--> wm2_control_qty
+                on_change={handle_text_change("wm2_control_qty", "number")}
               />
             </div>
             <div className="text-gray-500 text-2xl pt-[25px]">/</div>
             <div className="pt-[24px] w-[250px]">
-              <Text_Field type={"text"} disabled />
+              <Text_Field
+                type={"text"}
+                value={new_item_data.wm2_control_qty_uom} //--> wm2_control_qty_uom
+                disabled
+              />
             </div>
           </div>
           <div className="flex gap-2">
@@ -259,11 +302,17 @@ const WM_Data_2 = ({ set_display_modal }) => {
                 type={"number"}
                 placeholder="0"
                 int_only={true}
+                value={new_item_data.wm2_round_qty} //--> wm2_round_qty
+                on_change={handle_text_change("wm2_round_qty", "number")}
               />
             </div>
             <div className="text-gray-500 text-2xl pt-[25px]">/</div>
             <div className="pt-[24px] w-[250px]">
-              <Text_Field type={"text"} disabled />
+              <Text_Field
+                type={"text"}
+                value={new_item_data.wm2_round_qty_uom} //--> wm2_round_qty_uom
+                disabled
+              />
             </div>
           </div>
         </div>

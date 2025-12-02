@@ -63,7 +63,7 @@ const Text_Field_Adorn = ({
           type={type}
           placeholder={placeholder}
           name={name}
-          value={value}
+          value={value !== undefined && value !== null ? value : ""}
           onChange={on_change}
           disabled={disabled}
           onWheel={handle_wheel}

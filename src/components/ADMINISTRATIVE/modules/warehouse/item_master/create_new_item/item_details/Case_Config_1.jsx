@@ -1,8 +1,12 @@
 import React from "react";
 import Text_Field from "assets/elements/Text_Field";
 import Text_Field_Adorn from "assets/elements/Text_Field_Adorn";
+import { handle_text_change_function } from "assets/scripts/functions/input_functions";
 
-const Case_Config_1 = () => {
+const Case_Config_1 = ({ new_item_data, set_new_item_data }) => {
+  const handle_text_change = handle_text_change_function(set_new_item_data);
+
+  // RETURN ORIGIN
   return (
     <React.Fragment>
       <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
@@ -16,66 +20,72 @@ const Case_Config_1 = () => {
               <Text_Field_Adorn
                 type="number"
                 placeholder="0"
+                int_only={true}
                 adornment="PC / PC"
                 adornment_position="right"
                 adornment_width="w-[120px]"
-                // value={} //--> cc1_ac_pc_pc
-                // on_change={}
+                value={new_item_data.cc1_ac_pc_pc} //--> cc1_ac_pc_pc
+                on_change={handle_text_change("cc1_ac_pc_pc")}
               />
             </div>
             <div>
               <Text_Field_Adorn
                 type="number"
                 placeholder="0"
+                int_only={true}
                 adornment="PC / PAC"
                 adornment_position="right"
                 adornment_width="w-[120px]"
-                // value={} //--> cc1_ac_pc_pac
-                // on_change={}
+                value={new_item_data.cc1_ac_pc_pac} //--> cc1_ac_pc_pac
+                on_change={handle_text_change("cc1_ac_pc_pac")}
               />
             </div>
             <div>
               <Text_Field_Adorn
                 type="number"
                 placeholder="0"
+                int_only={true}
                 adornment="PC / IBX"
                 adornment_position="right"
                 adornment_width="w-[120px]"
-                // value={} //--> cc1_ac_pc_ibx
-                // on_change={}
+                value={new_item_data.cc1_ac_pc_ibx} //--> cc1_ac_pc_ibx
+                on_change={handle_text_change("cc1_ac_pc_ibx")}
               />
             </div>
             <div>
               <Text_Field_Adorn
                 type="number"
                 placeholder="0"
+                int_only={true}
                 adornment="PC / CS"
                 adornment_position="right"
                 adornment_width="w-[120px]"
-                // value={} //--> cc1_ac_pc_cs
-                // on_change={}
+                value={new_item_data.cc1_ac_pc_cs} //--> cc1_ac_pc_cs
+                on_change={handle_text_change("cc1_ac_pc_cs")}
               />
             </div>
             <div>
               <Text_Field_Adorn
                 type="number"
                 placeholder="0"
+                int_only={true}
                 adornment="# of PACS / CS"
                 adornment_position="right"
                 adornment_width="w-[120px]"
-                // value={} //--> cc1_ac_pacs_cs
-                // on_change={}
+                value={new_item_data.cc1_ac_pacs_cs} //--> cc1_ac_pacs_cs
+                on_change={handle_text_change("cc1_ac_pacs_cs")}
               />
             </div>
             <div>
               <Text_Field_Adorn
                 type="number"
                 placeholder="0"
+                int_only={true}
                 adornment="# of IBX / CS"
                 adornment_position="right"
                 adornment_width="w-[120px]"
-                // value={} //--> cc1_ac_no_ibx_cs
-                // on_change={}
+                value={new_item_data.cc1_ac_no_ibx_cs} //--> cc1_ac_no_ibx_cs
+                on_change={handle_text_change("cc1_ac_no_ibx_cs")}
               />
             </div>
           </div>
