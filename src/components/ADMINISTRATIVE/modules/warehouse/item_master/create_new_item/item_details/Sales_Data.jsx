@@ -1,16 +1,16 @@
 import React, { useState } from "react";
-import Date_Field from "assets/elements/Date_Field";
-import Select_Field from "assets/elements/Select_Field";
-import Text_Code_Field from "assets/elements/Text_Code_Field";
-import Text_Field from "assets/elements/Text_Field";
-import Find_Field from "assets/elements/Find_Field";
-import { get_description } from "assets/scripts/functions/get_description";
-import Select_Generic from "../../modals/select_generic/Select_Generic";
 import {
   handle_date_change_function,
   handle_select_change_function,
   make_options,
 } from "assets/scripts/functions/input_functions";
+import { get_description } from "assets/scripts/functions/get_description";
+import Date_Field from "assets/elements/Date_Field";
+import Select_Field from "assets/elements/Select_Field";
+import Text_Code_Field from "assets/elements/Text_Code_Field";
+import Text_Field from "assets/elements/Text_Field";
+import Find_Field from "assets/elements/Find_Field";
+import Select_Generic from "../../modals/select_generic/Select_Generic";
 
 const Sales_Data = ({
   display_modal,
@@ -54,7 +54,7 @@ const Sales_Data = ({
       return {
         key: `select_sd_item_group_${n}`,
         label: `Item Group ${n}`,
-        list: eval(`item_group_${n}_list`), // dynamic list variable
+        list: eval(`item_group_${n}_list`),
         code: `item_group_${n}_code`,
         desc: `item_group_${n}_desc`,
         target: `sd_item_group_${n}_code`,
@@ -65,7 +65,7 @@ const Sales_Data = ({
       return {
         key: `select_sd_product_class_${n}`,
         label: `Product Class ${n}`,
-        list: eval(`product_class_${n}_list`), // dynamic list variable
+        list: eval(`product_class_${n}_list`),
         code: `product_class_${n}_code`,
         desc: `product_class_${n}_desc`,
         target: `sd_product_class_${n}_code`,
@@ -78,7 +78,6 @@ const Sales_Data = ({
   const handle_date_change = handle_date_change_function(set_new_item_data);
 
   const Item_Group = () => {
-    // Array of item group configs
     const item_group_array = [
       {
         modal_key: "sd_item_group_1",
@@ -147,7 +146,6 @@ const Sales_Data = ({
   };
 
   const Product_Class = () => {
-    // Array of item group configs
     const product_class_array = [
       {
         modal_key: "sd_product_class_1",
@@ -219,34 +217,6 @@ const Sales_Data = ({
   return (
     <React.Fragment>
       {/* + Section 1 */}
-      {/* <div className="rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6">
-        <div className="grid grid-cols-1 gap-5">
-          <div>
-            <Text_Code_Field
-              label="Sales Organization"
-              code_width="150px"
-              show_search_button={true}
-              // code_value={code_data}
-              // text_value={text_data}
-              on_click={() => set_display_modal("select_sd_sales_org")}
-              disabled
-            />
-          </div>
-          <div>
-            <Text_Code_Field
-              label="Distribution Channel"
-              code_width="150px"
-              show_search_button={true}
-              // code_value={code_data}
-              // text_value={text_data}
-              on_click={() => set_display_modal("select_sd_dist_channel")}
-              disabled
-            />
-          </div>
-        </div>
-      </div> */}
-      {/* - Section 1 */}
-      {/* + Section 2 */}
       <div className="mt-5 rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6">
         <h1 className="mb-5 font-semibold text-sky-700">
           General Sales Details
@@ -330,8 +300,8 @@ const Sales_Data = ({
           </div>
         </div>
       </div>
-      {/* - Section 2 */}
-      {/* + Section 3 */}
+      {/* - Section 1 */}
+      {/* + Section 2 */}
       <div className="mt-5 w-full bg-white rounded-lg border">
         {/* + Tab Navigation */}
         <div className="w-full border-b p-2">
@@ -363,7 +333,7 @@ const Sales_Data = ({
         </div>
         {/* - Tab Content */}
       </div>
-      {/* - Section 3 */}
+      {/* - Section 2 */}
       {/* + Modals */}
       {select_modal_configs.map((cfg) => (
         <Select_Generic

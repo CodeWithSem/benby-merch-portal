@@ -1,203 +1,88 @@
 import React from "react";
-import { CirclePlus, Trash2 } from "lucide-react";
+import {
+  handle_select_change_function,
+  handle_text_change_function,
+  make_options,
+} from "assets/scripts/functions/input_functions";
+import { get_description } from "assets/scripts/functions/get_description";
 import Checkbox_Field from "assets/elements/Checkbox_Field";
 import Select_Field from "assets/elements/Select_Field";
 import Text_Code_Field from "assets/elements/Text_Code_Field";
 import Text_Field from "assets/elements/Text_Field";
-import Button from "assets/elements/Button";
 import Find_Field from "assets/elements/Find_Field";
+import Select_Generic from "../../modals/select_generic/Select_Generic";
 
 const Plant_Data = ({
+  display_modal,
   set_display_modal,
-  branch_list,
-  plant_list,
-  sloc_list,
+  edit_item_data,
+  set_edit_item_data,
+  item_group_list,
+  scon_list,
+  period_ind_list,
+  inv_acc_center_list,
 }) => {
-  const columns = [
-    { key: "branch_code", label: "Branch" },
-    { key: "plant_code", label: "Plant" },
-    { key: "sloc_code", label: "SLOC" },
-  ];
-
-  const plant_ext_list = [
+  const select_modal_configs = [
     {
-      id: 1,
-      branch_code: "BR-0001",
-      plant_code: "PL-0001",
-      sloc_code: "SLOC-0001",
+      key: "select_pd_scon",
+      label: "Purchasing Group",
+      list: scon_list,
+      code: "scon_code",
+      desc: "scon_desc",
+      target: "pd_scon_code",
+    },
+    {
+      key: "select_pd_inv_acc_center",
+      label: "Inventory Account Center",
+      list: inv_acc_center_list,
+      code: "inv_acc_center_code",
+      desc: "inv_acc_center_desc",
+      target: "pd_inv_acc_center_code",
     },
   ];
 
-  const branch_lookup = (code) => {
-    const item = branch_list.find((x) => x.branch_code === code);
-    return item ? item.branch_desc : "-";
-  };
-
-  const plant_lookup = (code) => {
-    const item = plant_list.find((x) => x.plant_code === code);
-    return item ? item.plant_desc : "-";
-  };
-
-  const sloc_lookup = (code) => {
-    const item = sloc_list.find((x) => x.sloc_code === code);
-    return item ? item.sloc_desc : "-";
-  };
-
-  const handle_add_ext = () => {
-    alert("Add Extension");
-  };
+  const period_ind_options = make_options(period_ind_list, "period_ind_desc");
+  const handle_select_change =
+    handle_select_change_function(set_edit_item_data);
+  const handle_text_change = handle_text_change_function(set_edit_item_data);
 
   // RETURN ORIGIN
   return (
     <React.Fragment>
       {/* + Section 1 */}
-      <div className="rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6 whitespace-nowrap">
-        <h1 className="mb-5 font-semibold text-sky-700">Plant Extension</h1>
-        <div className="grid grid-cols-1 gap-5">
-          {/* + Table */}
-          <div className="col-span-full scrollbar-custom overflow-x-auto max-h-[400px]">
-            <table className="min-w-full">
-              <thead className="bg-gray-100">
-                <tr className="whitespace-nowrap">
-                  {columns.map((col, i) => (
-                    <th
-                      key={col.key}
-                      className={`border px-4 py-3 text-left text-[12px] font-medium text-gray-700 select-none`}
-                    >
-                      {col.label}
-                    </th>
-                  ))}
-                  <th
-                    className={`border px-4 py-3 text-left text-[12px] font-medium text-gray-700 select-none`}
-                  ></th>
-                </tr>
-              </thead>
-              <tbody className="bg-white">
-                {plant_ext_list.map((data, idx) => (
-                  <tr key={idx} className="hover:bg-gray-50/50">
-                    <td
-                      className={`border px-4 py-4 text-[12px] text-gray-600`}
-                    >
-                      <div className="block font-medium">
-                        <span className="block text-gray-500 text-[10px]">
-                          {data.branch_code}
-                        </span>
-                        <span className="block text-gray-800">
-                          {branch_lookup(data.branch_code)}
-                        </span>
-                      </div>
-                    </td>
-                    <td
-                      className={`border px-4 py-4 text-[12px] text-gray-600`}
-                    >
-                      <div className="block font-medium">
-                        <span className="block text-gray-500 text-[10px]">
-                          {data.plant_code}
-                        </span>
-                        <span className="block text-gray-800">
-                          {plant_lookup(data.plant_code)}
-                        </span>
-                      </div>
-                    </td>
-                    <td
-                      className={`border px-4 py-4 text-[12px] text-gray-600`}
-                    >
-                      <div className="block font-medium">
-                        <span className="block text-gray-500 text-[10px]">
-                          {data.sloc_code}
-                        </span>
-                        <span className="block text-gray-800">
-                          {sloc_lookup(data.sloc_code)}
-                        </span>
-                      </div>
-                    </td>
-                    <td
-                      className={`border px-4 py-4 text-[12px] text-gray-600`}
-                    >
-                      <div className="flex gap-2">
-                        <button className="text-gray-500 hover:text-red-600">
-                          <Trash2 size={18} />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-          {/* - Table */}
-        </div>
-      </div>
-      {/* - Section 1 */}
-      {/* + Section 2 */}
-      <div className="mt-5 rounded-lg border border-gray-100 bg-gray-50 p-4 sm:p-6 whitespace-nowrap">
-        <div className="grid grid-cols-1 gap-5">
-          <div>
-            <Text_Code_Field
-              label="Branch"
-              code_width="150px"
-              show_search_button={true}
-              // code_value={code_data}
-              // text_value={text_data}
-              on_click={() => set_display_modal("select_pd_branch")}
-              disabled
-            />
-          </div>
-          <div>
-            <Text_Code_Field
-              label="Plant / DC"
-              code_width="150px"
-              show_search_button={true}
-              // code_value={code_data}
-              // text_value={text_data}
-              on_click={() => set_display_modal("select_pd_plant")}
-              disabled
-            />
-          </div>
-          <div>
-            <Text_Code_Field
-              label="SLOC"
-              code_width="150px"
-              show_search_button={true}
-              // code_value={code_data}
-              // text_value={text_data}
-              on_click={() => set_display_modal("select_pd_sloc")}
-              disabled
-            />
-          </div>
-          <div className="mt-2 flex justify-end">
-            <Button
-              variant="primary"
-              icon={CirclePlus}
-              icon_position="left"
-              width="w-full md:w-auto"
-              on_click={handle_add_ext}
-            >
-              Add Extension
-            </Button>
-          </div>
-        </div>
-      </div>
-      {/* - Section 2 */}
-      {/* + Section 3 */}
       <div className="mt-5 rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6">
         <h1 className="mb-5 font-semibold text-sky-700">General Data</h1>
         <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
           <div>
-            <Text_Field label="Item Group" type={"text"} disabled />
+            <Text_Field
+              label="Item Group"
+              type={"text"}
+              value={get_description(
+                edit_item_data.std_item_group_code,
+                item_group_list,
+                "item_group_code",
+                "item_group_desc"
+              )} //--> same as std_item_group_code
+              disabled
+            />
           </div>
           <div>
             <Text_Field
               label="Base Unit of Measure (UoM)"
               type={"text"}
+              value={edit_item_data.std_base_uom} //--> same as std_base_uom
               disabled
             />
           </div>
           <div>
             <Find_Field
               label="Storage Condition"
-              // value={data}
-              // on_change={(e) => handle_data_change(e.target.value)}
+              value={get_description(
+                edit_item_data.pd_scon_code,
+                scon_list,
+                "scon_code",
+                "scon_desc"
+              )} //--> pd_scon_code
               on_click={() => set_display_modal("select_pd_scon")}
               disabled
             />
@@ -205,64 +90,61 @@ const Plant_Data = ({
           <div className="mt-4 flex items-end col-span-full">
             <Checkbox_Field
               label="Batch Managament"
-              name="batch_manage"
               box_size={24}
               icon_size={14}
-              checked={false}
-              on_change={(e) => alert(e.target.checked)}
+              checked={edit_item_data.std_batch_management} //--> same as std_batch_management
+              disabled
             />
           </div>
         </div>
       </div>
-      {/* - Section 3 */}
-      {/* + Section 4 */}
+      {/* - Section 1 */}
+      {/* + Section 2 */}
       <div className="mt-5 rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6">
         <h1 className="mb-5 font-semibold text-sky-700">
-          Shell Life / Best Before Details
+          Shelf Life / Best Before Details
         </h1>
         <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
           <div>
             <Text_Field
               label="Maximum Shelf Life"
               type={"number"}
+              placeholder={"0"}
               int_only={true}
-              // value={}
-              // on_change={}
+              value={edit_item_data.pd_max_shelf_life} //--> pd_max_shelf_life
+              on_change={handle_text_change("pd_max_shelf_life")}
             />
           </div>
           <div>
             <Select_Field
               label="Shelf Life Indicator (Max)"
-              name="shelf_life_ind_max"
-              placeholder="Select Option"
-              // options={options}
-              // value={selected_data}
-              // on_change={handle_option_change}
+              options={period_ind_options}
+              value={edit_item_data.pd_max_shelf_life_ind || ""} //--> pd_max_shelf_life_ind
+              on_change={handle_select_change("pd_max_shelf_life_ind")}
             />
           </div>
           <div>
             <Text_Field
               label="Minimum Shelf Life"
               type={"number"}
+              placeholder={"0"}
               int_only={true}
-              // value={}
-              // on_change={}
+              value={edit_item_data.pd_min_shelf_life} //--> pd_min_shelf_life
+              on_change={handle_text_change("pd_min_shelf_life")}
             />
           </div>
           <div>
             <Select_Field
               label="Shelf Life Indicator (Min)"
-              name="shelf_life_ind_min"
-              placeholder="Select Option"
-              // options={options}
-              // value={selected_data}
-              // on_change={handle_option_change}
+              options={period_ind_options}
+              value={edit_item_data.pd_min_shelf_life_ind || ""} //--> pd_min_shelf_life_ind
+              on_change={handle_select_change("pd_min_shelf_life_ind")}
             />
           </div>
         </div>
       </div>
-      {/* - Section 4 */}
-      {/* + Section 5 */}
+      {/* - Section 2 */}
+      {/* + Section 3 */}
       <div className="mt-5 rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6">
         <h1 className="mb-5 font-semibold text-sky-700">
           General Plant Inventory Account Details
@@ -273,15 +155,37 @@ const Plant_Data = ({
               label="Inventory Account Center"
               code_width="150px"
               show_search_button={true}
-              // code_value={code_data}
-              // text_value={text_data}
+              code_value={edit_item_data.pd_inv_acc_center_code} //--> pd_inv_acc_center_code
+              text_value={get_description(
+                edit_item_data.pd_inv_acc_center_code,
+                inv_acc_center_list,
+                "inv_acc_center_code",
+                "inv_acc_center_desc"
+              )}
               on_click={() => set_display_modal("select_pd_inv_acc_center")}
               disabled
             />
           </div>
         </div>
       </div>
-      {/* - Section 5 */}
+      {/* - Section 3 */}
+      {/* + Modals */}
+      {select_modal_configs.map((cfg) => (
+        <Select_Generic
+          key={cfg.key}
+          is_open={display_modal === cfg.key}
+          on_close={() => set_display_modal("")}
+          width="max-w-[1000px]"
+          height="max-h-[600px]"
+          modal_label={cfg.label}
+          source_list={cfg.list}
+          source_code={cfg.code}
+          source_desc={cfg.desc}
+          target_field={cfg.target}
+          set_data={set_edit_item_data}
+        />
+      ))}
+      {/* - Modals */}
     </React.Fragment>
   );
 };

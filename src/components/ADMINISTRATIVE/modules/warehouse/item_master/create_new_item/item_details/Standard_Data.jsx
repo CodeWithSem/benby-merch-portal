@@ -1,11 +1,4 @@
 import React from "react";
-import Checkbox_Field from "assets/elements/Checkbox_Field";
-import Date_Field from "assets/elements/Date_Field";
-import Select_Field from "assets/elements/Select_Field";
-import Text_Field from "assets/elements/Text_Field";
-import Find_Field from "assets/elements/Find_Field";
-import { get_description } from "assets/scripts/functions/get_description";
-import Select_Generic from "../../modals/select_generic/Select_Generic";
 import {
   handle_checkbox_change_function,
   handle_date_change_function,
@@ -13,6 +6,13 @@ import {
   handle_text_change_function,
   make_options,
 } from "assets/scripts/functions/input_functions";
+import { get_description } from "assets/scripts/functions/get_description";
+import Checkbox_Field from "assets/elements/Checkbox_Field";
+import Date_Field from "assets/elements/Date_Field";
+import Select_Field from "assets/elements/Select_Field";
+import Text_Field from "assets/elements/Text_Field";
+import Find_Field from "assets/elements/Find_Field";
+import Select_Generic from "../../modals/select_generic/Select_Generic";
 
 const Standard_Data = ({
   display_modal,
@@ -122,7 +122,6 @@ const Standard_Data = ({
                 "item_group_category_code",
                 "item_group_category_desc"
               )} //--> std_item_group_category_code
-              // on_change={(e) => handle_data_change(e.target.value)}
               on_click={() =>
                 set_display_modal("select_std_item_group_category")
               }

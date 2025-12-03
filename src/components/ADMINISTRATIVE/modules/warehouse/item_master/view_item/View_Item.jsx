@@ -1,7 +1,12 @@
 import React, { useState } from "react";
+import {
+  console_log,
+  format_date_1,
+  get_date_now,
+} from "assets/scripts/format";
+import { ChevronLeft, CirclePlus } from "lucide-react";
 import Text_Field from "assets/elements/Text_Field";
 import Button from "assets/elements/Button";
-import { ChevronLeft } from "lucide-react";
 import Standard_Data from "./item_details/Standard_Data";
 import Purchasing from "./item_details/Purchasing";
 import Case_Config_1 from "./item_details/Case_Config_1";
@@ -11,19 +16,35 @@ import Sales_Data_Plant from "./item_details/Sales_Data_Plant";
 import Plant_Data from "./item_details/Plant_Data";
 import WM_Data_1 from "./item_details/WM_Data_1";
 import WM_Data_2 from "./item_details/WM_Data_2";
-import { format_date_1, get_date_now } from "assets/scripts/format";
 import {
-  branch_list,
-  dist_channel_list,
-  plant_list,
-  sales_org_list,
-  sloc_list,
+  item_group_list,
+  item_group_category_list,
+  item_division_list,
+  item_status_list,
+  sales_status_list,
+  item_group_1_list,
+  item_group_2_list,
+  item_group_3_list,
+  item_group_4_list,
+  item_group_5_list,
+  product_class_1_list,
+  product_class_2_list,
+  product_class_3_list,
+  product_class_4_list,
+  product_class_5_list,
+  trans_group_list,
+  load_group_list,
+  inv_acc_center_list,
+  purc_group_list,
+  plant_status_list,
+  source_hub_list,
+  scon_list,
   stype_list,
+  ssec_ind_list,
 } from "../ITEM_DATA_MAP";
 
-const View_Item = ({ set_page }) => {
+const View_Item = ({ set_page, view_item_data }) => {
   const [active_tab, set_active_tab] = useState("standard_data");
-  const [display_modal, set_display_modal] = useState("");
 
   const tabs = [
     { key: "standard_data", title: "Standard Data" },
@@ -46,7 +67,7 @@ const View_Item = ({ set_page }) => {
     <React.Fragment>
       <div className="w-full">
         <div className="flex flex-wrap items-center justify-between gap-3 py-5">
-          <h1 className="text-xl">Inbound</h1>
+          <h1 className="text-xl">Warehouse</h1>
           {/* + Breadcrumbs */}
           <nav>
             <ol className="flex flex-wrap items-center gap-1.5">
@@ -75,7 +96,7 @@ const View_Item = ({ set_page }) => {
               </li>
               <li className="flex items-center gap-1.5 text-sm text-gray-500">
                 <span>/</span>
-                <span className="text-gray-800">View Item</span>
+                <span className="text-gray-800">View</span>
               </li>
             </ol>
           </nav>
@@ -97,7 +118,7 @@ const View_Item = ({ set_page }) => {
 
             <div className="flex gap-2">
               <div className="text-gray-500 text-sm tracking-wider">
-                MM-DD-YYYY
+                {view_item_data.creation_date}
               </div>
             </div>
           </div>
@@ -106,10 +127,20 @@ const View_Item = ({ set_page }) => {
           <div className="p-5 sm:p-6 border-t">
             <div className="grid grid-cols-1 gap-5 lg:grid-cols-4">
               <div className="w-full">
-                <Text_Field label="Item Code" type={"text"} disabled />
+                <Text_Field
+                  label="Item Code"
+                  type={"text"}
+                  value={view_item_data.item_code} //--> item_code
+                  disabled
+                />
               </div>
               <div className="w-full lg:col-span-3">
-                <Text_Field label="Item Description" type={"text"} disabled />
+                <Text_Field
+                  label="Item Description"
+                  type={"text"}
+                  value={view_item_data.item_desc} //--> item_desc
+                  disabled
+                />
               </div>
             </div>
           </div>
@@ -138,49 +169,87 @@ const View_Item = ({ set_page }) => {
               {/* - Tab Navigation */}
               {/* + Tab Content */}
               <div className="p-6">
-                {active_tab === "standard_data" && <Standard_Data />}
-                {active_tab === "purchasing" && <Purchasing />}
-                {active_tab === "case_config_1" && <Case_Config_1 />}
-                {active_tab === "case_config_2" && <Case_Config_2 />}
+                {active_tab === "standard_data" && (
+                  <Standard_Data
+                    view_item_data={view_item_data}
+                    item_group_list={item_group_list}
+                    item_group_category_list={item_group_category_list}
+                    item_division_list={item_division_list}
+                    item_status_list={item_status_list}
+                  />
+                )}
+                {active_tab === "case_config_1" && (
+                  <Case_Config_1 view_item_data={view_item_data} />
+                )}
+                {active_tab === "case_config_2" && (
+                  <Case_Config_2 view_item_data={view_item_data} />
+                )}
                 {active_tab === "sales_data" && (
                   <Sales_Data
-                    sales_org_list={sales_org_list}
-                    dist_channel_list={dist_channel_list}
+                    view_item_data={view_item_data}
+                    item_group_list={item_group_list}
+                    item_group_category_list={item_group_category_list}
+                    item_division_list={item_division_list}
+                    sales_status_list={sales_status_list}
+                    item_group_1_list={item_group_1_list}
+                    item_group_2_list={item_group_2_list}
+                    item_group_3_list={item_group_3_list}
+                    item_group_4_list={item_group_4_list}
+                    item_group_5_list={item_group_5_list}
+                    product_class_1_list={product_class_1_list}
+                    product_class_2_list={product_class_2_list}
+                    product_class_3_list={product_class_3_list}
+                    product_class_4_list={product_class_4_list}
+                    product_class_5_list={product_class_5_list}
                   />
                 )}
                 {active_tab === "sales_data_plant" && (
                   <Sales_Data_Plant
-                    branch_list={branch_list}
-                    plant_list={plant_list}
+                    view_item_data={view_item_data}
+                    trans_group_list={trans_group_list}
+                    load_group_list={load_group_list}
+                    inv_acc_center_list={inv_acc_center_list}
+                  />
+                )}
+                {active_tab === "purchasing" && (
+                  <Purchasing
+                    view_item_data={view_item_data}
+                    item_group_list={item_group_list}
+                    purc_group_list={purc_group_list}
+                    plant_status_list={plant_status_list}
+                    source_hub_list={source_hub_list}
                   />
                 )}
                 {active_tab === "plant_data" && (
                   <Plant_Data
-                    branch_list={branch_list}
-                    plant_list={plant_list}
-                    sloc_list={sloc_list}
+                    view_item_data={view_item_data}
+                    item_group_list={item_group_list}
+                    scon_list={scon_list}
+                    inv_acc_center_list={inv_acc_center_list}
                   />
                 )}
                 {active_tab === "wm_data_1" && (
                   <WM_Data_1
-                    branch_list={branch_list}
-                    plant_list={plant_list}
-                    sloc_list={sloc_list}
+                    view_item_data={view_item_data}
+                    stype_list={stype_list}
+                    ssec_ind_list={ssec_ind_list}
                   />
                 )}
                 {active_tab === "wm_data_2" && (
-                  <WM_Data_2
-                    branch_list={branch_list}
-                    plant_list={plant_list}
-                    sloc_list={sloc_list}
-                    stype_list={stype_list}
-                  />
+                  <WM_Data_2 view_item_data={view_item_data} />
                 )}
               </div>
               {/* - Tab Content */}
             </div>
           </div>
           {/* - Section 2 */}
+          <div className="p-4 sm:p-8 border-t">
+            <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
+              <Button variant="white" size="lg" on_click={handle_go_back}>
+                Close
+              </Button>
+            </div>
+          </div>
         </div>
       </div>
     </React.Fragment>

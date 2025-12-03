@@ -1,16 +1,37 @@
 import React, { useState } from "react";
-import { CirclePlus, Trash2 } from "lucide-react";
+import {
+  handle_date_change_function,
+  handle_select_change_function,
+  make_options,
+} from "assets/scripts/functions/input_functions";
+import { get_description } from "assets/scripts/functions/get_description";
 import Date_Field from "assets/elements/Date_Field";
 import Select_Field from "assets/elements/Select_Field";
 import Text_Code_Field from "assets/elements/Text_Code_Field";
-import Button from "assets/elements/Button";
 import Text_Field from "assets/elements/Text_Field";
 import Find_Field from "assets/elements/Find_Field";
+import Select_Generic from "../../modals/select_generic/Select_Generic";
 
 const Sales_Data = ({
+  display_modal,
   set_display_modal,
-  sales_org_list,
-  dist_channel_list,
+  edit_item_data,
+  set_edit_item_data,
+  item_group_list,
+  item_group_category_list,
+  item_division_list,
+  sales_status_list,
+  uom_list,
+  item_group_1_list,
+  item_group_2_list,
+  item_group_3_list,
+  item_group_4_list,
+  item_group_5_list,
+  product_class_1_list,
+  product_class_2_list,
+  product_class_3_list,
+  product_class_4_list,
+  product_class_5_list,
 }) => {
   const [sd_active_tab, set_sd_active_tab] = useState("item_group");
 
@@ -19,165 +40,238 @@ const Sales_Data = ({
     { key: "product_class", title: "Product Classification" },
   ];
 
-  const columns = [
-    { key: "sales_org_code", label: "Sales Organization" },
-    { key: "dist_channel_code", label: "Distribution Channel" },
-  ];
-
-  const sales_org_ext_list = [
+  const select_modal_configs = [
     {
-      id: 1,
-      sales_org_code: "SAO-0001",
-      dist_channel_code: "DC-0001",
+      key: "select_sd_sales_status",
+      label: "Sales Status",
+      list: sales_status_list,
+      code: "sales_status_code",
+      desc: "sales_status_desc",
+      target: "sd_sales_status_code",
     },
+    ...Array.from({ length: 5 }, (_, i) => {
+      const n = i + 1;
+      return {
+        key: `select_sd_item_group_${n}`,
+        label: `Item Group ${n}`,
+        list: eval(`item_group_${n}_list`),
+        code: `item_group_${n}_code`,
+        desc: `item_group_${n}_desc`,
+        target: `sd_item_group_${n}_code`,
+      };
+    }),
+    ...Array.from({ length: 5 }, (_, i) => {
+      const n = i + 1;
+      return {
+        key: `select_sd_product_class_${n}`,
+        label: `Product Class ${n}`,
+        list: eval(`product_class_${n}_list`),
+        code: `product_class_${n}_code`,
+        desc: `product_class_${n}_desc`,
+        target: `sd_product_class_${n}_code`,
+      };
+    }),
   ];
 
-  const sales_org_lookup = (code) => {
-    const item = sales_org_list.find((x) => x.sales_org_code === code);
-    return item ? item.sales_org_desc : "";
+  const uom_options = make_options(uom_list, "uom_code");
+  const handle_select_change =
+    handle_select_change_function(set_edit_item_data);
+  const handle_date_change = handle_date_change_function(set_edit_item_data);
+
+  const Item_Group = () => {
+    const item_group_array = [
+      {
+        modal_key: "sd_item_group_1",
+        code_key: "sd_item_group_1_code",
+        list: item_group_1_list,
+        label: "Item Group 1",
+      },
+      {
+        modal_key: "sd_item_group_2",
+        code_key: "sd_item_group_2_code",
+        list: item_group_2_list,
+        label: "Item Group 2",
+      },
+      {
+        modal_key: "sd_item_group_3",
+        code_key: "sd_item_group_3_code",
+        list: item_group_3_list,
+        label: "Item Group 3",
+      },
+      {
+        modal_key: "sd_item_group_4",
+        code_key: "sd_item_group_4_code",
+        list: item_group_4_list,
+        label: "Item Group 4",
+      },
+      {
+        modal_key: "sd_item_group_5",
+        code_key: "sd_item_group_5_code",
+        list: item_group_5_list,
+        label: "Item Group 5",
+      },
+    ];
+
+    return (
+      <React.Fragment>
+        {/* + Section 1 */}
+        <div className="rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6">
+          <div className="grid grid-cols-1 gap-5">
+            {item_group_array.map((group, index) => (
+              <div key={index}>
+                <Text_Code_Field
+                  label={group.label}
+                  code_width="150px"
+                  show_search_button={true}
+                  code_value={edit_item_data[group.code_key]}
+                  text_value={get_description(
+                    edit_item_data[group.code_key],
+                    group.list,
+                    `${group.code_key.replace("sd_", "")}`,
+                    `${group.code_key
+                      .replace("sd_", "")
+                      .replace("_code", "_desc")}`
+                  )}
+                  on_click={() =>
+                    set_display_modal(`select_${group.modal_key}`)
+                  }
+                  disabled
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+        {/* - Section 1 */}
+      </React.Fragment>
+    );
   };
 
-  const dist_channel_lookup = (code) => {
-    const item = dist_channel_list.find((x) => x.dist_channel_code === code);
-    return item ? item.dist_channel_desc : "";
-  };
+  const Product_Class = () => {
+    const product_class_array = [
+      {
+        modal_key: "sd_product_class_1",
+        code_key: "sd_product_class_1_code",
+        list: product_class_1_list,
+        label: "Product Classification 1",
+      },
+      {
+        modal_key: "sd_product_class_2",
+        code_key: "sd_product_class_2_code",
+        list: product_class_2_list,
+        label: "Product Classification 2",
+      },
+      {
+        modal_key: "sd_product_class_3",
+        code_key: "sd_product_class_3_code",
+        list: product_class_3_list,
+        label: "Product Classification 3",
+      },
+      {
+        modal_key: "sd_product_class_4",
+        code_key: "sd_product_class_4_code",
+        list: product_class_4_list,
+        label: "Product Classification 4",
+      },
+      {
+        modal_key: "sd_product_class_5",
+        code_key: "sd_product_class_5_code",
+        list: product_class_5_list,
+        label: "Product Classification 5",
+      },
+    ];
 
-  const handle_add_ext = () => {
-    alert("Add Extension");
+    return (
+      <React.Fragment>
+        {/* + Section 1 */}
+        <div className="rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6">
+          <div className="grid grid-cols-1 gap-5">
+            {product_class_array.map((group, index) => (
+              <div key={index}>
+                <Text_Code_Field
+                  label={group.label}
+                  code_width="150px"
+                  show_search_button={true}
+                  code_value={edit_item_data[group.code_key]}
+                  text_value={get_description(
+                    edit_item_data[group.code_key],
+                    group.list,
+                    `${group.code_key.replace("sd_", "")}`,
+                    `${group.code_key
+                      .replace("sd_", "")
+                      .replace("_code", "_desc")}`
+                  )}
+                  on_click={() =>
+                    set_display_modal(`select_${group.modal_key}`)
+                  }
+                  disabled
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+        {/* - Section 1 */}
+      </React.Fragment>
+    );
   };
 
   // RETURN ORIGIN
   return (
     <React.Fragment>
       {/* + Section 1 */}
-      <div className="rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6 whitespace-nowrap">
-        <h1 className="mb-5 font-semibold text-sky-700">
-          Sales Organization Extension
-        </h1>
-        <div className="grid grid-cols-1 gap-5">
-          {/* + Table */}
-          <div className="col-span-full scrollbar-custom overflow-x-auto max-h-[400px]">
-            <table className="min-w-full">
-              <thead className="bg-gray-100">
-                <tr className="whitespace-nowrap">
-                  {columns.map((col, i) => (
-                    <th
-                      key={col.key}
-                      className={`border px-4 py-3 text-left text-[12px] font-medium text-gray-700 select-none`}
-                    >
-                      {col.label}
-                    </th>
-                  ))}
-                  <th
-                    className={`border px-4 py-3 text-left text-[12px] font-medium text-gray-700 select-none`}
-                  ></th>
-                </tr>
-              </thead>
-              <tbody className="bg-white">
-                {sales_org_ext_list.map((data, idx) => (
-                  <tr key={idx} className="hover:bg-gray-50/50">
-                    <td
-                      className={`border px-4 py-4 text-[12px] text-gray-600`}
-                    >
-                      <div className="block font-medium">
-                        <span className="block text-gray-500 text-[10px]">
-                          {data.sales_org_code}
-                        </span>
-                        <span className="block text-gray-800">
-                          {sales_org_lookup(data.sales_org_code)}
-                        </span>
-                      </div>
-                    </td>
-                    <td
-                      className={`border px-4 py-4 text-[12px] text-gray-600`}
-                    >
-                      <div className="block font-medium">
-                        <span className="block text-gray-500 text-[10px]">
-                          {data.dist_channel_code}
-                        </span>
-                        <span className="block text-gray-800">
-                          {dist_channel_lookup(data.dist_channel_code)}
-                        </span>
-                      </div>
-                    </td>
-                    <td
-                      className={`border px-4 py-4 text-[12px] text-gray-600`}
-                    >
-                      <div className="flex gap-2">
-                        <button className="text-gray-500 hover:text-red-600">
-                          <Trash2 size={18} />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-          {/* - Table */}
-        </div>
-      </div>
-      {/* - Section 1 */}
-      {/* + Section 2 */}
-      <div className="mt-5 rounded-lg border border-gray-100 bg-gray-50 p-4 sm:p-6 whitespace-nowrap">
-        <div className="grid grid-cols-1 gap-5">
-          <div>
-            <Text_Code_Field
-              label="Sales Organization"
-              code_width="150px"
-              show_search_button={true}
-              // code_value={code_data}
-              // text_value={text_data}
-              on_click={() => set_display_modal("select_sd_sales_org")}
-              disabled
-            />
-          </div>
-          <div>
-            <Text_Code_Field
-              label="Distribution Channel"
-              code_width="150px"
-              show_search_button={true}
-              // code_value={code_data}
-              // text_value={text_data}
-              on_click={() => set_display_modal("select_sd_dist_channel")}
-              disabled
-            />
-          </div>
-          <div className="mt-2 flex justify-end">
-            <Button
-              variant="primary"
-              icon={CirclePlus}
-              icon_position="left"
-              width="w-full md:w-auto"
-              on_click={handle_add_ext}
-            >
-              Add Extension
-            </Button>
-          </div>
-        </div>
-      </div>
-      {/* - Section 2 */}
-      {/* + Section 3 */}
       <div className="mt-5 rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6">
         <h1 className="mb-5 font-semibold text-sky-700">
           General Sales Details
         </h1>
         <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
           <div>
-            <Text_Field label="Item Group" type={"text"} disabled />
+            <Text_Field
+              label="Item Group"
+              type={"text"}
+              value={get_description(
+                edit_item_data.std_item_group_code,
+                item_group_list,
+                "item_group_code",
+                "item_group_desc"
+              )} //--> same as std_item_group_code
+              disabled
+            />
           </div>
           <div>
-            <Text_Field label="Item Group Category" type={"text"} disabled />
+            <Text_Field
+              label="Item Group Category"
+              type={"text"}
+              value={get_description(
+                edit_item_data.std_item_group_category_code,
+                item_group_category_list,
+                "item_group_category_code",
+                "item_group_category_desc"
+              )} //--> same as std_item_group_category_code
+              disabled
+            />
           </div>
           <div>
-            <Text_Field label="Item Division" type={"text"} disabled />
+            <Text_Field
+              label="Item Division"
+              type={"text"}
+              value={get_description(
+                edit_item_data.std_item_division_code,
+                item_division_list,
+                "item_division_code",
+                "item_division_desc"
+              )} //--> same as std_item_division_code
+              disabled
+            />
           </div>
           <div>
             <Find_Field
               label="Sales Specific Status"
-              // value={data}
-              // on_change={(e) => handle_data_change(e.target.value)}
-              on_click={() => set_display_modal("select_sd_s_spec_status")}
+              value={get_description(
+                edit_item_data.sd_sales_status_code,
+                sales_status_list,
+                "sales_status_code",
+                "sales_status_desc"
+              )} //--> sd_sales_status_code
+              on_click={() => set_display_modal("select_sd_sales_status")}
               disabled
             />
           </div>
@@ -185,35 +279,34 @@ const Sales_Data = ({
             <Date_Field
               label="Validity From"
               placeholder="MM-DD-YYYY"
-              // value={selected_data}
-              on_change={(e) => alert(e.target.value)}
+              value={edit_item_data.sd_valid_from} //--> sd_valid_from
+              on_change={handle_date_change("sd_valid_from")}
             />
           </div>
           <div>
             <Date_Field
               label="Validity To"
               placeholder="MM-DD-YYYY"
-              // value={selected_data}
-              on_change={(e) => alert(e.target.value)}
+              value={edit_item_data.sd_valid_to} //--> sd_valid_to
+              on_change={handle_date_change("sd_valid_to")}
             />
           </div>
           <div>
             <Select_Field
               label="Sales Unit"
-              placeholder="Select Option"
-              // options={options}
-              // value={selected_data}
-              // on_change={handle_option_change}
+              options={uom_options}
+              value={edit_item_data.sd_sales_uom || ""} //--> sd_sales_uom
+              on_change={handle_select_change("sd_sales_uom")}
             />
           </div>
         </div>
       </div>
-      {/* - Section 3 */}
-      {/* + Section 4 */}
+      {/* - Section 1 */}
+      {/* + Section 2 */}
       <div className="mt-5 w-full bg-white rounded-lg border">
         {/* + Tab Navigation */}
         <div className="w-full border-b p-2">
-          <nav className="flex overflow-x-auto rounded-lg bg-gray-100 p-1 dark:bg-gray-900 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-200 dark:[&::-webkit-scrollbar-thumb]:bg-gray-600 [&::-webkit-scrollbar-track]:bg-white dark:[&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar]:h-1.5">
+          <nav className="flex overflow-x-auto rounded-lg bg-gray-100 p-1 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-200 [&::-webkit-scrollbar-track]:bg-white [&::-webkit-scrollbar]:h-1.5">
             {tabs.map((tab) => (
               <button
                 key={tab.key}
@@ -221,7 +314,7 @@ const Sales_Data = ({
                 className={`inline-flex items-center rounded-md px-5 py-2 text-sm font-medium transition-colors duration-200 ease-in-out outline-none whitespace-nowrap ${
                   sd_active_tab === tab.key
                     ? "bg-white text-gray-900 shadow-xs"
-                    : "bg-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                    : "bg-transparent text-gray-500 hover:text-gray-700"
                 }`}
               >
                 {tab.title}
@@ -241,144 +334,26 @@ const Sales_Data = ({
         </div>
         {/* - Tab Content */}
       </div>
-      {/* - Section 4 */}
+      {/* - Section 2 */}
+      {/* + Modals */}
+      {select_modal_configs.map((cfg) => (
+        <Select_Generic
+          key={cfg.key}
+          is_open={display_modal === cfg.key}
+          on_close={() => set_display_modal("")}
+          width="max-w-[1000px]"
+          height="max-h-[600px]"
+          modal_label={cfg.label}
+          source_list={cfg.list}
+          source_code={cfg.code}
+          source_desc={cfg.desc}
+          target_field={cfg.target}
+          set_data={set_edit_item_data}
+        />
+      ))}
+      {/* - Modals */}
     </React.Fragment>
   );
 };
 
 export default Sales_Data;
-
-const Item_Group = ({ set_display_modal }) => {
-  return (
-    <React.Fragment>
-      {/* + Section 1 */}
-      <div className="rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6">
-        <div className="grid grid-cols-1 gap-5">
-          <div>
-            <Text_Code_Field
-              label="Item Grouping 1"
-              code_width="150px"
-              show_search_button={true}
-              // code_value={code_data}
-              // text_value={text_data}
-              on_click={() => set_display_modal("select_item_group_1")}
-              disabled
-            />
-          </div>
-          <div>
-            <Text_Code_Field
-              label="Item Grouping 2"
-              code_width="150px"
-              show_search_button={true}
-              // code_value={code_data}
-              // text_value={text_data}
-              on_click={() => set_display_modal("select_item_group_2")}
-              disabled
-            />
-          </div>
-          <div>
-            <Text_Code_Field
-              label="Item Grouping 3"
-              code_width="150px"
-              show_search_button={true}
-              // code_value={code_data}
-              // text_value={text_data}
-              on_click={() => set_display_modal("select_item_group_3")}
-              disabled
-            />
-          </div>
-          <div>
-            <Text_Code_Field
-              label="Item Grouping 4"
-              code_width="150px"
-              show_search_button={true}
-              // code_value={code_data}
-              // text_value={text_data}
-              on_click={() => set_display_modal("select_item_group_4")}
-              disabled
-            />
-          </div>
-          <div>
-            <Text_Code_Field
-              label="Item Grouping 5"
-              code_width="150px"
-              show_search_button={true}
-              // code_value={code_data}
-              // text_value={text_data}
-              on_click={() => set_display_modal("select_item_group_5")}
-              disabled
-            />
-          </div>
-        </div>
-      </div>
-      {/* - Section 1 */}
-    </React.Fragment>
-  );
-};
-const Product_Class = ({ set_display_modal }) => {
-  return (
-    <React.Fragment>
-      {/* + Section 1 */}
-      <div className="rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6">
-        <div className="grid grid-cols-1 gap-5">
-          <div>
-            <Text_Code_Field
-              label="Product Classification 1"
-              code_width="150px"
-              show_search_button={true}
-              // code_value={code_data}
-              // text_value={text_data}
-              on_click={() => set_display_modal("select_product_class_1")}
-              disabled
-            />
-          </div>
-          <div>
-            <Text_Code_Field
-              label="Product Classification 2"
-              code_width="150px"
-              show_search_button={true}
-              // code_value={code_data}
-              // text_value={text_data}
-              on_click={() => set_display_modal("select_product_class_2")}
-              disabled
-            />
-          </div>
-          <div>
-            <Text_Code_Field
-              label="Product Classification 3"
-              code_width="150px"
-              show_search_button={true}
-              // code_value={code_data}
-              // text_value={text_data}
-              on_click={() => set_display_modal("select_product_class_3")}
-              disabled
-            />
-          </div>
-          <div>
-            <Text_Code_Field
-              label="Product Classification 4"
-              code_width="150px"
-              show_search_button={true}
-              // code_value={code_data}
-              // text_value={text_data}
-              on_click={() => set_display_modal("select_product_class_4")}
-              disabled
-            />
-          </div>
-          <div>
-            <Text_Code_Field
-              label="Product Classification 5"
-              code_width="150px"
-              show_search_button={true}
-              // code_value={code_data}
-              // text_value={text_data}
-              on_click={() => set_display_modal("select_product_class_5")}
-              disabled
-            />
-          </div>
-        </div>
-      </div>
-      {/* - Section 1 */}
-    </React.Fragment>
-  );
-};

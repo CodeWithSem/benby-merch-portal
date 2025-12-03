@@ -1,13 +1,60 @@
 import React, { useState } from "react";
 import Text_Field from "assets/elements/Text_Field";
 import Button from "assets/elements/Button";
-import { X } from "lucide-react";
+import { CheckCircle2, CircleX, X } from "lucide-react";
+import { api_delete_item_master } from "api/firestore_db/warehouse/item_master/tbl_item_master_api";
 
-const Delete_Item = ({ is_open, on_close, width = "max-w-[700px]" }) => {
+const Delete_Item = ({
+  is_open,
+  on_close,
+  width = "max-w-[700px]",
+  show_toast,
+  delete_item_data,
+  set_item_master_list,
+}) => {
   const [is_confirm_modal_open, set_is_confirm_modal_open] = useState(false);
+  const [delete_loading, set_delete_loading] = useState(false);
 
-  const handle_delete_item = () => {
-    alert("Delete Item");
+  const handle_delete_item = async (id) => {
+    try {
+      set_delete_loading(true);
+      const response = await api_delete_item_master(id);
+      if (response.success) {
+        set_item_master_list((prev) => prev.filter((item) => item.id !== id));
+        show_status("success");
+        close_modal();
+      } else {
+        show_status("error");
+      }
+    } catch (error) {
+      console.error(error);
+      show_status("error");
+    } finally {
+      set_delete_loading(false);
+    }
+  };
+
+  const show_status = (status) => {
+    if (status === "success") {
+      show_toast({
+        type: "success",
+        title: "Deleted Successfully",
+        message: `The record has been delete.`,
+        icon: <CheckCircle2 size={21} className="text-green-500" />,
+      });
+    } else {
+      show_toast({
+        type: "danger",
+        title: "Error",
+        message: "Something went wrong. Please try again.",
+        icon: <CircleX size={21} className="text-red-500" />,
+      });
+    }
+  };
+
+  const close_modal = () => {
+    set_is_confirm_modal_open(false);
+    on_close();
   };
 
   const Confirm_Modal = () => {
@@ -39,7 +86,8 @@ const Delete_Item = ({ is_open, on_close, width = "max-w-[700px]" }) => {
               <Button
                 width="w-[100px]"
                 variant="danger"
-                on_click={handle_delete_item}
+                loading={delete_loading}
+                on_click={() => handle_delete_item(delete_item_data.id)}
               >
                 Yes
               </Button>
@@ -86,7 +134,7 @@ const Delete_Item = ({ is_open, on_close, width = "max-w-[700px]" }) => {
 
                   <div className="flex gap-2">
                     <div className="text-gray-500 text-sm tracking-wider">
-                      MM-DD-YYYY
+                      {delete_item_data.creation_date}
                     </div>
                   </div>
                 </div>
@@ -99,8 +147,7 @@ const Delete_Item = ({ is_open, on_close, width = "max-w-[700px]" }) => {
                           <Text_Field
                             label="Item Code"
                             type={"text"}
-                            // value={"AUTO GENERATED"}
-                            // on_change={handle_text_change}
+                            value={delete_item_data.item_code}
                             pattern="[A-Za-z]{1,}"
                             disabled
                           />
@@ -109,7 +156,7 @@ const Delete_Item = ({ is_open, on_close, width = "max-w-[700px]" }) => {
                           <Text_Field
                             label="Item Description"
                             type={"text"}
-                            pattern="[0-9]{1,}"
+                            value={delete_item_data.item_desc}
                             disabled
                           />
                         </div>

@@ -343,13 +343,13 @@ export const sutype_list = [
 export const sales_org_list = [
   {
     id: 1,
-    sales_org_code: "SAO-0001",
+    sales_org_code: "SA-ORG-001",
     sales_org_desc: "Sales Organization Data 1",
     creation_date: "MM-DD-YYYY",
   },
   {
     id: 2,
-    sales_org_code: "SAO-0002",
+    sales_org_code: "SA-ORG-002",
     sales_org_desc: "Sales Organization Data 2",
     creation_date: "MM-DD-YYYY",
   },
@@ -358,13 +358,13 @@ export const sales_org_list = [
 export const dist_channel_list = [
   {
     id: 1,
-    dist_channel_code: "DC-0001",
+    dist_channel_code: "D-CH-001",
     dist_channel_desc: "Distribution Channel Data 1",
     creation_date: "MM-DD-YYYY",
   },
   {
     id: 2,
-    dist_channel_code: "DC-0002",
+    dist_channel_code: "D-CH-002",
     dist_channel_desc: "Distribution Channel Data 2",
     creation_date: "MM-DD-YYYY",
   },

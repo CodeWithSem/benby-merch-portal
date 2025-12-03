@@ -1,10 +1,4 @@
 import React from "react";
-import Checkbox_Field from "assets/elements/Checkbox_Field";
-import Select_Field from "assets/elements/Select_Field";
-import Text_Code_Field from "assets/elements/Text_Code_Field";
-import Text_Field from "assets/elements/Text_Field";
-import Text_Field_Adorn from "assets/elements/Text_Field_Adorn";
-import Find_Field from "assets/elements/Find_Field";
 import {
   handle_checkbox_change_function,
   handle_select_change_function,
@@ -12,6 +6,11 @@ import {
   make_options,
 } from "assets/scripts/functions/input_functions";
 import { get_description } from "assets/scripts/functions/get_description";
+import Checkbox_Field from "assets/elements/Checkbox_Field";
+import Select_Field from "assets/elements/Select_Field";
+import Text_Field from "assets/elements/Text_Field";
+import Text_Field_Adorn from "assets/elements/Text_Field_Adorn";
+import Find_Field from "assets/elements/Find_Field";
 import Select_Generic from "../../modals/select_generic/Select_Generic";
 
 const WM_Data_1 = ({
@@ -49,6 +48,7 @@ const WM_Data_1 = ({
       target: "wm1_ssec_ind_code",
     },
   ];
+
   const uom_options = make_options(uom_list, "uom_code");
   const handle_select_change = handle_select_change_function(set_new_item_data);
   const handle_text_change = handle_text_change_function(set_new_item_data);
@@ -59,34 +59,6 @@ const WM_Data_1 = ({
   return (
     <React.Fragment>
       {/* + Section 1 */}
-      {/* <div className="rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6">
-        <div className="grid grid-cols-1 gap-5">
-          <div>
-            <Text_Code_Field
-              label="Branch"
-              code_width="150px"
-              show_search_button={true}
-              // code_value={code_data}
-              // text_value={text_data}
-              on_click={() => set_display_modal("select_wm1_branch")}
-              disabled
-            />
-          </div>
-          <div>
-            <Text_Code_Field
-              label="Plant / DC"
-              code_width="150px"
-              show_search_button={true}
-              // code_value={code_data}
-              // text_value={text_data}
-              on_click={() => set_display_modal("select_wm1_plant")}
-              disabled
-            />
-          </div>
-        </div>
-      </div> */}
-      {/* - Section 1 */}
-      {/* + Section 2 */}
       <div className="mt-5 rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6">
         <h1 className="mb-5 font-semibold text-sky-700">General Data</h1>
         <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
@@ -204,8 +176,8 @@ const WM_Data_1 = ({
           </div>
         </div>
       </div>
-      {/* - Section 2 */}
-      {/* + Section 3 */}
+      {/* - Section 1 */}
+      {/* + Section 2 */}
       <div className="mt-5 rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6">
         <h1 className="mb-5 font-semibold text-sky-700">
           Strategies for Storage
@@ -270,7 +242,7 @@ const WM_Data_1 = ({
           </div>
         </div>
       </div>
-      {/* - Section 3 */}
+      {/* - Section 2 */}
       {/* + Modals */}
       {select_modal_configs.map((cfg) => (
         <Select_Generic

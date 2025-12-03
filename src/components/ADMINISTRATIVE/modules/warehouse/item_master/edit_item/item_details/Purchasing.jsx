@@ -1,198 +1,93 @@
 import React from "react";
-import { CirclePlus, Trash2 } from "lucide-react";
+import {
+  handle_date_change_function,
+  handle_select_change_function,
+  handle_text_change_function,
+  make_options,
+} from "assets/scripts/functions/input_functions";
+import { get_description } from "assets/scripts/functions/get_description";
 import Checkbox_Field from "assets/elements/Checkbox_Field";
 import Date_Field from "assets/elements/Date_Field";
 import Select_Field from "assets/elements/Select_Field";
 import Text_Code_Field from "assets/elements/Text_Code_Field";
 import Text_Field from "assets/elements/Text_Field";
 import Textarea_Field from "assets/elements/Textarea_Field";
-import Button from "assets/elements/Button";
 import Find_Field from "assets/elements/Find_Field";
+import Select_Generic from "../../modals/select_generic/Select_Generic";
 
 const Purchasing = ({
+  display_modal,
   set_display_modal,
-  branch_list,
-  plant_list,
-  sloc_list,
+  edit_item_data,
+  set_edit_item_data,
+  item_group_list,
+  purc_group_list,
+  uom_list,
+  plant_status_list,
+  source_hub_list,
 }) => {
-  const columns = [
-    { key: "branch_code", label: "Branch" },
-    { key: "plant_code", label: "Plant" },
-    { key: "sloc_code", label: "SLOC" },
-  ];
-
-  const plant_ext_list = [
+  const select_modal_configs = [
     {
-      id: 1,
-      branch_code: "BR-0001",
-      plant_code: "PL-0001",
-      sloc_code: "SLOC-0001",
+      key: "select_pu_purc_group",
+      label: "Purchasing Group",
+      list: purc_group_list,
+      code: "purc_group_code",
+      desc: "purc_group_desc",
+      target: "pu_purc_group_code",
+    },
+    {
+      key: "select_pu_plant_status",
+      label: "Plant Status",
+      list: plant_status_list,
+      code: "plant_status_code",
+      desc: "plant_status_desc",
+      target: "pu_plant_status_code",
+    },
+    {
+      key: "select_pu_source_hub",
+      label: "Source Hub",
+      list: source_hub_list,
+      code: "source_hub_code",
+      desc: "source_hub_desc",
+      target: "pu_source_hub_code",
     },
   ];
 
-  const branch_lookup = (code) => {
-    const item = branch_list.find((x) => x.branch_code === code);
-    return item ? item.branch_desc : "-";
-  };
-
-  const plant_lookup = (code) => {
-    const item = plant_list.find((x) => x.plant_code === code);
-    return item ? item.plant_desc : "-";
-  };
-
-  const sloc_lookup = (code) => {
-    const item = sloc_list.find((x) => x.sloc_code === code);
-    return item ? item.sloc_desc : "-";
-  };
-
-  const handle_add_ext = () => {
-    alert("Add Extension");
-  };
+  const uom_options = make_options(uom_list, "uom_code");
+  const handle_select_change =
+    handle_select_change_function(set_edit_item_data);
+  const handle_date_change = handle_date_change_function(set_edit_item_data);
+  const handle_text_change = handle_text_change_function(set_edit_item_data);
   // RETURN ORIGIN
   return (
     <React.Fragment>
       {/* + Section 1 */}
-      <div className="rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6 whitespace-nowrap">
-        <h1 className="mb-5 font-semibold text-sky-700">Plant Extension</h1>
-        <div className="grid grid-cols-1 gap-5">
-          {/* + Table */}
-          <div className="col-span-full scrollbar-custom overflow-x-auto max-h-[400px]">
-            <table className="min-w-full">
-              <thead className="bg-gray-100">
-                <tr className="whitespace-nowrap">
-                  {columns.map((col, i) => (
-                    <th
-                      key={col.key}
-                      className={`border px-4 py-3 text-left text-[12px] font-medium text-gray-700 select-none`}
-                    >
-                      {col.label}
-                    </th>
-                  ))}
-                  <th
-                    className={`border px-4 py-3 text-left text-[12px] font-medium text-gray-700 select-none`}
-                  ></th>
-                </tr>
-              </thead>
-              <tbody className="bg-white">
-                {plant_ext_list.map((data, idx) => (
-                  <tr key={idx} className="hover:bg-gray-50/50">
-                    <td
-                      className={`border px-4 py-4 text-[12px] text-gray-600`}
-                    >
-                      <div className="block font-medium">
-                        <span className="block text-gray-500 text-[10px]">
-                          {data.branch_code}
-                        </span>
-                        <span className="block text-gray-800">
-                          {branch_lookup(data.branch_code)}
-                        </span>
-                      </div>
-                    </td>
-                    <td
-                      className={`border px-4 py-4 text-[12px] text-gray-600`}
-                    >
-                      <div className="block font-medium">
-                        <span className="block text-gray-500 text-[10px]">
-                          {data.plant_code}
-                        </span>
-                        <span className="block text-gray-800">
-                          {plant_lookup(data.plant_code)}
-                        </span>
-                      </div>
-                    </td>
-                    <td
-                      className={`border px-4 py-4 text-[12px] text-gray-600`}
-                    >
-                      <div className="block font-medium">
-                        <span className="block text-gray-500 text-[10px]">
-                          {data.sloc_code}
-                        </span>
-                        <span className="block text-gray-800">
-                          {sloc_lookup(data.sloc_code)}
-                        </span>
-                      </div>
-                    </td>
-                    <td
-                      className={`border px-4 py-4 text-[12px] text-gray-600`}
-                    >
-                      <div className="flex gap-2">
-                        <button className="text-gray-500 hover:text-red-600">
-                          <Trash2 size={18} />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-          {/* - Table */}
-        </div>
-      </div>
-      {/* - Section 1 */}
-      {/* + Section 2 */}
-      <div className="mt-5 rounded-lg border border-gray-100 bg-gray-50 p-4 sm:p-6 whitespace-nowrap">
-        <div className="grid grid-cols-1 gap-5">
-          <div>
-            <Text_Code_Field
-              label="Branch"
-              code_width="150px"
-              show_search_button={true}
-              // code_value={code_data}
-              // text_value={text_data}
-              on_click={() => set_display_modal("select_pu_branch")}
-              disabled
-            />
-          </div>
-          <div>
-            <Text_Code_Field
-              label="Plant / DC"
-              code_width="150px"
-              show_search_button={true}
-              // code_value={code_data}
-              // text_value={text_data}
-              on_click={() => set_display_modal("select_pu_plant")}
-              disabled
-            />
-          </div>
-          <div>
-            <Text_Code_Field
-              label="SLOC"
-              code_width="150px"
-              show_search_button={true}
-              // code_value={code_data}
-              // text_value={text_data}
-              on_click={() => set_display_modal("select_pu_sloc")}
-              disabled
-            />
-          </div>
-          <div className="mt-2 flex justify-end">
-            <Button
-              variant="primary"
-              icon={CirclePlus}
-              icon_position="left"
-              width="w-full md:w-auto"
-              on_click={handle_add_ext}
-            >
-              Add Extension
-            </Button>
-          </div>
-        </div>
-      </div>
-      {/* - Section 2 */}
-      {/* + Section 2 */}
       <div className="mt-5 rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6">
         <h1 className="mb-5 font-semibold text-sky-700">Purchasing Details</h1>
         <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
           <div>
-            <Text_Field label="Item Group" type={"text"} disabled />
+            <Text_Field
+              label="Item Group"
+              type={"text"}
+              value={get_description(
+                edit_item_data.std_item_group_code,
+                item_group_list,
+                "item_group_code",
+                "item_group_desc"
+              )} //--> same as std_item_group_code
+              disabled
+            />
           </div>
           <div>
             <Find_Field
               label="Purchasing Group"
-              // value={data}
-              // on_change={(e) => handle_data_change(e.target.value)}
-              on_click={() => set_display_modal("select_pu_p_group")}
+              value={get_description(
+                edit_item_data.pu_purc_group_code,
+                purc_group_list,
+                "purc_group_code",
+                "purc_group_desc"
+              )} //--> pu_purc_group_code
+              on_click={() => set_display_modal("select_pu_purc_group")}
               disabled
             />
           </div>
@@ -200,40 +95,44 @@ const Purchasing = ({
             <Text_Field
               label="Base Unit of Measure (UoM)"
               type={"text"}
+              value={edit_item_data.std_base_uom} //--> same as std_base_uom
               disabled
             />
           </div>
           <div>
             <Select_Field
               label="Ordering Unit"
-              placeholder="Select Option"
-              // options={options}
-              // value={selected_data}
-              // on_change={handle_option_change}
+              options={uom_options}
+              value={edit_item_data.pu_ordering_uom || ""} //--> pu_ordering_uom
+              on_change={handle_select_change("pu_ordering_uom")}
             />
           </div>
           <div>
             <Date_Field
               label="Validity From"
               placeholder="MM-DD-YYYY"
-              // value={selected_data}
-              on_change={(e) => console.log(e.target.value)}
+              value={edit_item_data.pu_valid_from} //--> pu_valid_from
+              on_change={handle_date_change("pu_valid_from")}
             />
           </div>
           <div>
             <Date_Field
               label="Validity To"
               placeholder="MM-DD-YYYY"
-              // value={selected_data}
-              on_change={(e) => console.log(e.target.value)}
+              value={edit_item_data.pu_valid_to} //--> pu_valid_to
+              on_change={handle_date_change("pu_valid_to")}
             />
           </div>
           <div>
             <Find_Field
               label="Plant Specific Status"
-              // value={data}
-              // on_change={(e) => handle_data_change(e.target.value)}
-              on_click={() => set_display_modal("select_pu_pl_spec_status")}
+              value={get_description(
+                edit_item_data.pu_plant_status_code,
+                plant_status_list,
+                "plant_status_code",
+                "plant_status_desc"
+              )} //--> pu_plant_status_code
+              on_click={() => set_display_modal("select_pu_plant_status")}
               disabled
             />
           </div>
@@ -242,14 +141,14 @@ const Purchasing = ({
               label="Batch Management"
               box_size={24}
               icon_size={14}
-              checked={false}
-              on_change={(e) => alert(e.target.value)}
+              checked={edit_item_data.std_batch_management} //--> same as std_batch_management
+              disabled
             />
           </div>
         </div>
       </div>
-      {/* - Section 2 */}
-      {/* + Section 3 */}
+      {/* - Section 1 */}
+      {/* + Section 2 */}
       <div className="mt-5 rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6">
         <h1 className="mb-5 font-semibold text-sky-700">
           Other Purchasing Details
@@ -260,32 +159,55 @@ const Purchasing = ({
               label="To Quality Inspection"
               type={"text"}
               placeholder="Enter quality inspection"
-              // value={}
-              // on_change={}
+              value={edit_item_data.pu_quality_inspection} //--> pu_quality_inspection
+              on_change={handle_text_change("pu_quality_inspection")}
             />
           </div>
           <div>
-            <Text_Field
+            <Text_Code_Field
               label="Source Hub"
-              type={"text"}
-              placeholder="Enter source hub"
-              // value={}
-              // on_change={}
+              code_width="150px"
+              show_search_button={true}
+              code_value={edit_item_data.pu_source_hub_code} //--> pu_source_hub_code
+              text_value={get_description(
+                edit_item_data.pu_source_hub_code,
+                source_hub_list,
+                "source_hub_code",
+                "source_hub_desc"
+              )}
+              on_click={() => set_display_modal("select_pu_source_hub")}
+              disabled
             />
           </div>
           <div>
             <Textarea_Field
               label="Purchasing Text"
-              name="purchasing_text"
               placeholder="Enter your description..."
               height="120px"
-              // value={}
-              // on_change={}
+              value={edit_item_data.pu_purchasing_text} //--> pu_purchasing_text
+              on_change={handle_text_change("pu_purchasing_text")}
             />
           </div>
         </div>
       </div>
-      {/* - Section 3 */}
+      {/* - Section 2 */}
+      {/* + Modals */}
+      {select_modal_configs.map((cfg) => (
+        <Select_Generic
+          key={cfg.key}
+          is_open={display_modal === cfg.key}
+          on_close={() => set_display_modal("")}
+          width="max-w-[1000px]"
+          height="max-h-[600px]"
+          modal_label={cfg.label}
+          source_list={cfg.list}
+          source_code={cfg.code}
+          source_desc={cfg.desc}
+          target_field={cfg.target}
+          set_data={set_edit_item_data}
+        />
+      ))}
+      {/* - Modals */}
     </React.Fragment>
   );
 };

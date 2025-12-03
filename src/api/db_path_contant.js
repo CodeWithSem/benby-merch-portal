@@ -1,6 +1,10 @@
 export const DB_ROOT = "DB1_ERP_SYSTEM";
 
 export const TABLES = {
+  // + Warhouse Module =================================
+  ITEM_MASTER: "TBL_ITEM_MASTER",
+  // - Warhouse Module =================================
+  // + Maintenance Module ==============================
   // General Structure
   COMPANY: "TBL_COMPANY",
   PURCHASING_ORG: "TBL_PURCHASING_ORG",
@@ -122,6 +126,7 @@ export const TABLES = {
   SO_TYPE_HIERARCHY: "TBL_SO_TYPE_HIERARCHY",
   BILLING_DOCUMENT_TYPE_HIERARCHY: "TBL_BILLING_DOCUMENT_TYPE_HIERARCHY",
   DELIVERY_DOCUMENT_TYPE_HIERARCHY: "TBL_DELIVERY_DOCUMENT_TYPE_HIERARCHY",
+  // - Maintenance Module ==============================
 };
 
 export const get_firestore_path = (table) => {

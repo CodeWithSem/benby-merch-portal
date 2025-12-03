@@ -4,7 +4,13 @@ import {
   format_date_1,
   get_date_now,
 } from "assets/scripts/format";
-import { ChevronLeft, CirclePlus } from "lucide-react";
+import { handle_text_change_function } from "assets/scripts/functions/input_functions";
+import {
+  api_create_item_master,
+  api_get_item_master_by_desc,
+} from "api/firestore_db/warehouse/item_master/tbl_item_master_api";
+import { validate_required_fields } from "assets/scripts/functions/validate_fields";
+import { CheckCircle2, ChevronLeft, CirclePlus, CircleX } from "lucide-react";
 import Text_Field from "assets/elements/Text_Field";
 import Button from "assets/elements/Button";
 import Standard_Data from "./item_details/Standard_Data";
@@ -17,7 +23,6 @@ import Plant_Data from "./item_details/Plant_Data";
 import WM_Data_1 from "./item_details/WM_Data_1";
 import WM_Data_2 from "./item_details/WM_Data_2";
 import {
-  // Standard Data
   item_group_list,
   item_group_category_list,
   item_division_list,
@@ -46,11 +51,20 @@ import {
   ssec_ind_list,
   sutype_list,
 } from "../ITEM_DATA_MAP";
-import { handle_text_change_function } from "assets/scripts/functions/input_functions";
 
-const Create_New_Item = ({ set_page, new_item_data, set_new_item_data }) => {
+const Create_New_Item = ({
+  set_page,
+  active_user,
+  reset_new_item_data,
+  show_toast,
+  new_item_data,
+  set_new_item_data,
+  set_item_master_list,
+}) => {
   const [active_tab, set_active_tab] = useState("standard_data");
   const [display_modal, set_display_modal] = useState("");
+  const [is_confirm_modal_open, set_is_confirm_modal_open] = useState(false);
+  const [create_loading, set_create_loading] = useState(false);
 
   const tabs = [
     { key: "standard_data", title: "Standard Data" },
@@ -64,32 +78,151 @@ const Create_New_Item = ({ set_page, new_item_data, set_new_item_data }) => {
     { key: "wm_data_2", title: "WM Data 2" },
   ];
 
-  const handle_preview = () => {
-    alert("Under Maintenance");
-  };
-
-  const handle_create_item_as_draft = () => {
-    alert("Under Maintenance");
-  };
-
   const handle_create_item = () => {
-    // alert("Create Item");
-    console_log(new_item_data);
-    console.log(new_item_data);
+    set_is_confirm_modal_open(true);
   };
+
+  const validate_new_item_data = () => {
+    const is_valid = validate_required_fields({
+      data: new_item_data,
+      fields: [
+        { name: "item_code", label: "Item Code" },
+        { name: "item_desc", label: "Item Description" },
+        { name: "std_base_uom", label: "Base Unit of Measure (UoM)" },
+      ],
+      show_toast,
+    });
+
+    return is_valid;
+  };
+
+  const verify_description_duplicate = async () => {
+    const result = await api_get_item_master_by_desc(new_item_data.item_desc);
+    if (result) {
+      return true;
+    } else {
+      return false;
+    }
+  };
+
+  const handle_create_new_item = async () => {
+    set_create_loading(true);
+    if (!validate_new_item_data()) {
+      close_confirm_modal();
+      return;
+    }
+
+    if (await verify_description_duplicate()) {
+      close_confirm_modal();
+      show_toast({
+        type: "danger",
+        title: "Invalid",
+        message: "Item description is already existing.",
+        icon: <CircleX size={21} className="text-red-500" />,
+      });
+      return;
+    }
+
+    try {
+      const response = await api_create_item_master(
+        new_item_data,
+        active_user?.username
+      );
+      if (response.success) {
+        set_item_master_list((prev) => [...prev, response.data]);
+        show_status("success");
+        reset_new_item_data();
+        handle_go_back("sub_level");
+      } else {
+        show_status("error");
+      }
+    } catch (error) {
+      console.error("Failed to create a new data:", error);
+      show_status("error");
+    } finally {
+      close_confirm_modal();
+    }
+  };
+
+  const show_status = (status) => {
+    if (status === "success") {
+      show_toast({
+        type: "success",
+        title: "Created Successfully",
+        message: "A new record has been added.",
+        icon: <CheckCircle2 size={21} className="text-green-500" />,
+      });
+    } else {
+      show_toast({
+        type: "danger",
+        title: "Error",
+        message: "Something went wrong. Please try again.",
+        icon: <CircleX size={21} className="text-red-500" />,
+      });
+    }
+  };
+
+  const close_confirm_modal = () => {
+    set_is_confirm_modal_open(false);
+    set_create_loading(false);
+  };
+
+  const Confirm_Modal = () => {
+    return (
+      <React.Fragment>
+        <div className="fixed inset-0 flex items-center justify-center z-[100]">
+          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm z-[101]"></div>
+          <div
+            className={`relative bg-white rounded-lg shadow-xl max-w-[500px] w-full p-10 m-5 z-[102]`}
+          >
+            <div className="w-full flex justify-center items-center text-lg md:text-xl font-bold mb-4">
+              Confirm Item Creation
+            </div>
+            <p className="w-full text-center text-sm leading-6 text-gray-500 dark:text-gray-400 pt-4">
+              You are about to create a new Item. Once created, it will be added
+              to the database.
+            </p>
+            <p className="w-full text-center text-sm leading-6 text-gray-500 dark:text-gray-400 pt-4">
+              Please review all the details — before proceeding.
+            </p>
+            <p className="w-full text-center text-sm leading-6 text-gray-500 dark:text-gray-400 py-4">
+              Are you sure you want to continue?
+            </p>
+            <div className="flex justify-center gap-2 mt-4">
+              <Button
+                width="w-[100px]"
+                variant="primary"
+                loading={create_loading}
+                on_click={handle_create_new_item}
+              >
+                Yes
+              </Button>
+              <Button
+                width="w-[100px]"
+                variant="white"
+                on_click={() => set_is_confirm_modal_open(false)}
+              >
+                No
+              </Button>
+            </div>
+          </div>
+        </div>
+      </React.Fragment>
+    );
+  };
+
+  const handle_text_change = handle_text_change_function(set_new_item_data);
 
   const handle_go_back = () => {
     set_page("main");
   };
-
-  const handle_text_change = handle_text_change_function(set_new_item_data);
 
   // RETURN ORIGIN
   return (
     <React.Fragment>
       <div className="w-full">
         <div className="flex flex-wrap items-center justify-between gap-3 py-5">
-          <h1 className="text-xl">Inbound</h1>
+          <h1 className="text-xl">Warehouse</h1>
           {/* + Breadcrumbs */}
           <nav>
             <ol className="flex flex-wrap items-center gap-1.5">
@@ -118,7 +251,7 @@ const Create_New_Item = ({ set_page, new_item_data, set_new_item_data }) => {
               </li>
               <li className="flex items-center gap-1.5 text-sm text-gray-500">
                 <span>/</span>
-                <span className="text-gray-800">Create New Item</span>
+                <span className="text-gray-800">Create</span>
               </li>
             </ol>
           </nav>
@@ -152,9 +285,8 @@ const Create_New_Item = ({ set_page, new_item_data, set_new_item_data }) => {
                 <Text_Field
                   label="Item Code"
                   type={"text"}
-                  value={"AUTO GENERATED"} //--> item_code
+                  value={new_item_data.item_code} //--> item_code
                   // on_change={handle_text_change}
-                  pattern="[A-Za-z]{1,}"
                   disabled
                 />
               </div>
@@ -320,6 +452,9 @@ const Create_New_Item = ({ set_page, new_item_data, set_new_item_data }) => {
           </div>
         </div>
       </div>
+      {/* + Modals */}
+      {is_confirm_modal_open && <Confirm_Modal />}
+      {/* - Modals */}
     </React.Fragment>
   );
 };

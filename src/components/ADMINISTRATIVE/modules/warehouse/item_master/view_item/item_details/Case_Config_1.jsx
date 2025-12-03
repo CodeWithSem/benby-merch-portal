@@ -2,7 +2,7 @@ import React from "react";
 import Text_Field from "assets/elements/Text_Field";
 import Text_Field_Adorn from "assets/elements/Text_Field_Adorn";
 
-const Case_Config_1 = () => {
+const Case_Config_1 = ({ view_item_data }) => {
   // RETURN ORIGIN
   return (
     <React.Fragment>
@@ -15,61 +15,73 @@ const Case_Config_1 = () => {
           <div className="grid grid-cols-1 gap-5">
             <div>
               <Text_Field_Adorn
-                type={"text"}
+                type="number"
+                placeholder="0"
+                int_only={true}
                 adornment="PC / PC"
                 adornment_position="right"
                 adornment_width="w-[120px]"
-                // value={}
+                value={view_item_data.cc1_ac_pc_pc} //--> cc1_ac_pc_pc
                 disabled
               />
             </div>
             <div>
               <Text_Field_Adorn
-                type={"text"}
+                type="number"
+                placeholder="0"
+                int_only={true}
                 adornment="PC / PAC"
                 adornment_position="right"
                 adornment_width="w-[120px]"
-                // value={}
+                value={view_item_data.cc1_ac_pc_pac} //--> cc1_ac_pc_pac
                 disabled
               />
             </div>
             <div>
               <Text_Field_Adorn
-                type={"text"}
+                type="number"
+                placeholder="0"
+                int_only={true}
                 adornment="PC / IBX"
                 adornment_position="right"
                 adornment_width="w-[120px]"
-                // value={}
+                value={view_item_data.cc1_ac_pc_ibx} //--> cc1_ac_pc_ibx
                 disabled
               />
             </div>
             <div>
               <Text_Field_Adorn
-                type={"text"}
+                type="number"
+                placeholder="0"
+                int_only={true}
                 adornment="PC / CS"
                 adornment_position="right"
                 adornment_width="w-[120px]"
-                // value={}
+                value={view_item_data.cc1_ac_pc_cs} //--> cc1_ac_pc_cs
                 disabled
               />
             </div>
             <div>
               <Text_Field_Adorn
-                type={"text"}
+                type="number"
+                placeholder="0"
+                int_only={true}
                 adornment="# of PACS / CS"
                 adornment_position="right"
                 adornment_width="w-[120px]"
-                // value={}
+                value={view_item_data.cc1_ac_pacs_cs} //--> cc1_ac_pacs_cs
                 disabled
               />
             </div>
             <div>
               <Text_Field_Adorn
-                type={"text"}
+                type="number"
+                placeholder="0"
+                int_only={true}
                 adornment="# of IBX / CS"
                 adornment_position="right"
                 adornment_width="w-[120px]"
-                // value={}
+                value={view_item_data.cc1_ac_no_ibx_cs} //--> cc1_ac_no_ibx_cs
                 disabled
               />
             </div>
@@ -83,16 +95,32 @@ const Case_Config_1 = () => {
           </h1>
           <div className="grid grid-cols-1 gap-5">
             <div className="mt-[4px]">
-              <Text_Field type={"text"} disabled />
+              <Text_Field
+                type={"text"}
+                // value={} //--> cc1_ac_barcode_pc_pc
+                disabled
+              />
             </div>
             <div className="mt-[4px]">
-              <Text_Field type={"text"} disabled />
+              <Text_Field
+                type={"text"}
+                // value={} //--> cc1_ac_barcode_pc_pac
+                disabled
+              />
             </div>
             <div className="mt-[4px]">
-              <Text_Field type={"text"} disabled />
+              <Text_Field
+                type={"text"}
+                // value={} //--> cc1_ac_barcode_pc_ibx
+                disabled
+              />
             </div>
             <div className="mt-[4px]">
-              <Text_Field type={"text"} disabled />
+              <Text_Field
+                type={"text"}
+                // value={} //--> cc1_ac_barcode_pc_cs
+                disabled
+              />
             </div>
           </div>
         </div>
@@ -107,61 +135,67 @@ const Case_Config_1 = () => {
           <div className="grid grid-cols-1 gap-5">
             <div>
               <Text_Field_Adorn
-                type={"text"}
+                type="number"
                 adornment="PC / PC"
                 adornment_position="right"
                 adornment_width="w-[120px]"
                 // value={}
+                // on_change={}
                 disabled
               />
             </div>
             <div>
               <Text_Field_Adorn
-                type={"text"}
+                type="number"
                 adornment="PC / PAC"
                 adornment_position="right"
                 adornment_width="w-[120px]"
                 // value={}
+                // on_change={}
                 disabled
               />
             </div>
             <div>
               <Text_Field_Adorn
-                type={"text"}
+                type="number"
                 adornment="PC / IBX"
                 adornment_position="right"
                 adornment_width="w-[120px]"
                 // value={}
+                // on_change={}
                 disabled
               />
             </div>
             <div>
               <Text_Field_Adorn
-                type={"text"}
+                type="number"
                 adornment="PC / CS"
                 adornment_position="right"
                 adornment_width="w-[120px]"
                 // value={}
+                // on_change={}
                 disabled
               />
             </div>
             <div>
               <Text_Field_Adorn
-                type={"text"}
+                type="number"
                 adornment="# of PACS / CS"
                 adornment_position="right"
                 adornment_width="w-[120px]"
                 // value={}
+                // on_change={}
                 disabled
               />
             </div>
             <div>
               <Text_Field_Adorn
-                type={"text"}
+                type="number"
                 adornment="# of IBX / CS"
                 adornment_position="right"
                 adornment_width="w-[120px]"
                 // value={}
+                // on_change={}
                 disabled
               />
             </div>

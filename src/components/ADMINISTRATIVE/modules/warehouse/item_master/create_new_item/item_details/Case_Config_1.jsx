@@ -1,7 +1,7 @@
 import React from "react";
+import { handle_text_change_function } from "assets/scripts/functions/input_functions";
 import Text_Field from "assets/elements/Text_Field";
 import Text_Field_Adorn from "assets/elements/Text_Field_Adorn";
-import { handle_text_change_function } from "assets/scripts/functions/input_functions";
 
 const Case_Config_1 = ({ new_item_data, set_new_item_data }) => {
   const handle_text_change = handle_text_change_function(set_new_item_data);

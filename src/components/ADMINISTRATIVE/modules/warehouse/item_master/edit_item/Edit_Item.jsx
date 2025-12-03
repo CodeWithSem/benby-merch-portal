@@ -1,6 +1,23 @@
 import React, { useState } from "react";
-import { format_date_1, get_date_now } from "assets/scripts/format";
-import { ChevronLeft, RefreshCcwDot } from "lucide-react";
+import {
+  console_log,
+  format_date_1,
+  get_date_now,
+} from "assets/scripts/format";
+import { handle_text_change_function } from "assets/scripts/functions/input_functions";
+import {
+  api_create_item_master,
+  api_get_item_master_by_desc,
+  api_update_item_master,
+} from "api/firestore_db/warehouse/item_master/tbl_item_master_api";
+import { validate_required_fields } from "assets/scripts/functions/validate_fields";
+import {
+  CheckCircle2,
+  ChevronLeft,
+  CirclePlus,
+  CircleX,
+  RefreshCcwDot,
+} from "lucide-react";
 import Text_Field from "assets/elements/Text_Field";
 import Button from "assets/elements/Button";
 import Standard_Data from "./item_details/Standard_Data";
@@ -13,9 +30,12 @@ import Plant_Data from "./item_details/Plant_Data";
 import WM_Data_1 from "./item_details/WM_Data_1";
 import WM_Data_2 from "./item_details/WM_Data_2";
 import {
-  branch_list,
-  dist_channel_list,
-  inv_acc_center_list,
+  item_group_list,
+  item_group_category_list,
+  item_division_list,
+  item_status_list,
+  uom_list,
+  sales_status_list,
   item_group_1_list,
   item_group_2_list,
   item_group_3_list,
@@ -26,62 +46,32 @@ import {
   product_class_3_list,
   product_class_4_list,
   product_class_5_list,
-  plant_list,
-  sales_org_list,
-  sloc_list,
-  stype_list,
   trans_group_list,
-  item_group_list,
-  item_status_list,
-  item_division_list,
-  gen_item_group_cat_list,
   load_group_list,
+  inv_acc_center_list,
   purc_group_list,
+  plant_status_list,
+  source_hub_list,
   scon_list,
+  period_ind_list,
+  stype_list,
+  ssec_ind_list,
+  sutype_list,
 } from "../ITEM_DATA_MAP";
-import Select_SD_Sales_Org from "../modals/sales_data/Select_SD_Sales_Org";
-import Select_SD_Dist_Channel from "../modals/sales_data/Select_SD_Dist_Channel";
-import Select_SDP_Branch from "../modals/sales_data_plant/Select_SDP_Branch";
-import Select_SDP_Plant from "../modals/sales_data_plant/Select_SDP_Plant";
-import Select_SDP_Trans_Group from "../modals/sales_data_plant/Select_SDP_Trans_Group";
-import Select_SDP_Inv_Center from "../modals/sales_data_plant/Select_SDP_Inv_Center";
-import Select_PU_Branch from "../modals/purchasing/Select_PU_Branch";
-import Select_PU_Plant from "../modals/purchasing/Select_PU_Plant";
-import Select_PU_SLOC from "../modals/purchasing/Select_PU_SLOC";
-import Select_PD_Branch from "../modals/plant_data/Select_PD_Branch";
-import Select_PD_Plant from "../modals/plant_data/Select_PD_Plant";
-import Select_PD_SLOC from "../modals/plant_data/Select_PD_SLOC";
-import Select_PD_Inv_Center from "../modals/plant_data/Select_PD_Inv_Center";
-import Select_WM1_Branch from "../modals/wm_data_1/Select_WM1_Branch";
-import Select_WM1_Plant from "../modals/wm_data_1/Select_WM1_Plant";
-import Select_WM2_Branch from "../modals/wm_data_2/Select_WM2_Branch";
-import Select_WM2_Plant from "../modals/wm_data_2/Select_WM2_Plant";
-import Select_WM2_SLOC from "../modals/wm_data_2/Select_WM2_SLOC";
-import Select_WM2_SType from "../modals/wm_data_2/Select_WM2_SType";
-import Select_Item_Group_1 from "../modals/item_group/Select_Item_Group_1";
-import Select_Item_Group_2 from "../modals/item_group/Select_Item_Group_2";
-import Select_Item_Group_3 from "../modals/item_group/Select_Item_Group_3";
-import Select_Item_Group_4 from "../modals/item_group/Select_Item_Group_4";
-import Select_Item_Group_5 from "../modals/item_group/Select_Item_Group_5";
-import Select_Product_Class_1 from "../modals/product_class/Select_Product_Class_1";
-import Select_Product_Class_2 from "../modals/product_class/Select_Product_Class_2";
-import Select_Product_Class_3 from "../modals/product_class/Select_Product_Class_3";
-import Select_Product_Class_4 from "../modals/product_class/Select_Product_Class_4";
-import Select_Product_Class_5 from "../modals/product_class/Select_Product_Class_5";
-import Select_WM1_SLOC from "../modals/wm_data_1/Select_WM1_SLOC";
-import Select_Item_Group from "../modals/item_group/Select_Item_Group";
-import Select_G_Item_Group_Cat from "../modals/standard_data/Select_G_Item_Group_Cat";
-import Select_Item_Division from "../modals/standard_data/Select_Item_Division";
-import Select_Item_Status from "../modals/standard_data/Select_Item_Status";
-import Select_SDP_Load_Group from "../modals/sales_data_plant/Select_SDP_Load_Group";
-import Select_SD_S_Spec_Status from "../modals/sales_data/Select_SD_S_Spec_Status";
-import Select_PU_PL_Spec_Status from "../modals/purchasing/Select_PU_PL_Spec_Status";
-import Select_PU_P_Group from "../modals/purchasing/Select_PU_P_Group";
-import Select_PD_SCON from "../modals/plant_data/Select_PD_SCON";
 
-const Edit_Item = ({ set_page }) => {
+const Edit_Item = ({
+  set_page,
+  active_user,
+  reset_edit_item_data,
+  show_toast,
+  edit_item_data,
+  set_edit_item_data,
+  set_item_master_list,
+}) => {
   const [active_tab, set_active_tab] = useState("standard_data");
   const [display_modal, set_display_modal] = useState("");
+  const [is_confirm_modal_open, set_is_confirm_modal_open] = useState(false);
+  const [update_loading, set_update_loading] = useState(false);
 
   const tabs = [
     { key: "standard_data", title: "Standard Data" },
@@ -95,17 +85,123 @@ const Edit_Item = ({ set_page }) => {
     { key: "wm_data_2", title: "WM Data 2" },
   ];
 
-  const handle_preview = () => {
-    alert("Under Maintenance");
+  const handle_update = () => {
+    set_is_confirm_modal_open(true);
   };
 
-  const handle_update_item_as_draft = () => {
-    alert("Under Maintenance");
+  const validate_edit_item_data = () => {
+    const is_valid = validate_required_fields({
+      data: edit_item_data,
+      fields: [
+        { name: "item_code", label: "Item Code" },
+        { name: "item_desc", label: "Item Description" },
+        { name: "std_base_uom", label: "Base Unit of Measure (UoM)" },
+      ],
+      show_toast,
+    });
+
+    return is_valid;
   };
 
-  const handle_update_item = () => {
-    alert("Under Maintenance");
+  const handle_update_item = async () => {
+    if (!validate_edit_item_data()) {
+      close_confirm_modal();
+      return;
+    }
+
+    try {
+      set_update_loading(true);
+      const response = await api_update_item_master(
+        edit_item_data,
+        active_user?.username
+      );
+      if (response.success) {
+        set_item_master_list((prev) =>
+          prev.map((item) =>
+            item.id === response.data.id ? response.data : item
+          )
+        );
+        show_status("success");
+        handle_go_back();
+      } else {
+        show_status("error");
+      }
+    } catch (error) {
+      console.error("Failed to create a new data:", error);
+      show_status("error");
+    } finally {
+      close_confirm_modal();
+    }
   };
+
+  const show_status = (status) => {
+    if (status === "success") {
+      show_toast({
+        type: "success",
+        title: "Updated Successfully",
+        message: "The record has been updated.",
+        icon: <CheckCircle2 size={21} className="text-green-500" />,
+      });
+    } else {
+      show_toast({
+        type: "danger",
+        title: "Error",
+        message: "Something went wrong. Please try again.",
+        icon: <CircleX size={21} className="text-red-500" />,
+      });
+    }
+  };
+
+  const close_confirm_modal = () => {
+    set_is_confirm_modal_open(false);
+    set_update_loading(false);
+  };
+
+  const Confirm_Modal = () => {
+    return (
+      <React.Fragment>
+        <div className="fixed inset-0 flex items-center justify-center z-[100]">
+          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm z-[101]"></div>
+          <div
+            className={`relative bg-white rounded-lg shadow-xl max-w-[500px] w-full p-10 m-5 z-[102]`}
+          >
+            <div className="w-full flex justify-center items-center text-lg md:text-xl font-bold mb-4">
+              Confirm Item Update
+            </div>
+            <p className="w-full text-center text-sm leading-6 text-gray-500 dark:text-gray-400 pt-4">
+              You are about to edit this Item. Once edited, it will be updated
+              to the database.
+            </p>
+            <p className="w-full text-center text-sm leading-6 text-gray-500 dark:text-gray-400 pt-4">
+              Please review all the details — before proceeding.
+            </p>
+            <p className="w-full text-center text-sm leading-6 text-gray-500 dark:text-gray-400 py-4">
+              Are you sure you want to continue?
+            </p>
+            <div className="flex justify-center gap-2 mt-4">
+              <Button
+                width="w-[100px]"
+                variant="primary"
+                loading={update_loading}
+                on_click={handle_update_item}
+              >
+                Yes
+              </Button>
+              <Button
+                width="w-[100px]"
+                variant="white"
+                on_click={() => set_is_confirm_modal_open(false)}
+              >
+                No
+              </Button>
+            </div>
+          </div>
+        </div>
+      </React.Fragment>
+    );
+  };
+
+  const handle_text_change = handle_text_change_function(set_edit_item_data);
 
   const handle_go_back = () => {
     set_page("main");
@@ -116,7 +212,7 @@ const Edit_Item = ({ set_page }) => {
     <React.Fragment>
       <div className="w-full">
         <div className="flex flex-wrap items-center justify-between gap-3 py-5">
-          <h1 className="text-xl">Inbound</h1>
+          <h1 className="text-xl">Warehouse</h1>
           {/* + Breadcrumbs */}
           <nav>
             <ol className="flex flex-wrap items-center gap-1.5">
@@ -145,7 +241,7 @@ const Edit_Item = ({ set_page }) => {
               </li>
               <li className="flex items-center gap-1.5 text-sm text-gray-500">
                 <span>/</span>
-                <span className="text-gray-800">Edit Item</span>
+                <span className="text-gray-800">Edit</span>
               </li>
             </ol>
           </nav>
@@ -179,9 +275,8 @@ const Edit_Item = ({ set_page }) => {
                 <Text_Field
                   label="Item Code"
                   type={"text"}
-                  value={"ITM-XXXXXXXXX"}
+                  value={edit_item_data.item_code} //--> item_code
                   // on_change={handle_text_change}
-                  pattern="[A-Za-z]{1,}"
                   disabled
                 />
               </div>
@@ -190,8 +285,8 @@ const Edit_Item = ({ set_page }) => {
                   label="Item Description"
                   type={"text"}
                   placeholder={"Enter item description"}
-                  // on_change={handle_text_change}
-                  pattern="[A-Za-z]{1,}"
+                  value={edit_item_data.item_desc} //--> item_desc
+                  on_change={handle_text_change("item_desc")}
                 />
               </div>
             </div>
@@ -222,55 +317,106 @@ const Edit_Item = ({ set_page }) => {
               {/* + Tab Content */}
               <div className="p-6">
                 {active_tab === "standard_data" && (
-                  <Standard_Data set_display_modal={set_display_modal} />
-                )}
-                {active_tab === "purchasing" && (
-                  <Purchasing
+                  <Standard_Data
+                    display_modal={display_modal}
                     set_display_modal={set_display_modal}
-                    branch_list={branch_list}
-                    plant_list={plant_list}
-                    sloc_list={sloc_list}
+                    edit_item_data={edit_item_data}
+                    set_edit_item_data={set_edit_item_data}
+                    item_group_list={item_group_list}
+                    item_group_category_list={item_group_category_list}
+                    item_division_list={item_division_list}
+                    item_status_list={item_status_list}
+                    uom_list={uom_list}
                   />
                 )}
-                {active_tab === "case_config_1" && <Case_Config_1 />}
-                {active_tab === "case_config_2" && <Case_Config_2 />}
+                {active_tab === "case_config_1" && (
+                  <Case_Config_1
+                    edit_item_data={edit_item_data}
+                    set_edit_item_data={set_edit_item_data}
+                  />
+                )}
+                {active_tab === "case_config_2" && (
+                  <Case_Config_2
+                    edit_item_data={edit_item_data}
+                    set_edit_item_data={set_edit_item_data}
+                  />
+                )}
                 {active_tab === "sales_data" && (
                   <Sales_Data
+                    display_modal={display_modal}
                     set_display_modal={set_display_modal}
-                    sales_org_list={sales_org_list}
-                    dist_channel_list={dist_channel_list}
+                    edit_item_data={edit_item_data}
+                    set_edit_item_data={set_edit_item_data}
+                    item_group_list={item_group_list}
+                    item_group_category_list={item_group_category_list}
+                    item_division_list={item_division_list}
+                    sales_status_list={sales_status_list}
+                    uom_list={uom_list}
+                    item_group_1_list={item_group_1_list}
+                    item_group_2_list={item_group_2_list}
+                    item_group_3_list={item_group_3_list}
+                    item_group_4_list={item_group_4_list}
+                    item_group_5_list={item_group_5_list}
+                    product_class_1_list={product_class_1_list}
+                    product_class_2_list={product_class_2_list}
+                    product_class_3_list={product_class_3_list}
+                    product_class_4_list={product_class_4_list}
+                    product_class_5_list={product_class_5_list}
                   />
                 )}
                 {active_tab === "sales_data_plant" && (
                   <Sales_Data_Plant
+                    display_modal={display_modal}
                     set_display_modal={set_display_modal}
-                    branch_list={branch_list}
-                    plant_list={plant_list}
+                    edit_item_data={edit_item_data}
+                    set_edit_item_data={set_edit_item_data}
+                    trans_group_list={trans_group_list}
+                    load_group_list={load_group_list}
+                    inv_acc_center_list={inv_acc_center_list}
+                  />
+                )}
+                {active_tab === "purchasing" && (
+                  <Purchasing
+                    display_modal={display_modal}
+                    set_display_modal={set_display_modal}
+                    edit_item_data={edit_item_data}
+                    set_edit_item_data={set_edit_item_data}
+                    item_group_list={item_group_list}
+                    purc_group_list={purc_group_list}
+                    uom_list={uom_list}
+                    plant_status_list={plant_status_list}
+                    source_hub_list={source_hub_list}
                   />
                 )}
                 {active_tab === "plant_data" && (
                   <Plant_Data
+                    display_modal={display_modal}
                     set_display_modal={set_display_modal}
-                    branch_list={branch_list}
-                    plant_list={plant_list}
-                    sloc_list={sloc_list}
+                    edit_item_data={edit_item_data}
+                    set_edit_item_data={set_edit_item_data}
+                    item_group_list={item_group_list}
+                    scon_list={scon_list}
+                    period_ind_list={period_ind_list}
+                    inv_acc_center_list={inv_acc_center_list}
                   />
                 )}
                 {active_tab === "wm_data_1" && (
                   <WM_Data_1
+                    display_modal={display_modal}
                     set_display_modal={set_display_modal}
-                    branch_list={branch_list}
-                    plant_list={plant_list}
-                    sloc_list={sloc_list}
+                    edit_item_data={edit_item_data}
+                    set_edit_item_data={set_edit_item_data}
+                    uom_list={uom_list}
+                    stype_list={stype_list}
+                    ssec_ind_list={ssec_ind_list}
                   />
                 )}
                 {active_tab === "wm_data_2" && (
                   <WM_Data_2
-                    set_display_modal={set_display_modal}
-                    branch_list={branch_list}
-                    plant_list={plant_list}
-                    sloc_list={sloc_list}
-                    stype_list={stype_list}
+                    edit_item_data={edit_item_data}
+                    set_edit_item_data={set_edit_item_data}
+                    uom_list={uom_list}
+                    sutype_list={sutype_list}
                   />
                 )}
               </div>
@@ -285,7 +431,7 @@ const Edit_Item = ({ set_page }) => {
                 size="lg"
                 icon={RefreshCcwDot}
                 icon_position="left"
-                on_click={handle_update_item}
+                on_click={handle_update}
               >
                 Update
               </Button>
@@ -297,279 +443,7 @@ const Edit_Item = ({ set_page }) => {
         </div>
       </div>
       {/* + Modals */}
-      <Select_SD_Sales_Org
-        is_open={display_modal === "select_sd_sales_org"}
-        on_close={() => set_display_modal("")}
-        width="max-w-[1000px]"
-        height="max-h-[700px]"
-        sales_org_list={sales_org_list}
-      />
-      <Select_SD_Dist_Channel
-        is_open={display_modal === "select_sd_dist_channel"}
-        on_close={() => set_display_modal("")}
-        width="max-w-[1000px]"
-        height="max-h-[700px]"
-        dist_channel_list={dist_channel_list}
-      />
-      <Select_SD_S_Spec_Status
-        is_open={display_modal === "select_sd_s_spec_status"}
-        on_close={() => set_display_modal("")}
-        width="max-w-[1000px]"
-        height="max-h-[700px]"
-        item_status_list={item_status_list}
-      />
-      <Select_SDP_Branch
-        is_open={display_modal === "select_sdp_branch"}
-        on_close={() => set_display_modal("")}
-        width="max-w-[1000px]"
-        height="max-h-[700px]"
-        branch_list={branch_list}
-      />
-      <Select_SDP_Plant
-        is_open={display_modal === "select_sdp_plant"}
-        on_close={() => set_display_modal("")}
-        width="max-w-[1000px]"
-        height="max-h-[700px]"
-        plant_list={plant_list}
-      />
-      <Select_SDP_Trans_Group
-        is_open={display_modal === "select_sdp_trans_group"}
-        on_close={() => set_display_modal("")}
-        width="max-w-[1000px]"
-        height="max-h-[700px]"
-        trans_group_list={trans_group_list}
-      />
-      <Select_SDP_Load_Group
-        is_open={display_modal === "select_sdp_load_group"}
-        on_close={() => set_display_modal("")}
-        width="max-w-[1000px]"
-        height="max-h-[700px]"
-        load_group_list={load_group_list}
-      />
-      <Select_SDP_Inv_Center
-        is_open={display_modal === "select_sdp_inv_acc_center"}
-        on_close={() => set_display_modal("")}
-        width="max-w-[1000px]"
-        height="max-h-[700px]"
-        inv_acc_center_list={inv_acc_center_list}
-      />
-      <Select_PU_Branch
-        is_open={display_modal === "select_pu_branch"}
-        on_close={() => set_display_modal("")}
-        width="max-w-[1000px]"
-        height="max-h-[700px]"
-        branch_list={branch_list}
-      />
-      <Select_PU_Plant
-        is_open={display_modal === "select_pu_plant"}
-        on_close={() => set_display_modal("")}
-        width="max-w-[1000px]"
-        height="max-h-[700px]"
-        plant_list={plant_list}
-      />
-      <Select_PU_SLOC
-        is_open={display_modal === "select_pu_sloc"}
-        on_close={() => set_display_modal("")}
-        width="max-w-[1000px]"
-        height="max-h-[700px]"
-        sloc_list={sloc_list}
-      />
-      <Select_PU_P_Group
-        is_open={display_modal === "select_pu_p_group"}
-        on_close={() => set_display_modal("")}
-        width="max-w-[1000px]"
-        height="max-h-[700px]"
-        purc_group_list={purc_group_list}
-      />
-      <Select_PU_PL_Spec_Status
-        is_open={display_modal === "select_pu_pl_spec_status"}
-        on_close={() => set_display_modal("")}
-        width="max-w-[1000px]"
-        height="max-h-[700px]"
-        item_status_list={item_status_list}
-      />
-      <Select_PD_Branch
-        is_open={display_modal === "select_pd_branch"}
-        on_close={() => set_display_modal("")}
-        width="max-w-[1000px]"
-        height="max-h-[700px]"
-        branch_list={branch_list}
-      />
-      <Select_PD_Plant
-        is_open={display_modal === "select_pd_plant"}
-        on_close={() => set_display_modal("")}
-        width="max-w-[1000px]"
-        height="max-h-[700px]"
-        plant_list={plant_list}
-      />
-      <Select_PD_SLOC
-        is_open={display_modal === "select_pd_sloc"}
-        on_close={() => set_display_modal("")}
-        width="max-w-[1000px]"
-        height="max-h-[700px]"
-        sloc_list={sloc_list}
-      />
-      <Select_PD_SCON
-        is_open={display_modal === "select_pd_scon"}
-        on_close={() => set_display_modal("")}
-        width="max-w-[1000px]"
-        height="max-h-[700px]"
-        scon_list={scon_list}
-      />
-      <Select_PD_Inv_Center
-        is_open={display_modal === "select_pd_inv_acc_center"}
-        on_close={() => set_display_modal("")}
-        width="max-w-[1000px]"
-        height="max-h-[700px]"
-        inv_acc_center_list={inv_acc_center_list}
-      />
-      <Select_WM1_Branch
-        is_open={display_modal === "select_wm1_branch"}
-        on_close={() => set_display_modal("")}
-        width="max-w-[1000px]"
-        height="max-h-[700px]"
-        branch_list={branch_list}
-      />
-      <Select_WM1_Plant
-        is_open={display_modal === "select_wm1_plant"}
-        on_close={() => set_display_modal("")}
-        width="max-w-[1000px]"
-        height="max-h-[700px]"
-        plant_list={plant_list}
-      />
-      <Select_WM1_SLOC
-        is_open={display_modal === "select_wm1_sloc"}
-        on_close={() => set_display_modal("")}
-        width="max-w-[1000px]"
-        height="max-h-[700px]"
-        sloc_list={sloc_list}
-      />
-      <Select_WM2_Branch
-        is_open={display_modal === "select_wm2_branch"}
-        on_close={() => set_display_modal("")}
-        width="max-w-[1000px]"
-        height="max-h-[700px]"
-        branch_list={branch_list}
-      />
-      <Select_WM2_Plant
-        is_open={display_modal === "select_wm2_plant"}
-        on_close={() => set_display_modal("")}
-        width="max-w-[1000px]"
-        height="max-h-[700px]"
-        plant_list={plant_list}
-      />
-      <Select_WM2_SLOC
-        is_open={display_modal === "select_wm2_sloc"}
-        on_close={() => set_display_modal("")}
-        width="max-w-[1000px]"
-        height="max-h-[700px]"
-        sloc_list={sloc_list}
-      />
-      <Select_WM2_SType
-        is_open={display_modal === "select_wm2_stype"}
-        on_close={() => set_display_modal("")}
-        width="max-w-[1000px]"
-        height="max-h-[700px]"
-        stype_list={stype_list}
-      />
-      <Select_G_Item_Group_Cat
-        is_open={display_modal === "select_item_group_category"}
-        on_close={() => set_display_modal("")}
-        width="max-w-[1000px]"
-        height="max-h-[700px]"
-        gen_item_group_cat_list={gen_item_group_cat_list}
-      />
-      <Select_Item_Division
-        is_open={display_modal === "select_item_division"}
-        on_close={() => set_display_modal("")}
-        width="max-w-[1000px]"
-        height="max-h-[700px]"
-        item_division_list={item_division_list}
-      />
-      <Select_Item_Status
-        is_open={display_modal === "select_item_status"}
-        on_close={() => set_display_modal("")}
-        width="max-w-[1000px]"
-        height="max-h-[700px]"
-        item_status_list={item_status_list}
-      />
-      <Select_Item_Group
-        is_open={display_modal === "select_item_group"}
-        on_close={() => set_display_modal("")}
-        width="max-w-[1000px]"
-        height="max-h-[700px]"
-        item_group_list={item_group_list}
-      />
-      <Select_Item_Group_1
-        is_open={display_modal === "select_item_group_1"}
-        on_close={() => set_display_modal("")}
-        width="max-w-[1000px]"
-        height="max-h-[700px]"
-        item_group_1_list={item_group_1_list}
-      />
-      <Select_Item_Group_2
-        is_open={display_modal === "select_item_group_2"}
-        on_close={() => set_display_modal("")}
-        width="max-w-[1000px]"
-        height="max-h-[700px]"
-        item_group_2_list={item_group_2_list}
-      />
-      <Select_Item_Group_3
-        is_open={display_modal === "select_item_group_3"}
-        on_close={() => set_display_modal("")}
-        width="max-w-[1000px]"
-        height="max-h-[700px]"
-        item_group_3_list={item_group_3_list}
-      />
-      <Select_Item_Group_4
-        is_open={display_modal === "select_item_group_4"}
-        on_close={() => set_display_modal("")}
-        width="max-w-[1000px]"
-        height="max-h-[700px]"
-        item_group_4_list={item_group_4_list}
-      />
-      <Select_Item_Group_5
-        is_open={display_modal === "select_item_group_5"}
-        on_close={() => set_display_modal("")}
-        width="max-w-[1000px]"
-        height="max-h-[700px]"
-        item_group_5_list={item_group_5_list}
-      />
-      <Select_Product_Class_1
-        is_open={display_modal === "select_product_class_1"}
-        on_close={() => set_display_modal("")}
-        width="max-w-[1000px]"
-        height="max-h-[700px]"
-        product_class_1_list={product_class_1_list}
-      />
-      <Select_Product_Class_2
-        is_open={display_modal === "select_product_class_2"}
-        on_close={() => set_display_modal("")}
-        width="max-w-[1000px]"
-        height="max-h-[700px]"
-        product_class_2_list={product_class_2_list}
-      />
-      <Select_Product_Class_3
-        is_open={display_modal === "select_product_class_3"}
-        on_close={() => set_display_modal("")}
-        width="max-w-[1000px]"
-        height="max-h-[700px]"
-        product_class_3_list={product_class_3_list}
-      />
-      <Select_Product_Class_4
-        is_open={display_modal === "select_product_class_4"}
-        on_close={() => set_display_modal("")}
-        width="max-w-[1000px]"
-        height="max-h-[700px]"
-        product_class_4_list={product_class_4_list}
-      />
-      <Select_Product_Class_5
-        is_open={display_modal === "select_product_class_5"}
-        on_close={() => set_display_modal("")}
-        width="max-w-[1000px]"
-        height="max-h-[700px]"
-        product_class_5_list={product_class_5_list}
-      />
+      {is_confirm_modal_open && <Confirm_Modal />}
       {/* - Modals */}
     </React.Fragment>
   );

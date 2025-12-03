@@ -1,0 +1,15 @@
+<Text_Code_Field
+              label="Inventory Account Center"
+              code_width="150px"
+              show_search_button={false}
+              bg_dis_color="bg-slate-50"
+              text_dis_color="text-slate-500"
+              code_value={view_item_data.pd_inv_acc_center_code} //--> pd_inv_acc_center_code
+              text_value={get_description(
+                view_item_data.pd_inv_acc_center_code,
+                inv_acc_center_list,
+                "inv_acc_center_code",
+                "inv_acc_center_desc"
+              )}
+              disabled
+            />

@@ -27,7 +27,7 @@ const Text_Code_Field = ({
 }) => {
   const input_class = `block w-full ${
     label ? "mt-1" : ""
-  } px-3 py-2 bg-white border rounded-md text-sm shadow-sm placeholder-slate-400 focus:ring-1 
+  } px-3 py-2 border rounded-md text-sm shadow-sm placeholder-slate-400 focus:ring-1 
     ${disabled ? `${bg_dis_color} ${text_dis_color}` : ""}
     ${error_message ? "border-pink-500 text-pink-600" : "border-slate-300"}
     ${

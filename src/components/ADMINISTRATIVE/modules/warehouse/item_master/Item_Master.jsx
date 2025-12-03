@@ -1,6 +1,12 @@
 import React, { useEffect, useState } from "react";
+import { Use_App } from "context/app_context";
 import { useToast } from "../../../layout/Toast_Provider";
-import { dist_channel_list, sales_org_list } from "./ITEM_DATA_MAP";
+import { Get_TBL_INCREMENTAL_ID } from "api/real_time_db/incremental";
+import {
+  api_get_item_master_list,
+  api_truncate_item_master,
+} from "api/firestore_db/warehouse/item_master/tbl_item_master_api";
+import { def_item_master_data } from "assets/scripts/variables/default_variables";
 import {
   Search,
   ChevronDown,
@@ -13,186 +19,119 @@ import {
   SlidersHorizontal,
   FileUp,
   Warehouse,
+  Trash2,
+  CheckCircle2,
+  FileDigit,
 } from "lucide-react";
 import Icon_Field from "assets/elements/Icon_Field";
 import Select_Field from "assets/elements/Select_Field";
 import Pagination from "assets/elements/Pagination";
 import Button from "assets/elements/Button";
-import Create_New_Item from "./create_new_item/Create_New_Item";
-// import Edit_Item from "./edit_item/Edit_Item";
-// import View_Item from "./view_item/View_Item";
-import Delete_Item from "./modals/delete_item/Delete_Item";
 import Button_Action from "assets/elements/Button_Action";
 import Text_Field from "assets/elements/Text_Field";
+import Spinner from "assets/elements/Spinner";
+import View_Item from "./view_item/View_Item";
+import Create_New_Item from "./create_new_item/Create_New_Item";
+import Edit_Item from "./edit_item/Edit_Item";
+import Delete_Item from "./modals/delete_item/Delete_Item";
+import Set_Item_ID from "./modals/set_item_id/Set_Item_ID";
+import Item_Extension from "./item_extension/Item_Extension";
 
 const HAS_FILTER = true;
 
 const Item_Master = () => {
+  const { active_user } = Use_App();
   const { show_toast } = useToast();
   const [show_filter, set_show_filter] = useState(false);
   const [page, set_page] = useState("main");
   const [display_modal, set_display_modal] = useState("");
+  const [loading_list, set_loading_list] = useState(false);
+  const [truncate_loading, set_truncate_loading] = useState(false);
 
   const columns = [
     { key: "index", label: "No.", sortable: true },
     { key: "item_code", label: "Item Code", sortable: true },
     { key: "item_desc", label: "Description", sortable: true },
-    { key: "item_type", label: "Type", sortable: true },
-    { key: "item_category", label: "Category", sortable: true },
-    { key: "uom", label: "UoM", sortable: true },
-    { key: "batch_manage", label: "Batch Manage", sortable: true },
-    { key: "std_cost", label: "Cost", sortable: true },
-    { key: "status", label: "Status", sortable: true },
+    { key: "std_base_uom", label: "Base UoM", sortable: true },
+    { key: "creation_date", label: "Creation Date", sortable: true },
+    { key: "created_by", label: "Created By", sortable: true },
     { key: "actions", label: "", sortable: false },
   ];
 
-  const def_item_data = {
+  const [current_id, set_current_id] = useState(0);
+  const [view_item_data, set_view_item_data] = useState(def_item_master_data);
+  const [new_item_data, set_new_item_data] = useState(def_item_master_data);
+  const [edit_item_data, set_edit_item_data] = useState(def_item_master_data);
+  const [delete_item_data, set_delete_item_data] = useState({
     id: 0,
-    item_code: "ITM-00000",
+    item_code: "",
     item_desc: "",
-    std_ltc_std_code: "",
-    std_industry_std_code: "",
-    std_item_group_code: "",
-    std_item_group_category_code: "",
-    std_item_division_code: "",
-    std_item_status_code: "",
-    std_valid_from: "",
-    std_valid_to: "",
-    std_base_uom: "",
-    std_batch_management: false,
-    std_gross_weight: "",
-    std_gross_weight_uom: "",
-    std_net_weight: "",
-    std_net_weight_uom: "",
-    std_item_volume: "",
-    std_item_volume_uom: "",
-    std_size_packing: "",
-    std_item_unit_per_liter: "",
-    cc1_ac_pc_pc: "",
-    cc1_ac_pc_pac: "",
-    cc1_ac_pc_ibx: "",
-    cc1_ac_pc_cs: "",
-    cc1_ac_pacs_cs: "",
-    cc1_ac_no_ibx_cs: "",
-    cc1_ac_barcode_pc_pc: "",
-    cc1_ac_barcode_pc_pac: "",
-    cc1_ac_barcode_pc_ibx: "",
-    cc1_ac_barcode_pc_cs: "",
-    cc2_inspect_remarks: "",
-    cc2_internal_comments: "",
-    cc2_base_cs_config_notes: "",
-    sd_sales_status_code: "",
-    sd_valid_from: "",
-    sd_valid_to: "",
-    sd_sales_uom: "",
-    sd_item_group_1_code: "",
-    sd_item_group_2_code: "",
-    sd_item_group_3_code: "",
-    sd_item_group_4_code: "",
-    sd_item_group_5_code: "",
-    sd_product_class_1_code: "",
-    sd_product_class_2_code: "",
-    sd_product_class_3_code: "",
-    sd_product_class_4_code: "",
-    sd_product_class_5_code: "",
-    sdp_stock_availability: false,
-    sdp_trans_group_code: "",
-    sdp_load_group_code: "",
-    sdp_sales_text: "",
-    sdp_inv_acc_center_code: "",
-    pu_purc_group_code: "",
-    pu_ordering_uom: "",
-    pu_valid_from: "",
-    pu_valid_to: "",
-    pu_plant_status_code: "",
-    pu_quality_inspection: "",
-    pu_source_hub_code: "",
-    pu_purchasing_text: "",
-    pd_scon_code: "",
-    pd_max_shelf_life: "",
-    pd_max_shelf_life_ind: "",
-    pd_min_shelf_life: "",
-    pd_min_shelf_life_ind: "",
-    pd_inv_acc_center_code: "",
-    wm1_wm_uom: "",
-    wm1_issue_uom: "",
-    wm1_proposed_uom: "",
-    wm1_cap_usage: "",
-    wm1_cap_usage_uom: "",
-    wm1_picking_stype: "",
-    wm1_picking_stype_uom: "",
-    wm1_stock_source_code: "",
-    wm1_stock_dest_code: "",
-    wm1_ssec_ind_code: "",
-    wm1_picking_type: false,
-    wm1_permit_add_stock: false,
-    wm2_pallet_load_1: "",
-    wm2_pallet_load_1_uom: "",
-    wm2_pallet_load_1_sutype: "",
-    wm2_pallet_load_2: "",
-    wm2_pallet_load_2_uom: "",
-    wm2_pallet_load_2_sutype: "",
-    wm2_pallet_load_3: "",
-    wm2_pallet_load_3_uom: "",
-    wm2_pallet_load_3_sutype: "",
-    wm2_pallet_config_1: "",
-    wm2_pallet_config_2: "",
-    wm2_pallet_config_3: "",
-    // wm2_pickline_bin: "",
-    // wm2_pickline_bin_?
-    wm2_max_qty: "",
-    wm2_max_qty_uom: "CS",
-    wm2_min_qty: "",
-    wm2_min_qty_uom: "CS",
-    wm2_replenish_qty: "",
-    wm2_replenish_qty_uom: "CS",
-    wm2_control_qty: "",
-    wm2_control_qty_uom: "CS",
-    wm2_round_qty: "",
-    wm2_round_qty_uom: "CS",
+    creatoin_date: "",
+  });
+
+  const reset_new_item_data = () => {
+    set_new_item_data((prev) => ({
+      ...def_item_master_data,
+      id: prev.id,
+      item_code: prev.item_code,
+    }));
   };
 
-  const [new_item_data, set_new_item_data] = useState(def_item_data);
+  useEffect(() => {
+    Get_TBL_INCREMENTAL_ID("TBL_ITEM_MASTER", (value) => {
+      set_new_item_data((prev) => ({
+        ...prev,
+        id: value,
+        item_code: `ITM-${String(value).padStart(5, "0")}`,
+      }));
+      set_current_id(value);
+    });
+  }, []);
 
-  const [item_list, set_item_list] = useState([
-    {
-      id: 1,
-      item_code: "ITM-0001",
-      item_desc: "NVIDIA GeForce GTX 1050 Graphics Card",
-      item_type: "PC Component",
-      item_category: "GPU",
-      uom: "PC",
-      batch_manage: false,
-      std_cost: 150,
-      status: "Active",
-    },
-    {
-      id: 2,
-      item_code: "ITM-0002",
-      item_desc: "Intel Core i5-10400F Processor",
-      item_type: "PC Component",
-      item_category: "CPU",
-      uom: "PC",
-      batch_manage: false,
-      std_cost: 180,
-      status: "Active",
-    },
-    {
-      id: 3,
-      item_code: "ITM-0003",
-      item_desc: "Kingston 16GB DDR4 3200MHz RAM",
-      item_type: "PC Component",
-      item_category: "Memory",
-      uom: "PC",
-      batch_manage: false,
-      std_cost: 60,
-      status: "Active",
-    },
-  ]);
+  const [item_master_list, set_item_master_list] = useState([]);
+
+  const handle_get_item_master_list = async () => {
+    set_loading_list(true);
+    const response = await api_get_item_master_list();
+    if (response.success) {
+      set_item_master_list(response.data);
+    } else {
+      console.error(response.message);
+    }
+    set_loading_list(false);
+  };
+
+  useEffect(() => {
+    handle_get_item_master_list();
+  }, []);
+
+  const handle_truncate_item_master_list = async () => {
+    set_truncate_loading(true);
+    const response = await api_truncate_item_master();
+    if (response.success) {
+      show_toast({
+        type: "success",
+        title: "Truncated Successfully",
+        message: "You have deleted all the record.",
+        icon: <CheckCircle2 size={21} className="text-green-500" />,
+      });
+    } else {
+      show_toast({
+        type: "danger",
+        title: "Error",
+        message: "Something went wrong. Please try again.",
+      });
+      console.error(response.message);
+    }
+    handle_get_item_master_list();
+    set_truncate_loading(false);
+    set_display_modal("");
+  };
 
   // + Client-Side Filtering
-  const [filtered_item_list, set_filtered_item_list] = useState([]);
-  const [loading, set_loading] = useState(false);
+  const [filtered_item_master_list, set_filtered_item_master_list] = useState(
+    []
+  );
   const [select_option, set_select_option] = useState(5);
   const [current_page, set_current_page] = useState(1);
   const [sort_by, set_sort_by] = useState("timestamp");
@@ -209,7 +148,7 @@ const Item_Master = () => {
   }, [search_query]);
 
   useEffect(() => {
-    let temp = [...item_list];
+    let temp = [...item_master_list];
 
     if (debounced_query.trim() !== "") {
       const q = debounced_query.toLowerCase();
@@ -236,9 +175,9 @@ const Item_Master = () => {
 
     const start_idx = (current_page - 1) * select_option;
     const end_idx = start_idx + select_option;
-    set_filtered_item_list(temp.slice(start_idx, end_idx));
+    set_filtered_item_master_list(temp.slice(start_idx, end_idx));
   }, [
-    item_list,
+    item_master_list,
     debounced_query,
     sort_by,
     sort_order,
@@ -248,7 +187,7 @@ const Item_Master = () => {
 
   const total_pages = Math.ceil(
     (debounced_query
-      ? item_list.filter((u) =>
+      ? item_master_list.filter((u) =>
           columns.some((col) => {
             if (col.key === "actions") return false;
             const val = u[col.key];
@@ -258,7 +197,7 @@ const Item_Master = () => {
               .includes(debounced_query.toLowerCase());
           })
         ).length
-      : item_list.length) / select_option
+      : item_master_list.length) / select_option
   );
 
   const handle_sort = (column) => {
@@ -282,21 +221,36 @@ const Item_Master = () => {
     alert("Upload Item");
   };
 
-  const handle_view_item = (id) => {
+  const handle_view_item = (data) => {
+    set_view_item_data(data);
     set_page("view_item");
   };
 
-  const handle_edit_item = () => {
+  const handle_edit_item = (data) => {
+    set_edit_item_data(data);
     set_page("edit_item");
   };
 
-  const handle_delete_item = () => {
+  const handle_delete_item = (id, item_code, item_desc, creation_date) => {
+    set_delete_item_data({
+      id: id,
+      item_code: item_code,
+      item_desc: item_desc,
+      creation_date: creation_date,
+    });
     set_display_modal("delete_item");
   };
 
-  const data_map_object = {
-    sales_org_list: sales_org_list,
-    sales_dist_channel: dist_channel_list,
+  const handle_item_extension = (data) => {
+    set_page("item_extension");
+  };
+
+  const handle_truncate = () => {
+    set_display_modal("confirm_truncate");
+  };
+
+  const handle_set_item_id = () => {
+    set_display_modal("set_item_id");
   };
 
   // useEffect(() => {
@@ -338,6 +292,28 @@ const Item_Master = () => {
               <div className="flex flex-wrap items-center justify-between gap-3 p-5">
                 <h1 className="text-lg">Item Master</h1>
                 <div className="flex gap-2">
+                  {active_user?.category === "DEV" && (
+                    <Button
+                      variant="success"
+                      icon={FileDigit}
+                      icon_position="left"
+                      width="w-[110px]"
+                      on_click={handle_set_item_id}
+                    >
+                      Set ID
+                    </Button>
+                  )}
+                  {active_user?.category === "DEV" && (
+                    <Button
+                      variant="danger"
+                      icon={Trash2}
+                      icon_position="left"
+                      width="w-[110px]"
+                      on_click={handle_truncate}
+                    >
+                      Truncate
+                    </Button>
+                  )}
                   <Button
                     variant="primary"
                     icon={PlusCircle}
@@ -383,7 +359,7 @@ const Item_Master = () => {
                         variant="white"
                         icon={RefreshCw}
                         icon_itemsition="left"
-                        //   on_click={() => load_data()}
+                        on_click={handle_get_item_master_list}
                       ></Button>
                     </div>
 
@@ -474,11 +450,11 @@ const Item_Master = () => {
                   </div>
                   {/* + Table */}
                   <div className="overflow-x-auto">
-                    {loading ? (
-                      <div className="p-6 text-center text-gray-500 text-sm">
-                        Loading...
+                    {loading_list ? (
+                      <div className="p-6 flex justify-center items-center text-gray-500 text-sm">
+                        <Spinner />
                       </div>
-                    ) : filtered_item_list.length === 0 ? (
+                    ) : filtered_item_master_list.length === 0 ? (
                       <div className="p-6 text-center text-gray-500 text-sm">
                         No data found
                       </div>
@@ -530,7 +506,7 @@ const Item_Master = () => {
                           </tr>
                         </thead>
                         <tbody className="bg-white">
-                          {filtered_item_list.map((row, idx) => {
+                          {filtered_item_master_list.map((row, idx) => {
                             const render_cell = (col, row) => {
                               const value = row[col.key];
                               if (col.key === "index") {
@@ -548,18 +524,14 @@ const Item_Master = () => {
                                       <Button_Action
                                         icon={View}
                                         tooltip="View Item"
-                                        on_click={() =>
-                                          handle_view_item(row.id)
-                                        }
+                                        on_click={() => handle_view_item(row)}
                                       />
                                     </div>
                                     <div className="relative group flex jusity-center items-center">
                                       <Button_Action
                                         icon={Edit}
                                         tooltip="Edit Item"
-                                        on_click={() =>
-                                          handle_edit_item(row.id)
-                                        }
+                                        on_click={() => handle_edit_item(row)}
                                       />
                                     </div>
                                     <div className="relative group flex jusity-center items-center">
@@ -567,9 +539,9 @@ const Item_Master = () => {
                                         class_name="mb-[1px]"
                                         icon={Warehouse}
                                         tooltip="Item Extension"
-                                        // on_click={() =>
-                                        //   handle_edit_item(row.id)
-                                        // }
+                                        on_click={() =>
+                                          handle_item_extension(row)
+                                        }
                                       />
                                     </div>
                                     <div className="relative group flex jusity-center items-center">
@@ -579,7 +551,12 @@ const Item_Master = () => {
                                         variant="danger"
                                         tooltip="Delete Item"
                                         on_click={() =>
-                                          handle_delete_item(row.id)
+                                          handle_delete_item(
+                                            row.id,
+                                            row.item_code,
+                                            row.item_desc,
+                                            row.creation_date
+                                          )
                                         }
                                       />
                                     </div>
@@ -638,18 +615,50 @@ const Item_Master = () => {
       {page === "item_creation" && (
         <Create_New_Item
           set_page={set_page}
+          active_user={active_user}
+          reset_new_item_data={reset_new_item_data}
+          show_toast={show_toast}
           new_item_data={new_item_data}
           set_new_item_data={set_new_item_data}
+          set_item_master_list={set_item_master_list}
         />
       )}
-      {/* {page === "edit_item" && <Edit_Item set_page={set_page} />} */}
-      {/* {page === "view_item" && <View_Item set_page={set_page} />} */}
+      {page === "edit_item" && (
+        <Edit_Item
+          set_page={set_page}
+          active_user={active_user}
+          reset_new_item_data={reset_new_item_data}
+          show_toast={show_toast}
+          edit_item_data={edit_item_data}
+          set_edit_item_data={set_edit_item_data}
+          set_item_master_list={set_item_master_list}
+        />
+      )}
+      {page === "view_item" && (
+        <View_Item set_page={set_page} view_item_data={view_item_data} />
+      )}
+      {page === "item_extension" && <Item_Extension set_page={set_page} />}
       {/* - Pages */}
       {/* + Modals */}
       <Delete_Item
         is_open={display_modal === "delete_item"}
         on_close={() => set_display_modal("")}
-        width="max-w-[1280px]"
+        width="max-w-[900px]"
+        show_toast={show_toast}
+        delete_item_data={delete_item_data}
+        set_item_master_list={set_item_master_list}
+      />
+      <Set_Item_ID
+        is_open={display_modal === "set_item_id"}
+        on_close={() => set_display_modal("")}
+        show_toast={show_toast}
+        current_id={current_id}
+      />
+      <Confirm_Truncate
+        is_open={display_modal === "confirm_truncate"}
+        on_close={() => set_display_modal("")}
+        truncate_loading={truncate_loading}
+        handle_truncate_item_master_list={handle_truncate_item_master_list}
       />
       {/* - Modals */}
     </React.Fragment>
@@ -657,3 +666,45 @@ const Item_Master = () => {
 };
 
 export default Item_Master;
+
+const Confirm_Truncate = ({
+  is_open,
+  on_close,
+  truncate_loading,
+  handle_truncate_item_master_list,
+}) => {
+  return is_open ? (
+    <React.Fragment>
+      <div className="fixed inset-0 flex items-center justify-center z-[100]">
+        <div className="absolute inset-0 bg-black/50 backdrop-blur-sm z-[101]"></div>
+        <div
+          className={`relative bg-white rounded-lg shadow-xl max-w-[500px] w-full p-10 m-5 z-[102]`}
+        >
+          <div className="w-full flex justify-center items-center text-lg md:text-xl font-bold mb-4">
+            Truncate Item Master
+          </div>
+          <p className="w-full text-center text-sm leading-6 text-gray-500 dark:text-gray-400 pt-4">
+            You are about to truncate the Item Master List. Once truncated, the
+            list will be cleared in the database.
+          </p>
+          <p className="w-full text-center text-sm leading-6 text-gray-500 dark:text-gray-400 py-4">
+            Are you sure you want to continue?
+          </p>
+          <div className="flex justify-center gap-2 mt-4">
+            <Button
+              width="w-[100px]"
+              variant="danger"
+              loading={truncate_loading}
+              on_click={handle_truncate_item_master_list}
+            >
+              Yes
+            </Button>
+            <Button width="w-[100px]" variant="white" on_click={on_close}>
+              No
+            </Button>
+          </div>
+        </div>
+      </div>
+    </React.Fragment>
+  ) : null;
+};
