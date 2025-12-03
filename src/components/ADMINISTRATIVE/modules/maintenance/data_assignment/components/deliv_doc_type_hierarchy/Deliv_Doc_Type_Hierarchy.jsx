@@ -4,7 +4,7 @@ import { Use_App } from "context/app_context";
 import {
   api_get_deliv_doc_type_hierarchy_list,
   api_truncate_deliv_doc_type_hierarchy,
-} from "api/firestore_db/tbl_deliv_doc_type_hierarchy_api";
+} from "api/firestore_db/maintenance/data_assignment/tbl_deliv_doc_type_hierarchy_api";
 import { Get_TBL_INCREMENTAL_ID } from "api/real_time_db/incremental";
 import { api_get_so_type_list } from "api/firestore_db/maintenance/sales_order/tbl_so_type_api";
 import { api_get_bill_doc_type_hierarchy_list } from "api/firestore_db/maintenance/data_assignment/tbl_bill_doc_type_hierarchy_api";

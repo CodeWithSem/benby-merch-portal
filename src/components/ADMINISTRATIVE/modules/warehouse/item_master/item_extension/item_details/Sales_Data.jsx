@@ -1,16 +1,13 @@
 import React, { useEffect, useState } from "react";
+import { get_description } from "assets/scripts/functions/get_description";
 import {
   ChevronDown,
   ChevronUp,
   CirclePlus,
-  Edit,
   RefreshCw,
   Search,
   SlidersHorizontal,
   Trash,
-  Trash2,
-  View,
-  Warehouse,
 } from "lucide-react";
 import Select_Field from "assets/elements/Select_Field";
 import Icon_Field from "assets/elements/Icon_Field";
@@ -19,9 +16,13 @@ import Text_Field from "assets/elements/Text_Field";
 import Spinner from "assets/elements/Spinner";
 import Button_Action from "assets/elements/Button_Action";
 import Pagination from "assets/elements/Pagination";
-import { sales_org_list, dist_channel_list } from "../../ITEM_DATA_MAP";
-import { get_description } from "assets/scripts/functions/get_description";
 import Text_Code_Field from "assets/elements/Text_Code_Field";
+import Select_Sales_Org_H from "../../modals/select_modal/Select_Sales_Org_H";
+import {
+  sales_org_list,
+  dist_channel_list,
+  sales_org_h_list,
+} from "../../ITEM_DATA_MAP";
 
 const HAS_FILTER = true;
 
@@ -29,6 +30,7 @@ const Sales_Data = () => {
   const [display_modal, set_display_modal] = useState("");
   const [show_filter, set_show_filter] = useState(false);
   const [loading_list, set_loading_list] = useState(false);
+  const [selected_data, set_selected_data] = useState({});
   const columns = [
     { key: "index", label: "No.", sortable: true },
     { key: "sales_org_code", label: "Sales Organization", sortable: true },
@@ -208,9 +210,14 @@ const Sales_Data = () => {
               label="Sales Organization"
               code_width="150px"
               show_search_button={true}
-              // code_value={code_data}
-              // text_value={text_data}
-              on_click={() => set_display_modal("select_sd_sales_org")}
+              code_value={selected_data.sales_org_code}
+              text_value={get_description(
+                selected_data.sales_org_code,
+                sales_org_list,
+                "sales_org_code",
+                "sales_org_desc"
+              )}
+              on_click={() => set_display_modal("select_sales_org_h")}
               disabled
             />
           </div>
@@ -218,10 +225,14 @@ const Sales_Data = () => {
             <Text_Code_Field
               label="Distribution Channel"
               code_width="150px"
-              show_search_button={true}
-              // code_value={code_data}
-              // text_value={text_data}
-              on_click={() => set_display_modal("select_sd_dist_channel")}
+              show_search_button={false}
+              code_value={selected_data.dist_channel_code}
+              text_value={get_description(
+                selected_data.dist_channel_code,
+                dist_channel_list,
+                "dist_channel_code",
+                "dist_channel_desc"
+              )}
               disabled
             />
           </div>
@@ -231,6 +242,7 @@ const Sales_Data = () => {
               icon={CirclePlus}
               icon_position="left"
               width="w-full md:w-auto"
+              disabled={!selected_data.sales_org_code}
               //   on_click={handle_add_ext}
             >
               Add Extension
@@ -512,6 +524,18 @@ const Sales_Data = () => {
         )}
         {/* - Pagination */}
       </div>
+      {/* + Modals */}
+      <Select_Sales_Org_H
+        is_open={display_modal === "select_sales_org_h"}
+        on_close={() => set_display_modal("")}
+        width="max-w-[1200px]"
+        height="max-h-[700px]"
+        sales_org_list={sales_org_list}
+        dist_channel_list={dist_channel_list}
+        sales_org_h_list={sales_org_h_list}
+        set_data={set_selected_data}
+      />
+      {/* - Modals */}
     </React.Fragment>
   );
 };

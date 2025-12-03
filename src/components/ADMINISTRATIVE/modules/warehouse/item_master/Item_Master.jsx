@@ -68,6 +68,7 @@ const Item_Master = () => {
     item_desc: "",
     creatoin_date: "",
   });
+  const [item_extension_data, set_item_extension_data] = useState({});
 
   const reset_new_item_data = () => {
     set_new_item_data((prev) => ({
@@ -242,6 +243,11 @@ const Item_Master = () => {
   };
 
   const handle_item_extension = (data) => {
+    set_item_extension_data({
+      id: data.id,
+      item_code: data.item_code,
+      item_desc: data.item_desc,
+    });
     set_page("item_extension");
   };
 
@@ -637,7 +643,12 @@ const Item_Master = () => {
       {page === "view_item" && (
         <View_Item set_page={set_page} view_item_data={view_item_data} />
       )}
-      {page === "item_extension" && <Item_Extension set_page={set_page} />}
+      {page === "item_extension" && (
+        <Item_Extension
+          set_page={set_page}
+          item_extension_data={item_extension_data}
+        />
+      )}
       {/* - Pages */}
       {/* + Modals */}
       <Delete_Item

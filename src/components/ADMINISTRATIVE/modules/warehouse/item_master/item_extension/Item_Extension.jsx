@@ -2,10 +2,10 @@ import React, { useState } from "react";
 import Text_Field from "assets/elements/Text_Field";
 import Button from "assets/elements/Button";
 import { format_date_1, get_date_now } from "assets/scripts/format";
-import { ChevronLeft, CirclePlus } from "lucide-react";
+import { ChevronLeft } from "lucide-react";
 import Sales_Data from "./item_details/Sales_Data";
 
-const Item_Extension = ({ set_page }) => {
+const Item_Extension = ({ set_page, item_extension_data }) => {
   const [active_tab, set_active_tab] = useState("sales_data");
   const [display_modal, set_display_modal] = useState("");
 
@@ -90,8 +90,7 @@ const Item_Extension = ({ set_page }) => {
                 <Text_Field
                   label="Item Code"
                   type={"text"}
-                  // value={new_item_data.item_code} //--> item_code
-
+                  value={item_extension_data.item_code} //--> item_code
                   disabled
                 />
               </div>
@@ -99,7 +98,7 @@ const Item_Extension = ({ set_page }) => {
                 <Text_Field
                   label="Item Description"
                   type={"text"}
-                  // value={new_item_data.item_desc} //--> item_desc
+                  value={item_extension_data.item_desc} //--> item_desc
                   disabled
                 />
               </div>

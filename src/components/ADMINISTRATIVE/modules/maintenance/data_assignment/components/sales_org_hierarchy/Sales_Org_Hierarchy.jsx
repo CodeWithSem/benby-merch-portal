@@ -69,11 +69,6 @@ const Sales_Org_Hierarchy = ({ set_page }) => {
       if (sales_org_response.success && dist_channel_response.success) {
         set_sales_org_list(sales_org_response.data);
         set_dist_channel_list(dist_channel_response.data);
-        const res_log = {
-          sales_org_log: sales_org_response.data,
-          dist_channel_log: dist_channel_response.data,
-        };
-        console.log(res_log);
         set_display_modal("");
       } else {
         console.error("One or more list fetches failed.", {

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { api_bulk_upload_deliv_doc_type_hierarchy } from "api/firestore_db/tbl_deliv_doc_type_hierarchy_api";
+import { api_bulk_upload_deliv_doc_type_hierarchy } from "api/firestore_db/maintenance/data_assignment/tbl_deliv_doc_type_hierarchy_api";
 import { handle_excel_upload_4_hierarchy } from "assets/scripts/functions/upload_excel";
 import { format_date_1, get_date_now } from "assets/scripts/format";
 import {

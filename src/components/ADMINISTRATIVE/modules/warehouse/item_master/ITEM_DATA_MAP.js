@@ -370,6 +370,21 @@ export const dist_channel_list = [
   },
 ];
 
+export const sales_org_h_list = [
+  {
+    id: 1,
+    sales_org_code: "SA-ORG-001",
+    dist_channel_code: "D-CH-001",
+    creation_date: "MM-DD-YYYY",
+  },
+  {
+    id: 2,
+    sales_org_code: "SA-ORG-002",
+    dist_channel_code: "D-CH-002",
+    creation_date: "MM-DD-YYYY",
+  },
+];
+
 export const branch_list = [
   {
     id: 1,

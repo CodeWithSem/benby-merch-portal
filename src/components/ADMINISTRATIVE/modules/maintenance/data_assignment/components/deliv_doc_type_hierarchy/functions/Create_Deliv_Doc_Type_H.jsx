@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { api_create_deliv_doc_type_hierarchy } from "api/firestore_db/tbl_deliv_doc_type_hierarchy_api";
+import { api_create_deliv_doc_type_hierarchy } from "api/firestore_db/maintenance/data_assignment/tbl_deliv_doc_type_hierarchy_api";
 import { get_description } from "assets/scripts/functions/get_description";
 import {
   console_log,
