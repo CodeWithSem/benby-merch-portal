@@ -9,16 +9,16 @@ const GI_Items = () => {
   const [items, set_items] = useState([
     {
       id: 1,
-      item_code: "ITM-000000001",
-      item_desc: 'Macbook Pro 13"',
-      available_quantity: 5,
+      item_code: "ITM-00001",
+      item_desc: "Item Description A",
+      available_quantity: 500,
       unit: "PC",
     },
     {
       id: 2,
-      item_code: "ITM-000000002",
-      item_desc: "iPhone 15 Pro Max",
-      available_quantity: 2,
+      item_code: "ITM-00001",
+      item_desc: "Item Description B",
+      available_quantity: 300,
       unit: "PC",
     },
   ]);

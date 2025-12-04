@@ -388,8 +388,20 @@ export const sales_org_h_list = [
 export const branch_list = [
   {
     id: 1,
-    branch_code: "BR-0001",
+    branch_code: "BR-001",
     branch_desc: "Branch Data 1",
+    creation_date: "MM-DD-YYYY",
+  },
+  {
+    id: 2,
+    branch_code: "BR-002",
+    branch_desc: "Branch Data 2",
+    creation_date: "MM-DD-YYYY",
+  },
+  {
+    id: 3,
+    branch_code: "BR-003",
+    branch_desc: "Branch Data 3",
     creation_date: "MM-DD-YYYY",
   },
 ];
@@ -397,8 +409,20 @@ export const branch_list = [
 export const plant_list = [
   {
     id: 1,
-    plant_code: "PL-0001",
-    plant_desc: "Plant Data 1",
+    plant_code: "PL-001",
+    plant_desc: "Plant Data A",
+    creation_date: "MM-DD-YYYY",
+  },
+  {
+    id: 2,
+    plant_code: "PL-002",
+    plant_desc: "Plant Data B",
+    creation_date: "MM-DD-YYYY",
+  },
+  {
+    id: 3,
+    plant_code: "PL-003",
+    plant_desc: "Plant Data C",
     creation_date: "MM-DD-YYYY",
   },
 ];
@@ -406,8 +430,68 @@ export const plant_list = [
 export const sloc_list = [
   {
     id: 1,
-    sloc_code: "SLOC-0001",
+    sloc_code: "SLOC-001",
     sloc_desc: "SLOC Data 1",
+    creation_date: "MM-DD-YYYY",
+  },
+  {
+    id: 2,
+    sloc_code: "SLOC-002",
+    sloc_desc: "SLOC Data 2",
+    creation_date: "MM-DD-YYYY",
+  },
+  {
+    id: 3,
+    sloc_code: "SLOC-003",
+    sloc_desc: "SLOC Data 3",
+    creation_date: "MM-DD-YYYY",
+  },
+];
+
+export const branch_h_list = [
+  {
+    id: 1,
+    branch_code: "BR-001",
+    plant_code: "PL-001",
+    creation_date: "MM-DD-YYYY",
+  },
+  {
+    id: 2,
+    branch_code: "BR-001",
+    plant_code: "PL-002",
+    creation_date: "MM-DD-YYYY",
+  },
+  {
+    id: 3,
+    branch_code: "BR-002",
+    plant_code: "PL-001",
+    creation_date: "MM-DD-YYYY",
+  },
+  {
+    id: 3,
+    branch_code: "BR-003",
+    plant_code: "PL-003",
+    creation_date: "MM-DD-YYYY",
+  },
+];
+
+export const plant_h_list = [
+  {
+    id: 1,
+    plant_code: "PL-001",
+    sloc_code: "SLOC-001",
+    creation_date: "MM-DD-YYYY",
+  },
+  {
+    id: 2,
+    plant_code: "PL-001",
+    sloc_code: "SLOC-002",
+    creation_date: "MM-DD-YYYY",
+  },
+  {
+    id: 3,
+    plant_code: "PL-002",
+    sloc_code: "SLOC-001",
     creation_date: "MM-DD-YYYY",
   },
 ];

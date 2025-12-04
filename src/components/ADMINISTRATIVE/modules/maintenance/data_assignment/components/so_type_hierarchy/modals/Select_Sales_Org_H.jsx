@@ -86,13 +86,7 @@ const Select_Sales_Org_H = ({
     const end_idx = start_idx + rows_per_page;
 
     set_filtered_sales_org_h_list(data.slice(start_idx, end_idx));
-  }, [
-    sales_org_h_list,
-    lookup_columns,
-    search_query,
-    current_page,
-    rows_per_page,
-  ]);
+  }, [sales_org_h_list, search_query, current_page, rows_per_page]);
 
   // 1. Apply lookup to sales_org_h_list
   const lookup_applied_list = apply_lookups(sales_org_h_list, lookup_columns);

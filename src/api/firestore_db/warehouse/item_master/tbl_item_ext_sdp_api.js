@@ -1,5 +1,5 @@
-// Data Name: item_ext_sd
-// Table Name: ITEM_EXT_SALES_DATA
+// Data Name: item_ext_sdp
+// Table Name: ITEM_EXT_SALES_DATA_PLANT
 
 import { firestore_db, realtime_db } from "assets/scripts/firebase";
 import { ref, set } from "firebase/database";
@@ -15,21 +15,17 @@ import {
   getDoc,
 } from "firebase/firestore";
 import { format_date_1, get_date_now } from "assets/scripts/format";
-import {
-  TABLES,
-  get_firestore_path,
-  get_incremental_path,
-} from "api/db_path_contant";
+import { TABLES, get_firestore_path } from "api/db_path_contant";
 
 // + [Get]
-export const api_get_item_ext_sd_list = async (item_code) => {
+export const api_get_item_ext_sdp_list = async (item_code) => {
   try {
-    const tbl_item_ext_sd_ref = collection(
+    const tbl_item_ext_sdp_ref = collection(
       firestore_db,
-      ...get_firestore_path(TABLES.ITEM_EXT_SALES_DATA)
+      ...get_firestore_path(TABLES.ITEM_EXT_SALES_DATA_PLANT)
     );
 
-    const q = query(tbl_item_ext_sd_ref, where("item_code", "==", item_code));
+    const q = query(tbl_item_ext_sdp_ref, where("item_code", "==", item_code));
 
     const query_snapshot = await getDocs(q);
 
@@ -58,15 +54,15 @@ export const api_get_item_ext_sd_list = async (item_code) => {
 
 // - [Get]
 // + [Create]
-export const api_create_item_ext_sd = async (new_data, user) => {
+export const api_create_item_ext_sdp = async (new_data, user) => {
   try {
-    const tbl_item_ext_sd_ref = collection(
+    const tbl_item_ext_sdp_ref = collection(
       firestore_db,
-      ...get_firestore_path(TABLES.ITEM_EXT_SALES_DATA)
+      ...get_firestore_path(TABLES.ITEM_EXT_SALES_DATA_PLANT)
     );
 
-    const custom_id = `${new_data.item_code}_${new_data.sales_org_code}_${new_data.dist_channel_code}`;
-    const doc_ref = doc(tbl_item_ext_sd_ref, custom_id);
+    const custom_id = `${new_data.item_code}_${new_data.branch_code}_${new_data.plant_code}`;
+    const doc_ref = doc(tbl_item_ext_sdp_ref, custom_id);
 
     const existing = await getDoc(doc_ref);
     if (existing.exists()) {
@@ -105,7 +101,7 @@ export const api_create_item_ext_sd = async (new_data, user) => {
 };
 // - [Create]
 // + [Delete]
-export const api_delete_item_ext_sd = async (id) => {
+export const api_delete_item_ext_sdp = async (id) => {
   if (!id) {
     return {
       success: false,
@@ -116,7 +112,7 @@ export const api_delete_item_ext_sd = async (id) => {
   try {
     const tbl_item_master_ref = collection(
       firestore_db,
-      ...get_firestore_path(TABLES.ITEM_EXT_SALES_DATA)
+      ...get_firestore_path(TABLES.ITEM_EXT_SALES_DATA_PLANT)
     );
 
     const doc_ref = doc(tbl_item_master_ref, String(id));
@@ -138,17 +134,17 @@ export const api_delete_item_ext_sd = async (id) => {
 
 // - [Delete]
 // + [Truncate]
-export const api_truncate_item_ext_sd = async () => {
+export const api_truncate_item_ext_sdp = async () => {
   try {
-    const tbl_item_ext_sd_ref = collection(
+    const tbl_item_ext_sdp_ref = collection(
       firestore_db,
-      ...get_firestore_path(TABLES.ITEM_EXT_SALES_DATA)
+      ...get_firestore_path(TABLES.ITEM_EXT_SALES_DATA_PLANT)
     );
 
-    const snapshot = await getDocs(tbl_item_ext_sd_ref);
+    const snapshot = await getDocs(tbl_item_ext_sdp_ref);
 
     const delete_promises = snapshot.docs.map((document) =>
-      deleteDoc(doc(tbl_item_ext_sd_ref, document.id))
+      deleteDoc(doc(tbl_item_ext_sdp_ref, document.id))
     );
 
     await Promise.all(delete_promises);

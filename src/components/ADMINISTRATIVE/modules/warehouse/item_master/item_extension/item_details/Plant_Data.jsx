@@ -20,22 +20,26 @@ import Spinner from "assets/elements/Spinner";
 import Button_Action from "assets/elements/Button_Action";
 import Pagination from "assets/elements/Pagination";
 import Text_Code_Field from "assets/elements/Text_Code_Field";
-import Select_Sales_Org_H from "../../modals/select_modal/Select_Sales_Org_H";
 import {
-  sales_org_list,
-  dist_channel_list,
-  sales_org_h_list,
+  branch_list,
+  plant_list,
+  branch_h_list,
+  sloc_list,
+  plant_h_list,
 } from "../../ITEM_DATA_MAP";
 import {
-  api_create_item_ext_sd,
-  api_delete_item_ext_sd,
-  api_get_item_ext_sd_list,
-  api_truncate_item_ext_sd,
-} from "api/firestore_db/warehouse/item_master/tbl_item_ext_sd_api";
+  api_create_item_ext_pd,
+  api_delete_item_ext_pd,
+  api_get_item_ext_pd_list,
+  api_truncate_item_ext_pd,
+} from "api/firestore_db/warehouse/item_master/tbl_item_ext_pd_api";
+import Select_Branch from "../../modals/select_modal/Select_Branch";
+import Select_Plant from "../../modals/select_modal/Select_Plant";
+import Select_SLOC from "../../modals/select_modal/Select_SLOC";
 
 const HAS_FILTER = true;
 
-const Sales_Data = ({ active_user, show_toast, item_extension_data }) => {
+const Plant_Data = ({ active_user, show_toast, item_extension_data }) => {
   const [display_modal, set_display_modal] = useState("");
   const [show_filter, set_show_filter] = useState(false);
   const [loading_list, set_loading_list] = useState(false);
@@ -47,18 +51,21 @@ const Sales_Data = ({ active_user, show_toast, item_extension_data }) => {
 
   const columns = [
     { key: "index", label: "No.", sortable: true },
-    { key: "sales_org_code", label: "Sales Organization", sortable: true },
-    { key: "dist_channel_code", label: "Distribution Channel", sortable: true },
+    { key: "branch_code", label: "Branch", sortable: true },
+    { key: "plant_code", label: "Plant", sortable: true },
+    { key: "sloc_code", label: "Storage Location", sortable: true },
     { key: "actions", label: "", sortable: false },
   ];
 
-  const handle_get_item_ext_sd_list = async () => {
+  const [item_ext_pd_list, set_item_ext_pd_list] = useState([]);
+
+  const handle_get_item_ext_pd_list = async () => {
     set_loading_list(true);
-    const response = await api_get_item_ext_sd_list(
+    const response = await api_get_item_ext_pd_list(
       item_extension_data.item_code
     );
     if (response.success) {
-      set_item_ext_sd_list(response.data);
+      set_item_ext_pd_list(response.data);
     } else {
       console.error(response.message);
     }
@@ -66,13 +73,11 @@ const Sales_Data = ({ active_user, show_toast, item_extension_data }) => {
   };
 
   useEffect(() => {
-    handle_get_item_ext_sd_list();
+    handle_get_item_ext_pd_list();
   }, []);
 
-  const [item_ext_sd_list, set_item_ext_sd_list] = useState([]);
-
   // + Client-Side Filtering
-  const [filtered_item_ext_sd_list, set_filtered_item_ext_sd_list] = useState(
+  const [filtered_item_ext_pd_list, set_filtered_item_ext_pd_list] = useState(
     []
   );
   const [select_option, set_select_option] = useState(5);
@@ -84,14 +89,19 @@ const Sales_Data = ({ active_user, show_toast, item_extension_data }) => {
 
   const lookup_columns = [
     {
-      code_key: "sales_org_code",
-      list: sales_org_list,
-      desc_key: "sales_org_desc",
+      code_key: "branch_code",
+      list: branch_list,
+      desc_key: "branch_desc",
     },
     {
-      code_key: "dist_channel_code",
-      list: dist_channel_list,
-      desc_key: "dist_channel_desc",
+      code_key: "plant_code",
+      list: plant_list,
+      desc_key: "plant_desc",
+    },
+    {
+      code_key: "sloc_code",
+      list: sloc_list,
+      desc_key: "sloc_desc",
     },
   ];
 
@@ -104,7 +114,7 @@ const Sales_Data = ({ active_user, show_toast, item_extension_data }) => {
   }, [search_query]);
 
   useEffect(() => {
-    let temp = [...item_ext_sd_list];
+    let temp = [...item_ext_pd_list];
 
     if (debounced_query.trim() !== "") {
       const q = debounced_query.toLowerCase();
@@ -157,9 +167,9 @@ const Sales_Data = ({ active_user, show_toast, item_extension_data }) => {
       index: start_idx + i + 1,
     }));
 
-    set_filtered_item_ext_sd_list(indexed_data);
+    set_filtered_item_ext_pd_list(indexed_data);
   }, [
-    item_ext_sd_list,
+    item_ext_pd_list,
     debounced_query,
     sort_by,
     sort_order,
@@ -169,7 +179,7 @@ const Sales_Data = ({ active_user, show_toast, item_extension_data }) => {
 
   const total_pages = Math.ceil(
     (debounced_query
-      ? item_ext_sd_list.filter((u) => {
+      ? item_ext_pd_list.filter((u) => {
           const q = debounced_query.toLowerCase();
 
           return columns.some((col) => {
@@ -198,7 +208,7 @@ const Sales_Data = ({ active_user, show_toast, item_extension_data }) => {
             return false;
           });
         }).length
-      : item_ext_sd_list.length) / select_option
+      : item_ext_pd_list.length) / select_option
   );
 
   const handle_sort = (column) => {
@@ -221,24 +231,23 @@ const Sales_Data = ({ active_user, show_toast, item_extension_data }) => {
       return;
     }
     try {
-      const new_item_ext_sd_data = {
+      const new_item_ext_pd_data = {
         item_code: item_extension_data.item_code,
-        sales_org_code: selected_data.sales_org_code,
-        dist_channel_code: selected_data.dist_channel_code,
+        branch_code: selected_data.branch_code,
+        plant_code: selected_data.plant_code,
+        sloc_code: selected_data.sloc_code,
       };
-
-      console.table(new_item_ext_sd_data);
-
-      const response = await api_create_item_ext_sd(
-        new_item_ext_sd_data,
+      console.table(new_item_ext_pd_data);
+      const response = await api_create_item_ext_pd(
+        new_item_ext_pd_data,
         active_user?.username
       );
-
       if (response.success) {
-        set_item_ext_sd_list((prev) => [...prev, response.data]);
+        set_item_ext_pd_list((prev) => [...prev, response.data]);
         set_selected_data({
-          sales_org_code: "",
-          dist_channel_code: "",
+          branch_code: "",
+          plant_code: "",
+          sloc_code: "",
         });
         show_status("add_success");
       } else {
@@ -266,11 +275,9 @@ const Sales_Data = ({ active_user, show_toast, item_extension_data }) => {
     const id = selected_data_delete_id;
     try {
       set_delete_loading(true);
-
-      const response = await api_delete_item_ext_sd(id);
-
+      const response = await api_delete_item_ext_pd(id);
       if (response.success) {
-        set_item_ext_sd_list((prev) => prev.filter((item) => item.id !== id));
+        set_item_ext_pd_list((prev) => prev.filter((item) => item.id !== id));
         show_status("delete_success");
         set_display_modal("");
       } else {
@@ -286,14 +293,14 @@ const Sales_Data = ({ active_user, show_toast, item_extension_data }) => {
 
   const handle_truncate = async () => {
     set_truncate_loading(true);
-    const response = await api_truncate_item_ext_sd();
+    const response = await api_truncate_item_ext_pd();
     if (response.success) {
       show_status("truncate_success");
     } else {
       console.error(response.message);
       show_status("error");
     }
-    handle_get_item_ext_sd_list();
+    handle_get_item_ext_pd_list();
     set_truncate_loading(false);
   };
 
@@ -373,7 +380,7 @@ const Sales_Data = ({ active_user, show_toast, item_extension_data }) => {
               variant="white"
               icon={RefreshCw}
               icon_itemsition="left"
-              on_click={handle_get_item_ext_sd_list}
+              on_click={handle_get_item_ext_pd_list}
             ></Button>
           </div>
 
@@ -466,7 +473,7 @@ const Sales_Data = ({ active_user, show_toast, item_extension_data }) => {
             <div className="p-6 flex justify-center items-center text-gray-500 text-sm">
               <Spinner />
             </div>
-          ) : filtered_item_ext_sd_list.length === 0 ? (
+          ) : filtered_item_ext_pd_list.length === 0 ? (
             <div className="p-6 text-center text-gray-500 text-sm">
               No data found
             </div>
@@ -511,7 +518,7 @@ const Sales_Data = ({ active_user, show_toast, item_extension_data }) => {
                 </tr>
               </thead>
               <tbody className="bg-white">
-                {filtered_item_ext_sd_list.map((row, idx) => {
+                {filtered_item_ext_pd_list.map((row, idx) => {
                   const render_cell = (col, row) => {
                     const value = row[col.key];
                     // + Index
@@ -519,44 +526,63 @@ const Sales_Data = ({ active_user, show_toast, item_extension_data }) => {
                       return <span>{row.index}</span>;
                     }
                     // - Index
-                    // + Sales Organization
-                    if (col.key === "sales_org_code") {
+                    // + Branch
+                    if (col.key === "branch_code") {
                       return (
                         <div className="block font-medium text-gray-800">
                           <span className="block text-gray-500 text-[10px]">
-                            {row.sales_org_code}
+                            {row.branch_code}
                           </span>
                           <span className="block text-gray-800 text-[12px]">
                             {get_description(
-                              row.sales_org_code,
-                              sales_org_list,
-                              "sales_org_code",
-                              "sales_org_desc"
+                              row.branch_code,
+                              branch_list,
+                              "branch_code",
+                              "branch_desc"
                             )}
                           </span>
                         </div>
                       );
                     }
-                    // - Sales Organization
-                    // + Distribution Channel
-                    if (col.key === "dist_channel_code") {
+                    // - Branch
+                    // + Plant
+                    if (col.key === "plant_code") {
                       return (
                         <div className="block font-medium text-gray-800">
                           <span className="block text-gray-500 text-[10px]">
-                            {row.dist_channel_code}
+                            {row.plant_code}
                           </span>
                           <span className="block text-gray-800 text-[12px]">
                             {get_description(
-                              row.dist_channel_code,
-                              dist_channel_list,
-                              "dist_channel_code",
-                              "dist_channel_desc"
+                              row.plant_code,
+                              plant_list,
+                              "plant_code",
+                              "plant_desc"
                             )}
                           </span>
                         </div>
                       );
                     }
-                    // - Distribution Channel
+                    // - Plant
+                    // + Storage Location
+                    if (col.key === "sloc_code") {
+                      return (
+                        <div className="block font-medium text-gray-800">
+                          <span className="block text-gray-500 text-[10px]">
+                            {row.sloc_code}
+                          </span>
+                          <span className="block text-gray-800 text-[12px]">
+                            {get_description(
+                              row.sloc_code,
+                              sloc_list,
+                              "sloc_code",
+                              "sloc_desc"
+                            )}
+                          </span>
+                        </div>
+                      );
+                    }
+                    // - Storage Location
                     if (col.key === "actions") {
                       return (
                         <div className="flex gap-2">
@@ -619,38 +645,53 @@ const Sales_Data = ({ active_user, show_toast, item_extension_data }) => {
       {/* - Section 1 */}
       {/* + Section 2 */}
       <div className="mt-5 rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6 whitespace-nowrap">
-        <h1 className="mb-5 font-semibold text-sky-700">
-          Sales Organization Extension
-        </h1>
+        <h1 className="mb-5 font-semibold text-sky-700">Plant Extension</h1>
         <div className="grid grid-cols-1 gap-5">
           <div>
             <Text_Code_Field
-              label="Sales Organization"
+              label="Branch"
               code_width="150px"
               show_search_button={true}
-              code_value={selected_data.sales_org_code}
+              code_value={selected_data.branch_code}
               text_value={get_description(
-                selected_data.sales_org_code,
-                sales_org_list,
-                "sales_org_code",
-                "sales_org_desc"
+                selected_data.branch_code,
+                branch_list,
+                "branch_code",
+                "branch_desc"
               )}
-              on_click={() => set_display_modal("select_sales_org_h")}
+              on_click={() => set_display_modal("select_branch")}
               disabled
             />
           </div>
           <div>
             <Text_Code_Field
-              label="Distribution Channel"
+              label="Plant"
               code_width="150px"
-              show_search_button={false}
-              code_value={selected_data.dist_channel_code}
+              show_search_button={!!selected_data.branch_code}
+              code_value={selected_data.plant_code}
               text_value={get_description(
-                selected_data.dist_channel_code,
-                dist_channel_list,
-                "dist_channel_code",
-                "dist_channel_desc"
+                selected_data.plant_code,
+                plant_list,
+                "plant_code",
+                "plant_desc"
               )}
+              on_click={() => set_display_modal("select_plant")}
+              disabled
+            />
+          </div>
+          <div>
+            <Text_Code_Field
+              label="Storage Location"
+              code_width="150px"
+              show_search_button={!!selected_data.plant_code}
+              code_value={selected_data.sloc_code}
+              text_value={get_description(
+                selected_data.sloc_code,
+                sloc_list,
+                "sloc_code",
+                "sloc_desc"
+              )}
+              on_click={() => set_display_modal("select_sloc")}
               disabled
             />
           </div>
@@ -663,7 +704,7 @@ const Sales_Data = ({ active_user, show_toast, item_extension_data }) => {
                 width="w-[110px]"
                 loading={truncate_loading}
                 on_click={handle_truncate}
-                disabled={item_ext_sd_list.length === 0}
+                disabled={item_ext_pd_list.length === 0}
               >
                 Truncate
               </Button>
@@ -673,7 +714,11 @@ const Sales_Data = ({ active_user, show_toast, item_extension_data }) => {
               icon={CirclePlus}
               icon_position="left"
               width="w-full md:w-auto"
-              disabled={!selected_data.sales_org_code}
+              disabled={
+                !selected_data.branch_code ||
+                !selected_data.plant_code ||
+                !selected_data.sloc_code
+              }
               on_click={() => set_display_modal("confirm_add")}
             >
               Add Extension
@@ -683,14 +728,34 @@ const Sales_Data = ({ active_user, show_toast, item_extension_data }) => {
       </div>
       {/* - Section 2 */}
       {/* + Modals */}
-      <Select_Sales_Org_H
-        is_open={display_modal === "select_sales_org_h"}
+      <Select_Branch
+        is_open={display_modal === "select_branch"}
         on_close={() => set_display_modal("")}
-        width="max-w-[1200px]"
+        width="max-w-[1000px]"
         height="max-h-[700px]"
-        sales_org_list={sales_org_list}
-        dist_channel_list={dist_channel_list}
-        sales_org_h_list={sales_org_h_list}
+        branch_list={branch_list}
+        set_data={set_selected_data}
+      />
+      <Select_Plant
+        is_open={display_modal === "select_plant"}
+        on_close={() => set_display_modal("")}
+        width="max-w-[1000px]"
+        height="max-h-[700px]"
+        selected_branch_code={selected_data.branch_code}
+        branch_list={branch_list}
+        plant_list={plant_list}
+        branch_h_list={branch_h_list}
+        set_data={set_selected_data}
+      />
+      <Select_SLOC
+        is_open={display_modal === "select_sloc"}
+        on_close={() => set_display_modal("")}
+        width="max-w-[1000px]"
+        height="max-h-[700px]"
+        selected_plant_code={selected_data.plant_code}
+        plant_list={plant_list}
+        sloc_list={sloc_list}
+        plant_h_list={plant_h_list}
         set_data={set_selected_data}
       />
       <Confirm_Add_Modal
@@ -710,7 +775,7 @@ const Sales_Data = ({ active_user, show_toast, item_extension_data }) => {
   );
 };
 
-export default Sales_Data;
+export default Plant_Data;
 
 const Confirm_Add_Modal = ({
   is_open,

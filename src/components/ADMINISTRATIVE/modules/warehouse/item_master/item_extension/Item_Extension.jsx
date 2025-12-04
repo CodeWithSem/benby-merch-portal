@@ -4,8 +4,18 @@ import Button from "assets/elements/Button";
 import { format_date_1, get_date_now } from "assets/scripts/format";
 import { ChevronLeft } from "lucide-react";
 import Sales_Data from "./item_details/Sales_Data";
+import Sales_Data_Plant from "./item_details/Sales_Data_Plant";
+import Purchasing from "./item_details/Purchasing";
+import Plant_Data from "./item_details/Plant_Data";
+import WM_Data_1 from "./item_details/WM_Data_1";
+import WM_Data_2 from "./item_details/WM_Data_2";
 
-const Item_Extension = ({ set_page, item_extension_data }) => {
+const Item_Extension = ({
+  set_page,
+  active_user,
+  show_toast,
+  item_extension_data,
+}) => {
   const [active_tab, set_active_tab] = useState("sales_data");
   const [display_modal, set_display_modal] = useState("");
 
@@ -129,7 +139,48 @@ const Item_Extension = ({ set_page, item_extension_data }) => {
               {/* - Tab Navigation */}
               {/* + Tab Content */}
               <div className="p-6">
-                {active_tab === "sales_data" && <Sales_Data />}
+                {active_tab === "sales_data" && (
+                  <Sales_Data
+                    active_user={active_user}
+                    show_toast={show_toast}
+                    item_extension_data={item_extension_data}
+                  />
+                )}
+                {active_tab === "sales_data_plant" && (
+                  <Sales_Data_Plant
+                    active_user={active_user}
+                    show_toast={show_toast}
+                    item_extension_data={item_extension_data}
+                  />
+                )}
+                {active_tab === "purchasing" && (
+                  <Purchasing
+                    active_user={active_user}
+                    show_toast={show_toast}
+                    item_extension_data={item_extension_data}
+                  />
+                )}
+                {active_tab === "plant_data" && (
+                  <Plant_Data
+                    active_user={active_user}
+                    show_toast={show_toast}
+                    item_extension_data={item_extension_data}
+                  />
+                )}
+                {active_tab === "wm_data_1" && (
+                  <WM_Data_1
+                    active_user={active_user}
+                    show_toast={show_toast}
+                    item_extension_data={item_extension_data}
+                  />
+                )}
+                {active_tab === "wm_data_2" && (
+                  <WM_Data_2
+                    active_user={active_user}
+                    show_toast={show_toast}
+                    item_extension_data={item_extension_data}
+                  />
+                )}
                 {/* 
                 {active_tab === "sales_data_plant" && <Sales_Data_Plant />}
                 {active_tab === "purchasing" && <Purchasing />}

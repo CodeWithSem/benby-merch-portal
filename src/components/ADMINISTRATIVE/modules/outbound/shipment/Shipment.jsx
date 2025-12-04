@@ -68,6 +68,42 @@ const Shipment = () => {
       creation_time: "12:00:00",
       status: "Delivered",
     },
+    {
+      id: 2,
+      ship_number: "SH-XXXXXXXXX",
+      ship_type: "LS-01",
+      plate_number: "QVS-412",
+      creation_date: "MM-DD-YYYY",
+      creation_time: "12:00:00",
+      status: "Delivered",
+    },
+    {
+      id: 3,
+      ship_number: "SH-XXXXXXXXX",
+      ship_type: "LS-01",
+      plate_number: "JHG-187",
+      creation_date: "MM-DD-YYYY",
+      creation_time: "12:00:00",
+      status: "In Tansit",
+    },
+    {
+      id: 4,
+      ship_number: "SH-XXXXXXXXX",
+      ship_type: "LS-01",
+      plate_number: "EJG-690",
+      creation_date: "MM-DD-YYYY",
+      creation_time: "12:00:00",
+      status: "In Tansit",
+    },
+    {
+      id: 5,
+      ship_number: "SH-XXXXXXXXX",
+      ship_type: "LS-01",
+      plate_number: "QWE-271",
+      creation_date: "MM-DD-YYYY",
+      creation_time: "12:00:00",
+      status: "In Tansit",
+    },
   ]);
 
   // + Client-Side Filtering

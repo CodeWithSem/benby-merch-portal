@@ -86,13 +86,7 @@ const Select_Company_H = ({
     const end_idx = start_idx + rows_per_page;
 
     set_filtered_company_h_list(data.slice(start_idx, end_idx));
-  }, [
-    company_h_list,
-    lookup_columns,
-    search_query,
-    current_page,
-    rows_per_page,
-  ]);
+  }, [company_h_list, search_query, current_page, rows_per_page]);
 
   // 1. Apply lookup to company_h_list
   const lookup_applied_list = apply_lookups(company_h_list, lookup_columns);

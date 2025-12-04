@@ -5,35 +5,34 @@ import Checkbox_Field from "assets/elements/Checkbox_Field";
 import Button from "assets/elements/Button";
 import Pagination_Modal from "assets/elements/Pagination_Modal";
 
-const Select_Sales_Org_H = ({
+const Select_SLOC = ({
   is_open,
   on_close,
   width = "max-w-[700px]",
   height = "h-[500px]",
-  sales_org_list,
-  dist_channel_list,
-  sales_org_h_list,
+  selected_plant_code,
+  plant_list,
+  sloc_list,
+  plant_h_list,
   set_data,
 }) => {
   // + Client-Side Filtering
-  const [filtered_sales_org_h_list, set_filtered_sales_org_h_list] = useState(
-    []
-  );
+  const [filtered_plant_h_list, set_filtered_plant_h_list] = useState([]);
   const [current_page, set_current_page] = useState(1);
   const [rows_per_page, set_rows_per_page] = useState(5);
   const [search_query, set_search_query] = useState("");
-  const [selected_sales_org_h, set_selected_sales_org_h] = useState(null);
+  const [selected_plant_h, set_selected_plant_h] = useState(null);
 
   const lookup_columns = [
     {
-      code_key: "sales_org_code",
-      list: sales_org_list,
-      desc_key: "sales_org_desc",
+      code_key: "plant_code",
+      list: plant_list,
+      desc_key: "plant_desc",
     },
     {
-      code_key: "dist_channel_code",
-      list: dist_channel_list,
-      desc_key: "dist_channel_desc",
+      code_key: "sloc_code",
+      list: sloc_list,
+      desc_key: "sloc_desc",
     },
   ];
 
@@ -64,13 +63,18 @@ const Select_Sales_Org_H = ({
   };
 
   useEffect(() => {
-    // 1. Start with sales_org_h_list
-    let data = apply_lookups(sales_org_h_list, lookup_columns);
+    // 1. Start with plant_h_list
+    let data = apply_lookups(plant_h_list, lookup_columns);
 
-    // 2. Searchable fields
+    // 2. Filter by selected_plant_code
+    if (selected_plant_code) {
+      data = data.filter((row) => row.plant_code === selected_plant_code);
+    }
+
+    // 3. Searchable fields
     const search_fields = get_searchable_fields(lookup_columns);
 
-    // 3. Perform search
+    // 4. Perform search
     if (search_query.trim() !== "") {
       const q = search_query.toLowerCase();
 
@@ -85,17 +89,17 @@ const Select_Sales_Org_H = ({
     const start_idx = (current_page - 1) * rows_per_page;
     const end_idx = start_idx + rows_per_page;
 
-    set_filtered_sales_org_h_list(data.slice(start_idx, end_idx));
+    set_filtered_plant_h_list(data.slice(start_idx, end_idx));
   }, [
-    sales_org_h_list,
-    // lookup_columns,
+    plant_h_list,
+    selected_plant_code,
     search_query,
     current_page,
     rows_per_page,
   ]);
 
-  // 1. Apply lookup to sales_org_h_list
-  const lookup_applied_list = apply_lookups(sales_org_h_list, lookup_columns);
+  // 1. Apply lookup to plant_h_list
+  const lookup_applied_list = apply_lookups(plant_h_list, lookup_columns);
 
   // 2. Generate searchable fields
   const search_fields = get_searchable_fields(lookup_columns);
@@ -115,13 +119,16 @@ const Select_Sales_Org_H = ({
   const handle_page_change = (page) => set_current_page(page);
   // - Client-Side Filtering
 
-  const handle_select_sales_org = () => {
-    if (!selected_sales_org_h) {
-      alert("Please select a sales_org hierarchy before proceeding.");
+  const handle_select_plant = () => {
+    if (!selected_plant_h) {
+      alert("Please select a data before proceeding.");
       return;
     }
-    set_data(selected_sales_org_h);
-    set_selected_sales_org_h(null);
+    set_data((prev) => ({
+      ...prev,
+      sloc_code: selected_plant_h.sloc_code,
+    }));
+    set_selected_plant_h(null);
     on_close();
   };
 
@@ -145,7 +152,7 @@ const Select_Sales_Org_H = ({
           </button>
           {/* + Modal Label */}
           <div className="text-lg md:text-xl font-bold mb-5 px-7">
-            Sales Organization Hierarchy Selection
+            Storage Location Selection
           </div>
           {/* - Modal Label */}
           {/* + Modal Body */}
@@ -173,10 +180,7 @@ const Select_Sales_Org_H = ({
                     <tr className="font-semibold text-xs">
                       <th className="px-6 py-3 w-[80px]"></th>
                       <th className="px-6 py-3 text-gray-500 text-left">
-                        Sales Organization
-                      </th>
-                      <th className="px-6 py-3 text-gray-500 text-left">
-                        Distribution Channel
+                        Storage Location
                       </th>
                       <th className="px-6 py-3 text-gray-500 text-left">
                         Creation Date
@@ -185,7 +189,7 @@ const Select_Sales_Org_H = ({
                   </thead>
 
                   <tbody className="divide-y divide-gray-100">
-                    {filtered_sales_org_h_list.length === 0 ? (
+                    {filtered_plant_h_list.length === 0 ? (
                       <tr>
                         <td
                           colSpan={3}
@@ -195,15 +199,13 @@ const Select_Sales_Org_H = ({
                         </td>
                       </tr>
                     ) : (
-                      filtered_sales_org_h_list.map((data) => (
+                      filtered_plant_h_list.map((data) => (
                         <tr
                           key={data.id}
                           className={`hover:bg-sky-50/50 cursor-pointer text-[12px] ${
-                            selected_sales_org_h?.id === data.id
-                              ? "bg-sky-50"
-                              : ""
+                            selected_plant_h?.id === data.id ? "bg-sky-50" : ""
                           }`}
-                          onClick={() => set_selected_sales_org_h(data)}
+                          onClick={() => set_selected_plant_h(data)}
                         >
                           <td className="px-5 py-4 sm:px-6 text-center">
                             <div className="flex justify-center items-center">
@@ -211,28 +213,18 @@ const Select_Sales_Org_H = ({
                                 name="check"
                                 box_size={18}
                                 icon_size={12}
-                                checked={selected_sales_org_h?.id === data.id}
-                                on_change={() => set_selected_sales_org_h(data)}
+                                checked={selected_plant_h?.id === data.id}
+                                on_change={() => set_selected_plant_h(data)}
                               />
                             </div>
                           </td>
                           <td className="px-5 py-4 sm:px-6">
                             <div className="block font-medium text-gray-800">
                               <span className="block text-gray-500 text-[10px]">
-                                {data.sales_org_code}
+                                {data.sloc_code}
                               </span>
                               <span className="block text-gray-800 text-[12px]">
-                                {data.sales_org_desc}
-                              </span>
-                            </div>
-                          </td>
-                          <td className="px-5 py-4 sm:px-6">
-                            <div className="block font-medium text-gray-800">
-                              <span className="block text-gray-500 text-[10px]">
-                                {data.dist_channel_code}
-                              </span>
-                              <span className="block text-gray-800 text-[12px]">
-                                {data.dist_channel_desc}
+                                {data.sloc_desc}
                               </span>
                             </div>
                           </td>
@@ -266,9 +258,9 @@ const Select_Sales_Org_H = ({
             <div className="flex justify-center sm:justify-end gap-2 w-full">
               <Button
                 variant="primary"
-                on_click={handle_select_sales_org}
+                on_click={handle_select_plant}
                 class_name="w-full md:w-[100px]"
-                disabled={!selected_sales_org_h}
+                disabled={!selected_plant_h}
               >
                 Proceed
               </Button>
@@ -289,4 +281,4 @@ const Select_Sales_Org_H = ({
   ) : null;
 };
 
-export default Select_Sales_Org_H;
+export default Select_SLOC;

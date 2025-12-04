@@ -228,7 +228,7 @@ const Inventory_Master = () => {
                 code_width="150px"
                 show_search_button={true}
                 on_click={handle_select_branch}
-                has_clear_button={true}
+                // has_clear_button={true}
                 on_clear={() => alert("Clear Branch")}
                 disabled
               />
@@ -237,7 +237,7 @@ const Inventory_Master = () => {
                 code_width="150px"
                 show_search_button={true}
                 on_click={handle_select_plant}
-                has_clear_button={true}
+                // has_clear_button={true}
                 on_clear={() => alert("Clear Plant")}
                 disabled
               />
@@ -246,7 +246,7 @@ const Inventory_Master = () => {
                 code_width="150px"
                 show_search_button={true}
                 on_click={handle_select_sloc}
-                has_clear_button={true}
+                // has_clear_button={true}
                 on_clear={() => alert("Clear SLOC")}
                 disabled
               />

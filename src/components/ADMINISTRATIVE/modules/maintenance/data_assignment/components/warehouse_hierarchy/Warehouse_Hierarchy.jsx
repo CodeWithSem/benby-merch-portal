@@ -1,101 +1,155 @@
 import React, { useEffect, useState } from "react";
+import { useToast } from "../../../../../layout/Toast_Provider";
 import { Use_App } from "context/app_context";
-import { useToast } from "../../../layout/Toast_Provider";
-import { Get_TBL_INCREMENTAL_ID } from "api/real_time_db/incremental";
 import {
-  api_get_item_master_list,
-  api_truncate_item_master,
-} from "api/firestore_db/warehouse/item_master/tbl_item_master_api";
-import { def_item_master_data } from "assets/scripts/variables/default_variables";
+  api_get_plant_hierarchy_list,
+  api_truncate_plant_hierarchy,
+} from "api/firestore_db/maintenance/data_assignment/tbl_plant_hierarchy_api";
+import { Get_TBL_INCREMENTAL_ID } from "api/real_time_db/incremental";
+import { api_get_plant_list } from "api/firestore_db/maintenance/general_structure/tbl_plant_api";
+import { api_get_sloc_list } from "api/firestore_db/maintenance/general_structure/tbl_sloc_api";
+import { get_description } from "assets/scripts/functions/get_description";
 import {
   Search,
   ChevronDown,
   ChevronUp,
   Edit,
   Trash,
-  View,
   PlusCircle,
   RefreshCw,
-  SlidersHorizontal,
   FileUp,
-  Warehouse,
+  ChevronLeft,
   Trash2,
   CheckCircle2,
-  FileDigit,
+  SlidersHorizontal,
+  CircleX,
 } from "lucide-react";
 import Icon_Field from "assets/elements/Icon_Field";
 import Select_Field from "assets/elements/Select_Field";
 import Pagination from "assets/elements/Pagination";
 import Button from "assets/elements/Button";
-import Button_Action from "assets/elements/Button_Action";
-import Text_Field from "assets/elements/Text_Field";
 import Spinner from "assets/elements/Spinner";
-import View_Item from "./view_item/View_Item";
-import Create_New_Item from "./create_new_item/Create_New_Item";
-import Edit_Item from "./edit_item/Edit_Item";
-import Delete_Item from "./modals/delete_item/Delete_Item";
-import Set_Item_ID from "./modals/set_item_id/Set_Item_ID";
-import Item_Extension from "./item_extension/Item_Extension";
+import Text_Field from "assets/elements/Text_Field";
+import Load_Screen from "./modals/Load_Screen";
+import Create_Plant_H from "./functions/Create_Warehouse_H";
+import Edit_Plant_H from "./functions/Edit_Warehouse_H";
+import Delete_Plant_H from "./functions/Delete_Warehouse_H";
+import Upload_Plant_H from "./functions/Upload_Warehouse_H";
 
 const HAS_FILTER = true;
 
-const Item_Master = () => {
+const Plant_Hierarchy = ({ set_page }) => {
   const { active_user } = Use_App();
   const { show_toast } = useToast();
+  const [sub_page, set_sub_page] = useState("main");
+  const [display_modal, set_display_modal] = useState("load_screen");
   const [show_filter, set_show_filter] = useState(false);
-  const [page, set_page] = useState("main");
-  const [display_modal, set_display_modal] = useState("");
   const [loading_list, set_loading_list] = useState(false);
   const [truncate_loading, set_truncate_loading] = useState(false);
+  const [plant_list, set_plant_list] = useState([]);
+  const [sloc_list, set_sloc_list] = useState([]);
 
-  const columns = [
-    { key: "index", label: "No.", sortable: true },
-    { key: "item_code", label: "Item Code", sortable: true },
-    { key: "item_desc", label: "Description", sortable: true },
-    { key: "std_base_uom", label: "Base UoM", sortable: true },
-    { key: "creation_date", label: "Creation Date", sortable: true },
-    { key: "created_by", label: "Created By", sortable: true },
-    { key: "actions", label: "", sortable: false },
-  ];
+  const handle_get_all_lists = async () => {
+    try {
+      const [plant_response, sloc_response] = await Promise.all([
+        api_get_plant_list(),
+        api_get_sloc_list(),
+      ]);
+      if (plant_response.success && sloc_response.success) {
+        set_plant_list(plant_response.data);
+        set_sloc_list(sloc_response.data);
+        const res_log = {
+          plant_log: plant_response.data,
+          sloc_log: sloc_response.data,
+        };
+        console.log(res_log);
+        set_display_modal("");
+      } else {
+        console.error("One or more list fetches failed.", {
+          plant: plant_response.message,
+          sloc: sloc_response.message,
+        });
+        show_error();
+        handle_go_back("main");
+      }
+    } catch (error) {
+      console.error("A critical error occurred while fetching lists:", error);
+      show_error();
+      handle_go_back("main");
+    }
+  };
 
-  const [current_id, set_current_id] = useState(0);
-  const [view_item_data, set_view_item_data] = useState(def_item_master_data);
-  const [new_item_data, set_new_item_data] = useState(def_item_master_data);
-  const [edit_item_data, set_edit_item_data] = useState(def_item_master_data);
-  const [delete_item_data, set_delete_item_data] = useState({
-    id: 0,
-    item_code: "",
-    item_desc: "",
-    creatoin_date: "",
+  const show_error = () => {
+    show_toast({
+      type: "danger",
+      title: "Error",
+      message: "Something went wrong. Please try again later.",
+      icon: <CircleX size={21} className="text-red-500" />,
+    });
+  };
+
+  useEffect(() => {
+    handle_get_all_lists();
+  }, []);
+
+  const def_plant_hierarchy_data = {
+    id: null,
+    plant_code: "",
+    sloc_code: "",
+    creation_date: "",
+    created_by: "",
+    change_date: "",
+    change_by: "",
+  };
+
+  const [new_data, set_new_data] = useState({ ...def_plant_hierarchy_data });
+  const [edit_data, set_edit_data] = useState({
+    ...def_plant_hierarchy_data,
   });
-  const [item_extension_data, set_item_extension_data] = useState({});
+  const [delete_data, set_delete_data] = useState({
+    ...def_plant_hierarchy_data,
+  });
 
-  const reset_new_item_data = () => {
-    set_new_item_data((prev) => ({
-      ...def_item_master_data,
-      id: prev.id,
-      item_code: prev.item_code,
+  const reset_new_data = () => {
+    set_new_data((prev) => ({
+      ...prev,
+      plant_code: "",
+      sloc_code: "",
+      creation_date: "",
+      created_by: "",
+      change_date: "",
+      change_by: "",
     }));
   };
 
   useEffect(() => {
-    Get_TBL_INCREMENTAL_ID("TBL_ITEM_MASTER", (value) => {
-      set_new_item_data((prev) => ({
+    Get_TBL_INCREMENTAL_ID("TBL_PLANT_HIERARCHY", (value) => {
+      set_new_data((prev) => ({
         ...prev,
         id: value,
-        item_code: `ITM-${String(value).padStart(5, "0")}`,
       }));
-      set_current_id(value);
     });
   }, []);
 
-  const [item_master_list, set_item_master_list] = useState([]);
+  const columns = [
+    { key: "index", label: "#", sortable: false },
+    { key: "id", label: "ID", sortable: true },
+    { key: "plant_code", label: "Plant", sortable: true },
+    { key: "sloc_code", label: "Storage Location", sortable: true },
+    { key: "creation_date", label: "Creation Date", sortable: true },
+    { key: "created_by", label: "Created By", sortable: true },
+    { key: "change_date", label: "Change Date", sortable: true },
+    { key: "change_by", label: "Change By", sortable: true },
+    { key: "actions", label: "", sortable: false },
+  ];
 
-  const handle_get_item_master_list = async () => {
+  const [plant_hierarchy_list, set_plant_hierarchy_list] = useState([]);
+
+  const handle_get_plant_hierarchy_list = async () => {
     set_loading_list(true);
-    const response = await api_get_item_master_list();
+    const response = await api_get_plant_hierarchy_list();
     if (response.success) {
-      set_item_master_list(response.data);
+      set_plant_hierarchy_list(response.data);
     } else {
       console.error(response.message);
     }
@@ -103,12 +157,12 @@ const Item_Master = () => {
   };
 
   useEffect(() => {
-    handle_get_item_master_list();
+    handle_get_plant_hierarchy_list();
   }, []);
 
-  const handle_truncate_item_master_list = async () => {
+  const handle_truncate_plant_hierarchy_list = async () => {
     set_truncate_loading(true);
-    const response = await api_truncate_item_master();
+    const response = await api_truncate_plant_hierarchy();
     if (response.success) {
       show_toast({
         type: "success",
@@ -124,21 +178,28 @@ const Item_Master = () => {
       });
       console.error(response.message);
     }
-    handle_get_item_master_list();
+    handle_get_plant_hierarchy_list();
     set_truncate_loading(false);
-    set_display_modal("");
   };
 
   // + Client-Side Filtering
-  const [filtered_item_master_list, set_filtered_item_master_list] = useState(
-    []
-  );
+  const [filtered_plant_hierarchy_list, set_filtered_plant_hierarchy_list] =
+    useState([]);
   const [select_option, set_select_option] = useState(5);
   const [current_page, set_current_page] = useState(1);
-  const [sort_by, set_sort_by] = useState("timestamp");
+  const [sort_by, set_sort_by] = useState("id");
   const [sort_order, set_sort_order] = useState("asc");
   const [search_query, set_search_query] = useState("");
   const [debounced_query, set_debounced_query] = useState("");
+
+  const lookup_columns = [
+    { code_key: "plant_code", list: plant_list, desc_key: "plant_desc" },
+    {
+      code_key: "sloc_code",
+      list: sloc_list,
+      desc_key: "sloc_desc",
+    },
+  ];
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -149,7 +210,7 @@ const Item_Master = () => {
   }, [search_query]);
 
   useEffect(() => {
-    let temp = [...item_master_list];
+    let temp = [...plant_hierarchy_list];
 
     if (debounced_query.trim() !== "") {
       const q = debounced_query.toLowerCase();
@@ -157,7 +218,27 @@ const Item_Master = () => {
         columns.some((col) => {
           if (col.key === "actions") return false;
           const val = u[col.key];
-          return val?.toString().toLowerCase().includes(q);
+
+          if (val?.toString().toLowerCase().includes(q)) {
+            return true;
+          }
+
+          const lookup = lookup_columns.find((lc) => lc.code_key === col.key);
+
+          if (lookup) {
+            const desc_val = get_description(
+              u[lookup.code_key],
+              lookup.list,
+              lookup.code_key,
+              lookup.desc_key
+            );
+
+            if (desc_val.toLowerCase().includes(q)) {
+              return true;
+            }
+          }
+
+          return false;
         })
       );
     }
@@ -176,9 +257,15 @@ const Item_Master = () => {
 
     const start_idx = (current_page - 1) * select_option;
     const end_idx = start_idx + select_option;
-    set_filtered_item_master_list(temp.slice(start_idx, end_idx));
+    const sliced = temp.slice(start_idx, end_idx);
+    const indexed_data = sliced.map((item, i) => ({
+      ...item,
+      index: start_idx + i + 1,
+    }));
+
+    set_filtered_plant_hierarchy_list(indexed_data);
   }, [
-    item_master_list,
+    plant_hierarchy_list,
     debounced_query,
     sort_by,
     sort_order,
@@ -188,17 +275,36 @@ const Item_Master = () => {
 
   const total_pages = Math.ceil(
     (debounced_query
-      ? item_master_list.filter((u) =>
-          columns.some((col) => {
+      ? plant_hierarchy_list.filter((u) => {
+          const q = debounced_query.toLowerCase();
+
+          return columns.some((col) => {
             if (col.key === "actions") return false;
-            const val = u[col.key];
-            return val
-              ?.toString()
-              .toLowerCase()
-              .includes(debounced_query.toLowerCase());
-          })
-        ).length
-      : item_master_list.length) / select_option
+
+            const code_val = u[col.key];
+            if (code_val?.toString().toLowerCase().includes(q)) {
+              return true;
+            }
+
+            const lookup = lookup_columns.find((lc) => lc.code_key === col.key);
+
+            if (lookup) {
+              const desc_val = get_description(
+                u[lookup.code_key],
+                lookup.list,
+                lookup.code_key,
+                lookup.desc_key
+              );
+
+              if (desc_val.toLowerCase().includes(q)) {
+                return true;
+              }
+            }
+
+            return false;
+          });
+        }).length
+      : plant_hierarchy_list.length) / select_option
   );
 
   const handle_sort = (column) => {
@@ -214,63 +320,46 @@ const Item_Master = () => {
   const handle_page_change = (page) => set_current_page(page);
   // - Client-Side Filtering
 
-  const handle_create_new_item = () => {
-    set_page("item_creation");
+  const handle_create_new_plant_hierarchy = () => {
+    set_sub_page("create_new_plant_hierarchy");
   };
 
-  const handle_upload_item = () => {
-    alert("Upload Item");
+  const handle_edit_plant_hierarchy = (data) => {
+    set_edit_data(data);
+    set_sub_page("edit_plant_hierarchy");
+  };
+  const handle_delete_plant_hierarchy = (data) => {
+    set_delete_data(data);
+    set_display_modal("delete_plant_hierarchy");
   };
 
-  const handle_view_item = (data) => {
-    set_view_item_data(data);
-    set_page("view_item");
+  const handle_upload_plant_hierarchy = () => {
+    set_sub_page("upload_plant_hierarchy");
   };
 
-  const handle_edit_item = (data) => {
-    set_edit_item_data(data);
-    set_page("edit_item");
+  const handle_go_back = (value) => {
+    switch (value) {
+      case "main":
+        set_page("main");
+        break;
+      case "sub_level":
+        set_sub_page("main");
+        break;
+      default:
+        alert("Error");
+        return;
+    }
   };
-
-  const handle_delete_item = (id, item_code, item_desc, creation_date) => {
-    set_delete_item_data({
-      id: id,
-      item_code: item_code,
-      item_desc: item_desc,
-      creation_date: creation_date,
-    });
-    set_display_modal("delete_item");
-  };
-
-  const handle_item_extension = (data) => {
-    set_item_extension_data({
-      id: data.id,
-      item_code: data.item_code,
-      item_desc: data.item_desc,
-    });
-    set_page("item_extension");
-  };
-
-  const handle_truncate = () => {
-    set_display_modal("confirm_truncate");
-  };
-
-  const handle_set_item_id = () => {
-    set_display_modal("set_item_id");
-  };
-
-  // useEffect(() => {
-  //   console.log(data_map_object);
-  // }, []);
 
   // RETURN ORIGIN
   return (
     <React.Fragment>
-      {page === "main" && (
+      {sub_page === "main" && (
         <React.Fragment>
           <div className="w-full">
+            {/* + Title */}
             <div className="flex flex-wrap items-center justify-between gap-3 py-5">
-              <h1 className="text-xl">Warehouse</h1>
+              <h1 className="text-xl">Maintenance</h1>
               {/* + Breadcrumbs */}
               <nav>
                 <ol className="flex flex-wrap items-center gap-1.5">
@@ -279,43 +368,55 @@ const Item_Master = () => {
                       Home
                     </a>
                   </li>
-                  <li className="flex items-center gap-1.5 text-sm text-gray-500">
+                  <li
+                    className="flex items-center gap-1.5 text-sm text-gray-500"
+                    onClick={() => handle_go_back("main")}
+                  >
                     <span>/</span>
                     <a className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-sky-500 cursor-pointer">
-                      Warehouse
+                      Maintenance
+                    </a>
+                  </li>
+                  <li
+                    className="flex items-center gap-1.5 text-sm text-gray-500"
+                    onClick={() => handle_go_back("main")}
+                  >
+                    <span>/</span>
+                    <a className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-sky-500 cursor-pointer">
+                      Data Assignment
                     </a>
                   </li>
                   <li className="flex items-center gap-1.5 text-sm text-gray-500">
                     <span>/</span>
-                    <span className="text-gray-800">Item Master</span>
+                    <span className="text-gray-800">Plant Hierarchy</span>
                   </li>
                 </ol>
               </nav>
               {/* - Breadcrumbs */}
             </div>
+            {/* - Title */}
             <div className="w-full bg-white rounded-lg border">
               {/* + Header */}
               <div className="flex flex-wrap items-center justify-between gap-3 p-5">
-                <h1 className="text-lg">Item Master</h1>
+                <div className="flex items-center gap-3">
+                  <Button
+                    variant="white"
+                    icon={ChevronLeft}
+                    icon_position="left"
+                    width="w-[20px]"
+                    on_click={() => handle_go_back("main")}
+                  ></Button>
+                  <h1 className="text-lg">Plant Hierarchy</h1>
+                </div>
                 <div className="flex gap-2">
-                  {active_user?.category === "DEV" && (
-                    <Button
-                      variant="success"
-                      icon={FileDigit}
-                      icon_position="left"
-                      width="w-[110px]"
-                      on_click={handle_set_item_id}
-                    >
-                      Set ID
-                    </Button>
-                  )}
                   {active_user?.category === "DEV" && (
                     <Button
                       variant="danger"
                       icon={Trash2}
                       icon_position="left"
                       width="w-[110px]"
-                      on_click={handle_truncate}
+                      loading={truncate_loading}
+                      on_click={handle_truncate_plant_hierarchy_list}
                     >
                       Truncate
                     </Button>
@@ -323,16 +424,16 @@ const Item_Master = () => {
                   <Button
                     variant="primary"
                     icon={PlusCircle}
-                    icon_itemsition="left"
-                    on_click={handle_create_new_item}
+                    icon_position="left"
+                    on_click={handle_create_new_plant_hierarchy}
                   >
-                    Create New Item
+                    Create New Data
                   </Button>
                   <Button
                     variant="primary"
                     icon={FileUp}
-                    icon_itemsition="left"
-                    on_click={handle_upload_item}
+                    icon_position="left"
+                    on_click={handle_upload_plant_hierarchy}
                   >
                     Upload
                   </Button>
@@ -364,11 +465,10 @@ const Item_Master = () => {
                       <Button
                         variant="white"
                         icon={RefreshCw}
-                        icon_itemsition="left"
-                        on_click={handle_get_item_master_list}
+                        icon_position="left"
+                        on_click={handle_get_plant_hierarchy_list}
                       ></Button>
                     </div>
-
                     <div className="w-full mt-4 md:mt-0 md:w-[600px]">
                       <div className="w-full flex items-center gap-2">
                         <div className="w-full">
@@ -376,7 +476,7 @@ const Item_Master = () => {
                             name="search"
                             placeholder="Search..."
                             icon={Search}
-                            icon_itemsition="left"
+                            icon_position="left"
                             value={search_query}
                             on_change={(e) => set_search_query(e.target.value)}
                           />
@@ -460,7 +560,7 @@ const Item_Master = () => {
                       <div className="p-6 flex justify-center items-center text-gray-500 text-sm">
                         <Spinner />
                       </div>
-                    ) : filtered_item_master_list.length === 0 ? (
+                    ) : filtered_plant_hierarchy_list.length === 0 ? (
                       <div className="p-6 text-center text-gray-500 text-sm">
                         No data found
                       </div>
@@ -471,7 +571,6 @@ const Item_Master = () => {
                             {columns.map((col, i) => {
                               const renderHeaderCell = (col) => {
                                 const is_sorted = sort_by === col.key;
-
                                 return (
                                   <div className="flex items-center justify-between w-full">
                                     <span>{col.label}</span>
@@ -512,63 +611,86 @@ const Item_Master = () => {
                           </tr>
                         </thead>
                         <tbody className="bg-white">
-                          {filtered_item_master_list.map((row, idx) => {
+                          {filtered_plant_hierarchy_list.map((row, idx) => {
                             const render_cell = (col, row) => {
                               const value = row[col.key];
+                              // + Index
                               if (col.key === "index") {
-                                return <div>{idx + 1}</div>;
+                                return <span>{row.index}</span>;
                               }
-                              if (col.key === "batch_manage") {
+                              // - Index
+                              // + Plant
+                              if (col.key === "plant_code") {
                                 return (
-                                  <div>{row.batch_manage ? "YES" : "NO"}</div>
+                                  <div className="block font-medium text-gray-800">
+                                    <span className="block text-gray-500 text-[10px]">
+                                      {row.plant_code}
+                                    </span>
+                                    <span className="block text-gray-800 text-[12px]">
+                                      {get_description(
+                                        row.plant_code,
+                                        plant_list,
+                                        "plant_code",
+                                        "plant_desc"
+                                      )}
+                                    </span>
+                                  </div>
                                 );
                               }
+                              // + Plant
+                              // + Storage Location
+                              if (col.key === "sloc_code") {
+                                return (
+                                  <div className="block font-medium text-gray-800">
+                                    <span className="block text-gray-500 text-[10px]">
+                                      {row.sloc_code}
+                                    </span>
+                                    <span className="block text-gray-800 text-[12px]">
+                                      {get_description(
+                                        row.sloc_code,
+                                        sloc_list,
+                                        "sloc_code",
+                                        "sloc_desc"
+                                      )}
+                                    </span>
+                                  </div>
+                                );
+                              }
+                              // - Storage Location
+                              // + Action Buttons
                               if (col.key === "actions") {
                                 return (
                                   <div className="flex gap-2">
                                     <div className="relative group flex jusity-center items-center">
-                                      <Button_Action
-                                        icon={View}
-                                        tooltip="View Item"
-                                        on_click={() => handle_view_item(row)}
-                                      />
-                                    </div>
-                                    <div className="relative group flex jusity-center items-center">
-                                      <Button_Action
-                                        icon={Edit}
-                                        tooltip="Edit Item"
-                                        on_click={() => handle_edit_item(row)}
-                                      />
-                                    </div>
-                                    <div className="relative group flex jusity-center items-center">
-                                      <Button_Action
-                                        class_name="mb-[1px]"
-                                        icon={Warehouse}
-                                        tooltip="Item Extension"
-                                        on_click={() =>
-                                          handle_item_extension(row)
+                                      <button
+                                        className="text-gray-500 hover:text-sky-600 text-[12px] outline-none"
+                                        onClick={() =>
+                                          handle_edit_plant_hierarchy(row)
                                         }
-                                      />
+                                      >
+                                        <Edit size={19} />
+                                      </button>
+                                      <span className="absolute bottom-full mb-1 left-1/2 transform -translate-x-1/2 px-2 py-1 text-xs text-white bg-sky-600 rounded opacity-0 group-hover:opacity-100 transition-opacity">
+                                        Edit Record
+                                      </span>
                                     </div>
                                     <div className="relative group flex jusity-center items-center">
-                                      <Button_Action
-                                        class_name="mb-[1px]"
-                                        icon={Trash}
-                                        variant="danger"
-                                        tooltip="Delete Item"
-                                        on_click={() =>
-                                          handle_delete_item(
-                                            row.id,
-                                            row.item_code,
-                                            row.item_desc,
-                                            row.creation_date
-                                          )
+                                      <button
+                                        className="text-gray-500 hover:text-red-600 text-[12px] mb-[1px] outline-none"
+                                        onClick={() =>
+                                          handle_delete_plant_hierarchy(row)
                                         }
-                                      />
+                                      >
+                                        <Trash size={19} />
+                                      </button>
+                                      <span className="absolute bottom-full mb-1 left-1/2 transform -translate-x-1/2 px-2 py-1 text-xs text-white bg-red-600 rounded opacity-0 group-hover:opacity-100 transition-opacity">
+                                        Delete Record
+                                      </span>
                                     </div>
                                   </div>
                                 );
                               }
+                              // - Action Buttons
 
                               return value;
                             };
@@ -617,107 +739,61 @@ const Item_Master = () => {
           </div>
         </React.Fragment>
       )}
-      {/* + Pages */}
-      {page === "item_creation" && (
-        <Create_New_Item
-          set_page={set_page}
+      {sub_page === "create_new_plant_hierarchy" && (
+        <Create_Plant_H
+          handle_go_back={handle_go_back}
           active_user={active_user}
-          reset_new_item_data={reset_new_item_data}
+          reset_new_data={reset_new_data}
           show_toast={show_toast}
-          new_item_data={new_item_data}
-          set_new_item_data={set_new_item_data}
-          set_item_master_list={set_item_master_list}
+          new_data={new_data}
+          set_new_data={set_new_data}
+          set_plant_hierarchy_list={set_plant_hierarchy_list}
+          plant_list={plant_list}
+          sloc_list={sloc_list}
         />
       )}
-      {page === "edit_item" && (
-        <Edit_Item
-          set_page={set_page}
+      {sub_page === "edit_plant_hierarchy" && (
+        <Edit_Plant_H
+          handle_go_back={handle_go_back}
           active_user={active_user}
-          reset_new_item_data={reset_new_item_data}
+          reset_new_data={reset_new_data}
           show_toast={show_toast}
-          edit_item_data={edit_item_data}
-          set_edit_item_data={set_edit_item_data}
-          set_item_master_list={set_item_master_list}
+          edit_data={edit_data}
+          set_edit_data={set_edit_data}
+          set_plant_hierarchy_list={set_plant_hierarchy_list}
+          plant_list={plant_list}
+          sloc_list={sloc_list}
         />
       )}
-      {page === "view_item" && (
-        <View_Item set_page={set_page} view_item_data={view_item_data} />
-      )}
-      {page === "item_extension" && (
-        <Item_Extension
-          set_page={set_page}
-          active_user={active_user}
+      {sub_page === "upload_plant_hierarchy" && (
+        <Upload_Plant_H
+          handle_go_back={handle_go_back}
+          handle_get_plant_hierarchy_list={handle_get_plant_hierarchy_list}
           show_toast={show_toast}
-          item_extension_data={item_extension_data}
+          plant_list={plant_list}
+          sloc_list={sloc_list}
         />
       )}
-      {/* - Pages */}
-      {/* + Modals */}
-      <Delete_Item
-        is_open={display_modal === "delete_item"}
+      <Delete_Plant_H
+        is_open={display_modal === "delete_plant_hierarchy"}
         on_close={() => set_display_modal("")}
-        width="max-w-[900px]"
+        width="max-w-[1000px]"
         show_toast={show_toast}
-        delete_item_data={delete_item_data}
-        set_item_master_list={set_item_master_list}
+        delete_data={delete_data}
+        set_plant_hierarchy_list={set_plant_hierarchy_list}
+        plant_list={plant_list}
+        sloc_list={sloc_list}
       />
-      <Set_Item_ID
-        is_open={display_modal === "set_item_id"}
-        on_close={() => set_display_modal("")}
-        show_toast={show_toast}
-        current_id={current_id}
+      <Load_Screen
+        is_open={display_modal === "load_screen"}
+        on_close={() => {
+          set_display_modal("");
+          handle_go_back("main");
+        }}
+        width="max-w-[400px]"
       />
-      <Confirm_Truncate
-        is_open={display_modal === "confirm_truncate"}
-        on_close={() => set_display_modal("")}
-        truncate_loading={truncate_loading}
-        handle_truncate_item_master_list={handle_truncate_item_master_list}
-      />
-      {/* - Modals */}
     </React.Fragment>
   );
 };
 
-export default Item_Master;
-
-const Confirm_Truncate = ({
-  is_open,
-  on_close,
-  truncate_loading,
-  handle_truncate_item_master_list,
-}) => {
-  return is_open ? (
-    <React.Fragment>
-      <div className="fixed inset-0 flex items-center justify-center z-[100]">
-        <div className="absolute inset-0 bg-black/50 backdrop-blur-sm z-[101]"></div>
-        <div
-          className={`relative bg-white rounded-lg shadow-xl max-w-[500px] w-full p-10 m-5 z-[102]`}
-        >
-          <div className="w-full flex justify-center items-center text-lg md:text-xl font-bold mb-4">
-            Truncate Item Master
-          </div>
-          <p className="w-full text-center text-sm leading-6 text-gray-500 dark:text-gray-400 pt-4">
-            You are about to truncate the Item Master List. Once truncated, the
-            list will be cleared in the database.
-          </p>
-          <p className="w-full text-center text-sm leading-6 text-gray-500 dark:text-gray-400 py-4">
-            Are you sure you want to continue?
-          </p>
-          <div className="flex justify-center gap-2 mt-4">
-            <Button
-              width="w-[100px]"
-              variant="danger"
-              loading={truncate_loading}
-              on_click={handle_truncate_item_master_list}
-            >
-              Yes
-            </Button>
-            <Button width="w-[100px]" variant="white" on_click={on_close}>
-              No
-            </Button>
-          </div>
-        </div>
-      </div>
-    </React.Fragment>
-  ) : null;
-};
+export default Plant_Hierarchy;

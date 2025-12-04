@@ -72,7 +72,7 @@ const Login = () => {
                   {/* Username */}
                   <div>
                     <label className="mb-1.5 block text-sm font-medium text-gray-700">
-                      Username <span className="text-red-500">*</span>
+                      Username
                     </label>
                     <input
                       type="text"
@@ -87,7 +87,7 @@ const Login = () => {
                   {/* Password */}
                   <div>
                     <label className="mb-1.5 block text-sm font-medium text-gray-700">
-                      Password <span className="text-red-500">*</span>
+                      Password
                     </label>
                     <div className="relative rounded-md shadow-sm border text-sm border-gray-300 focus-within:ring-1 focus-within:ring-sky-500 focus-within:border-sky-500">
                       <input
@@ -134,7 +134,7 @@ const Login = () => {
               </form>
 
               {/* Sign up link */}
-              <div className="mt-5">
+              {/* <div className="mt-5">
                 <p className="text-center text-sm font-normal text-gray-700 sm:text-start">
                   Don't have an account?
                   <span
@@ -144,7 +144,7 @@ const Login = () => {
                     Sign Up
                   </span>
                 </p>
-              </div>
+              </div> */}
             </div>
           </div>
 

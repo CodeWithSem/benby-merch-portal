@@ -37,8 +37,8 @@ const OSA_History_Table = () => {
   const rows = [
     {
       id: 1,
-      image: profile_1,
-      name: "Juan Dela Cruz",
+      image: profile_5,
+      name: "User 1",
       username: "TDS-001",
       date: "10/16/2025 05:14:23 PM",
       store_code: "5000001",
@@ -52,7 +52,7 @@ const OSA_History_Table = () => {
     {
       id: 2,
       image: profile_2,
-      name: "John Doe",
+      name: "User 2",
       username: "TDS-002",
       date: "10/16/2025 07:01:45 PM",
       store_code: "5000002",
@@ -66,7 +66,7 @@ const OSA_History_Table = () => {
     {
       id: 3,
       image: profile_3,
-      name: "Jane Hopper",
+      name: "User 3",
       username: "TDS-003",
       date: "10/16/2025 07:30:32 PM",
       store_code: "5000002",
@@ -80,7 +80,7 @@ const OSA_History_Table = () => {
     {
       id: 4,
       image: profile_4,
-      name: "Jude Wright",
+      name: "User 4",
       username: "TDS-004",
       date: "10/16/2025 09:10:12 PM",
       store_code: "5000002",
@@ -93,8 +93,8 @@ const OSA_History_Table = () => {
     },
     {
       id: 5,
-      image: profile_5,
-      name: "Erick Salvador",
+      image: profile_1,
+      name: "User 5",
       username: "TDS-005",
       date: "10/16/2025 10:03:15 PM",
       store_code: "5000002",

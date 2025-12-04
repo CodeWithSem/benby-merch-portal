@@ -4,6 +4,10 @@ export const TABLES = {
   // + Warhouse Module =================================
   ITEM_MASTER: "TBL_ITEM_MASTER",
   ITEM_EXT_SALES_DATA: "TBL_ITEM_EXT_SALES_DATA",
+  ITEM_EXT_SALES_DATA_PLANT: "TBL_ITEM_EXT_SALES_DATA_PLANT",
+  ITEM_EXT_PURCHASING: "TBL_ITEM_EXT_PURCHASING",
+  ITEM_EXT_PLANT_DATA: "TBL_ITEM_EXT_PLANT_DATA",
+  ITEM_EXT_WM_DATA_1: "TBL_ITEM_EXT_WM_DATA_1",
   // - Warhouse Module =================================
   // + Maintenance Module ==============================
   // General Structure
@@ -127,6 +131,8 @@ export const TABLES = {
   SO_TYPE_HIERARCHY: "TBL_SO_TYPE_HIERARCHY",
   BILLING_DOCUMENT_TYPE_HIERARCHY: "TBL_BILLING_DOCUMENT_TYPE_HIERARCHY",
   DELIVERY_DOCUMENT_TYPE_HIERARCHY: "TBL_DELIVERY_DOCUMENT_TYPE_HIERARCHY",
+  WAREHOUSE_HIERARCHY: "TBL_WAREHOUSE_HIERARCHY",
+
   // - Maintenance Module ==============================
 };
 

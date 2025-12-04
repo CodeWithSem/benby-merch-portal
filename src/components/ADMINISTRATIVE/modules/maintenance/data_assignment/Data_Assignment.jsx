@@ -110,6 +110,17 @@ const Data_Assignment = () => {
       ),
       plain_title: "Delivery Doc Type Hierarchy (Delivery Doc Type > SO Type)",
     },
+    {
+      key: "warehouse_hierarchy",
+      icon: Link,
+      title: (
+        <>
+          Warehouse Hierarchy <br />
+          <div className="text-[12px]">(Warehouse &gt; Storage Type)</div>
+        </>
+      ),
+      plain_title: "Warehouse Hierarchy (Warehouse > Storage Type)", // 👈 for searching
+    },
   ];
 
   // ✅ Filter based on search query
