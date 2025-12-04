@@ -5,57 +5,57 @@ import Checkbox_Field from "assets/elements/Checkbox_Field";
 import Button from "assets/elements/Button";
 import Pagination_Modal from "assets/elements/Pagination_Modal";
 
-const Select_SLOC = ({
+const Select_STYPE = ({
   is_open,
   on_close,
   width = "max-w-[700px]",
   height = "h-[500px]",
-  sloc_list,
+  stype_list,
   set_data,
 }) => {
   // + Client-Side Filtering
-  const [filtered_sloc_list, set_filtered_sloc_list] = useState([]);
+  const [filtered_stype_list, set_filtered_stype_list] = useState([]);
   const [current_page, set_current_page] = useState(1);
   const [rows_per_page, set_rows_per_page] = useState(5);
   const [search_query, set_search_query] = useState("");
-  const [selected_sloc, set_selected_sloc] = useState(null);
+  const [selected_stype, set_selected_stype] = useState(null);
 
   useEffect(() => {
-    let data = [...sloc_list];
+    let data = [...stype_list];
 
     if (search_query.trim() !== "") {
       const q = search_query.toLowerCase();
       data = data.filter(
         (data) =>
-          data.sloc_code.toLowerCase().includes(q) ||
-          data.sloc_desc.toLowerCase().includes(q)
+          data.stype_code.toLowerCase().includes(q) ||
+          data.stype_desc.toLowerCase().includes(q)
       );
     }
 
     const start_idx = (current_page - 1) * rows_per_page;
     const end_idx = start_idx + rows_per_page;
-    set_filtered_sloc_list(data.slice(start_idx, end_idx));
-  }, [sloc_list, search_query, current_page, rows_per_page]);
+    set_filtered_stype_list(data.slice(start_idx, end_idx));
+  }, [stype_list, search_query, current_page, rows_per_page]);
 
   const total_pages = Math.ceil(
-    sloc_list.filter(
+    stype_list.filter(
       (data) =>
-        data.sloc_code.toLowerCase().includes(search_query.toLowerCase()) ||
-        data.sloc_desc.toLowerCase().includes(search_query.toLowerCase())
+        data.stype_code.toLowerCase().includes(search_query.toLowerCase()) ||
+        data.stype_desc.toLowerCase().includes(search_query.toLowerCase())
     ).length / rows_per_page
   );
 
   const handle_page_change = (page) => set_current_page(page);
   // - Client-Side Filtering
 
-  const handle_select_sloc = () => {
-    if (!selected_sloc) {
-      alert("Please select a sloc before proceeding.");
+  const handle_select_stype = () => {
+    if (!selected_stype) {
+      alert("Please select a stype before proceeding.");
       return;
     }
     set_data((prev) => ({
       ...prev,
-      sloc_code: selected_sloc.sloc_code,
+      stype_code: selected_stype.stype_code,
     }));
     on_close();
   };
@@ -80,7 +80,7 @@ const Select_SLOC = ({
           </button>
           {/* + Modal Label */}
           <div className="text-lg md:text-xl font-bold mb-5 px-7">
-            Storage Location Selection
+            Storage Type Selection
           </div>
           {/* - Modal Label */}
           {/* + Modal Body */}
@@ -108,7 +108,7 @@ const Select_SLOC = ({
                     <tr className="font-semibold text-xs">
                       <th className="px-6 py-3 w-[80px]"></th>
                       <th className="px-6 py-3 text-gray-500 text-left">
-                        Storage Location
+                        Storage Type
                       </th>
                       <th className="px-6 py-3 text-gray-500 text-left">
                         Creation Date
@@ -117,7 +117,7 @@ const Select_SLOC = ({
                   </thead>
 
                   <tbody className="divide-y divide-gray-100">
-                    {filtered_sloc_list.length === 0 ? (
+                    {filtered_stype_list.length === 0 ? (
                       <tr>
                         <td
                           colSpan={3}
@@ -127,13 +127,13 @@ const Select_SLOC = ({
                         </td>
                       </tr>
                     ) : (
-                      filtered_sloc_list.map((data) => (
+                      filtered_stype_list.map((data) => (
                         <tr
                           key={data.id}
                           className={`hover:bg-sky-50/50 cursor-pointer text-[12px] ${
-                            selected_sloc?.id === data.id ? "bg-sky-50" : ""
+                            selected_stype?.id === data.id ? "bg-sky-50" : ""
                           }`}
-                          onClick={() => set_selected_sloc(data)}
+                          onClick={() => set_selected_stype(data)}
                         >
                           <td className="px-5 py-4 sm:px-6 text-center">
                             <div className="flex justify-center items-center">
@@ -141,18 +141,18 @@ const Select_SLOC = ({
                                 name="check"
                                 box_size={18}
                                 icon_size={12}
-                                checked={selected_sloc?.id === data.id}
-                                on_change={() => set_selected_sloc(data)}
+                                checked={selected_stype?.id === data.id}
+                                on_change={() => set_selected_stype(data)}
                               />
                             </div>
                           </td>
                           <td className="px-5 py-4 sm:px-6">
                             <div className="block font-medium text-gray-800">
                               <span className="block text-gray-500 text-[12px]">
-                                {data.sloc_code}
+                                {data.stype_code}
                               </span>
                               <span className="block text-gray-800 text-sm">
-                                {data.sloc_desc}
+                                {data.stype_desc}
                               </span>
                             </div>
                           </td>
@@ -186,9 +186,9 @@ const Select_SLOC = ({
             <div className="flex justify-center sm:justify-end gap-2 w-full">
               <Button
                 variant="primary"
-                on_click={handle_select_sloc}
+                on_click={handle_select_stype}
                 class_name="w-full md:w-[100px]"
-                disabled={!selected_sloc}
+                disabled={!selected_stype}
               >
                 Proceed
               </Button>
@@ -209,4 +209,4 @@ const Select_SLOC = ({
   ) : null;
 };
 
-export default Select_SLOC;
+export default Select_STYPE;

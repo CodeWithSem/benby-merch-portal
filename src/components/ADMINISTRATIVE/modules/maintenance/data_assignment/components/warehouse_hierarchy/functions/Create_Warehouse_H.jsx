@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { api_create_plant_hierarchy } from "api/firestore_db/maintenance/data_assignment/tbl_plant_hierarchy_api";
+import { api_create_warehouse_hierarchy } from "api/firestore_db/tbl_warehouse_hierarchy_api";
 import { get_description } from "assets/scripts/functions/get_description";
 import {
   console_log,
@@ -9,32 +9,32 @@ import {
 import { CheckCircle2, ChevronLeft, CirclePlus, CircleX } from "lucide-react";
 import Button from "assets/elements/Button";
 import Text_Code_Field from "assets/elements/Text_Code_Field";
-import Select_Plant from "../modals/Select_Warehouse";
-import Select_SLOC from "../modals/Select_STYPE";
+import Select_Warehouse from "../modals/Select_Warehouse";
+import Select_STYPE from "../modals/Select_STYPE";
 
-const Create_Plant_H = ({
+const Create_Warehouse_H = ({
   handle_go_back,
   active_user,
   reset_new_data,
   show_toast,
   new_data,
   set_new_data,
-  set_plant_hierarchy_list,
-  plant_list,
-  sloc_list,
+  set_warehouse_hierarchy_list,
+  warehouse_list,
+  stype_list,
 }) => {
   const [display_sub_modal, set_display_sub_modal] = useState("");
   const [is_confirm_modal_open, set_is_confirm_modal_open] = useState(false);
   const [create_loading, set_create_loading] = useState(false);
 
   const validate_new_data = () => {
-    if (!new_data.plant_code.trim()) {
-      show_toast_error("Plant");
+    if (!new_data.warehouse_code.trim()) {
+      show_toast_error("Warehouse");
       return false;
     }
 
-    if (!new_data.sloc_code.trim()) {
-      show_toast_error("Storage Location");
+    if (!new_data.stype_code.trim()) {
+      show_toast_error("Storage Type");
       return false;
     }
 
@@ -50,7 +50,7 @@ const Create_Plant_H = ({
     });
   };
 
-  const handle_create_plant_hierarchy = async () => {
+  const handle_create_warehouse_hierarchy = async () => {
     if (!validate_new_data()) {
       close_confirm_modal();
       return;
@@ -58,13 +58,13 @@ const Create_Plant_H = ({
     try {
       console_log(new_data);
       set_create_loading(true);
-      const response = await api_create_plant_hierarchy(
+      const response = await api_create_warehouse_hierarchy(
         new_data,
         active_user?.username
       );
       if (response.success) {
         console_log(response.data);
-        set_plant_hierarchy_list((prev) => [...prev, response.data]);
+        set_warehouse_hierarchy_list((prev) => [...prev, response.data]);
         show_status("success");
         reset_new_data();
         handle_go_back("sub_level");
@@ -111,11 +111,11 @@ const Create_Plant_H = ({
             className={`relative bg-white rounded-lg shadow-xl max-w-[500px] w-full p-10 m-5 z-[102]`}
           >
             <div className="w-full flex justify-center items-center text-lg md:text-xl font-bold mb-4">
-              Confirm Plant Hierarchy Creation
+              Confirm Warehouse Hierarchy Creation
             </div>
             <p className="w-full text-center text-sm leading-6 text-gray-500 dark:text-gray-400 pt-4">
-              You are about to create a new Plant Hierarchy. Once created, it
-              will be added to the database.
+              You are about to create a new Warehouse Hierarchy. Once created,
+              it will be added to the database.
             </p>
             <p className="w-full text-center text-sm leading-6 text-gray-500 dark:text-gray-400 pt-4">
               Please review all the details — before proceeding.
@@ -128,7 +128,7 @@ const Create_Plant_H = ({
                 width="w-[100px]"
                 variant="primary"
                 loading={create_loading}
-                on_click={handle_create_plant_hierarchy}
+                on_click={handle_create_warehouse_hierarchy}
               >
                 Yes
               </Button>
@@ -184,7 +184,7 @@ const Create_Plant_H = ({
               >
                 <span>/</span>
                 <a className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-sky-500 cursor-pointer">
-                  Plant Hierarchy
+                  Warehouse Hierarchy
                 </a>
               </li>
               <li className="flex items-center gap-1.5 text-sm text-gray-500">
@@ -206,7 +206,7 @@ const Create_Plant_H = ({
                 width="w-[20px]"
                 on_click={() => handle_go_back("sub_level")}
               ></Button>
-              <h1 className="text-lg">Plant Hierarchy Creation</h1>
+              <h1 className="text-lg">Warehouse Hierarchy Creation</h1>
             </div>
             <div className="flex gap-2 text-gray-500 text-sm tracking-wider">
               {format_date_1(get_date_now())}
@@ -218,33 +218,33 @@ const Create_Plant_H = ({
             <div className="grid grid-cols-1 gap-5">
               <div>
                 <Text_Code_Field
-                  label="Plant"
+                  label="Warehouse"
                   code_width="150px"
                   show_search_button={true}
-                  code_value={new_data.plant_code}
+                  code_value={new_data.warehouse_code}
                   text_value={get_description(
-                    new_data.plant_code,
-                    plant_list,
-                    "plant_code",
-                    "plant_desc"
+                    new_data.warehouse_code,
+                    warehouse_list,
+                    "warehouse_code",
+                    "warehouse_desc"
                   )}
-                  on_click={() => set_display_sub_modal("select_plant")}
+                  on_click={() => set_display_sub_modal("select_warehouse")}
                   disabled
                 />
               </div>
               <div>
                 <Text_Code_Field
-                  label="Storage Location"
+                  label="Storage Type"
                   code_width="150px"
                   show_search_button={true}
-                  code_value={new_data.sloc_code}
+                  code_value={new_data.stype_code}
                   text_value={get_description(
-                    new_data.sloc_code,
-                    sloc_list,
-                    "sloc_code",
-                    "sloc_desc"
+                    new_data.stype_code,
+                    stype_list,
+                    "stype_code",
+                    "stype_desc"
                   )}
-                  on_click={() => set_display_sub_modal("select_sloc")}
+                  on_click={() => set_display_sub_modal("select_stype")}
                   disabled
                 />
               </div>
@@ -275,20 +275,20 @@ const Create_Plant_H = ({
       </div>
       {/* + Modals */}
       {is_confirm_modal_open && <Confirm_Modal />}
-      <Select_Plant
-        is_open={display_sub_modal === "select_plant"}
+      <Select_Warehouse
+        is_open={display_sub_modal === "select_warehouse"}
         on_close={() => set_display_sub_modal("")}
         width="max-w-[1000px]"
         height="max-h-[700px]"
-        plant_list={plant_list}
+        warehouse_list={warehouse_list}
         set_data={set_new_data}
       />
-      <Select_SLOC
-        is_open={display_sub_modal === "select_sloc"}
+      <Select_STYPE
+        is_open={display_sub_modal === "select_stype"}
         on_close={() => set_display_sub_modal("")}
         width="max-w-[1000px]"
         height="max-h-[700px]"
-        sloc_list={sloc_list}
+        stype_list={stype_list}
         set_data={set_new_data}
       />
       {/* - Modals */}
@@ -296,4 +296,4 @@ const Create_Plant_H = ({
   );
 };
 
-export default Create_Plant_H;
+export default Create_Warehouse_H;

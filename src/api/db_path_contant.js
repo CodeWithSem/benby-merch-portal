@@ -8,6 +8,7 @@ export const TABLES = {
   ITEM_EXT_PURCHASING: "TBL_ITEM_EXT_PURCHASING",
   ITEM_EXT_PLANT_DATA: "TBL_ITEM_EXT_PLANT_DATA",
   ITEM_EXT_WM_DATA_1: "TBL_ITEM_EXT_WM_DATA_1",
+  ITEM_EXT_WM_DATA_2: "TBL_ITEM_EXT_WM_DATA_2",
   // - Warhouse Module =================================
   // + Maintenance Module ==============================
   // General Structure

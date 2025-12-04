@@ -307,6 +307,12 @@ export const stype_list = [
     stype_desc: "Storage Type Data 2",
     creation_date: "MM-DD-YYYY",
   },
+  {
+    id: 3,
+    stype_code: "STYPE-003",
+    stype_desc: "Storage Type Data 3",
+    creation_date: "MM-DD-YYYY",
+  },
 ];
 
 export const ssec_ind_list = [
@@ -448,6 +454,27 @@ export const sloc_list = [
   },
 ];
 
+export const warehouse_list = [
+  {
+    id: 1,
+    warehouse_code: "WH-001",
+    warehouse_desc: "Warehouse Data A",
+    creation_date: "MM-DD-YYYY",
+  },
+  {
+    id: 2,
+    warehouse_code: "WH-002",
+    warehouse_desc: "Warehouse Data B",
+    creation_date: "MM-DD-YYYY",
+  },
+  {
+    id: 3,
+    warehouse_code: "WH-003",
+    warehouse_desc: "Warehouse Data C",
+    creation_date: "MM-DD-YYYY",
+  },
+];
+
 export const branch_h_list = [
   {
     id: 1,
@@ -492,6 +519,45 @@ export const plant_h_list = [
     id: 3,
     plant_code: "PL-002",
     sloc_code: "SLOC-001",
+    creation_date: "MM-DD-YYYY",
+  },
+];
+
+export const warehouse_h_list = [
+  {
+    id: 1,
+    warehouse_code: "WH-001",
+    stype_code: "STYPE-001",
+    creation_date: "MM-DD-YYYY",
+  },
+  {
+    id: 2,
+    warehouse_code: "WH-001",
+    stype_code: "STYPE-002",
+    creation_date: "MM-DD-YYYY",
+  },
+  {
+    id: 3,
+    warehouse_code: "WH-001",
+    stype_code: "STYPE-003",
+    creation_date: "MM-DD-YYYY",
+  },
+  {
+    id: 4,
+    warehouse_code: "WH-002",
+    stype_code: "STYPE-002",
+    creation_date: "MM-DD-YYYY",
+  },
+  {
+    id: 5,
+    warehouse_code: "WH-002",
+    stype_code: "STYPE-003",
+    creation_date: "MM-DD-YYYY",
+  },
+  {
+    id: 6,
+    warehouse_code: "WH-003",
+    stype_code: "STYPE-001",
     creation_date: "MM-DD-YYYY",
   },
 ];

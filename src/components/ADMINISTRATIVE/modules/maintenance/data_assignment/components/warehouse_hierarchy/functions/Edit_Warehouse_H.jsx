@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { api_update_plant_hierarchy } from "api/firestore_db/maintenance/data_assignment/tbl_plant_hierarchy_api";
+import { api_update_warehouse_hierarchy } from "api/firestore_db/tbl_warehouse_hierarchy_api";
 import { get_description } from "assets/scripts/functions/get_description";
 import {
   console_log,
@@ -14,31 +14,31 @@ import {
 } from "lucide-react";
 import Button from "assets/elements/Button";
 import Text_Code_Field from "assets/elements/Text_Code_Field";
-import Select_Plant from "../modals/Select_Warehouse";
-import Select_SLOC from "../modals/Select_STYPE";
+import Select_Warehouse from "../modals/Select_Warehouse";
+import Select_STYPE from "../modals/Select_STYPE";
 
-const Edit_Plant_H = ({
+const Edit_Warehouse_H = ({
   handle_go_back,
   active_user,
   show_toast,
   edit_data,
   set_edit_data,
-  set_plant_hierarchy_list,
-  plant_list,
-  sloc_list,
+  set_warehouse_hierarchy_list,
+  warehouse_list,
+  stype_list,
 }) => {
   const [display_sub_modal, set_display_sub_modal] = useState("");
   const [is_confirm_modal_open, set_is_confirm_modal_open] = useState(false);
   const [update_loading, set_update_loading] = useState(false);
 
   const validate_edit_data = () => {
-    if (!edit_data.plant_code.trim()) {
-      show_toast_error("Plant");
+    if (!edit_data.warehouse_code.trim()) {
+      show_toast_error("Warehouse");
       return false;
     }
 
-    if (!edit_data.sloc_code.trim()) {
-      show_toast_error("Storage Location");
+    if (!edit_data.stype_code.trim()) {
+      show_toast_error("Storage Type");
       return false;
     }
 
@@ -54,7 +54,7 @@ const Edit_Plant_H = ({
     });
   };
 
-  const handle_update_plant_hierarchy = async () => {
+  const handle_update_warehouse_hierarchy = async () => {
     if (!validate_edit_data()) {
       close_confirm_modal();
       return;
@@ -62,13 +62,13 @@ const Edit_Plant_H = ({
     try {
       console_log(edit_data);
       set_update_loading(true);
-      const response = await api_update_plant_hierarchy(
+      const response = await api_update_warehouse_hierarchy(
         edit_data,
         active_user?.username
       );
       if (response.success) {
         console_log(response.data);
-        set_plant_hierarchy_list((prev) =>
+        set_warehouse_hierarchy_list((prev) =>
           prev.map((item) =>
             item.id === response.data.id ? response.data : item
           )
@@ -118,11 +118,11 @@ const Edit_Plant_H = ({
             className={`relative bg-white rounded-lg shadow-xl max-w-[500px] w-full p-10 m-5 z-[102]`}
           >
             <div className="w-full flex justify-center items-center text-lg md:text-xl font-bold mb-4">
-              Confirm Plant Hierarchy Update
+              Confirm Warehouse Hierarchy Update
             </div>
             <p className="w-full text-center text-sm leading-6 text-gray-500 dark:text-gray-400 pt-4">
-              You are about to edit this Plant Hierarchy. Once edited, it will
-              be updated to the database.
+              You are about to edit this Warehouse Hierarchy. Once edited, it
+              will be updated to the database.
             </p>
             <p className="w-full text-center text-sm leading-6 text-gray-500 dark:text-gray-400 pt-4">
               Please review all the details — before proceeding.
@@ -135,7 +135,7 @@ const Edit_Plant_H = ({
                 width="w-[100px]"
                 variant="primary"
                 loading={update_loading}
-                on_click={handle_update_plant_hierarchy}
+                on_click={handle_update_warehouse_hierarchy}
               >
                 Yes
               </Button>
@@ -191,7 +191,7 @@ const Edit_Plant_H = ({
               >
                 <span>/</span>
                 <a className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-sky-500 cursor-pointer">
-                  Plant Hierarchy
+                  Warehouse Hierarchy
                 </a>
               </li>
               <li className="flex items-center gap-1.5 text-sm text-gray-500">
@@ -213,7 +213,7 @@ const Edit_Plant_H = ({
                 width="w-[20px]"
                 on_click={() => handle_go_back("sub_level")}
               ></Button>
-              <h1 className="text-lg">Edit Plant Hierarchy</h1>
+              <h1 className="text-lg">Edit Warehouse Hierarchy</h1>
             </div>
             <div className="flex gap-2 text-gray-500 text-sm tracking-wider">
               {format_date_1(get_date_now())}
@@ -225,33 +225,33 @@ const Edit_Plant_H = ({
             <div className="grid grid-cols-1 gap-5">
               <div>
                 <Text_Code_Field
-                  label="Plant"
+                  label="Warehouse"
                   code_width="150px"
                   show_search_button={true}
-                  code_value={edit_data.plant_code}
+                  code_value={edit_data.warehouse_code}
                   text_value={get_description(
-                    edit_data.plant_code,
-                    plant_list,
-                    "plant_code",
-                    "plant_desc"
+                    edit_data.warehouse_code,
+                    warehouse_list,
+                    "warehouse_code",
+                    "warehouse_desc"
                   )}
-                  on_click={() => set_display_sub_modal("select_plant")}
+                  on_click={() => set_display_sub_modal("select_warehouse")}
                   disabled
                 />
               </div>
               <div>
                 <Text_Code_Field
-                  label="Storage Location"
+                  label="Storage Type"
                   code_width="150px"
                   show_search_button={true}
-                  code_value={edit_data.sloc_code}
+                  code_value={edit_data.stype_code}
                   text_value={get_description(
-                    edit_data.sloc_code,
-                    sloc_list,
-                    "sloc_code",
-                    "sloc_desc"
+                    edit_data.stype_code,
+                    stype_list,
+                    "stype_code",
+                    "stype_desc"
                   )}
-                  on_click={() => set_display_sub_modal("select_sloc")}
+                  on_click={() => set_display_sub_modal("select_stype")}
                   disabled
                 />
               </div>
@@ -282,20 +282,20 @@ const Edit_Plant_H = ({
       </div>
       {/* + Modals */}
       {is_confirm_modal_open && <Confirm_Modal />}
-      <Select_Plant
-        is_open={display_sub_modal === "select_plant"}
+      <Select_Warehouse
+        is_open={display_sub_modal === "select_warehouse"}
         on_close={() => set_display_sub_modal("")}
         width="max-w-[1000px]"
         height="max-h-[700px]"
-        plant_list={plant_list}
+        warehouse_list={warehouse_list}
         set_data={set_edit_data}
       />
-      <Select_SLOC
-        is_open={display_sub_modal === "select_sloc"}
+      <Select_STYPE
+        is_open={display_sub_modal === "select_stype"}
         on_close={() => set_display_sub_modal("")}
         width="max-w-[1000px]"
         height="max-h-[700px]"
-        sloc_list={sloc_list}
+        stype_list={stype_list}
         set_data={set_edit_data}
       />
       {/* - Modals */}
@@ -303,4 +303,4 @@ const Edit_Plant_H = ({
   );
 };
 
-export default Edit_Plant_H;
+export default Edit_Warehouse_H;

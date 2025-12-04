@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { api_bulk_upload_plant_hierarchy } from "api/firestore_db/maintenance/data_assignment/tbl_plant_hierarchy_api";
+import { api_bulk_upload_warehouse_hierarchy } from "api/firestore_db/tbl_warehouse_hierarchy_api";
 import { handle_excel_upload_2_hierarchy } from "assets/scripts/functions/upload_excel";
 import { format_date_1, get_date_now } from "assets/scripts/format";
 import {
@@ -17,33 +17,33 @@ import Select_Field from "assets/elements/Select_Field";
 import Icon_Field from "assets/elements/Icon_Field";
 import { get_description } from "assets/scripts/functions/get_description";
 
-const Upload_Plant_H = ({
+const Upload_Warehouse_H = ({
   handle_go_back,
-  handle_get_plant_hierarchy_list,
+  handle_get_warehouse_hierarchy_list,
   show_toast,
-  plant_list,
-  sloc_list,
+  warehouse_list,
+  stype_list,
 }) => {
   const [is_confirm_modal_open, set_is_confirm_modal_open] = useState(false);
   const [upload_loading, set_upload_loading] = useState(false);
 
   const columns = [
     { key: "id", label: "ID", sortable: true },
-    { key: "plant_code", label: "Plant", sortable: true },
-    { key: "sloc_code", label: "Storage Location", sortable: true },
+    { key: "warehouse_code", label: "Warehouse", sortable: true },
+    { key: "stype_code", label: "Storage Type", sortable: true },
     { key: "creation_date", label: "Creation Date", sortable: true },
     { key: "created_by", label: "Created By", sortable: true },
     { key: "change_date", label: "Change Date", sortable: true },
     { key: "change_by", label: "Change By", sortable: true },
   ];
 
-  const [upload_plant_hierarchy_list, set_upload_plant_hierarchy_list] =
+  const [upload_warehouse_hierarchy_list, set_upload_warehouse_hierarchy_list] =
     useState([]);
 
   // + Client-Side Filtering
   const [
-    filtered_upload_plant_hierarchy_list,
-    set_filtered_upload_plant_hierarchy_list,
+    filtered_upload_warehouse_hierarchy_list,
+    set_filtered_upload_warehouse_hierarchy_list,
   ] = useState([]);
   const [select_option, set_select_option] = useState(5);
   const [current_page, set_current_page] = useState(1);
@@ -53,11 +53,15 @@ const Upload_Plant_H = ({
   const [debounced_query, set_debounced_query] = useState("");
 
   const lookup_columns = [
-    { code_key: "plant_code", list: plant_list, desc_key: "plant_desc" },
     {
-      code_key: "sloc_code",
-      list: sloc_list,
-      desc_key: "sloc_desc",
+      code_key: "warehouse_code",
+      list: warehouse_list,
+      desc_key: "warehouse_desc",
+    },
+    {
+      code_key: "stype_code",
+      list: stype_list,
+      desc_key: "stype_desc",
     },
   ];
 
@@ -70,7 +74,7 @@ const Upload_Plant_H = ({
   }, [search_query]);
 
   useEffect(() => {
-    let temp = [...upload_plant_hierarchy_list];
+    let temp = [...upload_warehouse_hierarchy_list];
 
     if (debounced_query.trim() !== "") {
       const q = debounced_query.toLowerCase();
@@ -120,9 +124,9 @@ const Upload_Plant_H = ({
       index: start_idx + i + 1,
     }));
 
-    set_filtered_upload_plant_hierarchy_list(indexed_data);
+    set_filtered_upload_warehouse_hierarchy_list(indexed_data);
   }, [
-    upload_plant_hierarchy_list,
+    upload_warehouse_hierarchy_list,
     debounced_query,
     sort_by,
     sort_order,
@@ -132,7 +136,7 @@ const Upload_Plant_H = ({
 
   const total_pages = Math.ceil(
     (debounced_query
-      ? upload_plant_hierarchy_list.filter((u) => {
+      ? upload_warehouse_hierarchy_list.filter((u) => {
           const q = debounced_query.toLowerCase();
 
           return columns.some((col) => {
@@ -161,7 +165,7 @@ const Upload_Plant_H = ({
             return false;
           });
         }).length
-      : upload_plant_hierarchy_list.length) / select_option
+      : upload_warehouse_hierarchy_list.length) / select_option
   );
 
   const handle_sort = (column) => {
@@ -180,15 +184,15 @@ const Upload_Plant_H = ({
   const handle_excel_upload = (e) => {
     handle_excel_upload_2_hierarchy({
       e,
-      code_field_1: "plant_code",
-      code_field_2: "sloc_code",
-      set_data_callback: set_upload_plant_hierarchy_list,
+      code_field_1: "warehouse_code",
+      code_field_2: "stype_code",
+      set_data_callback: set_upload_warehouse_hierarchy_list,
       show_toast,
     });
   };
 
-  const handle_upload_plant_hierarchy = async () => {
-    if (upload_plant_hierarchy_list.length === 0) {
+  const handle_upload_warehouse_hierarchy = async () => {
+    if (upload_warehouse_hierarchy_list.length === 0) {
       show_toast({
         type: "danger",
         title: "Invalid Data",
@@ -200,19 +204,19 @@ const Upload_Plant_H = ({
     set_upload_loading(true);
 
     try {
-      const response = await api_bulk_upload_plant_hierarchy(
-        upload_plant_hierarchy_list
+      const response = await api_bulk_upload_warehouse_hierarchy(
+        upload_warehouse_hierarchy_list
       );
 
       if (response.success) {
         show_toast({
           type: "success",
           title: "Upload Successfully",
-          message: `${upload_plant_hierarchy_list.length} data has been uploaded.`,
+          message: `${upload_warehouse_hierarchy_list.length} data has been uploaded.`,
           icon: <CheckCircle2 size={21} className="text-green-500" />,
         });
-        set_upload_plant_hierarchy_list([]);
-        handle_get_plant_hierarchy_list();
+        set_upload_warehouse_hierarchy_list([]);
+        handle_get_warehouse_hierarchy_list();
         handle_go_back("sub_level");
       } else {
         show_toast({
@@ -249,7 +253,7 @@ const Upload_Plant_H = ({
             className={`relative bg-white rounded-lg shadow-xl max-w-[500px] w-full p-10 m-5 z-[102]`}
           >
             <div className="w-full flex justify-center items-center text-lg md:text-xl font-bold mb-4">
-              Upload Plant Hierarchy
+              Upload Warehouse Hierarchy
             </div>
             <p className="w-full text-center text-sm leading-6 text-gray-500 dark:text-gray-400 pt-4">
               You are about to upload the data. Once uploaded, it will be added
@@ -266,7 +270,7 @@ const Upload_Plant_H = ({
                 width="w-[100px]"
                 variant="primary"
                 loading={upload_loading}
-                on_click={handle_upload_plant_hierarchy}
+                on_click={handle_upload_warehouse_hierarchy}
               >
                 Yes
               </Button>
@@ -322,7 +326,7 @@ const Upload_Plant_H = ({
               >
                 <span>/</span>
                 <a className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-sky-500 cursor-pointer">
-                  Plant Hierarchy
+                  Warehouse Hierarchy
                 </a>
               </li>
               <li className="flex items-center gap-1.5 text-sm text-gray-500">
@@ -344,7 +348,7 @@ const Upload_Plant_H = ({
                 width="w-[20px]"
                 on_click={() => handle_go_back("sub_level")}
               ></Button>
-              <h1 className="text-lg">Upload Plant Hierarchy</h1>
+              <h1 className="text-lg">Upload Warehouse Hierarchy</h1>
             </div>
             <div className="flex gap-2 text-gray-500 text-sm tracking-wider">
               {format_date_1(get_date_now())}
@@ -404,7 +408,7 @@ const Upload_Plant_H = ({
               </div>
               {/* + Table */}
               <div className="overflow-x-auto">
-                {filtered_upload_plant_hierarchy_list.length === 0 ? (
+                {filtered_upload_warehouse_hierarchy_list.length === 0 ? (
                   <div className="p-6 text-center text-gray-500 text-sm">
                     No data found
                   </div>
@@ -454,78 +458,80 @@ const Upload_Plant_H = ({
                       </tr>
                     </thead>
                     <tbody className="bg-white">
-                      {filtered_upload_plant_hierarchy_list.map((row, idx) => {
-                        const render_cell = (col, row) => {
-                          const value = row[col.key];
-                          // + Index
-                          if (col.key === "index") {
-                            return <span>{row.index}</span>;
-                          }
-                          // - Index
-                          // + Plant
-                          if (col.key === "plant_code") {
-                            return (
-                              <div className="block font-medium text-gray-800">
-                                <span className="block text-gray-500 text-[10px]">
-                                  {row.plant_code}
-                                </span>
-                                <span className="block text-gray-800 text-[12px]">
-                                  {get_description(
-                                    row.plant_code,
-                                    plant_list,
-                                    "plant_code",
-                                    "plant_desc"
-                                  )}
-                                </span>
-                              </div>
-                            );
-                          }
-                          // + Plant
-                          // + Purchasing Organization
-                          if (col.key === "sloc_code") {
-                            return (
-                              <div className="block font-medium text-gray-800">
-                                <span className="block text-gray-500 text-[10px]">
-                                  {row.sloc_code}
-                                </span>
-                                <span className="block text-gray-800 text-[12px]">
-                                  {get_description(
-                                    row.sloc_code,
-                                    sloc_list,
-                                    "sloc_code",
-                                    "sloc_desc"
-                                  )}
-                                </span>
-                              </div>
-                            );
-                          }
-                          // - Purchasing Organization
+                      {filtered_upload_warehouse_hierarchy_list.map(
+                        (row, idx) => {
+                          const render_cell = (col, row) => {
+                            const value = row[col.key];
+                            // + Index
+                            if (col.key === "index") {
+                              return <span>{row.index}</span>;
+                            }
+                            // - Index
+                            // + Warehouse
+                            if (col.key === "warehouse_code") {
+                              return (
+                                <div className="block font-medium text-gray-800">
+                                  <span className="block text-gray-500 text-[10px]">
+                                    {row.warehouse_code}
+                                  </span>
+                                  <span className="block text-gray-800 text-[12px]">
+                                    {get_description(
+                                      row.warehouse_code,
+                                      warehouse_list,
+                                      "warehouse_code",
+                                      "warehouse_desc"
+                                    )}
+                                  </span>
+                                </div>
+                              );
+                            }
+                            // + Warehouse
+                            // + Purchasing Organization
+                            if (col.key === "stype_code") {
+                              return (
+                                <div className="block font-medium text-gray-800">
+                                  <span className="block text-gray-500 text-[10px]">
+                                    {row.stype_code}
+                                  </span>
+                                  <span className="block text-gray-800 text-[12px]">
+                                    {get_description(
+                                      row.stype_code,
+                                      stype_list,
+                                      "stype_code",
+                                      "stype_desc"
+                                    )}
+                                  </span>
+                                </div>
+                              );
+                            }
+                            // - Purchasing Organization
 
-                          return value;
-                        };
+                            return value;
+                          };
 
-                        return (
-                          <tr
-                            key={idx}
-                            className="hover:bg-gray-50 whitespace-nowrap"
-                          >
-                            {columns.map((col, i) => (
-                              <td
-                                key={i}
-                                className={`border px-4 py-4 text-[12px] text-gray-600 ${
-                                  i === 0 ? "border-l-0" : ""
-                                } ${
-                                  i === columns.length - 1
-                                    ? "border-r-0 text-left"
-                                    : ""
-                                }`}
-                              >
-                                {render_cell(col, row)}
-                              </td>
-                            ))}
-                          </tr>
-                        );
-                      })}
+                          return (
+                            <tr
+                              key={idx}
+                              className="hover:bg-gray-50 whitespace-nowrap"
+                            >
+                              {columns.map((col, i) => (
+                                <td
+                                  key={i}
+                                  className={`border px-4 py-4 text-[12px] text-gray-600 ${
+                                    i === 0 ? "border-l-0" : ""
+                                  } ${
+                                    i === columns.length - 1
+                                      ? "border-r-0 text-left"
+                                      : ""
+                                  }`}
+                                >
+                                  {render_cell(col, row)}
+                                </td>
+                              ))}
+                            </tr>
+                          );
+                        }
+                      )}
                     </tbody>
                   </table>
                 )}
@@ -573,4 +579,4 @@ const Upload_Plant_H = ({
   );
 };
 
-export default Upload_Plant_H;
+export default Upload_Warehouse_H;

@@ -58,7 +58,9 @@ const Select_Warehouse = ({
     set_data((prev) => ({
       ...prev,
       warehouse_code: selected_warehouse.warehouse_code,
+      stype_code: "",
     }));
+    set_selected_warehouse(null);
     on_close();
   };
 

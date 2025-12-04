@@ -5,60 +5,134 @@ import Checkbox_Field from "assets/elements/Checkbox_Field";
 import Button from "assets/elements/Button";
 import Pagination_Modal from "assets/elements/Pagination_Modal";
 
-const Select_Warehouse = ({
+const Select_STYPE = ({
   is_open,
   on_close,
   width = "max-w-[700px]",
   height = "h-[500px]",
+  selected_warehouse_code,
   warehouse_list,
+  stype_list,
+  warehouse_h_list,
   set_data,
 }) => {
   // + Client-Side Filtering
-  const [filtered_warehouse_list, set_filtered_warehouse_list] = useState([]);
+  const [filtered_warehouse_h_list, set_filtered_warehouse_h_list] = useState(
+    []
+  );
   const [current_page, set_current_page] = useState(1);
   const [rows_per_page, set_rows_per_page] = useState(5);
   const [search_query, set_search_query] = useState("");
-  const [selected_warehouse, set_selected_warehouse] = useState(null);
+  const [selected_warehouse_h, set_selected_warehouse_h] = useState(null);
+
+  const lookup_columns = [
+    {
+      code_key: "warehouse_code",
+      list: warehouse_list,
+      desc_key: "warehouse_desc",
+    },
+    {
+      code_key: "stype_code",
+      list: stype_list,
+      desc_key: "stype_desc",
+    },
+  ];
+
+  const apply_lookups = (data, lookup_columns) => {
+    return data.map((row) => {
+      const updated = { ...row };
+
+      lookup_columns.forEach(({ code_key, list, desc_key }) => {
+        const code_value = row[code_key];
+        const match = list.find((item) => item[code_key] === code_value);
+
+        updated[desc_key] = match ? match[desc_key] : "";
+      });
+
+      return updated;
+    });
+  };
+
+  const get_searchable_fields = (lookup_columns) => {
+    const fields = [];
+
+    lookup_columns.forEach(({ code_key, desc_key }) => {
+      fields.push(code_key);
+      fields.push(desc_key);
+    });
+
+    return fields;
+  };
 
   useEffect(() => {
-    let data = [...warehouse_list];
+    // 1. Start with warehouse_h_list
+    let data = apply_lookups(warehouse_h_list, lookup_columns);
 
-    if (search_query.trim() !== "") {
-      const q = search_query.toLowerCase();
+    // 2. Filter by selected_warehouse_code
+    if (selected_warehouse_code) {
       data = data.filter(
-        (data) =>
-          data.warehouse_code.toLowerCase().includes(q) ||
-          data.warehouse_desc.toLowerCase().includes(q)
+        (row) => row.warehouse_code === selected_warehouse_code
       );
     }
 
+    // 3. Searchable fields
+    const search_fields = get_searchable_fields(lookup_columns);
+
+    // 4. Perform search
+    if (search_query.trim() !== "") {
+      const q = search_query.toLowerCase();
+
+      data = data.filter((row) =>
+        search_fields.some((field) =>
+          row[field]?.toString().toLowerCase().includes(q)
+        )
+      );
+    }
+
+    // 4. Pagination
     const start_idx = (current_page - 1) * rows_per_page;
     const end_idx = start_idx + rows_per_page;
-    set_filtered_warehouse_list(data.slice(start_idx, end_idx));
-  }, [warehouse_list, search_query, current_page, rows_per_page]);
 
-  const total_pages = Math.ceil(
-    warehouse_list.filter(
-      (data) =>
-        data.warehouse_code
-          .toLowerCase()
-          .includes(search_query.toLowerCase()) ||
-        data.warehouse_desc.toLowerCase().includes(search_query.toLowerCase())
-    ).length / rows_per_page
-  );
+    set_filtered_warehouse_h_list(data.slice(start_idx, end_idx));
+  }, [
+    warehouse_h_list,
+    selected_warehouse_code,
+    search_query,
+    current_page,
+    rows_per_page,
+  ]);
+
+  // 1. Apply lookup to warehouse_h_list
+  const lookup_applied_list = apply_lookups(warehouse_h_list, lookup_columns);
+
+  // 2. Generate searchable fields
+  const search_fields = get_searchable_fields(lookup_columns);
+
+  // 3. Filter count based on search
+  const filtered_count = lookup_applied_list.filter((row) => {
+    const q = search_query.toLowerCase();
+
+    return search_fields.some((field) =>
+      row[field]?.toString().toLowerCase().includes(q)
+    );
+  }).length;
+
+  // 4. Calculate total pages
+  const total_pages = Math.ceil(filtered_count / rows_per_page);
 
   const handle_page_change = (page) => set_current_page(page);
   // - Client-Side Filtering
 
   const handle_select_warehouse = () => {
-    if (!selected_warehouse) {
-      alert("Please select a warehouse before proceeding.");
+    if (!selected_warehouse_h) {
+      alert("Please select a data before proceeding.");
       return;
     }
     set_data((prev) => ({
       ...prev,
-      warehouse_code: selected_warehouse.warehouse_code,
+      stype_code: selected_warehouse_h.stype_code,
     }));
+    set_selected_warehouse_h(null);
     on_close();
   };
 
@@ -82,7 +156,7 @@ const Select_Warehouse = ({
           </button>
           {/* + Modal Label */}
           <div className="text-lg md:text-xl font-bold mb-5 px-7">
-            Warehouse Selection
+            Storage Type Selection
           </div>
           {/* - Modal Label */}
           {/* + Modal Body */}
@@ -110,7 +184,7 @@ const Select_Warehouse = ({
                     <tr className="font-semibold text-xs">
                       <th className="px-6 py-3 w-[80px]"></th>
                       <th className="px-6 py-3 text-gray-500 text-left">
-                        Warehouse
+                        Storage Type
                       </th>
                       <th className="px-6 py-3 text-gray-500 text-left">
                         Creation Date
@@ -119,7 +193,7 @@ const Select_Warehouse = ({
                   </thead>
 
                   <tbody className="divide-y divide-gray-100">
-                    {filtered_warehouse_list.length === 0 ? (
+                    {filtered_warehouse_h_list.length === 0 ? (
                       <tr>
                         <td
                           colSpan={3}
@@ -129,15 +203,15 @@ const Select_Warehouse = ({
                         </td>
                       </tr>
                     ) : (
-                      filtered_warehouse_list.map((data) => (
+                      filtered_warehouse_h_list.map((data) => (
                         <tr
                           key={data.id}
                           className={`hover:bg-sky-50/50 cursor-pointer text-[12px] ${
-                            selected_warehouse?.id === data.id
+                            selected_warehouse_h?.id === data.id
                               ? "bg-sky-50"
                               : ""
                           }`}
-                          onClick={() => set_selected_warehouse(data)}
+                          onClick={() => set_selected_warehouse_h(data)}
                         >
                           <td className="px-5 py-4 sm:px-6 text-center">
                             <div className="flex justify-center items-center">
@@ -145,18 +219,18 @@ const Select_Warehouse = ({
                                 name="check"
                                 box_size={18}
                                 icon_size={12}
-                                checked={selected_warehouse?.id === data.id}
-                                on_change={() => set_selected_warehouse(data)}
+                                checked={selected_warehouse_h?.id === data.id}
+                                on_change={() => set_selected_warehouse_h(data)}
                               />
                             </div>
                           </td>
                           <td className="px-5 py-4 sm:px-6">
                             <div className="block font-medium text-gray-800">
-                              <span className="block text-gray-500 text-[12px]">
-                                {data.warehouse_code}
+                              <span className="block text-gray-500 text-[10px]">
+                                {data.stype_code}
                               </span>
-                              <span className="block text-gray-800 text-sm">
-                                {data.warehouse_desc}
+                              <span className="block text-gray-800 text-[12px]">
+                                {data.stype_desc}
                               </span>
                             </div>
                           </td>
@@ -192,7 +266,7 @@ const Select_Warehouse = ({
                 variant="primary"
                 on_click={handle_select_warehouse}
                 class_name="w-full md:w-[100px]"
-                disabled={!selected_warehouse}
+                disabled={!selected_warehouse_h}
               >
                 Proceed
               </Button>
@@ -213,4 +287,4 @@ const Select_Warehouse = ({
   ) : null;
 };
 
-export default Select_Warehouse;
+export default Select_STYPE;

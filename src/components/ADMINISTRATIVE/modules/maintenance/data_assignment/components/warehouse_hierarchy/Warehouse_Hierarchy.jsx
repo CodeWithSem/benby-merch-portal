@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { useToast } from "../../../../../layout/Toast_Provider";
 import { Use_App } from "context/app_context";
+import { api_get_warehouse_list } from "api/firestore_db/maintenance/warehouse/tbl_warehouse_api";
+import { api_get_stype_list } from "api/firestore_db/maintenance/warehouse/tbl_stype_api";
 import {
-  api_get_plant_hierarchy_list,
-  api_truncate_plant_hierarchy,
-} from "api/firestore_db/maintenance/data_assignment/tbl_plant_hierarchy_api";
+  api_get_warehouse_hierarchy_list,
+  api_truncate_warehouse_hierarchy,
+} from "api/firestore_db/tbl_warehouse_hierarchy_api";
 import { Get_TBL_INCREMENTAL_ID } from "api/real_time_db/incremental";
-import { api_get_plant_list } from "api/firestore_db/maintenance/general_structure/tbl_plant_api";
-import { api_get_sloc_list } from "api/firestore_db/maintenance/general_structure/tbl_sloc_api";
 import { get_description } from "assets/scripts/functions/get_description";
 import {
   Search,
@@ -31,14 +31,14 @@ import Button from "assets/elements/Button";
 import Spinner from "assets/elements/Spinner";
 import Text_Field from "assets/elements/Text_Field";
 import Load_Screen from "./modals/Load_Screen";
-import Create_Plant_H from "./functions/Create_Warehouse_H";
-import Edit_Plant_H from "./functions/Edit_Warehouse_H";
-import Delete_Plant_H from "./functions/Delete_Warehouse_H";
-import Upload_Plant_H from "./functions/Upload_Warehouse_H";
+import Create_Warehouse_H from "./functions/Create_Warehouse_H";
+import Edit_Warehouse_H from "./functions/Edit_Warehouse_H";
+import Delete_Warehouse_H from "./functions/Delete_Warehouse_H";
+import Upload_Warehouse_H from "./functions/Upload_Warehouse_H";
 
 const HAS_FILTER = true;
 
-const Plant_Hierarchy = ({ set_page }) => {
+const Warehouse_Hierarchy = ({ set_page }) => {
   const { active_user } = Use_App();
   const { show_toast } = useToast();
   const [sub_page, set_sub_page] = useState("main");
@@ -46,28 +46,28 @@ const Plant_Hierarchy = ({ set_page }) => {
   const [show_filter, set_show_filter] = useState(false);
   const [loading_list, set_loading_list] = useState(false);
   const [truncate_loading, set_truncate_loading] = useState(false);
-  const [plant_list, set_plant_list] = useState([]);
-  const [sloc_list, set_sloc_list] = useState([]);
+  const [warehouse_list, set_warehouse_list] = useState([]);
+  const [stype_list, set_stype_list] = useState([]);
 
   const handle_get_all_lists = async () => {
     try {
-      const [plant_response, sloc_response] = await Promise.all([
-        api_get_plant_list(),
-        api_get_sloc_list(),
+      const [warehouse_response, stype_response] = await Promise.all([
+        api_get_warehouse_list(),
+        api_get_stype_list(),
       ]);
-      if (plant_response.success && sloc_response.success) {
-        set_plant_list(plant_response.data);
-        set_sloc_list(sloc_response.data);
+      if (warehouse_response.success && stype_response.success) {
+        set_warehouse_list(warehouse_response.data);
+        set_stype_list(stype_response.data);
         const res_log = {
-          plant_log: plant_response.data,
-          sloc_log: sloc_response.data,
+          warehouse_log: warehouse_response.data,
+          stype_log: stype_response.data,
         };
         console.log(res_log);
         set_display_modal("");
       } else {
         console.error("One or more list fetches failed.", {
-          plant: plant_response.message,
-          sloc: sloc_response.message,
+          warehouse: warehouse_response.message,
+          stype: stype_response.message,
         });
         show_error();
         handle_go_back("main");
@@ -92,29 +92,31 @@ const Plant_Hierarchy = ({ set_page }) => {
     handle_get_all_lists();
   }, []);
 
-  const def_plant_hierarchy_data = {
+  const def_warehouse_hierarchy_data = {
     id: null,
-    plant_code: "",
-    sloc_code: "",
+    warehouse_code: "",
+    stype_code: "",
     creation_date: "",
     created_by: "",
     change_date: "",
     change_by: "",
   };
 
-  const [new_data, set_new_data] = useState({ ...def_plant_hierarchy_data });
+  const [new_data, set_new_data] = useState({
+    ...def_warehouse_hierarchy_data,
+  });
   const [edit_data, set_edit_data] = useState({
-    ...def_plant_hierarchy_data,
+    ...def_warehouse_hierarchy_data,
   });
   const [delete_data, set_delete_data] = useState({
-    ...def_plant_hierarchy_data,
+    ...def_warehouse_hierarchy_data,
   });
 
   const reset_new_data = () => {
     set_new_data((prev) => ({
       ...prev,
-      plant_code: "",
-      sloc_code: "",
+      warehouse_code: "",
+      stype_code: "",
       creation_date: "",
       created_by: "",
       change_date: "",
@@ -123,7 +125,7 @@ const Plant_Hierarchy = ({ set_page }) => {
   };
 
   useEffect(() => {
-    Get_TBL_INCREMENTAL_ID("TBL_PLANT_HIERARCHY", (value) => {
+    Get_TBL_INCREMENTAL_ID("TBL_WAREHOUSE_HIERARCHY", (value) => {
       set_new_data((prev) => ({
         ...prev,
         id: value,
@@ -134,8 +136,8 @@ const Plant_Hierarchy = ({ set_page }) => {
   const columns = [
     { key: "index", label: "#", sortable: false },
     { key: "id", label: "ID", sortable: true },
-    { key: "plant_code", label: "Plant", sortable: true },
-    { key: "sloc_code", label: "Storage Location", sortable: true },
+    { key: "warehouse_code", label: "Warehouse", sortable: true },
+    { key: "stype_code", label: "Storage Type", sortable: true },
     { key: "creation_date", label: "Creation Date", sortable: true },
     { key: "created_by", label: "Created By", sortable: true },
     { key: "change_date", label: "Change Date", sortable: true },
@@ -143,13 +145,13 @@ const Plant_Hierarchy = ({ set_page }) => {
     { key: "actions", label: "", sortable: false },
   ];
 
-  const [plant_hierarchy_list, set_plant_hierarchy_list] = useState([]);
+  const [warehouse_hierarchy_list, set_warehouse_hierarchy_list] = useState([]);
 
-  const handle_get_plant_hierarchy_list = async () => {
+  const handle_get_warehouse_hierarchy_list = async () => {
     set_loading_list(true);
-    const response = await api_get_plant_hierarchy_list();
+    const response = await api_get_warehouse_hierarchy_list();
     if (response.success) {
-      set_plant_hierarchy_list(response.data);
+      set_warehouse_hierarchy_list(response.data);
     } else {
       console.error(response.message);
     }
@@ -157,12 +159,12 @@ const Plant_Hierarchy = ({ set_page }) => {
   };
 
   useEffect(() => {
-    handle_get_plant_hierarchy_list();
+    handle_get_warehouse_hierarchy_list();
   }, []);
 
-  const handle_truncate_plant_hierarchy_list = async () => {
+  const handle_truncate_warehouse_hierarchy_list = async () => {
     set_truncate_loading(true);
-    const response = await api_truncate_plant_hierarchy();
+    const response = await api_truncate_warehouse_hierarchy();
     if (response.success) {
       show_toast({
         type: "success",
@@ -178,13 +180,15 @@ const Plant_Hierarchy = ({ set_page }) => {
       });
       console.error(response.message);
     }
-    handle_get_plant_hierarchy_list();
+    handle_get_warehouse_hierarchy_list();
     set_truncate_loading(false);
   };
 
   // + Client-Side Filtering
-  const [filtered_plant_hierarchy_list, set_filtered_plant_hierarchy_list] =
-    useState([]);
+  const [
+    filtered_warehouse_hierarchy_list,
+    set_filtered_warehouse_hierarchy_list,
+  ] = useState([]);
   const [select_option, set_select_option] = useState(5);
   const [current_page, set_current_page] = useState(1);
   const [sort_by, set_sort_by] = useState("id");
@@ -193,11 +197,15 @@ const Plant_Hierarchy = ({ set_page }) => {
   const [debounced_query, set_debounced_query] = useState("");
 
   const lookup_columns = [
-    { code_key: "plant_code", list: plant_list, desc_key: "plant_desc" },
     {
-      code_key: "sloc_code",
-      list: sloc_list,
-      desc_key: "sloc_desc",
+      code_key: "warehouse_code",
+      list: warehouse_list,
+      desc_key: "warehouse_desc",
+    },
+    {
+      code_key: "stype_code",
+      list: stype_list,
+      desc_key: "stype_desc",
     },
   ];
 
@@ -210,7 +218,7 @@ const Plant_Hierarchy = ({ set_page }) => {
   }, [search_query]);
 
   useEffect(() => {
-    let temp = [...plant_hierarchy_list];
+    let temp = [...warehouse_hierarchy_list];
 
     if (debounced_query.trim() !== "") {
       const q = debounced_query.toLowerCase();
@@ -263,9 +271,9 @@ const Plant_Hierarchy = ({ set_page }) => {
       index: start_idx + i + 1,
     }));
 
-    set_filtered_plant_hierarchy_list(indexed_data);
+    set_filtered_warehouse_hierarchy_list(indexed_data);
   }, [
-    plant_hierarchy_list,
+    warehouse_hierarchy_list,
     debounced_query,
     sort_by,
     sort_order,
@@ -275,7 +283,7 @@ const Plant_Hierarchy = ({ set_page }) => {
 
   const total_pages = Math.ceil(
     (debounced_query
-      ? plant_hierarchy_list.filter((u) => {
+      ? warehouse_hierarchy_list.filter((u) => {
           const q = debounced_query.toLowerCase();
 
           return columns.some((col) => {
@@ -304,7 +312,7 @@ const Plant_Hierarchy = ({ set_page }) => {
             return false;
           });
         }).length
-      : plant_hierarchy_list.length) / select_option
+      : warehouse_hierarchy_list.length) / select_option
   );
 
   const handle_sort = (column) => {
@@ -320,21 +328,21 @@ const Plant_Hierarchy = ({ set_page }) => {
   const handle_page_change = (page) => set_current_page(page);
   // - Client-Side Filtering
 
-  const handle_create_new_plant_hierarchy = () => {
-    set_sub_page("create_new_plant_hierarchy");
+  const handle_create_new_warehouse_hierarchy = () => {
+    set_sub_page("create_new_warehouse_hierarchy");
   };
 
-  const handle_edit_plant_hierarchy = (data) => {
+  const handle_edit_warehouse_hierarchy = (data) => {
     set_edit_data(data);
-    set_sub_page("edit_plant_hierarchy");
+    set_sub_page("edit_warehouse_hierarchy");
   };
-  const handle_delete_plant_hierarchy = (data) => {
+  const handle_delete_warehouse_hierarchy = (data) => {
     set_delete_data(data);
-    set_display_modal("delete_plant_hierarchy");
+    set_display_modal("delete_warehouse_hierarchy");
   };
 
-  const handle_upload_plant_hierarchy = () => {
-    set_sub_page("upload_plant_hierarchy");
+  const handle_upload_warehouse_hierarchy = () => {
+    set_sub_page("upload_warehouse_hierarchy");
   };
 
   const handle_go_back = (value) => {
@@ -388,7 +396,7 @@ const Plant_Hierarchy = ({ set_page }) => {
                   </li>
                   <li className="flex items-center gap-1.5 text-sm text-gray-500">
                     <span>/</span>
-                    <span className="text-gray-800">Plant Hierarchy</span>
+                    <span className="text-gray-800">Warehouse Hierarchy</span>
                   </li>
                 </ol>
               </nav>
@@ -406,7 +414,7 @@ const Plant_Hierarchy = ({ set_page }) => {
                     width="w-[20px]"
                     on_click={() => handle_go_back("main")}
                   ></Button>
-                  <h1 className="text-lg">Plant Hierarchy</h1>
+                  <h1 className="text-lg">Warehouse Hierarchy</h1>
                 </div>
                 <div className="flex gap-2">
                   {active_user?.category === "DEV" && (
@@ -416,7 +424,7 @@ const Plant_Hierarchy = ({ set_page }) => {
                       icon_position="left"
                       width="w-[110px]"
                       loading={truncate_loading}
-                      on_click={handle_truncate_plant_hierarchy_list}
+                      on_click={handle_truncate_warehouse_hierarchy_list}
                     >
                       Truncate
                     </Button>
@@ -425,7 +433,7 @@ const Plant_Hierarchy = ({ set_page }) => {
                     variant="primary"
                     icon={PlusCircle}
                     icon_position="left"
-                    on_click={handle_create_new_plant_hierarchy}
+                    on_click={handle_create_new_warehouse_hierarchy}
                   >
                     Create New Data
                   </Button>
@@ -433,7 +441,7 @@ const Plant_Hierarchy = ({ set_page }) => {
                     variant="primary"
                     icon={FileUp}
                     icon_position="left"
-                    on_click={handle_upload_plant_hierarchy}
+                    on_click={handle_upload_warehouse_hierarchy}
                   >
                     Upload
                   </Button>
@@ -466,7 +474,7 @@ const Plant_Hierarchy = ({ set_page }) => {
                         variant="white"
                         icon={RefreshCw}
                         icon_position="left"
-                        on_click={handle_get_plant_hierarchy_list}
+                        on_click={handle_get_warehouse_hierarchy_list}
                       ></Button>
                     </div>
                     <div className="w-full mt-4 md:mt-0 md:w-[600px]">
@@ -560,7 +568,7 @@ const Plant_Hierarchy = ({ set_page }) => {
                       <div className="p-6 flex justify-center items-center text-gray-500 text-sm">
                         <Spinner />
                       </div>
-                    ) : filtered_plant_hierarchy_list.length === 0 ? (
+                    ) : filtered_warehouse_hierarchy_list.length === 0 ? (
                       <div className="p-6 text-center text-gray-500 text-sm">
                         No data found
                       </div>
@@ -611,7 +619,7 @@ const Plant_Hierarchy = ({ set_page }) => {
                           </tr>
                         </thead>
                         <tbody className="bg-white">
-                          {filtered_plant_hierarchy_list.map((row, idx) => {
+                          {filtered_warehouse_hierarchy_list.map((row, idx) => {
                             const render_cell = (col, row) => {
                               const value = row[col.key];
                               // + Index
@@ -619,44 +627,44 @@ const Plant_Hierarchy = ({ set_page }) => {
                                 return <span>{row.index}</span>;
                               }
                               // - Index
-                              // + Plant
-                              if (col.key === "plant_code") {
+                              // + Warehouse
+                              if (col.key === "warehouse_code") {
                                 return (
                                   <div className="block font-medium text-gray-800">
                                     <span className="block text-gray-500 text-[10px]">
-                                      {row.plant_code}
+                                      {row.warehouse_code}
                                     </span>
                                     <span className="block text-gray-800 text-[12px]">
                                       {get_description(
-                                        row.plant_code,
-                                        plant_list,
-                                        "plant_code",
-                                        "plant_desc"
+                                        row.warehouse_code,
+                                        warehouse_list,
+                                        "warehouse_code",
+                                        "warehouse_desc"
                                       )}
                                     </span>
                                   </div>
                                 );
                               }
-                              // + Plant
-                              // + Storage Location
-                              if (col.key === "sloc_code") {
+                              // + Warehouse
+                              // + Storage Type
+                              if (col.key === "stype_code") {
                                 return (
                                   <div className="block font-medium text-gray-800">
                                     <span className="block text-gray-500 text-[10px]">
-                                      {row.sloc_code}
+                                      {row.stype_code}
                                     </span>
                                     <span className="block text-gray-800 text-[12px]">
                                       {get_description(
-                                        row.sloc_code,
-                                        sloc_list,
-                                        "sloc_code",
-                                        "sloc_desc"
+                                        row.stype_code,
+                                        stype_list,
+                                        "stype_code",
+                                        "stype_desc"
                                       )}
                                     </span>
                                   </div>
                                 );
                               }
-                              // - Storage Location
+                              // - Storage Type
                               // + Action Buttons
                               if (col.key === "actions") {
                                 return (
@@ -665,7 +673,7 @@ const Plant_Hierarchy = ({ set_page }) => {
                                       <button
                                         className="text-gray-500 hover:text-sky-600 text-[12px] outline-none"
                                         onClick={() =>
-                                          handle_edit_plant_hierarchy(row)
+                                          handle_edit_warehouse_hierarchy(row)
                                         }
                                       >
                                         <Edit size={19} />
@@ -678,7 +686,7 @@ const Plant_Hierarchy = ({ set_page }) => {
                                       <button
                                         className="text-gray-500 hover:text-red-600 text-[12px] mb-[1px] outline-none"
                                         onClick={() =>
-                                          handle_delete_plant_hierarchy(row)
+                                          handle_delete_warehouse_hierarchy(row)
                                         }
                                       >
                                         <Trash size={19} />
@@ -739,50 +747,52 @@ const Plant_Hierarchy = ({ set_page }) => {
           </div>
         </React.Fragment>
       )}
-      {sub_page === "create_new_plant_hierarchy" && (
-        <Create_Plant_H
+      {sub_page === "create_new_warehouse_hierarchy" && (
+        <Create_Warehouse_H
           handle_go_back={handle_go_back}
           active_user={active_user}
           reset_new_data={reset_new_data}
           show_toast={show_toast}
           new_data={new_data}
           set_new_data={set_new_data}
-          set_plant_hierarchy_list={set_plant_hierarchy_list}
-          plant_list={plant_list}
-          sloc_list={sloc_list}
+          set_warehouse_hierarchy_list={set_warehouse_hierarchy_list}
+          warehouse_list={warehouse_list}
+          stype_list={stype_list}
         />
       )}
-      {sub_page === "edit_plant_hierarchy" && (
-        <Edit_Plant_H
+      {sub_page === "edit_warehouse_hierarchy" && (
+        <Edit_Warehouse_H
           handle_go_back={handle_go_back}
           active_user={active_user}
           reset_new_data={reset_new_data}
           show_toast={show_toast}
           edit_data={edit_data}
           set_edit_data={set_edit_data}
-          set_plant_hierarchy_list={set_plant_hierarchy_list}
-          plant_list={plant_list}
-          sloc_list={sloc_list}
+          set_warehouse_hierarchy_list={set_warehouse_hierarchy_list}
+          warehouse_list={warehouse_list}
+          stype_list={stype_list}
         />
       )}
-      {sub_page === "upload_plant_hierarchy" && (
-        <Upload_Plant_H
+      {sub_page === "upload_warehouse_hierarchy" && (
+        <Upload_Warehouse_H
           handle_go_back={handle_go_back}
-          handle_get_plant_hierarchy_list={handle_get_plant_hierarchy_list}
+          handle_get_warehouse_hierarchy_list={
+            handle_get_warehouse_hierarchy_list
+          }
           show_toast={show_toast}
-          plant_list={plant_list}
-          sloc_list={sloc_list}
+          warehouse_list={warehouse_list}
+          stype_list={stype_list}
         />
       )}
-      <Delete_Plant_H
-        is_open={display_modal === "delete_plant_hierarchy"}
+      <Delete_Warehouse_H
+        is_open={display_modal === "delete_warehouse_hierarchy"}
         on_close={() => set_display_modal("")}
         width="max-w-[1000px]"
         show_toast={show_toast}
         delete_data={delete_data}
-        set_plant_hierarchy_list={set_plant_hierarchy_list}
-        plant_list={plant_list}
-        sloc_list={sloc_list}
+        set_warehouse_hierarchy_list={set_warehouse_hierarchy_list}
+        warehouse_list={warehouse_list}
+        stype_list={stype_list}
       />
       <Load_Screen
         is_open={display_modal === "load_screen"}
@@ -796,4 +806,4 @@ const Plant_Hierarchy = ({ set_page }) => {
   );
 };
 
-export default Plant_Hierarchy;
+export default Warehouse_Hierarchy;

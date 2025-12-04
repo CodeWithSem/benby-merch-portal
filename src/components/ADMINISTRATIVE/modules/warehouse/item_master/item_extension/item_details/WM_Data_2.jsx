@@ -23,19 +23,24 @@ import Text_Code_Field from "assets/elements/Text_Code_Field";
 import {
   branch_list,
   plant_list,
-  branch_h_list,
   sloc_list,
+  warehouse_list,
+  stype_list,
+  branch_h_list,
   plant_h_list,
+  warehouse_h_list,
 } from "../../ITEM_DATA_MAP";
 import {
-  api_create_item_ext_wm1,
-  api_delete_item_ext_wm1,
-  api_get_item_ext_wm1_list,
-  api_truncate_item_ext_wm1,
-} from "api/firestore_db/warehouse/item_master/tbl_item_ext_wm1_api";
+  api_create_item_ext_wm2,
+  api_delete_item_ext_wm2,
+  api_get_item_ext_wm2_list,
+  api_truncate_item_ext_wm2,
+} from "api/firestore_db/warehouse/item_master/tbl_item_ext_wm2_api";
 import Select_Branch from "../../modals/select_modal/Select_Branch";
 import Select_Plant from "../../modals/select_modal/Select_Plant";
 import Select_SLOC from "../../modals/select_modal/Select_SLOC";
+import Select_Warehouse from "../../modals/select_modal/Select_Warehouse";
+import Select_STYPE from "../../modals/select_modal/Select_STYPE";
 
 const HAS_FILTER = true;
 
@@ -54,18 +59,20 @@ const WM_Data_2 = ({ active_user, show_toast, item_extension_data }) => {
     { key: "branch_code", label: "Branch", sortable: true },
     { key: "plant_code", label: "Plant", sortable: true },
     { key: "sloc_code", label: "Storage Location", sortable: true },
+    { key: "warehouse_code", label: "Warehouse", sortable: true },
+    { key: "stype_code", label: "Storage Type", sortable: true },
     { key: "actions", label: "", sortable: false },
   ];
 
-  const [item_ext_wm1_list, set_item_ext_wm1_list] = useState([]);
+  const [item_ext_wm2_list, set_item_ext_wm2_list] = useState([]);
 
-  const handle_get_item_ext_wm1_list = async () => {
+  const handle_get_item_ext_wm2_list = async () => {
     set_loading_list(true);
-    const response = await api_get_item_ext_wm1_list(
+    const response = await api_get_item_ext_wm2_list(
       item_extension_data.item_code
     );
     if (response.success) {
-      set_item_ext_wm1_list(response.data);
+      set_item_ext_wm2_list(response.data);
     } else {
       console.error(response.message);
     }
@@ -73,11 +80,11 @@ const WM_Data_2 = ({ active_user, show_toast, item_extension_data }) => {
   };
 
   useEffect(() => {
-    handle_get_item_ext_wm1_list();
+    handle_get_item_ext_wm2_list();
   }, []);
 
   // + Client-Side Filtering
-  const [filtered_item_ext_wm1_list, set_filtered_item_ext_wm1_list] = useState(
+  const [filtered_item_ext_wm2_list, set_filtered_item_ext_wm2_list] = useState(
     []
   );
   const [select_option, set_select_option] = useState(5);
@@ -114,7 +121,7 @@ const WM_Data_2 = ({ active_user, show_toast, item_extension_data }) => {
   }, [search_query]);
 
   useEffect(() => {
-    let temp = [...item_ext_wm1_list];
+    let temp = [...item_ext_wm2_list];
 
     if (debounced_query.trim() !== "") {
       const q = debounced_query.toLowerCase();
@@ -167,9 +174,9 @@ const WM_Data_2 = ({ active_user, show_toast, item_extension_data }) => {
       index: start_idx + i + 1,
     }));
 
-    set_filtered_item_ext_wm1_list(indexed_data);
+    set_filtered_item_ext_wm2_list(indexed_data);
   }, [
-    item_ext_wm1_list,
+    item_ext_wm2_list,
     debounced_query,
     sort_by,
     sort_order,
@@ -179,7 +186,7 @@ const WM_Data_2 = ({ active_user, show_toast, item_extension_data }) => {
 
   const total_pages = Math.ceil(
     (debounced_query
-      ? item_ext_wm1_list.filter((u) => {
+      ? item_ext_wm2_list.filter((u) => {
           const q = debounced_query.toLowerCase();
 
           return columns.some((col) => {
@@ -208,7 +215,7 @@ const WM_Data_2 = ({ active_user, show_toast, item_extension_data }) => {
             return false;
           });
         }).length
-      : item_ext_wm1_list.length) / select_option
+      : item_ext_wm2_list.length) / select_option
   );
 
   const handle_sort = (column) => {
@@ -231,23 +238,27 @@ const WM_Data_2 = ({ active_user, show_toast, item_extension_data }) => {
       return;
     }
     try {
-      const new_item_ext_wm1_data = {
+      const new_item_ext_wm2_data = {
         item_code: item_extension_data.item_code,
         branch_code: selected_data.branch_code,
         plant_code: selected_data.plant_code,
         sloc_code: selected_data.sloc_code,
+        warehouse_code: selected_data.warehouse_code,
+        stype_code: selected_data.stype_code,
       };
-      console.table(new_item_ext_wm1_data);
-      const response = await api_create_item_ext_wm1(
-        new_item_ext_wm1_data,
+      console.table(new_item_ext_wm2_data);
+      const response = await api_create_item_ext_wm2(
+        new_item_ext_wm2_data,
         active_user?.username
       );
       if (response.success) {
-        set_item_ext_wm1_list((prev) => [...prev, response.data]);
+        set_item_ext_wm2_list((prev) => [...prev, response.data]);
         set_selected_data({
           branch_code: "",
           plant_code: "",
           sloc_code: "",
+          warehouse_code: "",
+          stype_code: "",
         });
         show_status("add_success");
       } else {
@@ -275,9 +286,9 @@ const WM_Data_2 = ({ active_user, show_toast, item_extension_data }) => {
     const id = selected_data_delete_id;
     try {
       set_delete_loading(true);
-      const response = await api_delete_item_ext_wm1(id);
+      const response = await api_delete_item_ext_wm2(id);
       if (response.success) {
-        set_item_ext_wm1_list((prev) => prev.filter((item) => item.id !== id));
+        set_item_ext_wm2_list((prev) => prev.filter((item) => item.id !== id));
         show_status("delete_success");
         set_display_modal("");
       } else {
@@ -293,14 +304,14 @@ const WM_Data_2 = ({ active_user, show_toast, item_extension_data }) => {
 
   const handle_truncate = async () => {
     set_truncate_loading(true);
-    const response = await api_truncate_item_ext_wm1();
+    const response = await api_truncate_item_ext_wm2();
     if (response.success) {
       show_status("truncate_success");
     } else {
       console.error(response.message);
       show_status("error");
     }
-    handle_get_item_ext_wm1_list();
+    handle_get_item_ext_wm2_list();
     set_truncate_loading(false);
   };
 
@@ -380,7 +391,7 @@ const WM_Data_2 = ({ active_user, show_toast, item_extension_data }) => {
               variant="white"
               icon={RefreshCw}
               icon_itemsition="left"
-              on_click={handle_get_item_ext_wm1_list}
+              on_click={handle_get_item_ext_wm2_list}
             ></Button>
           </div>
 
@@ -473,7 +484,7 @@ const WM_Data_2 = ({ active_user, show_toast, item_extension_data }) => {
             <div className="p-6 flex justify-center items-center text-gray-500 text-sm">
               <Spinner />
             </div>
-          ) : filtered_item_ext_wm1_list.length === 0 ? (
+          ) : filtered_item_ext_wm2_list.length === 0 ? (
             <div className="p-6 text-center text-gray-500 text-sm">
               No data found
             </div>
@@ -518,7 +529,7 @@ const WM_Data_2 = ({ active_user, show_toast, item_extension_data }) => {
                 </tr>
               </thead>
               <tbody className="bg-white">
-                {filtered_item_ext_wm1_list.map((row, idx) => {
+                {filtered_item_ext_wm2_list.map((row, idx) => {
                   const render_cell = (col, row) => {
                     const value = row[col.key];
                     // + Index
@@ -583,6 +594,44 @@ const WM_Data_2 = ({ active_user, show_toast, item_extension_data }) => {
                       );
                     }
                     // - Storage Location
+                    // + Warehouse
+                    if (col.key === "warehouse_code") {
+                      return (
+                        <div className="block font-medium text-gray-800">
+                          <span className="block text-gray-500 text-[10px]">
+                            {row.warehouse_code}
+                          </span>
+                          <span className="block text-gray-800 text-[12px]">
+                            {get_description(
+                              row.warehouse_code,
+                              warehouse_list,
+                              "warehouse_code",
+                              "warehouse_desc"
+                            )}
+                          </span>
+                        </div>
+                      );
+                    }
+                    // - Warehouse
+                    // + Storage Type
+                    if (col.key === "stype_code") {
+                      return (
+                        <div className="block font-medium text-gray-800">
+                          <span className="block text-gray-500 text-[10px]">
+                            {row.stype_code}
+                          </span>
+                          <span className="block text-gray-800 text-[12px]">
+                            {get_description(
+                              row.stype_code,
+                              stype_list,
+                              "stype_code",
+                              "stype_desc"
+                            )}
+                          </span>
+                        </div>
+                      );
+                    }
+                    // - Storage Type
                     if (col.key === "actions") {
                       return (
                         <div className="flex gap-2">
@@ -699,15 +748,15 @@ const WM_Data_2 = ({ active_user, show_toast, item_extension_data }) => {
             <Text_Code_Field
               label="Warehouse"
               code_width="150px"
-              // show_search_button={!!selected_data.branch_code}
-              // code_value={selected_data.plant_code}
-              // text_value={get_description(
-              //   selected_data.plant_code,
-              //   plant_list,
-              //   "plant_code",
-              //   "plant_desc"
-              // )}
-              // on_click={() => set_display_modal("select_plant")}
+              show_search_button={true}
+              code_value={selected_data.warehouse_code}
+              text_value={get_description(
+                selected_data.warehouse_code,
+                warehouse_list,
+                "warehouse_code",
+                "warehouse_desc"
+              )}
+              on_click={() => set_display_modal("select_warehouse")}
               disabled
             />
           </div>
@@ -716,14 +765,14 @@ const WM_Data_2 = ({ active_user, show_toast, item_extension_data }) => {
               label="Storage Type"
               code_width="150px"
               show_search_button={!!selected_data.warehouse_code}
-              // code_value={selected_data.sloc_code}
-              // text_value={get_description(
-              //   selected_data.sloc_code,
-              //   sloc_list,
-              //   "sloc_code",
-              //   "sloc_desc"
-              // )}
-              // on_click={() => set_display_modal("select_sloc")}
+              code_value={selected_data.stype_code}
+              text_value={get_description(
+                selected_data.stype_code,
+                stype_list,
+                "stype_code",
+                "stype_desc"
+              )}
+              on_click={() => set_display_modal("select_stype")}
               disabled
             />
           </div>
@@ -736,7 +785,7 @@ const WM_Data_2 = ({ active_user, show_toast, item_extension_data }) => {
                 width="w-[110px]"
                 loading={truncate_loading}
                 on_click={handle_truncate}
-                disabled={item_ext_wm1_list.length === 0}
+                disabled={item_ext_wm2_list.length === 0}
               >
                 Truncate
               </Button>
@@ -749,7 +798,9 @@ const WM_Data_2 = ({ active_user, show_toast, item_extension_data }) => {
               disabled={
                 !selected_data.branch_code ||
                 !selected_data.plant_code ||
-                !selected_data.sloc_code
+                !selected_data.sloc_code ||
+                !selected_data.warehouse_code ||
+                !selected_data.stype_code
               }
               on_click={() => set_display_modal("confirm_add")}
             >
@@ -788,6 +839,25 @@ const WM_Data_2 = ({ active_user, show_toast, item_extension_data }) => {
         plant_list={plant_list}
         sloc_list={sloc_list}
         plant_h_list={plant_h_list}
+        set_data={set_selected_data}
+      />
+      <Select_Warehouse
+        is_open={display_modal === "select_warehouse"}
+        on_close={() => set_display_modal("")}
+        width="max-w-[1000px]"
+        height="max-h-[700px]"
+        warehouse_list={warehouse_list}
+        set_data={set_selected_data}
+      />
+      <Select_STYPE
+        is_open={display_modal === "select_stype"}
+        on_close={() => set_display_modal("")}
+        width="max-w-[1000px]"
+        height="max-h-[700px]"
+        selected_warehouse_code={selected_data.warehouse_code}
+        warehouse_list={warehouse_list}
+        stype_list={stype_list}
+        warehouse_h_list={warehouse_h_list}
         set_data={set_selected_data}
       />
       <Confirm_Add_Modal
