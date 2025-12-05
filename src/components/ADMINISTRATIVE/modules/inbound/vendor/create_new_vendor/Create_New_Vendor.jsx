@@ -1,26 +1,47 @@
+import React, { useState } from "react";
+import { format_date_1, get_date_now } from "assets/scripts/format";
+import { handle_text_change_function } from "assets/scripts/functions/input_functions";
+import { api_create_vendor_master } from "api/firestore_db/inbound/vendor/tbl_vendor_master_api";
+import { validate_required_fields } from "assets/scripts/functions/validate_fields";
+import { ChevronLeft, UserPlus } from "lucide-react";
 import Button from "assets/elements/Button";
 import Text_Field from "assets/elements/Text_Field";
-import { format_date_1, get_date_now } from "assets/scripts/format";
-import { ChevronLeft, UserPlus } from "lucide-react";
-import React, { useState } from "react";
 import Account from "./vendor_details/Account";
 import Address from "./vendor_details/Address";
 import Accounting_Info from "./vendor_details/Accounting_Info";
-import Select_City from "../modals/Select_City";
-import Select_Trans_Zone from "../modals/Select_Trans_Zone";
-import Select_Company from "../modals/Select_Company";
+import {
+  city_h_list,
+  city_list,
+  country_list,
+  district_list,
+  language_list,
+  region_list,
+  trans_zone_list,
+  taxation_list,
+  industry_type_list,
+  incoterms_list,
+  company_h_list,
+  company_list,
+  currency_list,
+  payment_method_list,
+  payment_term_list,
+  purc_group_list,
+  purc_org_list,
+} from "../VENDOR_DATA_MAP";
 
 const Create_New_Vendor = ({
   set_page,
-  city_list,
-  company_list,
-  com_porg_pgroup_list,
-  purc_group_list,
-  purc_org_list,
-  trans_zone_list,
+  active_user,
+  reset_new_vendor_data,
+  show_toast,
+  new_vendor_data,
+  set_new_vendor_data,
+  set_vendor_master_list,
 }) => {
   const [active_tab, set_active_tab] = useState("address");
   const [display_modal, set_display_modal] = useState("");
+  const [is_confirm_modal_open, set_is_confirm_modal_open] = useState(false);
+  const [create_loading, set_create_loading] = useState(false);
 
   const tabs = [
     { key: "address", title: "Address" },
@@ -28,6 +49,93 @@ const Create_New_Vendor = ({
     { key: "accounting_info", title: "Accounting Information" },
   ];
 
+  const validate_vendor_fields = () => {
+    const is_valid = validate_required_fields({
+      data: new_vendor_data,
+      fields: [
+        { name: "vendor_code", label: "Vendor Code" },
+        { name: "vendor_desc", label: "Vendor Description" },
+      ],
+      show_toast,
+    });
+
+    return is_valid;
+  };
+
+  const handle_create_vendor = async () => {
+    set_create_loading(true);
+    if (!validate_vendor_fields()) {
+      close_confirm_modal();
+      return;
+    }
+    try {
+      const response = await api_create_vendor_master(
+        new_vendor_data,
+        active_user?.username,
+        show_toast
+      );
+      if (response.success) {
+        set_vendor_master_list((prev) => [...prev, response.data]);
+        reset_new_vendor_data();
+        handle_go_back();
+      }
+    } catch (error) {
+      console.error("Failed to create a new data:", error);
+    } finally {
+      close_confirm_modal();
+    }
+  };
+
+  const close_confirm_modal = () => {
+    set_is_confirm_modal_open(false);
+    set_create_loading(false);
+  };
+
+  const Confirm_Modal = () => {
+    return (
+      <React.Fragment>
+        <div className="fixed inset-0 flex items-center justify-center z-[100]">
+          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm z-[101]"></div>
+          <div
+            className={`relative bg-white rounded-lg shadow-xl max-w-[500px] w-full p-10 m-5 z-[102]`}
+          >
+            <div className="w-full flex justify-center items-center text-lg md:text-xl font-bold mb-4">
+              Confirm Vendor Creation
+            </div>
+            <p className="w-full text-center text-sm leading-6 text-gray-500 dark:text-gray-400 pt-4">
+              You are about to create a new Vendor. Once created, it will be
+              added to the database.
+            </p>
+            <p className="w-full text-center text-sm leading-6 text-gray-500 dark:text-gray-400 pt-4">
+              Please review all the details — before proceeding.
+            </p>
+            <p className="w-full text-center text-sm leading-6 text-gray-500 dark:text-gray-400 py-4">
+              Are you sure you want to continue?
+            </p>
+            <div className="flex justify-center gap-2 mt-4">
+              <Button
+                width="w-[100px]"
+                variant="primary"
+                loading={create_loading}
+                on_click={handle_create_vendor}
+              >
+                Yes
+              </Button>
+              <Button
+                width="w-[100px]"
+                variant="white"
+                on_click={() => set_is_confirm_modal_open(false)}
+              >
+                No
+              </Button>
+            </div>
+          </div>
+        </div>
+      </React.Fragment>
+    );
+  };
+
+  const handle_text_change = handle_text_change_function(set_new_vendor_data);
   const handle_go_back = () => {
     set_page("main");
   };
@@ -66,7 +174,7 @@ const Create_New_Vendor = ({
               </li>
               <li className="flex items-center gap-1.5 text-sm text-gray-500">
                 <span>/</span>
-                <span className="text-gray-800">Create New Vendor</span>
+                <span className="text-gray-800">Create</span>
               </li>
             </ol>
           </nav>
@@ -100,7 +208,7 @@ const Create_New_Vendor = ({
                 <Text_Field
                   label="Vendor Code"
                   type={"text"}
-                  value={"AUTO GENERATED"}
+                  value={new_vendor_data.vendor_code}
                   disabled
                 />
               </div>
@@ -109,8 +217,8 @@ const Create_New_Vendor = ({
                   label="Vendor Description"
                   type={"text"}
                   placeholder={"Enter description"}
-                  // value={}
-                  // on_change={}
+                  value={new_vendor_data.vendor_desc} //--> vendor_desc
+                  on_change={handle_text_change("vendor_desc")}
                 />
               </div>
             </div>
@@ -141,11 +249,45 @@ const Create_New_Vendor = ({
               {/* + Tab Content */}
               <div className="p-6">
                 {active_tab === "address" && (
-                  <Address set_display_modal={set_display_modal} />
+                  <Address
+                    display_modal={display_modal}
+                    set_display_modal={set_display_modal}
+                    new_vendor_data={new_vendor_data}
+                    set_new_vendor_data={set_new_vendor_data}
+                    city_list={city_list}
+                    district_list={district_list}
+                    region_list={region_list}
+                    country_list={country_list}
+                    city_h_list={city_h_list}
+                    trans_zone_list={trans_zone_list}
+                    language_list={language_list}
+                  />
                 )}
-                {active_tab === "account" && <Account />}
+                {active_tab === "account" && (
+                  <Account
+                    display_modal={display_modal}
+                    set_display_modal={set_display_modal}
+                    new_vendor_data={new_vendor_data}
+                    set_new_vendor_data={set_new_vendor_data}
+                    taxation_list={taxation_list}
+                    industry_type_list={industry_type_list}
+                    incoterms_list={incoterms_list}
+                  />
+                )}
                 {active_tab === "accounting_info" && (
-                  <Accounting_Info set_display_modal={set_display_modal} />
+                  <Accounting_Info
+                    display_modal={display_modal}
+                    set_display_modal={set_display_modal}
+                    new_vendor_data={new_vendor_data}
+                    set_new_vendor_data={set_new_vendor_data}
+                    company_list={company_list}
+                    purc_group_list={purc_group_list}
+                    purc_org_list={purc_org_list}
+                    company_h_list={company_h_list}
+                    payment_method_list={payment_method_list}
+                    payment_term_list={payment_term_list}
+                    currency_list={currency_list}
+                  />
                 )}
               </div>
               {/* - Tab Content */}
@@ -160,6 +302,7 @@ const Create_New_Vendor = ({
                 size="lg"
                 icon={UserPlus}
                 icon_position="left"
+                on_click={() => set_is_confirm_modal_open(true)}
               >
                 Create
               </Button>
@@ -172,30 +315,7 @@ const Create_New_Vendor = ({
         </div>
       </div>
       {/* + Modals */}
-      <Select_City
-        is_open={display_modal === "select_city"}
-        on_close={() => set_display_modal("")}
-        width="max-w-[1000px]"
-        height="max-h-[700px]"
-        city_list={city_list}
-      />
-      <Select_Trans_Zone
-        is_open={display_modal === "select_trans_zone"}
-        on_close={() => set_display_modal("")}
-        width="max-w-[1000px]"
-        height="max-h-[700px]"
-        trans_zone_list={trans_zone_list}
-      />
-      <Select_Company
-        is_open={display_modal === "select_company"}
-        on_close={() => set_display_modal("")}
-        width="max-w-[1280px]"
-        height="max-h-[700px]"
-        company_list={company_list}
-        purc_org_list={purc_org_list}
-        purc_group_list={purc_group_list}
-        com_porg_pgroup_list={com_porg_pgroup_list}
-      />
+      {is_confirm_modal_open && <Confirm_Modal />}
       {/* - Modals */}
     </React.Fragment>
   );

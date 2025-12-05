@@ -1,29 +1,13 @@
 import React, { useState } from "react";
-import { format_date_1, get_date_now } from "assets/scripts/format";
 import { ChevronLeft } from "lucide-react";
+import { format_date_1, get_date_now } from "assets/scripts/format";
 import Button from "assets/elements/Button";
 import Text_Field from "assets/elements/Text_Field";
 import Account from "./vendor_details/Account";
 import Address from "./vendor_details/Address";
 import Accounting_Info from "./vendor_details/Accounting_Info";
-import {
-  city_list,
-  country_list,
-  district_list,
-  language_list,
-  region_list,
-  trans_zone_list,
-  taxation_list,
-  industry_type_list,
-  incoterms_list,
-  company_list,
-  payment_method_list,
-  payment_term_list,
-  purc_group_list,
-  purc_org_list,
-} from "../VENDOR_DATA_MAP";
 
-const View_Vendor = ({ set_page, view_vendor_data }) => {
+const View_Vendor = ({ set_page }) => {
   const [active_tab, set_active_tab] = useState("address");
 
   const tabs = [
@@ -70,7 +54,7 @@ const View_Vendor = ({ set_page, view_vendor_data }) => {
               </li>
               <li className="flex items-center gap-1.5 text-sm text-gray-500">
                 <span>/</span>
-                <span className="text-gray-800">View</span>
+                <span className="text-gray-800">View Vendor</span>
               </li>
             </ol>
           </nav>
@@ -101,20 +85,10 @@ const View_Vendor = ({ set_page, view_vendor_data }) => {
           <div className="p-5 sm:p-6 border-t">
             <div className="grid grid-cols-1 gap-5 lg:grid-cols-3">
               <div className="w-full">
-                <Text_Field
-                  label="Vendor Code"
-                  type={"text"}
-                  value={view_vendor_data.vendor_code}
-                  disabled
-                />
+                <Text_Field label="Vendor Code" type={"text"} disabled />
               </div>
               <div className="w-full lg:col-span-2">
-                <Text_Field
-                  label="Vendor Description"
-                  type={"text"}
-                  value={view_vendor_data.vendor_desc} //--> vendor_desc
-                  disabled
-                />
+                <Text_Field label="Vendor Description" type={"text"} disabled />
               </div>
             </div>
           </div>
@@ -143,49 +117,14 @@ const View_Vendor = ({ set_page, view_vendor_data }) => {
               {/* - Tab Navigation */}
               {/* + Tab Content */}
               <div className="p-6">
-                {active_tab === "address" && (
-                  <Address
-                    view_vendor_data={view_vendor_data}
-                    city_list={city_list}
-                    district_list={district_list}
-                    region_list={region_list}
-                    country_list={country_list}
-                    trans_zone_list={trans_zone_list}
-                    language_list={language_list}
-                  />
-                )}
-                {active_tab === "account" && (
-                  <Account
-                    view_vendor_data={view_vendor_data}
-                    taxation_list={taxation_list}
-                    industry_type_list={industry_type_list}
-                    incoterms_list={incoterms_list}
-                  />
-                )}
-                {active_tab === "accounting_info" && (
-                  <Accounting_Info
-                    view_vendor_data={view_vendor_data}
-                    company_list={company_list}
-                    purc_group_list={purc_group_list}
-                    purc_org_list={purc_org_list}
-                    payment_method_list={payment_method_list}
-                    payment_term_list={payment_term_list}
-                  />
-                )}
+                {active_tab === "address" && <Address />}
+                {active_tab === "account" && <Account />}
+                {active_tab === "accounting_info" && <Accounting_Info />}
               </div>
               {/* - Tab Content */}
             </div>
           </div>
           {/* - Section 2 */}
-          {/* + Section 3 */}
-          <div className="p-4 sm:p-8 border-t">
-            <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
-              <Button variant="white" size="lg" on_click={handle_go_back}>
-                Close
-              </Button>
-            </div>
-          </div>
-          {/* - Section 3 */}
         </div>
       </div>
     </React.Fragment>

@@ -1,14 +1,9 @@
 import React from "react";
-import { get_description } from "assets/scripts/functions/get_description";
 import Checkbox_Field from "assets/elements/Checkbox_Field";
+import Select_Field from "assets/elements/Select_Field";
 import Text_Field from "assets/elements/Text_Field";
 
-const Account = ({
-  view_vendor_data,
-  taxation_list,
-  industry_type_list,
-  incoterms_list,
-}) => {
+const Account = () => {
   // RETURN ORIGIN
   return (
     <React.Fragment>
@@ -20,29 +15,23 @@ const Account = ({
             <Text_Field
               label="Tax Number"
               type={"text"}
-              value={view_vendor_data.ac_tax_number} //--> ac_tax_number
-              disabled
+              placeholder="Enter tax number"
             />
           </div>
           <div>
-            <Text_Field
-              label="Taxation"
-              type={"text"}
-              value={get_description(
-                view_vendor_data.ac_taxation_code,
-                taxation_list,
-                "taxation_code",
-                "taxation_desc"
-              )} //--> ac_taxation_code
-              disabled
+            <Select_Field
+              label="Tax Code"
+              // value={selected_data}
+              // on_change={(e) => handle_data_change(e.target.value)}
+              // options={options}
+              placeholder="Select Option"
             />
           </div>
           <div>
             <Text_Field
               label="Vat Registration Number"
               type={"text"}
-              value={view_vendor_data.ac_vat_reg_number} //--> ac_vat_reg_number
-              disabled
+              placeholder="Enter number"
             />
           </div>
         </div>
@@ -53,29 +42,21 @@ const Account = ({
         <h1 className="mb-5 font-semibold text-sky-700">Industry</h1>
         <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
           <div>
-            <Text_Field
+            <Select_Field
               label="Industry Type"
-              type={"text"}
-              value={get_description(
-                view_vendor_data.ac_industry_type_code,
-                industry_type_list,
-                "industry_type_code",
-                "industry_type_desc"
-              )} //--> ac_industry_type_code
-              disabled
+              // value={selected_data}
+              // on_change={(e) => handle_data_change(e.target.value)}
+              // options={options}
+              placeholder="Select Option"
             />
           </div>
           <div>
-            <Text_Field
+            <Select_Field
               label="Incoterms"
-              type={"text"}
-              value={get_description(
-                view_vendor_data.ac_incoterms_code,
-                incoterms_list,
-                "incoterms_code",
-                "incoterms_desc"
-              )} //--> ac_incoterms_code
-              disabled
+              // value={selected_data}
+              // on_change={(e) => handle_data_change(e.target.value)}
+              // options={options}
+              placeholder="Select Option"
             />
           </div>
           <div className="mt-4">
@@ -83,8 +64,8 @@ const Account = ({
               label="Vendor is Blocked"
               box_size={24}
               icon_size={14}
-              checked={view_vendor_data.ac_vendor_block} //--> ac_vendor_block
-              disabled
+              checked={false}
+              on_change={(e) => alert(e.target.checked)}
             />
           </div>
         </div>
@@ -95,43 +76,30 @@ const Account = ({
         <h1 className="mb-5 font-semibold text-sky-700">Contact Person</h1>
         <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
           <div className="col-span-full">
-            <Text_Field
-              label="Name"
-              type={"text"}
-              value={view_vendor_data.ac_contact_name} //--> ac_contact_name
-              disabled
-            />
+            <Text_Field label="Name" type={"text"} placeholder="Enter name" />
           </div>
           <div>
             <Text_Field
               label="Telephone"
               type={"text"}
-              value={view_vendor_data.ac_contact_telephone} //--> ac_contact_telephone
-              disabled
+              placeholder="Enter telephone"
             />
           </div>
           <div>
-            <Text_Field
-              label="Fax"
-              type={"text"}
-              value={view_vendor_data.ac_contact_fax} //--> ac_contact_fax
-              disabled
-            />
+            <Text_Field label="Fax" type={"text"} placeholder="Enter fax" />
           </div>
           <div>
             <Text_Field
               label="Mobile"
               type={"text"}
-              value={view_vendor_data.ac_contact_mobile} //--> ac_contact_mobile
-              disabled
+              placeholder="Enter mobile"
             />
           </div>
           <div>
             <Text_Field
               label="Corporate Position"
               type={"text"}
-              value={view_vendor_data.ac_contact_position} //--> ac_contact_position
-              disabled
+              placeholder="Enter position"
             />
           </div>
         </div>

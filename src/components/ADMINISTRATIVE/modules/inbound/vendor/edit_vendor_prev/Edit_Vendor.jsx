@@ -1,30 +1,26 @@
-import React, { useState } from "react";
-import { format_date_1, get_date_now } from "assets/scripts/format";
-import { ChevronLeft } from "lucide-react";
 import Button from "assets/elements/Button";
 import Text_Field from "assets/elements/Text_Field";
+import { format_date_1, get_date_now } from "assets/scripts/format";
+import { ChevronLeft, RefreshCcwDot } from "lucide-react";
+import React, { useState } from "react";
 import Account from "./vendor_details/Account";
 import Address from "./vendor_details/Address";
 import Accounting_Info from "./vendor_details/Accounting_Info";
-import {
+import Select_City from "../modals/Select_City";
+import Select_Trans_Zone from "../modals/Select_Trans_Zone";
+import Select_Company from "../modals/Select_Company";
+
+const Edit_Vendor = ({
+  set_page,
   city_list,
-  country_list,
-  district_list,
-  language_list,
-  region_list,
-  trans_zone_list,
-  taxation_list,
-  industry_type_list,
-  incoterms_list,
   company_list,
-  payment_method_list,
-  payment_term_list,
+  com_porg_pgroup_list,
   purc_group_list,
   purc_org_list,
-} from "../VENDOR_DATA_MAP";
-
-const View_Vendor = ({ set_page, view_vendor_data }) => {
+  trans_zone_list,
+}) => {
   const [active_tab, set_active_tab] = useState("address");
+  const [display_modal, set_display_modal] = useState("");
 
   const tabs = [
     { key: "address", title: "Address" },
@@ -70,7 +66,7 @@ const View_Vendor = ({ set_page, view_vendor_data }) => {
               </li>
               <li className="flex items-center gap-1.5 text-sm text-gray-500">
                 <span>/</span>
-                <span className="text-gray-800">View</span>
+                <span className="text-gray-800">Edit Vendor</span>
               </li>
             </ol>
           </nav>
@@ -87,7 +83,7 @@ const View_Vendor = ({ set_page, view_vendor_data }) => {
                 width="w-[20px]"
                 on_click={handle_go_back}
               ></Button>
-              <h1 className="text-lg">View Vendor</h1>
+              <h1 className="text-lg">Edit Vendor</h1>
             </div>
 
             <div className="flex gap-2">
@@ -104,7 +100,7 @@ const View_Vendor = ({ set_page, view_vendor_data }) => {
                 <Text_Field
                   label="Vendor Code"
                   type={"text"}
-                  value={view_vendor_data.vendor_code}
+                  value={"VN-XXXX"}
                   disabled
                 />
               </div>
@@ -112,8 +108,9 @@ const View_Vendor = ({ set_page, view_vendor_data }) => {
                 <Text_Field
                   label="Vendor Description"
                   type={"text"}
-                  value={view_vendor_data.vendor_desc} //--> vendor_desc
-                  disabled
+                  placeholder={"Enter description"}
+                  // value={}
+                  // on_change={}
                 />
               </div>
             </div>
@@ -144,33 +141,11 @@ const View_Vendor = ({ set_page, view_vendor_data }) => {
               {/* + Tab Content */}
               <div className="p-6">
                 {active_tab === "address" && (
-                  <Address
-                    view_vendor_data={view_vendor_data}
-                    city_list={city_list}
-                    district_list={district_list}
-                    region_list={region_list}
-                    country_list={country_list}
-                    trans_zone_list={trans_zone_list}
-                    language_list={language_list}
-                  />
+                  <Address set_display_modal={set_display_modal} />
                 )}
-                {active_tab === "account" && (
-                  <Account
-                    view_vendor_data={view_vendor_data}
-                    taxation_list={taxation_list}
-                    industry_type_list={industry_type_list}
-                    incoterms_list={incoterms_list}
-                  />
-                )}
+                {active_tab === "account" && <Account />}
                 {active_tab === "accounting_info" && (
-                  <Accounting_Info
-                    view_vendor_data={view_vendor_data}
-                    company_list={company_list}
-                    purc_group_list={purc_group_list}
-                    purc_org_list={purc_org_list}
-                    payment_method_list={payment_method_list}
-                    payment_term_list={payment_term_list}
-                  />
+                  <Accounting_Info set_display_modal={set_display_modal} />
                 )}
               </div>
               {/* - Tab Content */}
@@ -180,16 +155,50 @@ const View_Vendor = ({ set_page, view_vendor_data }) => {
           {/* + Section 3 */}
           <div className="p-4 sm:p-8 border-t">
             <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
+              <Button
+                variant="primary"
+                size="lg"
+                icon={RefreshCcwDot}
+                icon_position="left"
+              >
+                Update
+              </Button>
               <Button variant="white" size="lg" on_click={handle_go_back}>
-                Close
+                Cancel
               </Button>
             </div>
           </div>
           {/* - Section 3 */}
         </div>
       </div>
+      {/* + Modals */}
+      <Select_City
+        is_open={display_modal === "select_city"}
+        on_close={() => set_display_modal("")}
+        width="max-w-[1000px]"
+        height="max-h-[700px]"
+        city_list={city_list}
+      />
+      <Select_Trans_Zone
+        is_open={display_modal === "select_trans_zone"}
+        on_close={() => set_display_modal("")}
+        width="max-w-[1000px]"
+        height="max-h-[700px]"
+        trans_zone_list={trans_zone_list}
+      />
+      <Select_Company
+        is_open={display_modal === "select_company"}
+        on_close={() => set_display_modal("")}
+        width="max-w-[1280px]"
+        height="max-h-[700px]"
+        company_list={company_list}
+        purc_org_list={purc_org_list}
+        purc_group_list={purc_group_list}
+        com_porg_pgroup_list={com_porg_pgroup_list}
+      />
+      {/* - Modals */}
     </React.Fragment>
   );
 };
 
-export default View_Vendor;
+export default Edit_Vendor;

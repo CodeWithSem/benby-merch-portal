@@ -178,7 +178,6 @@ const Select_Generic = ({
                               </span>
                             </div>
                           </td>
-
                           <td className="px-6 py-3 text-gray-700 tracking-wide">
                             {data.creation_date}
                           </td>

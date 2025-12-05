@@ -5,16 +5,11 @@ import {
   get_date_now,
 } from "assets/scripts/format";
 import { handle_text_change_function } from "assets/scripts/functions/input_functions";
-import {
-  api_create_item_master,
-  api_get_item_master_by_desc,
-  api_update_item_master,
-} from "api/firestore_db/warehouse/item_master/tbl_item_master_api";
+import { api_update_item_master } from "api/firestore_db/warehouse/item_master/tbl_item_master_api";
 import { validate_required_fields } from "assets/scripts/functions/validate_fields";
 import {
   CheckCircle2,
   ChevronLeft,
-  CirclePlus,
   CircleX,
   RefreshCcwDot,
 } from "lucide-react";

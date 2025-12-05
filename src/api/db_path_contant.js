@@ -1,6 +1,9 @@
 export const DB_ROOT = "DB1_ERP_SYSTEM";
 
 export const TABLES = {
+  // + Inbound Module ==================================
+  VENDOR_MASTER: "TBL_VENDOR_MASTER",
+  // - Inbound Module ==================================
   // + Warhouse Module =================================
   ITEM_MASTER: "TBL_ITEM_MASTER",
   ITEM_EXT_SALES_DATA: "TBL_ITEM_EXT_SALES_DATA",
