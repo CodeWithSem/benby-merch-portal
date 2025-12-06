@@ -5,53 +5,62 @@ import Checkbox_Field from "assets/elements/Checkbox_Field";
 import Button from "assets/elements/Button";
 import Pagination_Modal from "assets/elements/Pagination_Modal";
 
-const Select_Vendor = ({
+const Select_Branch = ({
   is_open,
   on_close,
   width = "max-w-[700px]",
   height = "h-[500px]",
-  vendor_list,
+  branch_list,
+  set_data,
 }) => {
   // + Client-Side Filtering
-  const [filtered_vendors, set_filtered_vendors] = useState([]);
+  const [filtered_branch_list, set_filtered_branch_list] = useState([]);
   const [current_page, set_current_page] = useState(1);
   const [rows_per_page, set_rows_per_page] = useState(5);
   const [search_query, set_search_query] = useState("");
-  const [selected_vendor, set_selected_vendor] = useState(null);
+  const [selected_branch, set_selected_branch] = useState(null);
 
   useEffect(() => {
-    let data = [...vendor_list];
+    let data = [...branch_list];
 
     if (search_query.trim() !== "") {
       const q = search_query.toLowerCase();
       data = data.filter(
-        (vendor) =>
-          vendor.vendor_code.toLowerCase().includes(q) ||
-          vendor.vendor_desc.toLowerCase().includes(q)
+        (data) =>
+          data.branch_code.toLowerCase().includes(q) ||
+          data.branch_desc.toLowerCase().includes(q)
       );
     }
 
     const start_idx = (current_page - 1) * rows_per_page;
     const end_idx = start_idx + rows_per_page;
-    set_filtered_vendors(data.slice(start_idx, end_idx));
-  }, [vendor_list, search_query, current_page, rows_per_page]);
+    set_filtered_branch_list(data.slice(start_idx, end_idx));
+  }, [branch_list, search_query, current_page, rows_per_page]);
 
   const total_pages = Math.ceil(
-    vendor_list.filter(
-      (vendor) =>
-        vendor.vendor_code.toLowerCase().includes(search_query.toLowerCase()) ||
-        vendor.vendor_desc.toLowerCase().includes(search_query.toLowerCase())
+    branch_list.filter(
+      (data) =>
+        data.branch_code.toLowerCase().includes(search_query.toLowerCase()) ||
+        data.branch_desc.toLowerCase().includes(search_query.toLowerCase())
     ).length / rows_per_page
   );
 
   const handle_page_change = (page) => set_current_page(page);
   // - Client-Side Filtering
-  const handle_select_vendor = () => {
-    if (!selected_vendor) {
-      alert("Please select a vendor before proceeding.");
+
+  const handle_select_branch = () => {
+    if (!selected_branch) {
+      alert("Please select a branch before proceeding.");
       return;
     }
-    alert(`Selected: ${selected_vendor.description}`);
+    set_data((prev) => ({
+      ...prev,
+      branch_code: selected_branch.branch_code,
+      plant_code: "",
+      sloc_code: "",
+    }));
+    set_selected_branch(null);
+    on_close();
   };
 
   // RETURN ORIGIN
@@ -61,6 +70,7 @@ const Select_Vendor = ({
         {/* + Blur */}
         <div className="absolute inset-0 bg-black/50 backdrop-blur-sm z-[98]"></div>
         {/* - Blur */}
+
         {/* + Modal Content */}
         <div
           className={`relative bg-white rounded-lg shadow-xl ${width} w-full py-7 m-5 z-[99]`}
@@ -73,7 +83,7 @@ const Select_Vendor = ({
           </button>
           {/* + Modal Label */}
           <div className="text-lg md:text-xl font-bold mb-5 px-7">
-            Vendor Selection
+            Branch Selection
           </div>
           {/* - Modal Label */}
           {/* + Modal Body */}
@@ -94,7 +104,6 @@ const Select_Vendor = ({
                   />
                 </div>
               </div>
-
               {/* + Table */}
               <div className="max-w-full overflow-x-auto custom-scrollbar">
                 <table className="min-w-full whitespace-nowrap">
@@ -102,7 +111,7 @@ const Select_Vendor = ({
                     <tr className="font-semibold text-xs">
                       <th className="px-6 py-3 w-[80px]"></th>
                       <th className="px-6 py-3 text-gray-500 text-left">
-                        Vendor
+                        Branch
                       </th>
                       <th className="px-6 py-3 text-gray-500 text-left">
                         Creation Date
@@ -111,7 +120,7 @@ const Select_Vendor = ({
                   </thead>
 
                   <tbody className="divide-y divide-gray-100">
-                    {filtered_vendors.length === 0 ? (
+                    {filtered_branch_list.length === 0 ? (
                       <tr>
                         <td
                           colSpan={3}
@@ -121,13 +130,13 @@ const Select_Vendor = ({
                         </td>
                       </tr>
                     ) : (
-                      filtered_vendors.map((data) => (
+                      filtered_branch_list.map((data) => (
                         <tr
                           key={data.id}
                           className={`hover:bg-sky-50/50 cursor-pointer text-[12px] ${
-                            selected_vendor?.id === data.id ? "bg-sky-50" : ""
+                            selected_branch?.id === data.id ? "bg-sky-50" : ""
                           }`}
-                          onClick={() => set_selected_vendor(data)}
+                          onClick={() => set_selected_branch(data)}
                         >
                           <td className="px-5 py-4 sm:px-6 text-center">
                             <div className="flex justify-center items-center">
@@ -135,18 +144,18 @@ const Select_Vendor = ({
                                 name="check"
                                 box_size={18}
                                 icon_size={12}
-                                checked={selected_vendor?.id === data.id}
-                                on_change={() => set_selected_vendor(data)}
+                                checked={selected_branch?.id === data.id}
+                                on_change={() => set_selected_branch(data)}
                               />
                             </div>
                           </td>
                           <td className="px-5 py-4 sm:px-6">
-                            <div className="block font-medium">
+                            <div className="block font-medium text-gray-800">
                               <span className="block text-gray-500 text-[10px]">
-                                {data.vendor_code}
+                                {data.branch_code}
                               </span>
-                              <span className="block text-gray-800 text-sm">
-                                {data.vendor_desc}
+                              <span className="block text-gray-800 text-[13px]">
+                                {data.branch_desc}
                               </span>
                             </div>
                           </td>
@@ -164,7 +173,7 @@ const Select_Vendor = ({
           </div>
           {/* - Modal Body */}
           {/* + Modal Footer */}
-          <div className="flex flex-col items-center sm:flex-row sm:justify-between gap-3 px-7 mt-5">
+          <div className="flex flex-col items-center sm:flex-row sm:justify-between gap-3 mt-5 px-7">
             {/* + Pagination */}
             {total_pages > 0 && (
               <div className="w-full sm:w-auto">
@@ -176,13 +185,13 @@ const Select_Vendor = ({
               </div>
             )}
             {/* - Pagination */}
-            {/* + Buttons */}
+            {/* + Action Buttons */}
             <div className="flex justify-center sm:justify-end gap-2 w-full">
               <Button
                 variant="primary"
-                on_click={handle_select_vendor}
+                on_click={handle_select_branch}
                 class_name="w-full md:w-[100px]"
-                disabled={!selected_vendor}
+                disabled={!selected_branch}
               >
                 Proceed
               </Button>
@@ -194,7 +203,7 @@ const Select_Vendor = ({
                 Close
               </Button>
             </div>
-            {/* - Buttons */}
+            {/* - Action Buttons */}
           </div>
           {/* - Modal Footer */}
         </div>
@@ -203,4 +212,4 @@ const Select_Vendor = ({
   ) : null;
 };
 
-export default Select_Vendor;
+export default Select_Branch;

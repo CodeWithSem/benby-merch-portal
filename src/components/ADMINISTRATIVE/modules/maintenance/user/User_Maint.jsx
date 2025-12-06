@@ -7,6 +7,7 @@ import User_Activity from "./components/user_activity/User_Activity";
 import Module_Access from "./components/module_access/Module_Access";
 import Sub_Module_Access from "./components/sub_module_access/Sub_Module_Access";
 import Authorization_Object from "./components/authorization_object/Authorization_Object";
+import Approval_Matrix from "./components/approval_matrix/Approval_Matrix";
 
 const User_Maint = () => {
   const [page, set_page] = useState("main");
@@ -19,6 +20,7 @@ const User_Maint = () => {
     { key: "module_access", icon: User, title: "Module Access" },
     { key: "sub_module_access", icon: User, title: "Sub-Module Access" },
     { key: "auth_object", icon: User, title: "Authorization Object" },
+    { key: "approval_matrix", icon: User, title: "Approval Matrix" },
   ];
 
   // ✅ Filter based on search query
@@ -122,6 +124,7 @@ const User_Maint = () => {
         <Sub_Module_Access set_page={set_page} />
       )}
       {page === "auth_object" && <Authorization_Object set_page={set_page} />}
+      {page === "approval_matrix" && <Approval_Matrix set_page={set_page} />}
       {/* - Pages */}
     </React.Fragment>
   );

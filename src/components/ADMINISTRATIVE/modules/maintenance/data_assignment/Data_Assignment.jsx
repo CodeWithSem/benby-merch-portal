@@ -10,6 +10,7 @@ import SO_Type_Hierarchy from "./components/so_type_hierarchy/SO_Type_Hierarchy"
 import Bill_Doc_Type_Hierarchy from "./components/bill_doc_type_hierarchy/Bill_Doc_Type_Hierarchy";
 import Deliv_Doc_Type_Hierarchy from "./components/deliv_doc_type_hierarchy/Deliv_Doc_Type_Hierarchy";
 import Warehouse_Hierarchy from "./components/warehouse_hierarchy/Warehouse_Hierarchy";
+import App_Matrix_Hierarchy from "./components/approval_matrix_hierarchy/App_Matrix_Hierarchy";
 
 const Data_Assignment = () => {
   const [page, set_page] = useState("main");
@@ -121,6 +122,17 @@ const Data_Assignment = () => {
         </>
       ),
       plain_title: "Warehouse Hierarchy (Warehouse > Storage Type)", // 👈 for searching
+    },
+    {
+      key: "app_matrix_hierarchy",
+      icon: Link,
+      title: (
+        <>
+          Approval Matrix Hierarchy <br />
+          <div className="text-[12px]">(Approval Matrix &gt; User Role)</div>
+        </>
+      ),
+      plain_title: "Warehouse Hierarchy (Approval Matrix > User Role)", // 👈 for searching
     },
   ];
 
@@ -238,6 +250,9 @@ const Data_Assignment = () => {
       )}
       {page === "warehouse_hierarchy" && (
         <Warehouse_Hierarchy set_page={set_page} />
+      )}
+      {page === "app_matrix_hierarchy" && (
+        <App_Matrix_Hierarchy set_page={set_page} />
       )}
     </React.Fragment>
   );

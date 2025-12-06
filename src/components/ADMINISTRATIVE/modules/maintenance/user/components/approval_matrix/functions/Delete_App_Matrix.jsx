@@ -1,34 +1,34 @@
+// Function Name: App_Matrix
+// Data Name: app_matrix
+// Column Name: Approval Matrix
+// Title Name: Approval Matrix
+
 import React, { useState } from "react";
-import { api_delete_warehouse_hierarchy } from "api/firestore_db/maintenance/data_assignment/tbl_warehouse_hierarchy_api";
-import { get_description } from "assets/scripts/functions/get_description";
+import { api_delete_app_matrix } from "api/firestore_db/tbl_app_matrix_api";
 import { format_date_1, get_date_now } from "assets/scripts/format";
 import { CheckCircle2, CircleX, X } from "lucide-react";
+import Text_Field from "assets/elements/Text_Field";
 import Button from "assets/elements/Button";
-import Text_Code_Field from "assets/elements/Text_Code_Field";
 
-const Delete_Warehouse_H = ({
+const Delete_App_Matrix = ({
   is_open,
   on_close,
   width = "max-w-[700px]",
   show_toast,
   delete_data,
-  set_warehouse_hierarchy_list,
-  warehouse_list,
-  stype_list,
+  set_app_matrix_list,
 }) => {
   const [is_confirm_modal_open, set_is_confirm_modal_open] = useState(false);
   const [delete_loading, set_delete_loading] = useState(false);
 
-  const handle_delete_warehouse_hierarchy = async (id) => {
+  const handle_delete_app_matrix = async (id) => {
     try {
       set_delete_loading(true);
 
-      const response = await api_delete_warehouse_hierarchy(id);
+      const response = await api_delete_app_matrix(id);
 
       if (response.success) {
-        set_warehouse_hierarchy_list((prev) =>
-          prev.filter((item) => item.id !== id)
-        );
+        set_app_matrix_list((prev) => prev.filter((item) => item.id !== id));
         show_status("success");
         close_modal();
       } else {
@@ -74,10 +74,10 @@ const Delete_Warehouse_H = ({
             className={`relative bg-white rounded-lg shadow-xl max-w-[500px] w-full p-10 m-5 z-[102]`}
           >
             <div className="w-full flex justify-center items-center text-lg md:text-xl font-bold mb-4">
-              Delete Warehouse Hierarchy
+              Delete Approval Matrix
             </div>
             <p className="w-full text-center text-sm leading-6 text-gray-500 dark:text-gray-400 pt-4">
-              You are about to delete this Warehouse Hierarchy.
+              You are about to delete this Approval Matrix.
             </p>
             <p className="w-full text-center text-sm leading-6 text-gray-500 dark:text-gray-400 pt-4">
               This action is permanent and cannot be undone. All related data
@@ -91,9 +91,7 @@ const Delete_Warehouse_H = ({
                 width="w-[100px]"
                 variant="danger"
                 loading={delete_loading}
-                on_click={() =>
-                  handle_delete_warehouse_hierarchy(delete_data.id)
-                }
+                on_click={() => handle_delete_app_matrix(delete_data.id)}
               >
                 Yes
               </Button>
@@ -129,7 +127,7 @@ const Delete_Warehouse_H = ({
           </button>
           {/* + Modal Label */}
           <div className="text-lg md:text-xl font-bold mb-5">
-            Delete Warehouse Hierarchy
+            Delete Approval Matrix
           </div>
           {/* - Modal Label */}
           {/* + Modal Body */}
@@ -137,7 +135,7 @@ const Delete_Warehouse_H = ({
             <div className="w-full">
               <div className="w-full bg-white rounded-lg border">
                 <div className="flex flex-wrap items-center justify-between gap-3 p-5">
-                  <h1 className="text-lg">Warehouse Hierarchy Details</h1>
+                  <h1 className="text-lg">Approval Matrix Details</h1>
 
                   <div className="flex gap-2">
                     <div className="text-gray-500 text-sm tracking-wider">
@@ -148,33 +146,19 @@ const Delete_Warehouse_H = ({
 
                 <div className="p-5 sm:p-6 border-t">
                   <div className="grid grid-cols-1 gap-5">
-                    <div>
-                      <Text_Code_Field
-                        label="Warehouse"
-                        code_width="150px"
-                        show_search_button={false}
-                        code_value={delete_data.warehouse_code}
-                        text_value={get_description(
-                          delete_data.warehouse_code,
-                          warehouse_list,
-                          "warehouse_code",
-                          "warehouse_desc"
-                        )}
+                    <div className="col-span-full">
+                      <Text_Field
+                        label="Approval Matrix Code"
+                        type={"text"}
+                        value={delete_data.app_matrix_code}
                         disabled
                       />
                     </div>
-                    <div>
-                      <Text_Code_Field
-                        label="Storage Type"
-                        code_width="150px"
-                        show_search_button={false}
-                        code_value={delete_data.stype_code}
-                        text_value={get_description(
-                          delete_data.stype_code,
-                          stype_list,
-                          "stype_code",
-                          "stype_desc"
-                        )}
+                    <div className="col-span-full">
+                      <Text_Field
+                        label="Approval Matrix Description"
+                        type={"text"}
+                        value={delete_data.app_matrix_desc}
                         disabled
                       />
                     </div>
@@ -209,4 +193,4 @@ const Delete_Warehouse_H = ({
   ) : null;
 };
 
-export default Delete_Warehouse_H;
+export default Delete_App_Matrix;

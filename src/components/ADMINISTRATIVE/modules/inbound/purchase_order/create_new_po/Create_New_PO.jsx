@@ -11,19 +11,30 @@ import PO_Status from "./po_details/PO_Status";
 import Shipment from "./po_details/Shipment";
 import Approval from "./po_details/Approval";
 import PO_Items from "./po_items/PO_Items";
-import Select_Vendor from "../modals/Select_Vendor";
-import Select_Branch from "../modals/Select_Branch";
-import Select_Plant from "../modals/Select_Plant";
-import Select_SLOC from "../modals/Select_SLOC";
-import Select_Item from "../modals/Select_Item";
-
-const Create_New_PO = ({
-  set_page,
-  vendor_list,
+import Select_Generic from "assets/elements/modals/Select_Generic";
+import {
+  branch_h_list,
   branch_list,
+  plant_h_list,
   plant_list,
+  po_type_list,
   sloc_list,
-}) => {
+  vendor_master_list,
+  payment_term_list,
+  incoterms_list,
+  city_list,
+  country_list,
+  district_list,
+  language_list,
+  region_list,
+} from "../PO_DATA_MAP";
+import Select_Generic_Hierarchy from "assets/elements/modals/Select_Generic_Hierarchy";
+import { get_description } from "assets/scripts/functions/get_description";
+import Select_Branch from "../modals/select_hierarchy/Select_Branch";
+import Select_Plant from "../modals/select_hierarchy/Select_Plant";
+import Select_SLOC from "../modals/select_hierarchy/Select_SLOC";
+
+const Create_New_PO = ({ set_page, new_po_data, set_new_po_data }) => {
   const [active_tab, set_active_tab] = useState("delivery");
   const [display_modal, set_display_modal] = useState("");
 
@@ -36,6 +47,54 @@ const Create_New_PO = ({
     { key: "approval", title: "Approval" },
   ];
 
+  const select_modal_configs = [
+    {
+      key: "select_vendor",
+      label: "Vendor",
+      width: "max-w-[800px]",
+      list: vendor_master_list,
+      column: ["Vendor"],
+      show_creation_date: true,
+      code: [
+        "vendor_code",
+        "aci_payment_term_code",
+        "ac_incoterms_code",
+        "aci_currency",
+        "ad_street",
+        "ad_postal_code",
+        "ad_city_code",
+        "ad_district_code",
+        "ad_region_code",
+        "ad_country_code",
+        "ad_language_code",
+        "ad_telephone",
+        "ad_fax",
+        "ad_mobile",
+        "ad_email",
+      ],
+      desc: ["vendor_desc"],
+      lookup: [vendor_master_list],
+      target: [
+        "vendor_code",
+        "de_payment_term_code",
+        "de_incoterms_code",
+        "de_currency",
+        "ad_street",
+        "ad_postal_code",
+        "ad_city_code",
+        "ad_district_code",
+        "ad_region_code",
+        "ad_country_code",
+        "ad_language_code",
+        "ad_telephone",
+        "ad_fax",
+        "ad_mobile",
+        "ad_email",
+      ],
+      // on_after_select: () => set_page("po_creation"),
+    },
+  ];
+
   const handle_preview = () => {
     alert("Under Maintenance");
   };
@@ -45,7 +104,8 @@ const Create_New_PO = ({
   };
 
   const handle_save = () => {
-    alert("Under Maintenance");
+    // alert("Create PO");
+    console.table(new_po_data);
   };
 
   const handle_go_back = () => {
@@ -114,8 +174,8 @@ const Create_New_PO = ({
           {/* + Section 1 */}
           <div className="p-5 sm:p-6 border-t">
             <div className="w-full">
-              <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
-                <div className="col-span-full">
+              <div className="grid grid-cols-1 gap-5">
+                <div>
                   <Text_Field
                     label="PO Number"
                     type={"text"}
@@ -123,56 +183,82 @@ const Create_New_PO = ({
                     disabled
                   />
                 </div>
-                <div className="col-span-full">
+                <div>
                   <Text_Code_Field
                     label="PO Type"
-                    // code_value={search_value}
-                    // text_value={search_value}
                     code_width="150px"
                     show_search_button={false}
+                    code_value={new_po_data.po_type_code}
+                    text_value={get_description(
+                      new_po_data.po_type_code,
+                      po_type_list,
+                      "po_type_code",
+                      "po_type_desc"
+                    )}
                     disabled
                   />
                 </div>
-                <div className="col-span-full">
+                <div>
                   <Text_Code_Field
                     label="Vendor"
-                    // code_value={search_value}
-                    // text_value={search_value}
                     code_width="150px"
                     show_search_button={true}
+                    code_value={new_po_data.vendor_code}
+                    text_value={get_description(
+                      new_po_data.vendor_code,
+                      vendor_master_list,
+                      "vendor_code",
+                      "vendor_desc"
+                    )}
                     on_click={() => set_display_modal("select_vendor")}
                     disabled
                   />
                 </div>
-                <div className="col-span-full">
+                <div>
                   <Text_Code_Field
                     label="Branch"
-                    // code_value={search_value}
-                    // text_value={search_value}
                     code_width="150px"
                     show_search_button={true}
+                    code_value={new_po_data.branch_code}
+                    text_value={get_description(
+                      new_po_data.branch_code,
+                      branch_list,
+                      "branch_code",
+                      "branch_desc"
+                    )}
                     on_click={() => set_display_modal("select_branch")}
                     disabled
                   />
                 </div>
-                <div className="col-span-full">
+                <div>
                   <Text_Code_Field
-                    label="Plant / DC"
-                    // code_value={search_value}
-                    // text_value={search_value}
+                    label="Plant"
                     code_width="150px"
-                    show_search_button={true}
+                    show_search_button={!!new_po_data.branch_code}
+                    code_value={new_po_data.plant_code}
+                    text_value={get_description(
+                      new_po_data.plant_code,
+                      plant_list,
+                      "plant_code",
+                      "plant_desc"
+                    )}
                     on_click={() => set_display_modal("select_plant")}
                     disabled
                   />
                 </div>
-                <div className="col-span-full">
+
+                <div>
                   <Text_Code_Field
-                    label="SLOC"
-                    // code_value={search_value}
-                    // text_value={search_value}
+                    label="Storage Location"
                     code_width="150px"
-                    show_search_button={true}
+                    show_search_button={!!new_po_data.plant_code}
+                    code_value={new_po_data.sloc_code}
+                    text_value={get_description(
+                      new_po_data.sloc_code,
+                      sloc_list,
+                      "sloc_code",
+                      "sloc_desc"
+                    )}
                     on_click={() => set_display_modal("select_sloc")}
                     disabled
                   />
@@ -205,11 +291,33 @@ const Create_New_PO = ({
               {/* - Tab Navigation */}
               {/* + Tab Content */}
               <div className="p-6">
-                {active_tab === "delivery" && <Delivery />}
-                {active_tab === "address" && <Address />}
-                {active_tab === "org_data" && <Org_Data />}
+                {active_tab === "delivery" && (
+                  <Delivery
+                    new_po_data={new_po_data}
+                    payment_term_list={payment_term_list}
+                    incoterms_list={incoterms_list}
+                  />
+                )}
+                {active_tab === "address" && (
+                  <Address
+                    new_po_data={new_po_data}
+                    city_list={city_list}
+                    country_list={country_list}
+                    district_list={district_list}
+                    language_list={language_list}
+                    region_list={region_list}
+                  />
+                )}
+                {active_tab === "org_data" && (
+                  <Org_Data new_po_data={new_po_data} />
+                )}
                 {active_tab === "po_status" && <PO_Status />}
-                {active_tab === "shipment" && <Shipment />}
+                {active_tab === "shipment" && (
+                  <Shipment
+                    new_po_data={new_po_data}
+                    set_new_po_data={set_new_po_data}
+                  />
+                )}
                 {active_tab === "approval" && <Approval />}
               </div>
               {/* - Tab Content */}
@@ -258,12 +366,63 @@ const Create_New_PO = ({
         </div>
       </div>
       {/* + Modals */}
-      <Select_Vendor
+      {select_modal_configs.map((cfg) => (
+        <Select_Generic
+          key={cfg.key}
+          is_open={display_modal === cfg.key}
+          on_close={() => set_display_modal("")}
+          width={cfg.width}
+          height="max-h-[1280px]"
+          modal_label={cfg.label}
+          show_creation_date={cfg.show_creation_date}
+          column_names={cfg.column}
+          source_list={cfg.list}
+          source_code={cfg.code}
+          source_desc={cfg.desc}
+          lookup_lists={cfg.lookup}
+          target_field={cfg.target}
+          set_data={set_new_po_data}
+          on_after_select={cfg.on_after_select}
+        />
+      ))}
+      <Select_Branch
+        is_open={display_modal === "select_branch"}
+        on_close={() => set_display_modal("")}
+        width="max-w-[1000px]"
+        height="max-h-[700px]"
+        branch_list={branch_list}
+        set_data={set_new_po_data}
+      />
+      <Select_Plant
+        is_open={display_modal === "select_plant"}
+        on_close={() => set_display_modal("")}
+        width="max-w-[1000px]"
+        height="max-h-[700px]"
+        selected_branch_code={new_po_data.branch_code}
+        branch_list={branch_list}
+        plant_list={plant_list}
+        branch_h_list={branch_h_list}
+        set_data={set_new_po_data}
+      />
+      <Select_SLOC
+        is_open={display_modal === "select_sloc"}
+        on_close={() => set_display_modal("")}
+        width="max-w-[1000px]"
+        height="max-h-[700px]"
+        selected_plant_code={new_po_data.plant_code}
+        plant_list={plant_list}
+        sloc_list={sloc_list}
+        plant_h_list={plant_h_list}
+        set_data={set_new_po_data}
+      />
+      {/* - Modals */}
+      {/* + Modals */}
+      {/* <Select_Vendor
         is_open={display_modal === "select_vendor"}
         on_close={() => set_display_modal("")}
         width="max-w-[1000px]"
         height="max-h-[700px]"
-        vendor_list={vendor_list}
+        vendor_master_list={vendor_master_list}
       />
       <Select_Branch
         is_open={display_modal === "select_branch"}
@@ -291,7 +450,7 @@ const Create_New_PO = ({
         on_close={() => set_display_modal("")}
         width="max-w-[1000px]"
         height="max-h-[700px]"
-      />
+      /> */}
       {/* - Modals */}
     </React.Fragment>
   );

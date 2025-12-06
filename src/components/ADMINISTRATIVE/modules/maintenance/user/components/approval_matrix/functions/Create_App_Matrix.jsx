@@ -1,6 +1,11 @@
+// Function Name: App_Matrix
+// Data Name: app_matrix
+// Column Name: Approval Matrix
+// Title Name: Approval Matrix
+// Sub-module Name: User
+
 import React, { useState } from "react";
-import { api_create_warehouse_hierarchy } from "api/firestore_db/maintenance/data_assignment/tbl_warehouse_hierarchy_api";
-import { get_description } from "assets/scripts/functions/get_description";
+import { api_create_app_matrix } from "api/firestore_db/tbl_app_matrix_api";
 import {
   console_log,
   format_date_1,
@@ -8,63 +13,72 @@ import {
 } from "assets/scripts/format";
 import { CheckCircle2, ChevronLeft, CirclePlus, CircleX } from "lucide-react";
 import Button from "assets/elements/Button";
-import Text_Code_Field from "assets/elements/Text_Code_Field";
-import Select_Warehouse from "../modals/Select_Warehouse";
-import Select_STYPE from "../modals/Select_STYPE";
+import Text_Field from "assets/elements/Text_Field";
 
-const Create_Warehouse_H = ({
+const Create_App_Matrix = ({
   handle_go_back,
   active_user,
   reset_new_data,
   show_toast,
   new_data,
   set_new_data,
-  set_warehouse_hierarchy_list,
-  warehouse_list,
-  stype_list,
+  set_app_matrix_list,
 }) => {
-  const [display_sub_modal, set_display_sub_modal] = useState("");
   const [is_confirm_modal_open, set_is_confirm_modal_open] = useState(false);
   const [create_loading, set_create_loading] = useState(false);
 
+  const handle_change_app_matrix_code = (value) => {
+    set_new_data((prev) => ({
+      ...prev,
+      app_matrix_code: value,
+    }));
+  };
+
+  const handle_change_app_matrix_desc = (value) => {
+    set_new_data((prev) => ({
+      ...prev,
+      app_matrix_desc: value,
+    }));
+  };
+
   const validate_new_data = () => {
-    if (!new_data.warehouse_code.trim()) {
-      show_toast_error("Warehouse");
+    if (!new_data.app_matrix_code.trim()) {
+      show_toast({
+        type: "danger",
+        title: "Invalid",
+        message: "Code is required",
+        icon: <CircleX size={21} className="text-red-500" />,
+      });
       return false;
     }
 
-    if (!new_data.stype_code.trim()) {
-      show_toast_error("Storage Type");
+    if (!new_data.app_matrix_desc.trim()) {
+      show_toast({
+        type: "danger",
+        title: "Invalid",
+        message: "Description is required",
+        icon: <CircleX size={21} className="text-red-500" />,
+      });
       return false;
     }
 
     return true;
   };
 
-  const show_toast_error = (field_name) => {
-    show_toast({
-      type: "danger",
-      title: "Invalid",
-      message: `${field_name} is required`,
-      icon: <CircleX size={21} className="text-red-500" />,
-    });
-  };
-
-  const handle_create_warehouse_hierarchy = async () => {
+  const handle_create_app_matrix = async () => {
     if (!validate_new_data()) {
       close_confirm_modal();
       return;
     }
     try {
-      console_log(new_data);
       set_create_loading(true);
-      const response = await api_create_warehouse_hierarchy(
+      const response = await api_create_app_matrix(
         new_data,
         active_user?.username
       );
       if (response.success) {
         console_log(response.data);
-        set_warehouse_hierarchy_list((prev) => [...prev, response.data]);
+        set_app_matrix_list((prev) => [...prev, response.data]);
         show_status("success");
         reset_new_data();
         handle_go_back("sub_level");
@@ -111,11 +125,11 @@ const Create_Warehouse_H = ({
             className={`relative bg-white rounded-lg shadow-xl max-w-[500px] w-full p-10 m-5 z-[102]`}
           >
             <div className="w-full flex justify-center items-center text-lg md:text-xl font-bold mb-4">
-              Confirm Warehouse Hierarchy Creation
+              Confirm Approval Matrix Creation
             </div>
             <p className="w-full text-center text-sm leading-6 text-gray-500 dark:text-gray-400 pt-4">
-              You are about to create a new Warehouse Hierarchy. Once created,
-              it will be added to the database.
+              You are about to create a new Approval Matrix. Once created, it
+              will be added to the database.
             </p>
             <p className="w-full text-center text-sm leading-6 text-gray-500 dark:text-gray-400 pt-4">
               Please review all the details — before proceeding.
@@ -128,7 +142,7 @@ const Create_Warehouse_H = ({
                 width="w-[100px]"
                 variant="primary"
                 loading={create_loading}
-                on_click={handle_create_warehouse_hierarchy}
+                on_click={handle_create_app_matrix}
               >
                 Yes
               </Button>
@@ -175,7 +189,7 @@ const Create_Warehouse_H = ({
               >
                 <span>/</span>
                 <a className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-sky-500 cursor-pointer">
-                  Data Assignment
+                  User
                 </a>
               </li>
               <li
@@ -184,7 +198,7 @@ const Create_Warehouse_H = ({
               >
                 <span>/</span>
                 <a className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-sky-500 cursor-pointer">
-                  Warehouse Hierarchy
+                  Approval Matrix
                 </a>
               </li>
               <li className="flex items-center gap-1.5 text-sm text-gray-500">
@@ -206,7 +220,7 @@ const Create_Warehouse_H = ({
                 width="w-[20px]"
                 on_click={() => handle_go_back("sub_level")}
               ></Button>
-              <h1 className="text-lg">Warehouse Hierarchy Creation</h1>
+              <h1 className="text-lg">Approval Matrix Creation</h1>
             </div>
             <div className="flex gap-2 text-gray-500 text-sm tracking-wider">
               {format_date_1(get_date_now())}
@@ -215,37 +229,27 @@ const Create_Warehouse_H = ({
           {/* - Header */}
           {/* + Section 1 */}
           <div className="p-5 sm:p-6 border-t">
-            <div className="grid grid-cols-1 gap-5">
+            <div className="grid grid-cols-1 gap-x 0 lg:gap-x-5 gap-y-5 lg:grid-cols-3">
               <div>
-                <Text_Code_Field
-                  label="Warehouse"
-                  code_width="150px"
-                  show_search_button={true}
-                  code_value={new_data.warehouse_code}
-                  text_value={get_description(
-                    new_data.warehouse_code,
-                    warehouse_list,
-                    "warehouse_code",
-                    "warehouse_desc"
-                  )}
-                  on_click={() => set_display_sub_modal("select_warehouse")}
-                  disabled
+                <Text_Field
+                  label="Approval Matrix Code"
+                  type={"text"}
+                  placeholder="Enter code"
+                  value={new_data.app_matrix_code || ""}
+                  on_change={(e) =>
+                    handle_change_app_matrix_code(e.target.value)
+                  }
                 />
               </div>
-              <div>
-                <Text_Code_Field
-                  label="Storage Type"
-                  code_width="150px"
-                  show_search_button={true}
-                  code_value={new_data.stype_code}
-                  text_value={get_description(
-                    new_data.stype_code,
-                    stype_list,
-                    "stype_code",
-                    "stype_desc"
-                  )}
-                  on_click={() => set_display_sub_modal("select_stype")}
-                  disabled
+              <div className="col-span-2">
+                <Text_Field
+                  label="Approval Matrix Description"
+                  type={"text"}
+                  placeholder="Enter description"
+                  value={new_data.app_matrix_desc || ""}
+                  on_change={(e) =>
+                    handle_change_app_matrix_desc(e.target.value)
+                  }
                 />
               </div>
             </div>
@@ -275,25 +279,9 @@ const Create_Warehouse_H = ({
       </div>
       {/* + Modals */}
       {is_confirm_modal_open && <Confirm_Modal />}
-      <Select_Warehouse
-        is_open={display_sub_modal === "select_warehouse"}
-        on_close={() => set_display_sub_modal("")}
-        width="max-w-[1000px]"
-        height="max-h-[700px]"
-        warehouse_list={warehouse_list}
-        set_data={set_new_data}
-      />
-      <Select_STYPE
-        is_open={display_sub_modal === "select_stype"}
-        on_close={() => set_display_sub_modal("")}
-        width="max-w-[1000px]"
-        height="max-h-[700px]"
-        stype_list={stype_list}
-        set_data={set_new_data}
-      />
       {/* - Modals */}
     </React.Fragment>
   );
 };
 
-export default Create_Warehouse_H;
+export default Create_App_Matrix;

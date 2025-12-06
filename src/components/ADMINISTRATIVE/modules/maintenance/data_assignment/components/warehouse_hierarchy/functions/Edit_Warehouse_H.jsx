@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { api_update_warehouse_hierarchy } from "api/firestore_db/tbl_warehouse_hierarchy_api";
+import { api_update_warehouse_hierarchy } from "api/firestore_db/maintenance/data_assignment/tbl_warehouse_hierarchy_api";
 import { get_description } from "assets/scripts/functions/get_description";
 import {
   console_log,

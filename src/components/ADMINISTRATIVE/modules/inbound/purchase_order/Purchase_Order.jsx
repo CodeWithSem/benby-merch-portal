@@ -22,21 +22,23 @@ import Button from "assets/elements/Button";
 import Checkbox_Field from "assets/elements/Checkbox_Field";
 import Date_Field from "assets/elements/Date_Field";
 import Create_New_PO from "./create_new_po/Create_New_PO";
-import Edit_PO from "./edit_po/Edit_PO";
-import Post_View_PO from "./post_view_po/Post_View_PO";
+// import Edit_PO from "./edit_po/Edit_PO";
+// import Post_View_PO from "./post_view_po/Post_View_PO";
 import Select_PO_Type from "./modals/select_po_type/Select_PO_Type";
 import Delete_PO from "./modals/delete_po/Delete_PO";
+import Button_Action from "assets/elements/Button_Action";
 import {
   company_list,
   purc_org_list,
   purc_group_list,
   po_type_list,
-  vendor_list,
+  vendor_master_list,
   branch_list,
   plant_list,
   sloc_list,
+  po_type_h_list,
 } from "./PO_DATA_MAP";
-import Button_Action from "assets/elements/Button_Action";
+import Select_Generic from "assets/elements/modals/Select_Generic";
 
 const Purchase_Order = () => {
   const { show_toast } = useToast();
@@ -61,6 +63,8 @@ const Purchase_Order = () => {
     { key: "actions", label: "", sortable: false },
   ];
   // - Columns
+
+  const [new_po_data, set_new_po_data] = useState({});
 
   const [po_list, set_po_list] = useState([
     {
@@ -168,8 +172,44 @@ const Purchase_Order = () => {
   const handle_page_change = (page) => set_current_page(page);
   // - Client-Side Filtering
 
+  const select_modal_configs = [
+    {
+      key: "select_po_type_h",
+      label: "PO Type Hierarchy",
+      show_creation_date: false,
+      width: "max-w-[1200px]",
+      list: po_type_h_list,
+      column: [
+        "PO Type",
+        "Company",
+        "Purchasing Organization",
+        "Purchasing Group",
+      ],
+      code: [
+        "po_type_code",
+        "company_code",
+        "purc_org_code",
+        "purc_group_code",
+      ],
+      desc: [
+        "po_type_desc",
+        "company_desc",
+        "purc_org_desc",
+        "purc_group_desc",
+      ],
+      lookup: [po_type_list, company_list, purc_org_list, purc_group_list],
+      target: [
+        "po_type_code",
+        "od_company_code",
+        "od_purc_org_code",
+        "od_purc_group_code",
+      ],
+      on_after_select: () => set_page("po_creation"),
+    },
+  ];
+
   const handle_create_new_po = () => {
-    set_display_modal("select_po_type");
+    set_display_modal("select_po_type_h");
   };
 
   const handle_upload_po = () => {
@@ -573,26 +613,44 @@ const Purchase_Order = () => {
       {page === "po_creation" && (
         <Create_New_PO
           set_page={set_page}
-          vendor_list={vendor_list}
-          branch_list={branch_list}
-          plant_list={plant_list}
-          sloc_list={sloc_list}
+          new_po_data={new_po_data}
+          set_new_po_data={set_new_po_data}
         />
       )}
-      {page === "edit_po" && (
+      {/* {page === "edit_po" && (
         <Edit_PO
           set_page={set_page}
-          vendor_list={vendor_list}
+          vendor_master_list={vendor_master_list}
           branch_list={branch_list}
           plant_list={plant_list}
           sloc_list={sloc_list}
         />
-      )}
-      {page === "post_view_po" && (
+      )} */}
+      {/* {page === "post_view_po" && (
         <Post_View_PO set_page={set_page} for_posting={for_posting} />
-      )}
+      )} */}
       {/* - Pages */}
       {/* + Modals */}
+      {select_modal_configs.map((cfg) => (
+        <Select_Generic
+          key={cfg.key}
+          is_open={display_modal === cfg.key}
+          on_close={() => set_display_modal("")}
+          width={cfg.width}
+          height="max-h-[1280px]"
+          modal_label={cfg.label}
+          show_creation_date={cfg.show_creation_date}
+          column_names={cfg.column}
+          source_list={cfg.list}
+          source_code={cfg.code}
+          source_desc={cfg.desc}
+          lookup_lists={cfg.lookup}
+          target_field={cfg.target}
+          set_data={set_new_po_data}
+          on_after_select={cfg.on_after_select}
+        />
+      ))}
+      {/* - Modals */}
       <Select_PO_Type
         is_open={display_modal === "select_po_type"}
         on_close={() => set_display_modal("")}

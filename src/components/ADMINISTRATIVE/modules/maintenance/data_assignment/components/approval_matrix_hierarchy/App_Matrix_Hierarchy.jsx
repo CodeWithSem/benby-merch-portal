@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { useToast } from "../../../../../layout/Toast_Provider";
 import { Use_App } from "context/app_context";
-import { api_get_warehouse_list } from "api/firestore_db/maintenance/warehouse/tbl_warehouse_api";
-import { api_get_stype_list } from "api/firestore_db/maintenance/warehouse/tbl_stype_api";
 import {
-  api_get_warehouse_hierarchy_list,
-  api_truncate_warehouse_hierarchy,
-} from "api/firestore_db/maintenance/data_assignment/tbl_warehouse_hierarchy_api";
+  api_get_app_matrix_hierarchy_list,
+  api_truncate_app_matrix_hierarchy,
+} from "api/firestore_db/maintenance/data_assignment/tbl_app_matrix_hierarchy_api";
 import { Get_TBL_INCREMENTAL_ID } from "api/real_time_db/incremental";
+import { api_get_app_matrix_list } from "api/firestore_db/tbl_app_matrix_api";
+import { api_get_user_role_list } from "api/firestore_db/maintenance/user/tbl_user_role_api";
 import { get_description } from "assets/scripts/functions/get_description";
 import {
   Search,
@@ -31,14 +31,14 @@ import Button from "assets/elements/Button";
 import Spinner from "assets/elements/Spinner";
 import Text_Field from "assets/elements/Text_Field";
 import Load_Screen from "./modals/Load_Screen";
-import Create_Warehouse_H from "./functions/Create_Warehouse_H";
-import Edit_Warehouse_H from "./functions/Edit_Warehouse_H";
-import Delete_Warehouse_H from "./functions/Delete_Warehouse_H";
-import Upload_Warehouse_H from "./functions/Upload_Warehouse_H";
+import Create_App_Matrix_H from "./functions/Create_App_Matrix_H";
+import Edit_App_Matrix_H from "./functions/Edit_App_Matrix_H";
+import Delete_App_Matrix_H from "./functions/Delete_App_Matrix_H";
+import Upload_App_Matrix_H from "./functions/Upload_App_Matrix_H";
 
 const HAS_FILTER = true;
 
-const Warehouse_Hierarchy = ({ set_page }) => {
+const App_Matrix_Hierarchy = ({ set_page }) => {
   const { active_user } = Use_App();
   const { show_toast } = useToast();
   const [sub_page, set_sub_page] = useState("main");
@@ -46,28 +46,28 @@ const Warehouse_Hierarchy = ({ set_page }) => {
   const [show_filter, set_show_filter] = useState(false);
   const [loading_list, set_loading_list] = useState(false);
   const [truncate_loading, set_truncate_loading] = useState(false);
-  const [warehouse_list, set_warehouse_list] = useState([]);
-  const [stype_list, set_stype_list] = useState([]);
+  const [app_matrix_list, set_app_matrix_list] = useState([]);
+  const [user_role_list, set_user_role_list] = useState([]);
 
   const handle_get_all_lists = async () => {
     try {
-      const [warehouse_response, stype_response] = await Promise.all([
-        api_get_warehouse_list(),
-        api_get_stype_list(),
+      const [app_matrix_response, user_role_response] = await Promise.all([
+        api_get_app_matrix_list(),
+        api_get_user_role_list(),
       ]);
-      if (warehouse_response.success && stype_response.success) {
-        set_warehouse_list(warehouse_response.data);
-        set_stype_list(stype_response.data);
+      if (app_matrix_response.success && user_role_response.success) {
+        set_app_matrix_list(app_matrix_response.data);
+        set_user_role_list(user_role_response.data);
         const res_log = {
-          warehouse_log: warehouse_response.data,
-          stype_log: stype_response.data,
+          app_matrix_log: app_matrix_response.data,
+          user_role_log: user_role_response.data,
         };
         console.log(res_log);
         set_display_modal("");
       } else {
         console.error("One or more list fetches failed.", {
-          warehouse: warehouse_response.message,
-          stype: stype_response.message,
+          app_matrix: app_matrix_response.message,
+          user_role: user_role_response.message,
         });
         show_error();
         handle_go_back("main");
@@ -92,10 +92,10 @@ const Warehouse_Hierarchy = ({ set_page }) => {
     handle_get_all_lists();
   }, []);
 
-  const def_warehouse_hierarchy_data = {
+  const def_app_matrix_hierarchy_data = {
     id: null,
-    warehouse_code: "",
-    stype_code: "",
+    app_matrix_code: "",
+    user_role_code: "",
     creation_date: "",
     created_by: "",
     change_date: "",
@@ -103,20 +103,20 @@ const Warehouse_Hierarchy = ({ set_page }) => {
   };
 
   const [new_data, set_new_data] = useState({
-    ...def_warehouse_hierarchy_data,
+    ...def_app_matrix_hierarchy_data,
   });
   const [edit_data, set_edit_data] = useState({
-    ...def_warehouse_hierarchy_data,
+    ...def_app_matrix_hierarchy_data,
   });
   const [delete_data, set_delete_data] = useState({
-    ...def_warehouse_hierarchy_data,
+    ...def_app_matrix_hierarchy_data,
   });
 
   const reset_new_data = () => {
     set_new_data((prev) => ({
       ...prev,
-      warehouse_code: "",
-      stype_code: "",
+      app_matrix_code: "",
+      user_role_code: "",
       creation_date: "",
       created_by: "",
       change_date: "",
@@ -125,7 +125,7 @@ const Warehouse_Hierarchy = ({ set_page }) => {
   };
 
   useEffect(() => {
-    Get_TBL_INCREMENTAL_ID("TBL_WAREHOUSE_HIERARCHY", (value) => {
+    Get_TBL_INCREMENTAL_ID("TBL_APPROVAL_MATRIX_HIERARCHY", (value) => {
       set_new_data((prev) => ({
         ...prev,
         id: value,
@@ -136,8 +136,8 @@ const Warehouse_Hierarchy = ({ set_page }) => {
   const columns = [
     { key: "index", label: "#", sortable: false },
     { key: "id", label: "ID", sortable: true },
-    { key: "warehouse_code", label: "Warehouse", sortable: true },
-    { key: "stype_code", label: "Storage Type", sortable: true },
+    { key: "app_matrix_code", label: "Approval Matrix", sortable: true },
+    { key: "user_role_code", label: "User Role", sortable: true },
     { key: "creation_date", label: "Creation Date", sortable: true },
     { key: "created_by", label: "Created By", sortable: true },
     { key: "change_date", label: "Change Date", sortable: true },
@@ -145,13 +145,15 @@ const Warehouse_Hierarchy = ({ set_page }) => {
     { key: "actions", label: "", sortable: false },
   ];
 
-  const [warehouse_hierarchy_list, set_warehouse_hierarchy_list] = useState([]);
+  const [app_matrix_hierarchy_list, set_app_matrix_hierarchy_list] = useState(
+    []
+  );
 
-  const handle_get_warehouse_hierarchy_list = async () => {
+  const handle_get_app_matrix_hierarchy_list = async () => {
     set_loading_list(true);
-    const response = await api_get_warehouse_hierarchy_list();
+    const response = await api_get_app_matrix_hierarchy_list();
     if (response.success) {
-      set_warehouse_hierarchy_list(response.data);
+      set_app_matrix_hierarchy_list(response.data);
     } else {
       console.error(response.message);
     }
@@ -159,12 +161,12 @@ const Warehouse_Hierarchy = ({ set_page }) => {
   };
 
   useEffect(() => {
-    handle_get_warehouse_hierarchy_list();
+    handle_get_app_matrix_hierarchy_list();
   }, []);
 
-  const handle_truncate_warehouse_hierarchy_list = async () => {
+  const handle_truncate_app_matrix_hierarchy_list = async () => {
     set_truncate_loading(true);
-    const response = await api_truncate_warehouse_hierarchy();
+    const response = await api_truncate_app_matrix_hierarchy();
     if (response.success) {
       show_toast({
         type: "success",
@@ -180,14 +182,14 @@ const Warehouse_Hierarchy = ({ set_page }) => {
       });
       console.error(response.message);
     }
-    handle_get_warehouse_hierarchy_list();
+    handle_get_app_matrix_hierarchy_list();
     set_truncate_loading(false);
   };
 
   // + Client-Side Filtering
   const [
-    filtered_warehouse_hierarchy_list,
-    set_filtered_warehouse_hierarchy_list,
+    filtered_app_matrix_hierarchy_list,
+    set_filtered_app_matrix_hierarchy_list,
   ] = useState([]);
   const [select_option, set_select_option] = useState(5);
   const [current_page, set_current_page] = useState(1);
@@ -198,14 +200,14 @@ const Warehouse_Hierarchy = ({ set_page }) => {
 
   const lookup_columns = [
     {
-      code_key: "warehouse_code",
-      list: warehouse_list,
-      desc_key: "warehouse_desc",
+      code_key: "app_matrix_code",
+      list: app_matrix_list,
+      desc_key: "app_matrix_desc",
     },
     {
-      code_key: "stype_code",
-      list: stype_list,
-      desc_key: "stype_desc",
+      code_key: "user_role_code",
+      list: user_role_list,
+      desc_key: "user_role_desc",
     },
   ];
 
@@ -218,7 +220,7 @@ const Warehouse_Hierarchy = ({ set_page }) => {
   }, [search_query]);
 
   useEffect(() => {
-    let temp = [...warehouse_hierarchy_list];
+    let temp = [...app_matrix_hierarchy_list];
 
     if (debounced_query.trim() !== "") {
       const q = debounced_query.toLowerCase();
@@ -271,9 +273,9 @@ const Warehouse_Hierarchy = ({ set_page }) => {
       index: start_idx + i + 1,
     }));
 
-    set_filtered_warehouse_hierarchy_list(indexed_data);
+    set_filtered_app_matrix_hierarchy_list(indexed_data);
   }, [
-    warehouse_hierarchy_list,
+    app_matrix_hierarchy_list,
     debounced_query,
     sort_by,
     sort_order,
@@ -283,7 +285,7 @@ const Warehouse_Hierarchy = ({ set_page }) => {
 
   const total_pages = Math.ceil(
     (debounced_query
-      ? warehouse_hierarchy_list.filter((u) => {
+      ? app_matrix_hierarchy_list.filter((u) => {
           const q = debounced_query.toLowerCase();
 
           return columns.some((col) => {
@@ -312,7 +314,7 @@ const Warehouse_Hierarchy = ({ set_page }) => {
             return false;
           });
         }).length
-      : warehouse_hierarchy_list.length) / select_option
+      : app_matrix_hierarchy_list.length) / select_option
   );
 
   const handle_sort = (column) => {
@@ -328,21 +330,21 @@ const Warehouse_Hierarchy = ({ set_page }) => {
   const handle_page_change = (page) => set_current_page(page);
   // - Client-Side Filtering
 
-  const handle_create_new_warehouse_hierarchy = () => {
-    set_sub_page("create_new_warehouse_hierarchy");
+  const handle_create_new_app_matrix_hierarchy = () => {
+    set_sub_page("create_new_app_matrix_hierarchy");
   };
 
-  const handle_edit_warehouse_hierarchy = (data) => {
+  const handle_edit_app_matrix_hierarchy = (data) => {
     set_edit_data(data);
-    set_sub_page("edit_warehouse_hierarchy");
+    set_sub_page("edit_app_matrix_hierarchy");
   };
-  const handle_delete_warehouse_hierarchy = (data) => {
+  const handle_delete_app_matrix_hierarchy = (data) => {
     set_delete_data(data);
-    set_display_modal("delete_warehouse_hierarchy");
+    set_display_modal("delete_app_matrix_hierarchy");
   };
 
-  const handle_upload_warehouse_hierarchy = () => {
-    set_sub_page("upload_warehouse_hierarchy");
+  const handle_upload_app_matrix_hierarchy = () => {
+    set_sub_page("upload_app_matrix_hierarchy");
   };
 
   const handle_go_back = (value) => {
@@ -396,7 +398,9 @@ const Warehouse_Hierarchy = ({ set_page }) => {
                   </li>
                   <li className="flex items-center gap-1.5 text-sm text-gray-500">
                     <span>/</span>
-                    <span className="text-gray-800">Warehouse Hierarchy</span>
+                    <span className="text-gray-800">
+                      Approval Matrix Hierarchy
+                    </span>
                   </li>
                 </ol>
               </nav>
@@ -414,7 +418,7 @@ const Warehouse_Hierarchy = ({ set_page }) => {
                     width="w-[20px]"
                     on_click={() => handle_go_back("main")}
                   ></Button>
-                  <h1 className="text-lg">Warehouse Hierarchy</h1>
+                  <h1 className="text-lg">Approval Matrix Hierarchy</h1>
                 </div>
                 <div className="flex gap-2">
                   {active_user?.category === "DEV" && (
@@ -424,7 +428,7 @@ const Warehouse_Hierarchy = ({ set_page }) => {
                       icon_position="left"
                       width="w-[110px]"
                       loading={truncate_loading}
-                      on_click={handle_truncate_warehouse_hierarchy_list}
+                      on_click={handle_truncate_app_matrix_hierarchy_list}
                     >
                       Truncate
                     </Button>
@@ -433,7 +437,7 @@ const Warehouse_Hierarchy = ({ set_page }) => {
                     variant="primary"
                     icon={PlusCircle}
                     icon_position="left"
-                    on_click={handle_create_new_warehouse_hierarchy}
+                    on_click={handle_create_new_app_matrix_hierarchy}
                   >
                     Create New Data
                   </Button>
@@ -441,7 +445,7 @@ const Warehouse_Hierarchy = ({ set_page }) => {
                     variant="primary"
                     icon={FileUp}
                     icon_position="left"
-                    on_click={handle_upload_warehouse_hierarchy}
+                    on_click={handle_upload_app_matrix_hierarchy}
                   >
                     Upload
                   </Button>
@@ -474,7 +478,7 @@ const Warehouse_Hierarchy = ({ set_page }) => {
                         variant="white"
                         icon={RefreshCw}
                         icon_position="left"
-                        on_click={handle_get_warehouse_hierarchy_list}
+                        on_click={handle_get_app_matrix_hierarchy_list}
                       ></Button>
                     </div>
                     <div className="w-full mt-4 md:mt-0 md:w-[600px]">
@@ -568,7 +572,7 @@ const Warehouse_Hierarchy = ({ set_page }) => {
                       <div className="p-6 flex justify-center items-center text-gray-500 text-sm">
                         <Spinner />
                       </div>
-                    ) : filtered_warehouse_hierarchy_list.length === 0 ? (
+                    ) : filtered_app_matrix_hierarchy_list.length === 0 ? (
                       <div className="p-6 text-center text-gray-500 text-sm">
                         No data found
                       </div>
@@ -619,112 +623,118 @@ const Warehouse_Hierarchy = ({ set_page }) => {
                           </tr>
                         </thead>
                         <tbody className="bg-white">
-                          {filtered_warehouse_hierarchy_list.map((row, idx) => {
-                            const render_cell = (col, row) => {
-                              const value = row[col.key];
-                              // + Index
-                              if (col.key === "index") {
-                                return <span>{row.index}</span>;
-                              }
-                              // - Index
-                              // + Warehouse
-                              if (col.key === "warehouse_code") {
-                                return (
-                                  <div className="block font-medium text-gray-800">
-                                    <span className="block text-gray-500 text-[10px]">
-                                      {row.warehouse_code}
-                                    </span>
-                                    <span className="block text-gray-800 text-[12px]">
-                                      {get_description(
-                                        row.warehouse_code,
-                                        warehouse_list,
-                                        "warehouse_code",
-                                        "warehouse_desc"
-                                      )}
-                                    </span>
-                                  </div>
-                                );
-                              }
-                              // + Warehouse
-                              // + Storage Type
-                              if (col.key === "stype_code") {
-                                return (
-                                  <div className="block font-medium text-gray-800">
-                                    <span className="block text-gray-500 text-[10px]">
-                                      {row.stype_code}
-                                    </span>
-                                    <span className="block text-gray-800 text-[12px]">
-                                      {get_description(
-                                        row.stype_code,
-                                        stype_list,
-                                        "stype_code",
-                                        "stype_desc"
-                                      )}
-                                    </span>
-                                  </div>
-                                );
-                              }
-                              // - Storage Type
-                              // + Action Buttons
-                              if (col.key === "actions") {
-                                return (
-                                  <div className="flex gap-2">
-                                    <div className="relative group flex jusity-center items-center">
-                                      <button
-                                        className="text-gray-500 hover:text-sky-600 text-[12px] outline-none"
-                                        onClick={() =>
-                                          handle_edit_warehouse_hierarchy(row)
-                                        }
-                                      >
-                                        <Edit size={19} />
-                                      </button>
-                                      <span className="absolute bottom-full mb-1 left-1/2 transform -translate-x-1/2 px-2 py-1 text-xs text-white bg-sky-600 rounded opacity-0 group-hover:opacity-100 transition-opacity">
-                                        Edit Record
+                          {filtered_app_matrix_hierarchy_list.map(
+                            (row, idx) => {
+                              const render_cell = (col, row) => {
+                                const value = row[col.key];
+                                // + Index
+                                if (col.key === "index") {
+                                  return <span>{row.index}</span>;
+                                }
+                                // - Index
+                                // + Approval Matrix
+                                if (col.key === "app_matrix_code") {
+                                  return (
+                                    <div className="block font-medium text-gray-800">
+                                      <span className="block text-gray-500 text-[10px]">
+                                        {row.app_matrix_code}
+                                      </span>
+                                      <span className="block text-gray-800 text-[12px]">
+                                        {get_description(
+                                          row.app_matrix_code,
+                                          app_matrix_list,
+                                          "app_matrix_code",
+                                          "app_matrix_desc"
+                                        )}
                                       </span>
                                     </div>
-                                    <div className="relative group flex jusity-center items-center">
-                                      <button
-                                        className="text-gray-500 hover:text-red-600 text-[12px] mb-[1px] outline-none"
-                                        onClick={() =>
-                                          handle_delete_warehouse_hierarchy(row)
-                                        }
-                                      >
-                                        <Trash size={19} />
-                                      </button>
-                                      <span className="absolute bottom-full mb-1 left-1/2 transform -translate-x-1/2 px-2 py-1 text-xs text-white bg-red-600 rounded opacity-0 group-hover:opacity-100 transition-opacity">
-                                        Delete Record
+                                  );
+                                }
+                                // + Approval Matrix
+                                // + User Role
+                                if (col.key === "user_role_code") {
+                                  return (
+                                    <div className="block font-medium text-gray-800">
+                                      <span className="block text-gray-500 text-[10px]">
+                                        {row.user_role_code}
+                                      </span>
+                                      <span className="block text-gray-800 text-[12px]">
+                                        {get_description(
+                                          row.user_role_code,
+                                          user_role_list,
+                                          "user_role_code",
+                                          "user_role_desc"
+                                        )}
                                       </span>
                                     </div>
-                                  </div>
-                                );
-                              }
-                              // - Action Buttons
+                                  );
+                                }
+                                // - User Role
+                                // + Action Buttons
+                                if (col.key === "actions") {
+                                  return (
+                                    <div className="flex gap-2">
+                                      <div className="relative group flex jusity-center items-center">
+                                        <button
+                                          className="text-gray-500 hover:text-sky-600 text-[12px] outline-none"
+                                          onClick={() =>
+                                            handle_edit_app_matrix_hierarchy(
+                                              row
+                                            )
+                                          }
+                                        >
+                                          <Edit size={19} />
+                                        </button>
+                                        <span className="absolute bottom-full mb-1 left-1/2 transform -translate-x-1/2 px-2 py-1 text-xs text-white bg-sky-600 rounded opacity-0 group-hover:opacity-100 transition-opacity">
+                                          Edit Record
+                                        </span>
+                                      </div>
+                                      <div className="relative group flex jusity-center items-center">
+                                        <button
+                                          className="text-gray-500 hover:text-red-600 text-[12px] mb-[1px] outline-none"
+                                          onClick={() =>
+                                            handle_delete_app_matrix_hierarchy(
+                                              row
+                                            )
+                                          }
+                                        >
+                                          <Trash size={19} />
+                                        </button>
+                                        <span className="absolute bottom-full mb-1 left-1/2 transform -translate-x-1/2 px-2 py-1 text-xs text-white bg-red-600 rounded opacity-0 group-hover:opacity-100 transition-opacity">
+                                          Delete Record
+                                        </span>
+                                      </div>
+                                    </div>
+                                  );
+                                }
+                                // - Action Buttons
 
-                              return value;
-                            };
+                                return value;
+                              };
 
-                            return (
-                              <tr
-                                key={idx}
-                                className="hover:bg-gray-50 whitespace-nowrap"
-                              >
-                                {columns.map((col, i) => (
-                                  <td
-                                    key={i}
-                                    className={`border px-4 py-4 text-[12px] text-gray-600 ${
-                                      i === 0 ? "border-l-0" : ""
-                                    } ${
-                                      i === columns.length - 1
-                                        ? "border-r-0 text-left"
-                                        : ""
-                                    }`}
-                                  >
-                                    {render_cell(col, row)}
-                                  </td>
-                                ))}
-                              </tr>
-                            );
-                          })}
+                              return (
+                                <tr
+                                  key={idx}
+                                  className="hover:bg-gray-50 whitespace-nowrap"
+                                >
+                                  {columns.map((col, i) => (
+                                    <td
+                                      key={i}
+                                      className={`border px-4 py-4 text-[12px] text-gray-600 ${
+                                        i === 0 ? "border-l-0" : ""
+                                      } ${
+                                        i === columns.length - 1
+                                          ? "border-r-0 text-left"
+                                          : ""
+                                      }`}
+                                    >
+                                      {render_cell(col, row)}
+                                    </td>
+                                  ))}
+                                </tr>
+                              );
+                            }
+                          )}
                         </tbody>
                       </table>
                     )}
@@ -747,52 +757,52 @@ const Warehouse_Hierarchy = ({ set_page }) => {
           </div>
         </React.Fragment>
       )}
-      {sub_page === "create_new_warehouse_hierarchy" && (
-        <Create_Warehouse_H
+      {sub_page === "create_new_app_matrix_hierarchy" && (
+        <Create_App_Matrix_H
           handle_go_back={handle_go_back}
           active_user={active_user}
           reset_new_data={reset_new_data}
           show_toast={show_toast}
           new_data={new_data}
           set_new_data={set_new_data}
-          set_warehouse_hierarchy_list={set_warehouse_hierarchy_list}
-          warehouse_list={warehouse_list}
-          stype_list={stype_list}
+          set_app_matrix_hierarchy_list={set_app_matrix_hierarchy_list}
+          app_matrix_list={app_matrix_list}
+          user_role_list={user_role_list}
         />
       )}
-      {sub_page === "edit_warehouse_hierarchy" && (
-        <Edit_Warehouse_H
+      {sub_page === "edit_app_matrix_hierarchy" && (
+        <Edit_App_Matrix_H
           handle_go_back={handle_go_back}
           active_user={active_user}
           reset_new_data={reset_new_data}
           show_toast={show_toast}
           edit_data={edit_data}
           set_edit_data={set_edit_data}
-          set_warehouse_hierarchy_list={set_warehouse_hierarchy_list}
-          warehouse_list={warehouse_list}
-          stype_list={stype_list}
+          set_app_matrix_hierarchy_list={set_app_matrix_hierarchy_list}
+          app_matrix_list={app_matrix_list}
+          user_role_list={user_role_list}
         />
       )}
-      {sub_page === "upload_warehouse_hierarchy" && (
-        <Upload_Warehouse_H
+      {sub_page === "upload_app_matrix_hierarchy" && (
+        <Upload_App_Matrix_H
           handle_go_back={handle_go_back}
-          handle_get_warehouse_hierarchy_list={
-            handle_get_warehouse_hierarchy_list
+          handle_get_app_matrix_hierarchy_list={
+            handle_get_app_matrix_hierarchy_list
           }
           show_toast={show_toast}
-          warehouse_list={warehouse_list}
-          stype_list={stype_list}
+          app_matrix_list={app_matrix_list}
+          user_role_list={user_role_list}
         />
       )}
-      <Delete_Warehouse_H
-        is_open={display_modal === "delete_warehouse_hierarchy"}
+      <Delete_App_Matrix_H
+        is_open={display_modal === "delete_app_matrix_hierarchy"}
         on_close={() => set_display_modal("")}
         width="max-w-[1000px]"
         show_toast={show_toast}
         delete_data={delete_data}
-        set_warehouse_hierarchy_list={set_warehouse_hierarchy_list}
-        warehouse_list={warehouse_list}
-        stype_list={stype_list}
+        set_app_matrix_hierarchy_list={set_app_matrix_hierarchy_list}
+        app_matrix_list={app_matrix_list}
+        user_role_list={user_role_list}
       />
       <Load_Screen
         is_open={display_modal === "load_screen"}
@@ -806,4 +816,4 @@ const Warehouse_Hierarchy = ({ set_page }) => {
   );
 };
 
-export default Warehouse_Hierarchy;
+export default App_Matrix_Hierarchy;

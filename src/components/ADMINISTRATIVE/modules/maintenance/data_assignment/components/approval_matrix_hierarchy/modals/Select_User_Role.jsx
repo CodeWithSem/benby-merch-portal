@@ -5,63 +5,71 @@ import Checkbox_Field from "assets/elements/Checkbox_Field";
 import Button from "assets/elements/Button";
 import Pagination_Modal from "assets/elements/Pagination_Modal";
 
-const Select_Plant = ({
+const Select_User_Role = ({
   is_open,
   on_close,
   width = "max-w-[700px]",
   height = "h-[500px]",
-  plant_list,
+  user_role_list,
+  set_data,
 }) => {
   // + Client-Side Filtering
-  const [filtered_plant_list, set_filtered_plant_list] = useState([]);
+  const [filtered_user_role_list, set_filtered_user_role_list] = useState([]);
   const [current_page, set_current_page] = useState(1);
   const [rows_per_page, set_rows_per_page] = useState(5);
   const [search_query, set_search_query] = useState("");
-  const [selected_plant, set_selected_plant] = useState(null);
+  const [selected_user_role, set_selected_user_role] = useState(null);
 
   useEffect(() => {
-    let data = [...plant_list];
+    let data = [...user_role_list];
 
     if (search_query.trim() !== "") {
       const q = search_query.toLowerCase();
       data = data.filter(
         (data) =>
-          data.plant_code.toLowerCase().includes(q) ||
-          data.plant_desc.toLowerCase().includes(q)
+          data.user_role_code.toLowerCase().includes(q) ||
+          data.user_role_desc.toLowerCase().includes(q)
       );
     }
 
     const start_idx = (current_page - 1) * rows_per_page;
     const end_idx = start_idx + rows_per_page;
-    set_filtered_plant_list(data.slice(start_idx, end_idx));
-  }, [plant_list, search_query, current_page, rows_per_page]);
+    set_filtered_user_role_list(data.slice(start_idx, end_idx));
+  }, [user_role_list, search_query, current_page, rows_per_page]);
 
   const total_pages = Math.ceil(
-    plant_list.filter(
+    user_role_list.filter(
       (data) =>
-        data.plant_code.toLowerCase().includes(search_query.toLowerCase()) ||
-        data.plant_desc.toLowerCase().includes(search_query.toLowerCase())
+        data.user_role_code
+          .toLowerCase()
+          .includes(search_query.toLowerCase()) ||
+        data.user_role_desc.toLowerCase().includes(search_query.toLowerCase())
     ).length / rows_per_page
   );
 
   const handle_page_change = (page) => set_current_page(page);
   // - Client-Side Filtering
 
-  const handle_select_plant = () => {
-    if (!selected_plant) {
-      alert("Please select a plant before proceeding.");
+  const handle_select_user_role = () => {
+    if (!selected_user_role) {
+      alert("Please select a user_role before proceeding.");
       return;
     }
-    alert(`Selected: ${selected_plant.plant_desc}`);
+    set_data((prev) => ({
+      ...prev,
+      user_role_code: selected_user_role.user_role_code,
+    }));
+    on_close();
   };
 
-  /// RETURN ORIGIN
+  // RETURN ORIGIN
   return is_open ? (
     <React.Fragment>
       <div className="fixed inset-0 flex items-center justify-center z-[97] px-4">
         {/* + Blur */}
         <div className="absolute inset-0 bg-black/50 backdrop-blur-sm z-[98]"></div>
         {/* - Blur */}
+
         {/* + Modal Content */}
         <div
           className={`relative bg-white rounded-lg shadow-xl ${width} w-full py-7 m-5 z-[99]`}
@@ -74,7 +82,7 @@ const Select_Plant = ({
           </button>
           {/* + Modal Label */}
           <div className="text-lg md:text-xl font-bold mb-5 px-7">
-            Plant / DC Selection
+            User Role Selection
           </div>
           {/* - Modal Label */}
           {/* + Modal Body */}
@@ -102,7 +110,7 @@ const Select_Plant = ({
                     <tr className="font-semibold text-xs">
                       <th className="px-6 py-3 w-[80px]"></th>
                       <th className="px-6 py-3 text-gray-500 text-left">
-                        Plant / DC
+                        User Role
                       </th>
                       <th className="px-6 py-3 text-gray-500 text-left">
                         Creation Date
@@ -111,7 +119,7 @@ const Select_Plant = ({
                   </thead>
 
                   <tbody className="divide-y divide-gray-100">
-                    {filtered_plant_list.length === 0 ? (
+                    {filtered_user_role_list.length === 0 ? (
                       <tr>
                         <td
                           colSpan={3}
@@ -121,32 +129,34 @@ const Select_Plant = ({
                         </td>
                       </tr>
                     ) : (
-                      filtered_plant_list.map((data) => (
+                      filtered_user_role_list.map((data) => (
                         <tr
                           key={data.id}
                           className={`hover:bg-sky-50/50 cursor-pointer text-[12px] ${
-                            selected_plant?.id === data.id ? "bg-sky-50" : ""
+                            selected_user_role?.id === data.id
+                              ? "bg-sky-50"
+                              : ""
                           }`}
-                          onClick={() => set_selected_plant(data)}
+                          onClick={() => set_selected_user_role(data)}
                         >
-                          <td className="px-5 py-4 sm:px-6">
+                          <td className="px-5 py-4 sm:px-6 text-center">
                             <div className="flex justify-center items-center">
                               <Checkbox_Field
                                 name="check"
                                 box_size={18}
                                 icon_size={12}
-                                checked={selected_plant?.id === data.id}
-                                on_change={() => set_selected_plant(data)}
+                                checked={selected_user_role?.id === data.id}
+                                on_change={() => set_selected_user_role(data)}
                               />
                             </div>
                           </td>
                           <td className="px-5 py-4 sm:px-6">
                             <div className="block font-medium text-gray-800">
-                              <span className="block text-gray-500 text-[10px]">
-                                {data.plant_code}
+                              <span className="block text-gray-500 text-[12px]">
+                                {data.user_role_code}
                               </span>
                               <span className="block text-gray-800 text-sm">
-                                {data.plant_desc}
+                                {data.user_role_desc}
                               </span>
                             </div>
                           </td>
@@ -176,13 +186,13 @@ const Select_Plant = ({
               </div>
             )}
             {/* - Pagination */}
-            {/* + Buttons */}
+            {/* + Action Buttons */}
             <div className="flex justify-center sm:justify-end gap-2 w-full">
               <Button
                 variant="primary"
-                on_click={handle_select_plant}
+                on_click={handle_select_user_role}
                 class_name="w-full md:w-[100px]"
-                disabled={!selected_plant}
+                disabled={!selected_user_role}
               >
                 Proceed
               </Button>
@@ -194,7 +204,7 @@ const Select_Plant = ({
                 Close
               </Button>
             </div>
-            {/* - Buttons */}
+            {/* - Action Buttons */}
           </div>
           {/* - Modal Footer */}
         </div>
@@ -203,4 +213,4 @@ const Select_Plant = ({
   ) : null;
 };
 
-export default Select_Plant;
+export default Select_User_Role;

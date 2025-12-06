@@ -1,6 +1,12 @@
+// Function Name: App_Matrix
+// Data Name: app_matrix
+// Column Name: Approval Matrix
+// Title Name: Approval Matrix
+// Sub-module Name: User
+
 import React, { useState, useEffect } from "react";
-import { api_bulk_upload_warehouse_hierarchy } from "api/firestore_db/maintenance/data_assignment/tbl_warehouse_hierarchy_api";
-import { handle_excel_upload_2_hierarchy } from "assets/scripts/functions/upload_excel";
+import { api_bulk_upload_app_matrix } from "api/firestore_db/tbl_app_matrix_api";
+import { handle_excel_upload_generic } from "assets/scripts/functions/upload_excel";
 import { format_date_1, get_date_now } from "assets/scripts/format";
 import {
   CheckCircle2,
@@ -15,55 +21,44 @@ import Upload_Field from "assets/elements/Upload_Field";
 import Pagination from "assets/elements/Pagination";
 import Select_Field from "assets/elements/Select_Field";
 import Icon_Field from "assets/elements/Icon_Field";
-import { get_description } from "assets/scripts/functions/get_description";
 
-const Upload_Warehouse_H = ({
+const Upload_App_Matrix = ({
   handle_go_back,
-  handle_get_warehouse_hierarchy_list,
+  handle_get_app_matrix_list,
   show_toast,
-  warehouse_list,
-  stype_list,
 }) => {
   const [is_confirm_modal_open, set_is_confirm_modal_open] = useState(false);
   const [upload_loading, set_upload_loading] = useState(false);
 
   const columns = [
     { key: "id", label: "ID", sortable: true },
-    { key: "warehouse_code", label: "Warehouse", sortable: true },
-    { key: "stype_code", label: "Storage Type", sortable: true },
+    {
+      key: "app_matrix_code",
+      label: "Approval Matrix Code",
+      sortable: true,
+    },
+    {
+      key: "app_matrix_desc",
+      label: "Approval Matrix Description",
+      sortable: true,
+    },
     { key: "creation_date", label: "Creation Date", sortable: true },
     { key: "created_by", label: "Created By", sortable: true },
     { key: "change_date", label: "Change Date", sortable: true },
     { key: "change_by", label: "Change By", sortable: true },
   ];
 
-  const [upload_warehouse_hierarchy_list, set_upload_warehouse_hierarchy_list] =
-    useState([]);
+  const [upload_app_matrix_list, set_upload_app_matrix_list] = useState([]);
 
   // + Client-Side Filtering
-  const [
-    filtered_upload_warehouse_hierarchy_list,
-    set_filtered_upload_warehouse_hierarchy_list,
-  ] = useState([]);
+  const [filtered_upload_app_matrix_list, set_filtered_upload_app_matrix_list] =
+    useState([]);
   const [select_option, set_select_option] = useState(5);
   const [current_page, set_current_page] = useState(1);
   const [sort_by, set_sort_by] = useState("id");
   const [sort_order, set_sort_order] = useState("asc");
   const [search_query, set_search_query] = useState("");
   const [debounced_query, set_debounced_query] = useState("");
-
-  const lookup_columns = [
-    {
-      code_key: "warehouse_code",
-      list: warehouse_list,
-      desc_key: "warehouse_desc",
-    },
-    {
-      code_key: "stype_code",
-      list: stype_list,
-      desc_key: "stype_desc",
-    },
-  ];
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -74,7 +69,7 @@ const Upload_Warehouse_H = ({
   }, [search_query]);
 
   useEffect(() => {
-    let temp = [...upload_warehouse_hierarchy_list];
+    let temp = [...upload_app_matrix_list];
 
     if (debounced_query.trim() !== "") {
       const q = debounced_query.toLowerCase();
@@ -82,24 +77,7 @@ const Upload_Warehouse_H = ({
         columns.some((col) => {
           if (col.key === "actions") return false;
           const val = u[col.key];
-          if (val?.toString().toLowerCase().includes(q)) {
-            return true;
-          }
-
-          const lookup = lookup_columns.find((lc) => lc.code_key === col.key);
-
-          if (lookup) {
-            const desc_val = get_description(
-              u[lookup.code_key],
-              lookup.list,
-              lookup.code_key,
-              lookup.desc_key
-            );
-
-            if (desc_val.toLowerCase().includes(q)) {
-              return true;
-            }
-          }
+          return val?.toString().toLowerCase().includes(q);
         })
       );
     }
@@ -124,9 +102,9 @@ const Upload_Warehouse_H = ({
       index: start_idx + i + 1,
     }));
 
-    set_filtered_upload_warehouse_hierarchy_list(indexed_data);
+    set_filtered_upload_app_matrix_list(indexed_data);
   }, [
-    upload_warehouse_hierarchy_list,
+    upload_app_matrix_list,
     debounced_query,
     sort_by,
     sort_order,
@@ -136,36 +114,17 @@ const Upload_Warehouse_H = ({
 
   const total_pages = Math.ceil(
     (debounced_query
-      ? upload_warehouse_hierarchy_list.filter((u) => {
-          const q = debounced_query.toLowerCase();
-
-          return columns.some((col) => {
+      ? upload_app_matrix_list.filter((u) =>
+          columns.some((col) => {
             if (col.key === "actions") return false;
-
-            const code_val = u[col.key];
-            if (code_val?.toString().toLowerCase().includes(q)) {
-              return true;
-            }
-
-            const lookup = lookup_columns.find((lc) => lc.code_key === col.key);
-
-            if (lookup) {
-              const desc_val = get_description(
-                u[lookup.code_key],
-                lookup.list,
-                lookup.code_key,
-                lookup.desc_key
-              );
-
-              if (desc_val.toLowerCase().includes(q)) {
-                return true;
-              }
-            }
-
-            return false;
-          });
-        }).length
-      : upload_warehouse_hierarchy_list.length) / select_option
+            const val = u[col.key];
+            return val
+              ?.toString()
+              .toLowerCase()
+              .includes(debounced_query.toLowerCase());
+          })
+        ).length
+      : upload_app_matrix_list.length) / select_option
   );
 
   const handle_sort = (column) => {
@@ -182,17 +141,17 @@ const Upload_Warehouse_H = ({
   // - Client-Side Filtering
 
   const handle_excel_upload = (e) => {
-    handle_excel_upload_2_hierarchy({
+    handle_excel_upload_generic({
       e,
-      code_field_1: "warehouse_code",
-      code_field_2: "stype_code",
-      set_data_callback: set_upload_warehouse_hierarchy_list,
+      code_field: "app_matrix_code",
+      desc_field: "app_matrix_desc",
+      set_data_callback: set_upload_app_matrix_list,
       show_toast,
     });
   };
 
-  const handle_upload_warehouse_hierarchy = async () => {
-    if (upload_warehouse_hierarchy_list.length === 0) {
+  const handle_upload_app_matrix = async () => {
+    if (upload_app_matrix_list.length === 0) {
       show_toast({
         type: "danger",
         title: "Invalid Data",
@@ -204,19 +163,17 @@ const Upload_Warehouse_H = ({
     set_upload_loading(true);
 
     try {
-      const response = await api_bulk_upload_warehouse_hierarchy(
-        upload_warehouse_hierarchy_list
-      );
+      const response = await api_bulk_upload_app_matrix(upload_app_matrix_list);
 
       if (response.success) {
         show_toast({
           type: "success",
           title: "Upload Successfully",
-          message: `${upload_warehouse_hierarchy_list.length} data has been uploaded.`,
+          message: `${upload_app_matrix_list.length} data has been uploaded.`,
           icon: <CheckCircle2 size={21} className="text-green-500" />,
         });
-        set_upload_warehouse_hierarchy_list([]);
-        handle_get_warehouse_hierarchy_list();
+        set_upload_app_matrix_list([]);
+        handle_get_app_matrix_list();
         handle_go_back("sub_level");
       } else {
         show_toast({
@@ -253,7 +210,7 @@ const Upload_Warehouse_H = ({
             className={`relative bg-white rounded-lg shadow-xl max-w-[500px] w-full p-10 m-5 z-[102]`}
           >
             <div className="w-full flex justify-center items-center text-lg md:text-xl font-bold mb-4">
-              Upload Warehouse Hierarchy
+              Upload Approval Matrix
             </div>
             <p className="w-full text-center text-sm leading-6 text-gray-500 dark:text-gray-400 pt-4">
               You are about to upload the data. Once uploaded, it will be added
@@ -270,7 +227,7 @@ const Upload_Warehouse_H = ({
                 width="w-[100px]"
                 variant="primary"
                 loading={upload_loading}
-                on_click={handle_upload_warehouse_hierarchy}
+                on_click={handle_upload_app_matrix}
               >
                 Yes
               </Button>
@@ -317,7 +274,7 @@ const Upload_Warehouse_H = ({
               >
                 <span>/</span>
                 <a className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-sky-500 cursor-pointer">
-                  Data Assignment
+                  User
                 </a>
               </li>
               <li
@@ -326,7 +283,7 @@ const Upload_Warehouse_H = ({
               >
                 <span>/</span>
                 <a className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-sky-500 cursor-pointer">
-                  Warehouse Hierarchy
+                  Approval Matrix
                 </a>
               </li>
               <li className="flex items-center gap-1.5 text-sm text-gray-500">
@@ -348,7 +305,7 @@ const Upload_Warehouse_H = ({
                 width="w-[20px]"
                 on_click={() => handle_go_back("sub_level")}
               ></Button>
-              <h1 className="text-lg">Upload Warehouse Hierarchy</h1>
+              <h1 className="text-lg">Upload Approval Matrix</h1>
             </div>
             <div className="flex gap-2 text-gray-500 text-sm tracking-wider">
               {format_date_1(get_date_now())}
@@ -408,7 +365,7 @@ const Upload_Warehouse_H = ({
               </div>
               {/* + Table */}
               <div className="overflow-x-auto">
-                {filtered_upload_warehouse_hierarchy_list.length === 0 ? (
+                {filtered_upload_app_matrix_list.length === 0 ? (
                   <div className="p-6 text-center text-gray-500 text-sm">
                     No data found
                   </div>
@@ -458,80 +415,38 @@ const Upload_Warehouse_H = ({
                       </tr>
                     </thead>
                     <tbody className="bg-white">
-                      {filtered_upload_warehouse_hierarchy_list.map(
-                        (row, idx) => {
-                          const render_cell = (col, row) => {
-                            const value = row[col.key];
-                            // + Index
-                            if (col.key === "index") {
-                              return <span>{row.index}</span>;
-                            }
-                            // - Index
-                            // + Warehouse
-                            if (col.key === "warehouse_code") {
-                              return (
-                                <div className="block font-medium text-gray-800">
-                                  <span className="block text-gray-500 text-[10px]">
-                                    {row.warehouse_code}
-                                  </span>
-                                  <span className="block text-gray-800 text-[12px]">
-                                    {get_description(
-                                      row.warehouse_code,
-                                      warehouse_list,
-                                      "warehouse_code",
-                                      "warehouse_desc"
-                                    )}
-                                  </span>
-                                </div>
-                              );
-                            }
-                            // + Warehouse
-                            // + Purchasing Organization
-                            if (col.key === "stype_code") {
-                              return (
-                                <div className="block font-medium text-gray-800">
-                                  <span className="block text-gray-500 text-[10px]">
-                                    {row.stype_code}
-                                  </span>
-                                  <span className="block text-gray-800 text-[12px]">
-                                    {get_description(
-                                      row.stype_code,
-                                      stype_list,
-                                      "stype_code",
-                                      "stype_desc"
-                                    )}
-                                  </span>
-                                </div>
-                              );
-                            }
-                            // - Purchasing Organization
+                      {filtered_upload_app_matrix_list.map((row, idx) => {
+                        const render_cell = (col, row) => {
+                          const value = row[col.key];
+                          if (col.key === "index") {
+                            return <span>{row.index}</span>;
+                          }
 
-                            return value;
-                          };
+                          return value;
+                        };
 
-                          return (
-                            <tr
-                              key={idx}
-                              className="hover:bg-gray-50 whitespace-nowrap"
-                            >
-                              {columns.map((col, i) => (
-                                <td
-                                  key={i}
-                                  className={`border px-4 py-4 text-[12px] text-gray-600 ${
-                                    i === 0 ? "border-l-0" : ""
-                                  } ${
-                                    i === columns.length - 1
-                                      ? "border-r-0 text-left"
-                                      : ""
-                                  }`}
-                                >
-                                  {render_cell(col, row)}
-                                </td>
-                              ))}
-                            </tr>
-                          );
-                        }
-                      )}
+                        return (
+                          <tr
+                            key={idx}
+                            className="hover:bg-gray-50 whitespace-nowrap"
+                          >
+                            {columns.map((col, i) => (
+                              <td
+                                key={i}
+                                className={`border px-4 py-4 text-[12px] text-gray-600 ${
+                                  i === 0 ? "border-l-0" : ""
+                                } ${
+                                  i === columns.length - 1
+                                    ? "border-r-0 text-left"
+                                    : ""
+                                }`}
+                              >
+                                {render_cell(col, row)}
+                              </td>
+                            ))}
+                          </tr>
+                        );
+                      })}
                     </tbody>
                   </table>
                 )}
@@ -579,4 +494,4 @@ const Upload_Warehouse_H = ({
   );
 };
 
-export default Upload_Warehouse_H;
+export default Upload_App_Matrix;

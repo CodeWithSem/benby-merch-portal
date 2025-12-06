@@ -1,14 +1,19 @@
+// File Name: Approval_Matrix
+// Function Name: App_Matrix
+// Data Name: app_matrix
+// Column Name: Approval Matrix
+// Title Name: Approval Matrix
+// Sub-module Name: User
+// Table Name: TBL_APPROVAL_MATRIX
+
 import React, { useEffect, useState } from "react";
 import { useToast } from "../../../../../layout/Toast_Provider";
 import { Use_App } from "context/app_context";
-import { api_get_warehouse_list } from "api/firestore_db/maintenance/warehouse/tbl_warehouse_api";
-import { api_get_stype_list } from "api/firestore_db/maintenance/warehouse/tbl_stype_api";
 import {
-  api_get_warehouse_hierarchy_list,
-  api_truncate_warehouse_hierarchy,
-} from "api/firestore_db/maintenance/data_assignment/tbl_warehouse_hierarchy_api";
+  api_get_app_matrix_list,
+  api_truncate_app_matrix,
+} from "api/firestore_db/tbl_app_matrix_api";
 import { Get_TBL_INCREMENTAL_ID } from "api/real_time_db/incremental";
-import { get_description } from "assets/scripts/functions/get_description";
 import {
   Search,
   ChevronDown,
@@ -22,101 +27,50 @@ import {
   Trash2,
   CheckCircle2,
   SlidersHorizontal,
-  CircleX,
 } from "lucide-react";
 import Icon_Field from "assets/elements/Icon_Field";
 import Select_Field from "assets/elements/Select_Field";
 import Pagination from "assets/elements/Pagination";
 import Button from "assets/elements/Button";
-import Spinner from "assets/elements/Spinner";
 import Text_Field from "assets/elements/Text_Field";
-import Load_Screen from "./modals/Load_Screen";
-import Create_Warehouse_H from "./functions/Create_Warehouse_H";
-import Edit_Warehouse_H from "./functions/Edit_Warehouse_H";
-import Delete_Warehouse_H from "./functions/Delete_Warehouse_H";
-import Upload_Warehouse_H from "./functions/Upload_Warehouse_H";
+import Spinner from "assets/elements/Spinner";
+import Create_App_Matrix from "./functions/Create_App_Matrix";
+import Edit_App_Matrix from "./functions/Edit_App_Matrix";
+import Delete_App_Matrix from "./functions/Delete_App_Matrix";
+import Upload_App_Matrix from "./functions/Upload_App_Matrix";
 
 const HAS_FILTER = true;
 
-const Warehouse_Hierarchy = ({ set_page }) => {
+const Approval_Matrix = ({ set_page }) => {
   const { active_user } = Use_App();
   const { show_toast } = useToast();
   const [sub_page, set_sub_page] = useState("main");
-  const [display_modal, set_display_modal] = useState("load_screen");
+  const [display_modal, set_display_modal] = useState("");
   const [show_filter, set_show_filter] = useState(false);
   const [loading_list, set_loading_list] = useState(false);
   const [truncate_loading, set_truncate_loading] = useState(false);
-  const [warehouse_list, set_warehouse_list] = useState([]);
-  const [stype_list, set_stype_list] = useState([]);
 
-  const handle_get_all_lists = async () => {
-    try {
-      const [warehouse_response, stype_response] = await Promise.all([
-        api_get_warehouse_list(),
-        api_get_stype_list(),
-      ]);
-      if (warehouse_response.success && stype_response.success) {
-        set_warehouse_list(warehouse_response.data);
-        set_stype_list(stype_response.data);
-        const res_log = {
-          warehouse_log: warehouse_response.data,
-          stype_log: stype_response.data,
-        };
-        console.log(res_log);
-        set_display_modal("");
-      } else {
-        console.error("One or more list fetches failed.", {
-          warehouse: warehouse_response.message,
-          stype: stype_response.message,
-        });
-        show_error();
-        handle_go_back("main");
-      }
-    } catch (error) {
-      console.error("A critical error occurred while fetching lists:", error);
-      show_error();
-      handle_go_back("main");
-    }
-  };
-
-  const show_error = () => {
-    show_toast({
-      type: "danger",
-      title: "Error",
-      message: "Something went wrong. Please try again later.",
-      icon: <CircleX size={21} className="text-red-500" />,
-    });
-  };
-
-  useEffect(() => {
-    handle_get_all_lists();
-  }, []);
-
-  const def_warehouse_hierarchy_data = {
+  const def_app_matrix_data = {
     id: null,
-    warehouse_code: "",
-    stype_code: "",
+    app_matrix_code: "",
+    app_matrix_desc: "",
     creation_date: "",
     created_by: "",
     change_date: "",
     change_by: "",
   };
 
-  const [new_data, set_new_data] = useState({
-    ...def_warehouse_hierarchy_data,
-  });
-  const [edit_data, set_edit_data] = useState({
-    ...def_warehouse_hierarchy_data,
-  });
+  const [new_data, set_new_data] = useState({ ...def_app_matrix_data });
+  const [edit_data, set_edit_data] = useState({ ...def_app_matrix_data });
   const [delete_data, set_delete_data] = useState({
-    ...def_warehouse_hierarchy_data,
+    ...def_app_matrix_data,
   });
 
   const reset_new_data = () => {
     set_new_data((prev) => ({
       ...prev,
-      warehouse_code: "",
-      stype_code: "",
+      app_matrix_code: "",
+      app_matrix_desc: "",
       creation_date: "",
       created_by: "",
       change_date: "",
@@ -125,7 +79,7 @@ const Warehouse_Hierarchy = ({ set_page }) => {
   };
 
   useEffect(() => {
-    Get_TBL_INCREMENTAL_ID("TBL_WAREHOUSE_HIERARCHY", (value) => {
+    Get_TBL_INCREMENTAL_ID("TBL_APPROVAL_MATRIX", (value) => {
       set_new_data((prev) => ({
         ...prev,
         id: value,
@@ -136,8 +90,16 @@ const Warehouse_Hierarchy = ({ set_page }) => {
   const columns = [
     { key: "index", label: "#", sortable: false },
     { key: "id", label: "ID", sortable: true },
-    { key: "warehouse_code", label: "Warehouse", sortable: true },
-    { key: "stype_code", label: "Storage Type", sortable: true },
+    {
+      key: "app_matrix_code",
+      label: "Approval Matrix Code",
+      sortable: true,
+    },
+    {
+      key: "app_matrix_desc",
+      label: "Approval Matrix Description",
+      sortable: true,
+    },
     { key: "creation_date", label: "Creation Date", sortable: true },
     { key: "created_by", label: "Created By", sortable: true },
     { key: "change_date", label: "Change Date", sortable: true },
@@ -145,13 +107,13 @@ const Warehouse_Hierarchy = ({ set_page }) => {
     { key: "actions", label: "", sortable: false },
   ];
 
-  const [warehouse_hierarchy_list, set_warehouse_hierarchy_list] = useState([]);
+  const [app_matrix_list, set_app_matrix_list] = useState([]);
 
-  const handle_get_warehouse_hierarchy_list = async () => {
+  const handle_get_app_matrix_list = async () => {
     set_loading_list(true);
-    const response = await api_get_warehouse_hierarchy_list();
+    const response = await api_get_app_matrix_list();
     if (response.success) {
-      set_warehouse_hierarchy_list(response.data);
+      set_app_matrix_list(response.data);
     } else {
       console.error(response.message);
     }
@@ -159,12 +121,12 @@ const Warehouse_Hierarchy = ({ set_page }) => {
   };
 
   useEffect(() => {
-    handle_get_warehouse_hierarchy_list();
+    handle_get_app_matrix_list();
   }, []);
 
-  const handle_truncate_warehouse_hierarchy_list = async () => {
+  const handle_truncate_app_matrix_list = async () => {
     set_truncate_loading(true);
-    const response = await api_truncate_warehouse_hierarchy();
+    const response = await api_truncate_app_matrix();
     if (response.success) {
       show_toast({
         type: "success",
@@ -180,34 +142,18 @@ const Warehouse_Hierarchy = ({ set_page }) => {
       });
       console.error(response.message);
     }
-    handle_get_warehouse_hierarchy_list();
+    handle_get_app_matrix_list();
     set_truncate_loading(false);
   };
 
   // + Client-Side Filtering
-  const [
-    filtered_warehouse_hierarchy_list,
-    set_filtered_warehouse_hierarchy_list,
-  ] = useState([]);
+  const [filtered_app_matrix_list, set_filtered_app_matrix_list] = useState([]);
   const [select_option, set_select_option] = useState(5);
   const [current_page, set_current_page] = useState(1);
   const [sort_by, set_sort_by] = useState("id");
   const [sort_order, set_sort_order] = useState("asc");
   const [search_query, set_search_query] = useState("");
   const [debounced_query, set_debounced_query] = useState("");
-
-  const lookup_columns = [
-    {
-      code_key: "warehouse_code",
-      list: warehouse_list,
-      desc_key: "warehouse_desc",
-    },
-    {
-      code_key: "stype_code",
-      list: stype_list,
-      desc_key: "stype_desc",
-    },
-  ];
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -218,7 +164,7 @@ const Warehouse_Hierarchy = ({ set_page }) => {
   }, [search_query]);
 
   useEffect(() => {
-    let temp = [...warehouse_hierarchy_list];
+    let temp = [...app_matrix_list];
 
     if (debounced_query.trim() !== "") {
       const q = debounced_query.toLowerCase();
@@ -226,27 +172,7 @@ const Warehouse_Hierarchy = ({ set_page }) => {
         columns.some((col) => {
           if (col.key === "actions") return false;
           const val = u[col.key];
-
-          if (val?.toString().toLowerCase().includes(q)) {
-            return true;
-          }
-
-          const lookup = lookup_columns.find((lc) => lc.code_key === col.key);
-
-          if (lookup) {
-            const desc_val = get_description(
-              u[lookup.code_key],
-              lookup.list,
-              lookup.code_key,
-              lookup.desc_key
-            );
-
-            if (desc_val.toLowerCase().includes(q)) {
-              return true;
-            }
-          }
-
-          return false;
+          return val?.toString().toLowerCase().includes(q);
         })
       );
     }
@@ -271,9 +197,9 @@ const Warehouse_Hierarchy = ({ set_page }) => {
       index: start_idx + i + 1,
     }));
 
-    set_filtered_warehouse_hierarchy_list(indexed_data);
+    set_filtered_app_matrix_list(indexed_data);
   }, [
-    warehouse_hierarchy_list,
+    app_matrix_list,
     debounced_query,
     sort_by,
     sort_order,
@@ -283,36 +209,17 @@ const Warehouse_Hierarchy = ({ set_page }) => {
 
   const total_pages = Math.ceil(
     (debounced_query
-      ? warehouse_hierarchy_list.filter((u) => {
-          const q = debounced_query.toLowerCase();
-
-          return columns.some((col) => {
+      ? app_matrix_list.filter((u) =>
+          columns.some((col) => {
             if (col.key === "actions") return false;
-
-            const code_val = u[col.key];
-            if (code_val?.toString().toLowerCase().includes(q)) {
-              return true;
-            }
-
-            const lookup = lookup_columns.find((lc) => lc.code_key === col.key);
-
-            if (lookup) {
-              const desc_val = get_description(
-                u[lookup.code_key],
-                lookup.list,
-                lookup.code_key,
-                lookup.desc_key
-              );
-
-              if (desc_val.toLowerCase().includes(q)) {
-                return true;
-              }
-            }
-
-            return false;
-          });
-        }).length
-      : warehouse_hierarchy_list.length) / select_option
+            const val = u[col.key];
+            return val
+              ?.toString()
+              .toLowerCase()
+              .includes(debounced_query.toLowerCase());
+          })
+        ).length
+      : app_matrix_list.length) / select_option
   );
 
   const handle_sort = (column) => {
@@ -328,21 +235,21 @@ const Warehouse_Hierarchy = ({ set_page }) => {
   const handle_page_change = (page) => set_current_page(page);
   // - Client-Side Filtering
 
-  const handle_create_new_warehouse_hierarchy = () => {
-    set_sub_page("create_new_warehouse_hierarchy");
+  const handle_create_new_app_matrix = () => {
+    set_sub_page("create_new_app_matrix");
   };
 
-  const handle_edit_warehouse_hierarchy = (data) => {
+  const handle_edit_app_matrix = (data) => {
     set_edit_data(data);
-    set_sub_page("edit_warehouse_hierarchy");
+    set_sub_page("edit_app_matrix");
   };
-  const handle_delete_warehouse_hierarchy = (data) => {
+  const handle_delete_app_matrix = (data) => {
     set_delete_data(data);
-    set_display_modal("delete_warehouse_hierarchy");
+    set_display_modal("delete_app_matrix");
   };
 
-  const handle_upload_warehouse_hierarchy = () => {
-    set_sub_page("upload_warehouse_hierarchy");
+  const handle_upload_app_matrix = () => {
+    set_sub_page("upload_app_matrix");
   };
 
   const handle_go_back = (value) => {
@@ -391,12 +298,12 @@ const Warehouse_Hierarchy = ({ set_page }) => {
                   >
                     <span>/</span>
                     <a className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-sky-500 cursor-pointer">
-                      Data Assignment
+                      User
                     </a>
                   </li>
                   <li className="flex items-center gap-1.5 text-sm text-gray-500">
                     <span>/</span>
-                    <span className="text-gray-800">Warehouse Hierarchy</span>
+                    <span className="text-gray-800">Approval Matrix</span>
                   </li>
                 </ol>
               </nav>
@@ -414,7 +321,7 @@ const Warehouse_Hierarchy = ({ set_page }) => {
                     width="w-[20px]"
                     on_click={() => handle_go_back("main")}
                   ></Button>
-                  <h1 className="text-lg">Warehouse Hierarchy</h1>
+                  <h1 className="text-lg">Approval Matrix</h1>
                 </div>
                 <div className="flex gap-2">
                   {active_user?.category === "DEV" && (
@@ -424,7 +331,7 @@ const Warehouse_Hierarchy = ({ set_page }) => {
                       icon_position="left"
                       width="w-[110px]"
                       loading={truncate_loading}
-                      on_click={handle_truncate_warehouse_hierarchy_list}
+                      on_click={handle_truncate_app_matrix_list}
                     >
                       Truncate
                     </Button>
@@ -433,7 +340,7 @@ const Warehouse_Hierarchy = ({ set_page }) => {
                     variant="primary"
                     icon={PlusCircle}
                     icon_position="left"
-                    on_click={handle_create_new_warehouse_hierarchy}
+                    on_click={handle_create_new_app_matrix}
                   >
                     Create New Data
                   </Button>
@@ -441,7 +348,7 @@ const Warehouse_Hierarchy = ({ set_page }) => {
                     variant="primary"
                     icon={FileUp}
                     icon_position="left"
-                    on_click={handle_upload_warehouse_hierarchy}
+                    on_click={handle_upload_app_matrix}
                   >
                     Upload
                   </Button>
@@ -474,7 +381,7 @@ const Warehouse_Hierarchy = ({ set_page }) => {
                         variant="white"
                         icon={RefreshCw}
                         icon_position="left"
-                        on_click={handle_get_warehouse_hierarchy_list}
+                        on_click={handle_get_app_matrix_list}
                       ></Button>
                     </div>
                     <div className="w-full mt-4 md:mt-0 md:w-[600px]">
@@ -568,7 +475,7 @@ const Warehouse_Hierarchy = ({ set_page }) => {
                       <div className="p-6 flex justify-center items-center text-gray-500 text-sm">
                         <Spinner />
                       </div>
-                    ) : filtered_warehouse_hierarchy_list.length === 0 ? (
+                    ) : filtered_app_matrix_list.length === 0 ? (
                       <div className="p-6 text-center text-gray-500 text-sm">
                         No data found
                       </div>
@@ -579,6 +486,7 @@ const Warehouse_Hierarchy = ({ set_page }) => {
                             {columns.map((col, i) => {
                               const renderHeaderCell = (col) => {
                                 const is_sorted = sort_by === col.key;
+
                                 return (
                                   <div className="flex items-center justify-between w-full">
                                     <span>{col.label}</span>
@@ -619,53 +527,26 @@ const Warehouse_Hierarchy = ({ set_page }) => {
                           </tr>
                         </thead>
                         <tbody className="bg-white">
-                          {filtered_warehouse_hierarchy_list.map((row, idx) => {
+                          {filtered_app_matrix_list.map((row, idx) => {
+                            // + Cell Renderer
                             const render_cell = (col, row) => {
                               const value = row[col.key];
-                              // + Index
                               if (col.key === "index") {
                                 return <span>{row.index}</span>;
                               }
-                              // - Index
-                              // + Warehouse
-                              if (col.key === "warehouse_code") {
+                              if (col.key === "status") {
                                 return (
-                                  <div className="block font-medium text-gray-800">
-                                    <span className="block text-gray-500 text-[10px]">
-                                      {row.warehouse_code}
-                                    </span>
-                                    <span className="block text-gray-800 text-[12px]">
-                                      {get_description(
-                                        row.warehouse_code,
-                                        warehouse_list,
-                                        "warehouse_code",
-                                        "warehouse_desc"
-                                      )}
-                                    </span>
-                                  </div>
+                                  <span
+                                    className={`inline-flex items-center justify-center gap-1 rounded-full px-3 py-0.5 text-xs font-medium ${
+                                      row.status === "Posted"
+                                        ? "bg-green-100 text-green-500"
+                                        : "bg-yellow-100 text-yellow-600"
+                                    }`}
+                                  >
+                                    {row.status}
+                                  </span>
                                 );
                               }
-                              // + Warehouse
-                              // + Storage Type
-                              if (col.key === "stype_code") {
-                                return (
-                                  <div className="block font-medium text-gray-800">
-                                    <span className="block text-gray-500 text-[10px]">
-                                      {row.stype_code}
-                                    </span>
-                                    <span className="block text-gray-800 text-[12px]">
-                                      {get_description(
-                                        row.stype_code,
-                                        stype_list,
-                                        "stype_code",
-                                        "stype_desc"
-                                      )}
-                                    </span>
-                                  </div>
-                                );
-                              }
-                              // - Storage Type
-                              // + Action Buttons
                               if (col.key === "actions") {
                                 return (
                                   <div className="flex gap-2">
@@ -673,7 +554,7 @@ const Warehouse_Hierarchy = ({ set_page }) => {
                                       <button
                                         className="text-gray-500 hover:text-sky-600 text-[12px] outline-none"
                                         onClick={() =>
-                                          handle_edit_warehouse_hierarchy(row)
+                                          handle_edit_app_matrix(row)
                                         }
                                       >
                                         <Edit size={19} />
@@ -686,7 +567,7 @@ const Warehouse_Hierarchy = ({ set_page }) => {
                                       <button
                                         className="text-gray-500 hover:text-red-600 text-[12px] mb-[1px] outline-none"
                                         onClick={() =>
-                                          handle_delete_warehouse_hierarchy(row)
+                                          handle_delete_app_matrix(row)
                                         }
                                       >
                                         <Trash size={19} />
@@ -698,7 +579,6 @@ const Warehouse_Hierarchy = ({ set_page }) => {
                                   </div>
                                 );
                               }
-                              // - Action Buttons
 
                               return value;
                             };
@@ -747,63 +627,44 @@ const Warehouse_Hierarchy = ({ set_page }) => {
           </div>
         </React.Fragment>
       )}
-      {sub_page === "create_new_warehouse_hierarchy" && (
-        <Create_Warehouse_H
+      {sub_page === "create_new_app_matrix" && (
+        <Create_App_Matrix
           handle_go_back={handle_go_back}
           active_user={active_user}
           reset_new_data={reset_new_data}
           show_toast={show_toast}
           new_data={new_data}
           set_new_data={set_new_data}
-          set_warehouse_hierarchy_list={set_warehouse_hierarchy_list}
-          warehouse_list={warehouse_list}
-          stype_list={stype_list}
+          set_app_matrix_list={set_app_matrix_list}
         />
       )}
-      {sub_page === "edit_warehouse_hierarchy" && (
-        <Edit_Warehouse_H
+      {sub_page === "edit_app_matrix" && (
+        <Edit_App_Matrix
           handle_go_back={handle_go_back}
           active_user={active_user}
-          reset_new_data={reset_new_data}
           show_toast={show_toast}
           edit_data={edit_data}
           set_edit_data={set_edit_data}
-          set_warehouse_hierarchy_list={set_warehouse_hierarchy_list}
-          warehouse_list={warehouse_list}
-          stype_list={stype_list}
+          set_app_matrix_list={set_app_matrix_list}
         />
       )}
-      {sub_page === "upload_warehouse_hierarchy" && (
-        <Upload_Warehouse_H
+      {sub_page === "upload_app_matrix" && (
+        <Upload_App_Matrix
           handle_go_back={handle_go_back}
-          handle_get_warehouse_hierarchy_list={
-            handle_get_warehouse_hierarchy_list
-          }
+          handle_get_app_matrix_list={handle_get_app_matrix_list}
           show_toast={show_toast}
-          warehouse_list={warehouse_list}
-          stype_list={stype_list}
         />
       )}
-      <Delete_Warehouse_H
-        is_open={display_modal === "delete_warehouse_hierarchy"}
+      <Delete_App_Matrix
+        is_open={display_modal === "delete_app_matrix"}
         on_close={() => set_display_modal("")}
         width="max-w-[1000px]"
         show_toast={show_toast}
         delete_data={delete_data}
-        set_warehouse_hierarchy_list={set_warehouse_hierarchy_list}
-        warehouse_list={warehouse_list}
-        stype_list={stype_list}
-      />
-      <Load_Screen
-        is_open={display_modal === "load_screen"}
-        on_close={() => {
-          set_display_modal("");
-          handle_go_back("main");
-        }}
-        width="max-w-[400px]"
+        set_app_matrix_list={set_app_matrix_list}
       />
     </React.Fragment>
   );
 };
 
-export default Warehouse_Hierarchy;
+export default Approval_Matrix;

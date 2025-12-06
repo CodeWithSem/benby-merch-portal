@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { api_create_warehouse_hierarchy } from "api/firestore_db/maintenance/data_assignment/tbl_warehouse_hierarchy_api";
+import { api_create_app_matrix_hierarchy } from "api/firestore_db/maintenance/data_assignment/tbl_app_matrix_hierarchy_api";
 import { get_description } from "assets/scripts/functions/get_description";
 import {
   console_log,
@@ -9,32 +9,32 @@ import {
 import { CheckCircle2, ChevronLeft, CirclePlus, CircleX } from "lucide-react";
 import Button from "assets/elements/Button";
 import Text_Code_Field from "assets/elements/Text_Code_Field";
-import Select_Warehouse from "../modals/Select_Warehouse";
-import Select_STYPE from "../modals/Select_STYPE";
+import Select_App_Matrix from "../modals/Select_App_Matrix";
+import Select_User_Role from "../modals/Select_User_Role";
 
-const Create_Warehouse_H = ({
+const Create_App_Matrix_H = ({
   handle_go_back,
   active_user,
   reset_new_data,
   show_toast,
   new_data,
   set_new_data,
-  set_warehouse_hierarchy_list,
-  warehouse_list,
-  stype_list,
+  set_app_matrix_hierarchy_list,
+  app_matrix_list,
+  user_role_list,
 }) => {
   const [display_sub_modal, set_display_sub_modal] = useState("");
   const [is_confirm_modal_open, set_is_confirm_modal_open] = useState(false);
   const [create_loading, set_create_loading] = useState(false);
 
   const validate_new_data = () => {
-    if (!new_data.warehouse_code.trim()) {
-      show_toast_error("Warehouse");
+    if (!new_data.app_matrix_code.trim()) {
+      show_toast_error("Approval Matrix");
       return false;
     }
 
-    if (!new_data.stype_code.trim()) {
-      show_toast_error("Storage Type");
+    if (!new_data.user_role_code.trim()) {
+      show_toast_error("User Role");
       return false;
     }
 
@@ -50,7 +50,7 @@ const Create_Warehouse_H = ({
     });
   };
 
-  const handle_create_warehouse_hierarchy = async () => {
+  const handle_create_app_matrix_hierarchy = async () => {
     if (!validate_new_data()) {
       close_confirm_modal();
       return;
@@ -58,13 +58,13 @@ const Create_Warehouse_H = ({
     try {
       console_log(new_data);
       set_create_loading(true);
-      const response = await api_create_warehouse_hierarchy(
+      const response = await api_create_app_matrix_hierarchy(
         new_data,
         active_user?.username
       );
       if (response.success) {
         console_log(response.data);
-        set_warehouse_hierarchy_list((prev) => [...prev, response.data]);
+        set_app_matrix_hierarchy_list((prev) => [...prev, response.data]);
         show_status("success");
         reset_new_data();
         handle_go_back("sub_level");
@@ -111,11 +111,11 @@ const Create_Warehouse_H = ({
             className={`relative bg-white rounded-lg shadow-xl max-w-[500px] w-full p-10 m-5 z-[102]`}
           >
             <div className="w-full flex justify-center items-center text-lg md:text-xl font-bold mb-4">
-              Confirm Warehouse Hierarchy Creation
+              Confirm Approval Matrix Hierarchy Creation
             </div>
             <p className="w-full text-center text-sm leading-6 text-gray-500 dark:text-gray-400 pt-4">
-              You are about to create a new Warehouse Hierarchy. Once created,
-              it will be added to the database.
+              You are about to create a new Approval Matrix Hierarchy. Once
+              created, it will be added to the database.
             </p>
             <p className="w-full text-center text-sm leading-6 text-gray-500 dark:text-gray-400 pt-4">
               Please review all the details — before proceeding.
@@ -128,7 +128,7 @@ const Create_Warehouse_H = ({
                 width="w-[100px]"
                 variant="primary"
                 loading={create_loading}
-                on_click={handle_create_warehouse_hierarchy}
+                on_click={handle_create_app_matrix_hierarchy}
               >
                 Yes
               </Button>
@@ -184,7 +184,7 @@ const Create_Warehouse_H = ({
               >
                 <span>/</span>
                 <a className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-sky-500 cursor-pointer">
-                  Warehouse Hierarchy
+                  Approval Matrix Hierarchy
                 </a>
               </li>
               <li className="flex items-center gap-1.5 text-sm text-gray-500">
@@ -206,7 +206,7 @@ const Create_Warehouse_H = ({
                 width="w-[20px]"
                 on_click={() => handle_go_back("sub_level")}
               ></Button>
-              <h1 className="text-lg">Warehouse Hierarchy Creation</h1>
+              <h1 className="text-lg">Approval Matrix Hierarchy Creation</h1>
             </div>
             <div className="flex gap-2 text-gray-500 text-sm tracking-wider">
               {format_date_1(get_date_now())}
@@ -218,33 +218,33 @@ const Create_Warehouse_H = ({
             <div className="grid grid-cols-1 gap-5">
               <div>
                 <Text_Code_Field
-                  label="Warehouse"
+                  label="Approval Matrix"
                   code_width="150px"
                   show_search_button={true}
-                  code_value={new_data.warehouse_code}
+                  code_value={new_data.app_matrix_code}
                   text_value={get_description(
-                    new_data.warehouse_code,
-                    warehouse_list,
-                    "warehouse_code",
-                    "warehouse_desc"
+                    new_data.app_matrix_code,
+                    app_matrix_list,
+                    "app_matrix_code",
+                    "app_matrix_desc"
                   )}
-                  on_click={() => set_display_sub_modal("select_warehouse")}
+                  on_click={() => set_display_sub_modal("select_app_matrix")}
                   disabled
                 />
               </div>
               <div>
                 <Text_Code_Field
-                  label="Storage Type"
+                  label="User Role"
                   code_width="150px"
                   show_search_button={true}
-                  code_value={new_data.stype_code}
+                  code_value={new_data.user_role_code}
                   text_value={get_description(
-                    new_data.stype_code,
-                    stype_list,
-                    "stype_code",
-                    "stype_desc"
+                    new_data.user_role_code,
+                    user_role_list,
+                    "user_role_code",
+                    "user_role_desc"
                   )}
-                  on_click={() => set_display_sub_modal("select_stype")}
+                  on_click={() => set_display_sub_modal("select_user_role")}
                   disabled
                 />
               </div>
@@ -275,20 +275,20 @@ const Create_Warehouse_H = ({
       </div>
       {/* + Modals */}
       {is_confirm_modal_open && <Confirm_Modal />}
-      <Select_Warehouse
-        is_open={display_sub_modal === "select_warehouse"}
+      <Select_App_Matrix
+        is_open={display_sub_modal === "select_app_matrix"}
         on_close={() => set_display_sub_modal("")}
         width="max-w-[1000px]"
         height="max-h-[700px]"
-        warehouse_list={warehouse_list}
+        app_matrix_list={app_matrix_list}
         set_data={set_new_data}
       />
-      <Select_STYPE
-        is_open={display_sub_modal === "select_stype"}
+      <Select_User_Role
+        is_open={display_sub_modal === "select_user_role"}
         on_close={() => set_display_sub_modal("")}
         width="max-w-[1000px]"
         height="max-h-[700px]"
-        stype_list={stype_list}
+        user_role_list={user_role_list}
         set_data={set_new_data}
       />
       {/* - Modals */}
@@ -296,4 +296,4 @@ const Create_Warehouse_H = ({
   );
 };
 
-export default Create_Warehouse_H;
+export default Create_App_Matrix_H;

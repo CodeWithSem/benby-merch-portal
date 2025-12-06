@@ -1,69 +1,91 @@
+// + company_list
 export const company_list = [
-  { id: 1, company_code: "COM-0001", company_desc: "Company Description 1" },
-  { id: 2, company_code: "COM-0002", company_desc: "Company Description 2" },
-];
-export const purc_org_list = [
-  { id: 1, purc_org_code: "PCO-0001", purc_org_desc: "Purchasing Org 1" },
-  { id: 2, purc_org_code: "PCO-0002", purc_org_desc: "Purchasing Org 2" },
-];
-export const purc_group_list = [
   {
     id: 1,
-    purc_group_code: "PCG-0001",
-    purc_group_desc: "Purchasing Group 1",
+    company_code: "COM-001",
+    company_desc: "Company A",
+    creation_date: "MM-DD-YYYY",
   },
   {
     id: 2,
-    purc_group_code: "PCG-0002",
-    purc_group_desc: "Purchasing Group 2",
+    company_code: "COM-002",
+    company_desc: "Company B",
+    creation_date: "MM-DD-YYYY",
   },
 ];
-
+// - company_list
+// + purc_org_list
+export const purc_org_list = [
+  {
+    id: 1,
+    purc_org_code: "P-ORG-001",
+    purc_org_desc: "Purchasing Organization A",
+  },
+  {
+    id: 2,
+    purc_org_code: "P-ORG-002",
+    purc_org_desc: "Purchasing Organization B",
+  },
+];
+// - purc_org_list
+// + purc_group_list
+export const purc_group_list = [
+  {
+    id: 1,
+    purc_group_code: "P-GRP-001",
+    purc_group_desc: "Purchasing Group A",
+  },
+  {
+    id: 2,
+    purc_group_code: "P-GRP-002",
+    purc_group_desc: "Purchasing Group B",
+  },
+];
+// - purc_group_list
+// + po_type_list
 export const po_type_list = [
   {
     id: 1,
-    po_type_code: "PT-0001",
-    po_type_desc: "PO Type Description 1",
-    company_code: "COM-0001",
-    purc_org_code: "PCO-0001",
-    purc_group_code: "PCG-0001",
+    po_type_code: "SPO",
+    po_type_desc: "Standard Purchase Order",
+  },
+  {
+    id: 2,
+    po_type_code: "BPO",
+    po_type_desc: "Blanket Purchase Order",
+  },
+  {
+    id: 3,
+    po_type_code: "CPO",
+    po_type_desc: "Contract Purchase Order",
   },
 ];
-
-export const vendor_list = [
+// - po_type_list
+// + po_type_h_list
+export const po_type_h_list = [
   {
     id: 1,
-    vendor_code: "VE-0001",
-    vendor_desc: "Vendor Description 1",
-    creation_date: "06-05-2025",
+    po_type_code: "SPO",
+    company_code: "COM-001",
+    purc_org_code: "P-ORG-001",
+    purc_group_code: "P-GRP-001",
   },
-];
-
-export const branch_list = [
   {
-    id: 1,
-    branch_code: "BR-0001",
-    branch_desc: "Branch Description 1",
-    creation_date: "06-05-2025",
+    id: 2,
+    po_type_code: "BPO",
+    company_code: "COM-001",
+    purc_org_code: "P-ORG-001",
+    purc_group_code: "P-GRP-001",
   },
-];
-
-export const plant_list = [
   {
-    id: 1,
-    plant_code: "PL-0001",
-    plant_desc: "Plant Description 1",
-    creation_date: "06-05-2025",
+    id: 3,
+    po_type_code: "CPO",
+    company_code: "COM-002",
+    purc_org_code: "P-ORG-002",
+    purc_group_code: "P-GRP-002",
   },
 ];
-export const sloc_list = [
-  {
-    id: 1,
-    sloc_code: "SLOC-0001",
-    sloc_desc: "SLOC Description 1",
-    creation_date: "06-05-2025",
-  },
-];
+// - po_type_h_list
 
 export const item_list = [
   {
@@ -72,5 +94,351 @@ export const item_list = [
     item_desc: "Item Description",
     unit_price: 0,
     creation_date: "06-05-2025",
+  },
+];
+
+export const vendor_master_list = [
+  {
+    id: 1,
+    vendor_code: "VE-00001",
+    vendor_desc: "Vendor Description A",
+    creation_date: "12-05-2025",
+    created_by: "DEV-001",
+    change_date: "12-05-2025",
+    change_by: "DEV-001",
+
+    // --- AD FIELDS ---
+    ad_city_code: "MAL",
+    ad_country_code: "PH",
+    ad_district_code: "LD",
+    ad_email: "codewithsem19513@gmail.com",
+    ad_fax: "123-4567",
+    ad_language_code: "EN",
+    ad_mobile: "0947-393-1095",
+    ad_postal_code: "1473",
+    ad_region_code: "NCR",
+    ad_street: "5 J. Dela Cruz st. Longos",
+    ad_telephone: "123-4567",
+    ad_trans_zone_code: "TR-Z-0001",
+
+    // --- AC FIELDS ---
+    ac_contact_fax: "N/A",
+    ac_contact_mobile: "N/A",
+    ac_contact_name: "Juan Dela Cruz",
+    ac_contact_position: "Sales Manager",
+    ac_contact_telephone: "N/A",
+    ac_incoterms_code: "FOB",
+    ac_industry_type_code: "NPR",
+    ac_tax_number: "TAX-000-000",
+    ac_taxation_code: "T2",
+    ac_vendor_block: false,
+    ac_vat_reg_number: "VAT-000-000",
+
+    // --- ACI FIELDS ---
+    aci_company_code: "COM-001",
+    aci_credit_limit: "5000",
+    aci_credit_term_code: "T120",
+    aci_currency: "PHP",
+    aci_payment_method_code: "OB",
+    aci_payment_term_code: "T120",
+    aci_purc_group_code: "P-GRP-001",
+    aci_purc_org_code: "P-ORG-001",
+    aci_tax_liable: true,
+  },
+];
+
+export const branch_list = [
+  {
+    id: 1,
+    branch_code: "BR-001",
+    branch_desc: "Branch Data 1",
+    creation_date: "MM-DD-YYYY",
+  },
+  {
+    id: 2,
+    branch_code: "BR-002",
+    branch_desc: "Branch Data 2",
+    creation_date: "MM-DD-YYYY",
+  },
+  {
+    id: 3,
+    branch_code: "BR-003",
+    branch_desc: "Branch Data 3",
+    creation_date: "MM-DD-YYYY",
+  },
+];
+
+export const plant_list = [
+  {
+    id: 1,
+    plant_code: "PL-001",
+    plant_desc: "Plant Data A",
+    creation_date: "MM-DD-YYYY",
+  },
+  {
+    id: 2,
+    plant_code: "PL-002",
+    plant_desc: "Plant Data B",
+    creation_date: "MM-DD-YYYY",
+  },
+  {
+    id: 3,
+    plant_code: "PL-003",
+    plant_desc: "Plant Data C",
+    creation_date: "MM-DD-YYYY",
+  },
+];
+
+export const sloc_list = [
+  {
+    id: 1,
+    sloc_code: "SLOC-001",
+    sloc_desc: "SLOC Data 1",
+    creation_date: "MM-DD-YYYY",
+  },
+  {
+    id: 2,
+    sloc_code: "SLOC-002",
+    sloc_desc: "SLOC Data 2",
+    creation_date: "MM-DD-YYYY",
+  },
+  {
+    id: 3,
+    sloc_code: "SLOC-003",
+    sloc_desc: "SLOC Data 3",
+    creation_date: "MM-DD-YYYY",
+  },
+];
+
+export const branch_h_list = [
+  // for plant selection
+  {
+    id: 1,
+    branch_code: "BR-001",
+    plant_code: "PL-001",
+    creation_date: "MM-DD-YYYY",
+  },
+  {
+    id: 2,
+    branch_code: "BR-001",
+    plant_code: "PL-002",
+    creation_date: "MM-DD-YYYY",
+  },
+  {
+    id: 3,
+    branch_code: "BR-002",
+    plant_code: "PL-001",
+    creation_date: "MM-DD-YYYY",
+  },
+  {
+    id: 4,
+    branch_code: "BR-003",
+    plant_code: "PL-003",
+    creation_date: "MM-DD-YYYY",
+  },
+];
+
+export const plant_h_list = [
+  // for sloc selection
+  {
+    id: 1,
+    plant_code: "PL-001",
+    sloc_code: "SLOC-001",
+    creation_date: "MM-DD-YYYY",
+  },
+  {
+    id: 2,
+    plant_code: "PL-001",
+    sloc_code: "SLOC-002",
+    creation_date: "MM-DD-YYYY",
+  },
+  {
+    id: 3,
+    plant_code: "PL-002",
+    sloc_code: "SLOC-001",
+    creation_date: "MM-DD-YYYY",
+  },
+];
+
+export const payment_term_list = [
+  {
+    id: 1,
+    payment_term_code: "TCOD",
+    payment_term_desc: "Cash On Delivery",
+    creation_date: "MM-DD-YYYY",
+  },
+  {
+    id: 2,
+    payment_term_code: "TCPD",
+    payment_term_desc: "Check Payment on Delivery",
+    creation_date: "MM-DD-YYYY",
+  },
+  {
+    id: 3,
+    payment_term_code: "T007",
+    payment_term_desc: "7 Days",
+    creation_date: "MM-DD-YYYY",
+  },
+  {
+    id: 4,
+    payment_term_code: "T015",
+    payment_term_desc: "15 Days",
+    creation_date: "MM-DD-YYYY",
+  },
+  {
+    id: 5,
+    payment_term_code: "T030",
+    payment_term_desc: "30 Days",
+    creation_date: "MM-DD-YYYY",
+  },
+  {
+    id: 6,
+    payment_term_code: "T045",
+    payment_term_desc: "45 Days",
+    creation_date: "MM-DD-YYYY",
+  },
+  {
+    id: 7,
+    payment_term_code: "T060",
+    payment_term_desc: "60 Days",
+    creation_date: "MM-DD-YYYY",
+  },
+  {
+    id: 8,
+    payment_term_code: "T075",
+    payment_term_desc: "75 Days",
+    creation_date: "MM-DD-YYYY",
+  },
+  {
+    id: 9,
+    payment_term_code: "T090",
+    payment_term_desc: "90 Days",
+    creation_date: "MM-DD-YYYY",
+  },
+  {
+    id: 10,
+    payment_term_code: "T105",
+    payment_term_desc: "105 Days",
+    creation_date: "MM-DD-YYYY",
+  },
+  {
+    id: 11,
+    payment_term_code: "T120",
+    payment_term_desc: "120 Days",
+    creation_date: "MM-DD-YYYY",
+  },
+];
+
+export const incoterms_list = [
+  {
+    id: 1,
+    incoterms_code: "EXW",
+    incoterms_desc: "Ex Works",
+    creation_date: "MM-DD-YYYY",
+  },
+  {
+    id: 2,
+    incoterms_code: "FCA",
+    incoterms_desc: "Free Carrier",
+    creation_date: "MM-DD-YYYY",
+  },
+  {
+    id: 3,
+    incoterms_code: "CPT",
+    incoterms_desc: "Carriage Paid To",
+    creation_date: "MM-DD-YYYY",
+  },
+  {
+    id: 4,
+    incoterms_code: "CIP",
+    incoterms_desc: "Carriage and Insurance Paid To",
+    creation_date: "MM-DD-YYYY",
+  },
+  {
+    id: 5,
+    incoterms_code: "DAT",
+    incoterms_desc: "Delivered",
+    creation_date: "MM-DD-YYYY",
+  },
+  {
+    id: 6,
+    incoterms_code: "DDP",
+    incoterms_desc: "Delivered Duty Paid",
+    creation_date: "MM-DD-YYYY",
+  },
+  {
+    id: 7,
+    incoterms_code: "FAS",
+    incoterms_desc: "Free Alongside Ship",
+    creation_date: "MM-DD-YYYY",
+  },
+  {
+    id: 8,
+    incoterms_code: "FOB",
+    incoterms_desc: "Free On Board",
+    creation_date: "MM-DD-YYYY",
+  },
+  {
+    id: 9,
+    incoterms_code: "CFR",
+    incoterms_desc: "Cost and Freight",
+    creation_date: "MM-DD-YYYY",
+  },
+  {
+    id: 10,
+    incoterms_code: "CIF",
+    incoterms_desc: "Cost, Insurance, and Freight",
+    creation_date: "MM-DD-YYYY",
+  },
+];
+
+export const city_list = [
+  {
+    id: 1,
+    city_code: "MAL",
+    city_desc: "Malabon",
+    creation_date: "MM-DD-YYYY",
+  },
+  {
+    id: 2,
+    city_code: "NAV",
+    city_desc: "Navotas",
+    creation_date: "MM-DD-YYYY",
+  },
+];
+
+export const district_list = [
+  {
+    id: 1,
+    district_code: "LD",
+    district_desc: "Lone District",
+    creation_date: "MM-DD-YYYY",
+  },
+];
+
+export const region_list = [
+  {
+    id: 1,
+    region_code: "NCR",
+    region_desc: "National Capital Region",
+    creation_date: "MM-DD-YYYY",
+  },
+];
+
+export const country_list = [
+  {
+    id: 1,
+    country_code: "PH",
+    country_desc: "Philippines",
+    creation_date: "MM-DD-YYYY",
+  },
+];
+
+export const language_list = [
+  {
+    id: 1,
+    language_code: "EN",
+    language_desc: "English",
+    creation_date: "MM-DD-YYYY",
   },
 ];

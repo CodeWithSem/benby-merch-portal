@@ -5,54 +5,61 @@ import Checkbox_Field from "assets/elements/Checkbox_Field";
 import Button from "assets/elements/Button";
 import Pagination_Modal from "assets/elements/Pagination_Modal";
 
-const Select_Branch = ({
+const Select_App_Matrix = ({
   is_open,
   on_close,
   width = "max-w-[700px]",
   height = "h-[500px]",
-  branch_list,
+  app_matrix_list,
+  set_data,
 }) => {
   // + Client-Side Filtering
-  const [filtered_branch_list, set_filtered_branch_list] = useState([]);
+  const [filtered_app_matrix_list, set_filtered_app_matrix_list] = useState([]);
   const [current_page, set_current_page] = useState(1);
   const [rows_per_page, set_rows_per_page] = useState(5);
   const [search_query, set_search_query] = useState("");
-  const [selected_branch, set_selected_branch] = useState(null);
+  const [selected_app_matrix, set_selected_app_matrix] = useState(null);
 
   useEffect(() => {
-    let data = [...branch_list];
+    let data = [...app_matrix_list];
 
     if (search_query.trim() !== "") {
       const q = search_query.toLowerCase();
       data = data.filter(
         (data) =>
-          data.branch_code.toLowerCase().includes(q) ||
-          data.branch_desc.toLowerCase().includes(q)
+          data.app_matrix_code.toLowerCase().includes(q) ||
+          data.app_matrix_desc.toLowerCase().includes(q)
       );
     }
 
     const start_idx = (current_page - 1) * rows_per_page;
     const end_idx = start_idx + rows_per_page;
-    set_filtered_branch_list(data.slice(start_idx, end_idx));
-  }, [branch_list, search_query, current_page, rows_per_page]);
+    set_filtered_app_matrix_list(data.slice(start_idx, end_idx));
+  }, [app_matrix_list, search_query, current_page, rows_per_page]);
 
   const total_pages = Math.ceil(
-    branch_list.filter(
+    app_matrix_list.filter(
       (data) =>
-        data.branch_code.toLowerCase().includes(search_query.toLowerCase()) ||
-        data.branch_desc.toLowerCase().includes(search_query.toLowerCase())
+        data.app_matrix_code
+          .toLowerCase()
+          .includes(search_query.toLowerCase()) ||
+        data.app_matrix_desc.toLowerCase().includes(search_query.toLowerCase())
     ).length / rows_per_page
   );
 
   const handle_page_change = (page) => set_current_page(page);
   // - Client-Side Filtering
 
-  const handle_select_branch = () => {
-    if (!selected_branch) {
-      alert("Please select a branch before proceeding.");
+  const handle_select_app_matrix = () => {
+    if (!selected_app_matrix) {
+      alert("Please select a app_matrix before proceeding.");
       return;
     }
-    alert(`Selected: ${selected_branch.branch_desc}`);
+    set_data((prev) => ({
+      ...prev,
+      app_matrix_code: selected_app_matrix.app_matrix_code,
+    }));
+    on_close();
   };
 
   // RETURN ORIGIN
@@ -73,10 +80,9 @@ const Select_Branch = ({
           >
             <X size={20} />
           </button>
-
           {/* + Modal Label */}
           <div className="text-lg md:text-xl font-bold mb-5 px-7">
-            Branch Selection
+            Approval Matrix Selection
           </div>
           {/* - Modal Label */}
           {/* + Modal Body */}
@@ -104,7 +110,7 @@ const Select_Branch = ({
                     <tr className="font-semibold text-xs">
                       <th className="px-6 py-3 w-[80px]"></th>
                       <th className="px-6 py-3 text-gray-500 text-left">
-                        Branch
+                        Approval Matrix
                       </th>
                       <th className="px-6 py-3 text-gray-500 text-left">
                         Creation Date
@@ -113,7 +119,7 @@ const Select_Branch = ({
                   </thead>
 
                   <tbody className="divide-y divide-gray-100">
-                    {filtered_branch_list.length === 0 ? (
+                    {filtered_app_matrix_list.length === 0 ? (
                       <tr>
                         <td
                           colSpan={3}
@@ -123,13 +129,15 @@ const Select_Branch = ({
                         </td>
                       </tr>
                     ) : (
-                      filtered_branch_list.map((data) => (
+                      filtered_app_matrix_list.map((data) => (
                         <tr
                           key={data.id}
                           className={`hover:bg-sky-50/50 cursor-pointer text-[12px] ${
-                            selected_branch?.id === data.id ? "bg-sky-50" : ""
+                            selected_app_matrix?.id === data.id
+                              ? "bg-sky-50"
+                              : ""
                           }`}
-                          onClick={() => set_selected_branch(data)}
+                          onClick={() => set_selected_app_matrix(data)}
                         >
                           <td className="px-5 py-4 sm:px-6 text-center">
                             <div className="flex justify-center items-center">
@@ -137,18 +145,18 @@ const Select_Branch = ({
                                 name="check"
                                 box_size={18}
                                 icon_size={12}
-                                checked={selected_branch?.id === data.id}
-                                on_change={() => set_selected_branch(data)}
+                                checked={selected_app_matrix?.id === data.id}
+                                on_change={() => set_selected_app_matrix(data)}
                               />
                             </div>
                           </td>
                           <td className="px-5 py-4 sm:px-6">
                             <div className="block font-medium text-gray-800">
                               <span className="block text-gray-500 text-[12px]">
-                                {data.branch_code}
+                                {data.app_matrix_code}
                               </span>
                               <span className="block text-gray-800 text-sm">
-                                {data.branch_desc}
+                                {data.app_matrix_desc}
                               </span>
                             </div>
                           </td>
@@ -165,7 +173,6 @@ const Select_Branch = ({
             </div>
           </div>
           {/* - Modal Body */}
-
           {/* + Modal Footer */}
           <div className="flex flex-col items-center sm:flex-row sm:justify-between gap-3 mt-5 px-7">
             {/* + Pagination */}
@@ -179,13 +186,13 @@ const Select_Branch = ({
               </div>
             )}
             {/* - Pagination */}
-            {/* + Buttons */}
+            {/* + Action Buttons */}
             <div className="flex justify-center sm:justify-end gap-2 w-full">
               <Button
                 variant="primary"
-                on_click={handle_select_branch}
+                on_click={handle_select_app_matrix}
                 class_name="w-full md:w-[100px]"
-                disabled={!selected_branch}
+                disabled={!selected_app_matrix}
               >
                 Proceed
               </Button>
@@ -197,7 +204,7 @@ const Select_Branch = ({
                 Close
               </Button>
             </div>
-            {/* - Buttons */}
+            {/* - Action Buttons */}
           </div>
           {/* - Modal Footer */}
         </div>
@@ -206,4 +213,4 @@ const Select_Branch = ({
   ) : null;
 };
 
-export default Select_Branch;
+export default Select_App_Matrix;

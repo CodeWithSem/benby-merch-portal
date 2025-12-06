@@ -14,50 +14,60 @@ const PO_Status = () => {
           <div className="col-span-full">
             <Text_Code_Field
               label="Ordered"
-              // code_value={search_value}
-              // text_value={search_value}
               code_width="150px"
               show_search_button={false}
+              bg_dis_color="bg-slate-50"
+              text_dis_color="text-slate-500"
+              // code_value={search_value}
+              // text_value={search_value}
               disabled
             />
           </div>
           <div className="col-span-full">
             <Text_Code_Field
               label="Still to Deliver"
-              // code_value={search_value}
-              // text_value={search_value}
               code_width="150px"
               show_search_button={false}
+              bg_dis_color="bg-slate-50"
+              text_dis_color="text-slate-500"
+              // code_value={search_value}
+              // text_value={search_value}
               disabled
             />
           </div>
           <div className="col-span-full">
             <Text_Code_Field
               label="Delivered"
-              // code_value={search_value}
-              // text_value={search_value}
               code_width="150px"
               show_search_button={false}
+              bg_dis_color="bg-slate-50"
+              text_dis_color="text-slate-500"
+              // code_value={search_value}
+              // text_value={search_value}
               disabled
             />
           </div>
           <div className="col-span-full">
             <Text_Code_Field
               label="Still Invoice"
-              // code_value={search_value}
-              // text_value={search_value}
               code_width="150px"
               show_search_button={false}
+              bg_dis_color="bg-slate-50"
+              text_dis_color="text-slate-500"
+              // code_value={search_value}
+              // text_value={search_value}
               disabled
             />
           </div>
           <div className="col-span-full">
             <Text_Code_Field
               label="Invoiced"
-              // code_value={search_value}
-              // text_value={search_value}
               code_width="150px"
               show_search_button={false}
+              bg_dis_color="bg-slate-50"
+              text_dis_color="text-slate-500"
+              // code_value={search_value}
+              // text_value={search_value}
               disabled
             />
           </div>
@@ -74,9 +84,9 @@ const PO_Status = () => {
               name="terms"
               box_size={24}
               icon_size={14}
-              // checked={check}
+              checked={false}
               // on_change={(e) => set_check(e.target.checked)}
-              on_change={() => alert("Close PO")}
+              disabled
             />
           </div>
         </div>

@@ -1,7 +1,13 @@
 import React from "react";
 import Text_Field from "assets/elements/Text_Field";
+import { get_description } from "assets/scripts/functions/get_description";
+import {
+  company_list,
+  purc_group_list,
+  purc_org_list,
+} from "../../PO_DATA_MAP";
 
-const Org_Data = () => {
+const Org_Data = ({ new_po_data }) => {
   return (
     <React.Fragment>
       {/* + Section 1 */}
@@ -11,7 +17,12 @@ const Org_Data = () => {
             <Text_Field
               label="Company"
               type={"text"}
-              // value={}
+              value={get_description(
+                new_po_data.od_company_code,
+                company_list,
+                "company_code",
+                "company_desc"
+              )} //--> od_company_code
               disabled
             />
           </div>
@@ -28,7 +39,12 @@ const Org_Data = () => {
             <Text_Field
               label="Purchasing Organization"
               type={"text"}
-              // value={}
+              value={get_description(
+                new_po_data.od_purc_org_code,
+                purc_org_list,
+                "purc_org_code",
+                "purc_org_desc"
+              )} //--> od_purc_org_code
               disabled
             />
           </div>
@@ -45,7 +61,12 @@ const Org_Data = () => {
             <Text_Field
               label="Purchasing Group"
               type={"text"}
-              // value={}
+              value={get_description(
+                new_po_data.od_purc_group_code,
+                purc_group_list,
+                "purc_group_code",
+                "purc_group_desc"
+              )} //--> od_purc_group_code
               disabled
             />
           </div>
