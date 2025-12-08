@@ -4,6 +4,7 @@ import { useToast } from "../../../../../layout/Toast_Provider";
 import { Get_TBL_INCREMENTAL_ID } from "api/real_time_db/incremental";
 import {
   api_get_inv_acc_center_list,
+  api_set_inv_acc_center_increment,
   api_truncate_inv_acc_center,
 } from "api/firestore_db/maintenance/financial/tbl_inv_acc_center_api";
 import {
@@ -19,6 +20,7 @@ import {
   SlidersHorizontal,
   CheckCircle2,
   Trash2,
+  FileDigit,
 } from "lucide-react";
 import Icon_Field from "assets/elements/Icon_Field";
 import Select_Field from "assets/elements/Select_Field";
@@ -30,6 +32,7 @@ import Create_IAC from "./functions/Create_IAC";
 import Edit_IAC from "./functions/Edit_IAC";
 import Delete_IAC from "./functions/Delete_IAC";
 import Upload_IAC from "./functions/Upload_IAC";
+import Set_Increment_ID from "assets/elements/modals/Set_Increment_ID";
 
 const HAS_FILTER = true;
 
@@ -52,6 +55,7 @@ const Inv_Acc_Center = ({ set_page }) => {
     change_by: "",
   };
 
+  const [current_id, set_current_id] = useState(0);
   const [new_data, set_new_data] = useState({ ...def_inv_acc_center_data });
   const [edit_data, set_edit_data] = useState({ ...def_inv_acc_center_data });
   const [delete_data, set_delete_data] = useState({
@@ -61,6 +65,7 @@ const Inv_Acc_Center = ({ set_page }) => {
   const reset_new_data = () => {
     set_new_data((prev) => ({
       ...prev,
+      inv_acc_center_code: "",
       inv_acc_center_desc: "",
       created_by: "",
       change_date: "",
@@ -73,8 +78,9 @@ const Inv_Acc_Center = ({ set_page }) => {
       set_new_data((prev) => ({
         ...prev,
         id: value,
-        inv_acc_center_code: `IAC-${String(value).padStart(2, "0")}`,
+        // inv_acc_center_code: `IAC-${String(value).padStart(2, "0")}`,
       }));
+      set_current_id(value);
     });
   }, []);
 
@@ -99,15 +105,6 @@ const Inv_Acc_Center = ({ set_page }) => {
   ];
 
   const [inv_acc_center_list, set_inv_acc_center_list] = useState([]);
-  // ======================================================
-  // id: 1,
-  // inv_acc_center_code: "PL-S-001",
-  // inv_acc_center_desc: "Inv. Account Center Description 1",
-  // created_by: "Admin",
-  // creation_date: "MM-DD-YYYY",
-  // change_by: "",
-  // change_date: "",
-  // ======================================================
 
   const handle_get_inv_acc_center_list = async () => {
     set_loading_list(true);
@@ -144,6 +141,10 @@ const Inv_Acc_Center = ({ set_page }) => {
     }
     handle_get_inv_acc_center_list();
     set_truncate_loading(false);
+  };
+
+  const handle_set_incremental_id = () => {
+    set_display_modal("set_incremental_id");
   };
 
   // + Client-Side Filtering
@@ -323,6 +324,17 @@ const Inv_Acc_Center = ({ set_page }) => {
                   <h1 className="text-lg">Inv. Account Center</h1>
                 </div>
                 <div className="flex gap-2">
+                  {active_user?.category === "DEV" && (
+                    <Button
+                      variant="success"
+                      icon={FileDigit}
+                      icon_position="left"
+                      width="w-[110px]"
+                      on_click={handle_set_incremental_id}
+                    >
+                      Set ID
+                    </Button>
+                  )}
                   {active_user?.category === "DEV" && (
                     <Button
                       variant="danger"
@@ -662,6 +674,13 @@ const Inv_Acc_Center = ({ set_page }) => {
         show_toast={show_toast}
         delete_data={delete_data}
         set_inv_acc_center_list={set_inv_acc_center_list}
+      />
+      <Set_Increment_ID
+        is_open={display_modal === "set_incremental_id"}
+        on_close={() => set_display_modal("")}
+        show_toast={show_toast}
+        current_id={current_id}
+        api_set_increment_id={api_set_inv_acc_center_increment}
       />
     </React.Fragment>
   );

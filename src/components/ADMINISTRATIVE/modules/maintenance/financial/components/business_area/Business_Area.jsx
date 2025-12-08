@@ -4,6 +4,7 @@ import { useToast } from "../../../../../layout/Toast_Provider";
 import { Get_TBL_INCREMENTAL_ID } from "api/real_time_db/incremental";
 import {
   api_get_business_area_list,
+  api_set_business_area_increment,
   api_truncate_business_area,
 } from "api/firestore_db/maintenance/financial/tbl_business_area_api";
 import {
@@ -19,6 +20,7 @@ import {
   SlidersHorizontal,
   CheckCircle2,
   Trash2,
+  FileDigit,
 } from "lucide-react";
 import Icon_Field from "assets/elements/Icon_Field";
 import Select_Field from "assets/elements/Select_Field";
@@ -30,6 +32,7 @@ import Create_B_Area from "./functions/Create_B_Area";
 import Edit_B_Area from "./functions/Edit_B_Area";
 import Delete_B_Area from "./functions/Delete_B_Area";
 import Upload_B_Area from "./functions/Upload_B_Area";
+import Set_Increment_ID from "assets/elements/modals/Set_Increment_ID";
 
 const HAS_FILTER = true;
 
@@ -52,6 +55,7 @@ const Business_Area = ({ set_page }) => {
     change_by: "",
   };
 
+  const [current_id, set_current_id] = useState(0);
   const [new_data, set_new_data] = useState({ ...def_business_area_data });
   const [edit_data, set_edit_data] = useState({ ...def_business_area_data });
   const [delete_data, set_delete_data] = useState({
@@ -75,6 +79,7 @@ const Business_Area = ({ set_page }) => {
         id: value,
         business_area_code: `BA-${String(value).padStart(3, "0")}`,
       }));
+      set_current_id(value);
     });
   }, []);
 
@@ -95,15 +100,6 @@ const Business_Area = ({ set_page }) => {
   ];
 
   const [business_area_list, set_business_area_list] = useState([]);
-  // ======================================================
-  // id: 1,
-  // business_area_code: "B_Area-001",
-  // business_area_desc: "Business Area Description 1",
-  // created_by: "Admin",
-  // creation_date: "MM-DD-YYYY",
-  // change_by: "",
-  // change_date: "",
-  // ======================================================
 
   const handle_get_business_area_list = async () => {
     set_loading_list(true);
@@ -140,6 +136,10 @@ const Business_Area = ({ set_page }) => {
     }
     handle_get_business_area_list();
     set_truncate_loading(false);
+  };
+
+  const handle_set_incremental_id = () => {
+    set_display_modal("set_incremental_id");
   };
 
   // + Client-Side Filtering
@@ -319,6 +319,17 @@ const Business_Area = ({ set_page }) => {
                   <h1 className="text-lg">Business Area</h1>
                 </div>
                 <div className="flex gap-2">
+                  {active_user?.category === "DEV" && (
+                    <Button
+                      variant="success"
+                      icon={FileDigit}
+                      icon_position="left"
+                      width="w-[110px]"
+                      on_click={handle_set_incremental_id}
+                    >
+                      Set ID
+                    </Button>
+                  )}
                   {active_user?.category === "DEV" && (
                     <Button
                       variant="danger"
@@ -658,6 +669,13 @@ const Business_Area = ({ set_page }) => {
         show_toast={show_toast}
         delete_data={delete_data}
         set_business_area_list={set_business_area_list}
+      />
+      <Set_Increment_ID
+        is_open={display_modal === "set_incremental_id"}
+        on_close={() => set_display_modal("")}
+        show_toast={show_toast}
+        current_id={current_id}
+        api_set_increment_id={api_set_business_area_increment}
       />
     </React.Fragment>
   );

@@ -63,7 +63,11 @@ const Edit_SLOC = ({
     }
     try {
       set_update_loading(true);
-      const response = await api_update_sloc(edit_data, active_user?.username);
+      const response = await api_update_sloc(
+        edit_data,
+        active_user?.username,
+        show_toast
+      );
       if (response.success) {
         console_log(response.data);
         set_sloc_list((prev) =>
@@ -71,14 +75,10 @@ const Edit_SLOC = ({
             item.id === response.data.id ? response.data : item
           )
         );
-        show_status("success");
         handle_go_back("sub_level");
-      } else {
-        show_status("error");
       }
     } catch (error) {
       console.error("Failed to create sloc:", error);
-      show_status("error");
     } finally {
       close_confirm_modal();
     }

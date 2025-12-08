@@ -4,6 +4,7 @@ import { useToast } from "../../../../../layout/Toast_Provider";
 import { Get_TBL_INCREMENTAL_ID } from "api/real_time_db/incremental";
 import {
   api_get_payment_term_list,
+  api_set_payment_term_increment,
   api_truncate_payment_term,
 } from "api/firestore_db/maintenance/financial/tbl_payment_term_api";
 import {
@@ -19,6 +20,7 @@ import {
   SlidersHorizontal,
   CheckCircle2,
   Trash2,
+  FileDigit,
 } from "lucide-react";
 import Icon_Field from "assets/elements/Icon_Field";
 import Select_Field from "assets/elements/Select_Field";
@@ -30,6 +32,7 @@ import Create_P_Term from "./functions/Create_P_Term";
 import Edit_P_Term from "./functions/Edit_P_Term";
 import Delete_P_Term from "./functions/Delete_P_Term";
 import Upload_P_Term from "./functions/Upload_P_Term";
+import Set_Increment_ID from "assets/elements/modals/Set_Increment_ID";
 
 const HAS_FILTER = true;
 
@@ -52,6 +55,7 @@ const Payment_Term = ({ set_page }) => {
     change_by: "",
   };
 
+  const [current_id, set_current_id] = useState(0);
   const [new_data, set_new_data] = useState({ ...def_payment_term_data });
   const [edit_data, set_edit_data] = useState({ ...def_payment_term_data });
   const [delete_data, set_delete_data] = useState({ ...def_payment_term_data });
@@ -59,6 +63,7 @@ const Payment_Term = ({ set_page }) => {
   const reset_new_data = () => {
     set_new_data((prev) => ({
       ...prev,
+      payment_term_code: "",
       payment_term_desc: "",
       created_by: "",
       change_date: "",
@@ -71,8 +76,9 @@ const Payment_Term = ({ set_page }) => {
       set_new_data((prev) => ({
         ...prev,
         id: value,
-        payment_term_code: `PT-${String(value).padStart(2, "0")}`,
+        // payment_term_code: `PT-${String(value).padStart(2, "0")}`,
       }));
+      set_current_id(value);
     });
   }, []);
 
@@ -93,15 +99,6 @@ const Payment_Term = ({ set_page }) => {
   ];
 
   const [payment_term_list, set_payment_term_list] = useState([]);
-  // ======================================================
-  // id: 1,
-  // payment_term_code: "PL-S-001",
-  // payment_term_desc: "Payment Term Description 1",
-  // created_by: "Admin",
-  // creation_date: "MM-DD-YYYY",
-  // change_by: "",
-  // change_date: "",
-  // ======================================================
 
   const handle_get_payment_term_list = async () => {
     set_loading_list(true);
@@ -138,6 +135,10 @@ const Payment_Term = ({ set_page }) => {
     }
     handle_get_payment_term_list();
     set_truncate_loading(false);
+  };
+
+  const handle_set_incremental_id = () => {
+    set_display_modal("set_incremental_id");
   };
 
   // + Client-Side Filtering
@@ -318,6 +319,17 @@ const Payment_Term = ({ set_page }) => {
                   <h1 className="text-lg">Payment Term</h1>
                 </div>
                 <div className="flex gap-2">
+                  {active_user?.category === "DEV" && (
+                    <Button
+                      variant="success"
+                      icon={FileDigit}
+                      icon_position="left"
+                      width="w-[110px]"
+                      on_click={handle_set_incremental_id}
+                    >
+                      Set ID
+                    </Button>
+                  )}
                   {active_user?.category === "DEV" && (
                     <Button
                       variant="danger"
@@ -657,6 +669,13 @@ const Payment_Term = ({ set_page }) => {
         show_toast={show_toast}
         delete_data={delete_data}
         set_payment_term_list={set_payment_term_list}
+      />
+      <Set_Increment_ID
+        is_open={display_modal === "set_incremental_id"}
+        on_close={() => set_display_modal("")}
+        show_toast={show_toast}
+        current_id={current_id}
+        api_set_increment_id={api_set_payment_term_increment}
       />
     </React.Fragment>
   );

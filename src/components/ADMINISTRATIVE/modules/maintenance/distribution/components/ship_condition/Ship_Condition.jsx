@@ -12,6 +12,7 @@ import { useToast } from "../../../../../layout/Toast_Provider";
 import { Use_App } from "context/app_context";
 import {
   api_get_ship_condition_list,
+  api_set_ship_condition_increment,
   api_truncate_ship_condition,
 } from "api/firestore_db/maintenance/distribution/tbl_ship_condition_api";
 import { Get_TBL_INCREMENTAL_ID } from "api/real_time_db/incremental";
@@ -28,6 +29,7 @@ import {
   Trash2,
   CheckCircle2,
   SlidersHorizontal,
+  FileDigit,
 } from "lucide-react";
 import Icon_Field from "assets/elements/Icon_Field";
 import Select_Field from "assets/elements/Select_Field";
@@ -39,6 +41,7 @@ import Create_Ship_Condition from "./functions/Create_Ship_Condition";
 import Edit_Ship_Condition from "./functions/Edit_Ship_Condition";
 import Delete_Ship_Condition from "./functions/Delete_Ship_Condition";
 import Upload_Ship_Condition from "./functions/Upload_Ship_Condition";
+import Set_Increment_ID from "assets/elements/modals/Set_Increment_ID";
 
 const HAS_FILTER = true;
 
@@ -61,6 +64,7 @@ const Ship_Condition = ({ set_page }) => {
     change_by: "",
   };
 
+  const [current_id, set_current_id] = useState(0);
   const [new_data, set_new_data] = useState({ ...def_ship_condition_data });
   const [edit_data, set_edit_data] = useState({ ...def_ship_condition_data });
   const [delete_data, set_delete_data] = useState({
@@ -85,6 +89,7 @@ const Ship_Condition = ({ set_page }) => {
         id: value,
         ship_condition_code: `SH-CON-${String(value).padStart(2, "0")}`,
       }));
+      set_current_id(value);
     });
   }, []);
 
@@ -145,6 +150,10 @@ const Ship_Condition = ({ set_page }) => {
     }
     handle_get_ship_condition_list();
     set_truncate_loading(false);
+  };
+
+  const handle_set_incremental_id = () => {
+    set_display_modal("set_incremental_id");
   };
 
   // + Client-Side Filtering
@@ -326,6 +335,17 @@ const Ship_Condition = ({ set_page }) => {
                   <h1 className="text-lg">Shipping Condition</h1>
                 </div>
                 <div className="flex gap-2">
+                  {active_user?.category === "DEV" && (
+                    <Button
+                      variant="success"
+                      icon={FileDigit}
+                      icon_position="left"
+                      width="w-[110px]"
+                      on_click={handle_set_incremental_id}
+                    >
+                      Set ID
+                    </Button>
+                  )}
                   {active_user?.category === "DEV" && (
                     <Button
                       variant="danger"
@@ -664,6 +684,13 @@ const Ship_Condition = ({ set_page }) => {
         show_toast={show_toast}
         delete_data={delete_data}
         set_ship_condition_list={set_ship_condition_list}
+      />
+      <Set_Increment_ID
+        is_open={display_modal === "set_incremental_id"}
+        on_close={() => set_display_modal("")}
+        show_toast={show_toast}
+        current_id={current_id}
+        api_set_increment_id={api_set_ship_condition_increment}
       />
     </React.Fragment>
   );

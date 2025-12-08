@@ -4,6 +4,7 @@ import { useToast } from "../../../../../layout/Toast_Provider";
 import { Get_TBL_INCREMENTAL_ID } from "api/real_time_db/incremental";
 import {
   api_get_exchange_rate_list,
+  api_set_exchange_rate_increment,
   api_truncate_exchange_rate,
 } from "api/firestore_db/maintenance/financial/tbl_exchange_rate_api";
 import {
@@ -19,6 +20,7 @@ import {
   SlidersHorizontal,
   CheckCircle2,
   Trash2,
+  FileDigit,
 } from "lucide-react";
 import Icon_Field from "assets/elements/Icon_Field";
 import Select_Field from "assets/elements/Select_Field";
@@ -30,6 +32,7 @@ import Create_E_Rate from "./functions/Create_E_Rate";
 import Edit_E_Rate from "./functions/Edit_E_Rate";
 import Delete_E_Rate from "./functions/Delete_E_Rate";
 import Upload_E_Rate from "./functions/Upload_E_Rate";
+import Set_Increment_ID from "assets/elements/modals/Set_Increment_ID";
 
 const HAS_FILTER = true;
 
@@ -52,6 +55,7 @@ const Exchange_Rate = ({ set_page }) => {
     change_by: "",
   };
 
+  const [current_id, set_current_id] = useState(0);
   const [new_data, set_new_data] = useState({ ...def_exchange_rate_data });
   const [edit_data, set_edit_data] = useState({ ...def_exchange_rate_data });
   const [delete_data, set_delete_data] = useState({
@@ -75,6 +79,7 @@ const Exchange_Rate = ({ set_page }) => {
         id: value,
         exchange_rate_code: `ER-${String(value).padStart(2, "0")}`,
       }));
+      set_current_id(value);
     });
   }, []);
 
@@ -95,15 +100,6 @@ const Exchange_Rate = ({ set_page }) => {
   ];
 
   const [exchange_rate_list, set_exchange_rate_list] = useState([]);
-  // ======================================================
-  // id: 1,
-  // exchange_rate_code: "PL-S-001",
-  // exchange_rate_desc: "Exchange Rate Description 1",
-  // created_by: "Admin",
-  // creation_date: "MM-DD-YYYY",
-  // change_by: "",
-  // change_date: "",
-  // ======================================================
 
   const handle_get_exchange_rate_list = async () => {
     set_loading_list(true);
@@ -140,6 +136,10 @@ const Exchange_Rate = ({ set_page }) => {
     }
     handle_get_exchange_rate_list();
     set_truncate_loading(false);
+  };
+
+  const handle_set_incremental_id = () => {
+    set_display_modal("set_incremental_id");
   };
 
   // + Client-Side Filtering
@@ -319,6 +319,17 @@ const Exchange_Rate = ({ set_page }) => {
                   <h1 className="text-lg">Exchange Rate</h1>
                 </div>
                 <div className="flex gap-2">
+                  {active_user?.category === "DEV" && (
+                    <Button
+                      variant="success"
+                      icon={FileDigit}
+                      icon_position="left"
+                      width="w-[110px]"
+                      on_click={handle_set_incremental_id}
+                    >
+                      Set ID
+                    </Button>
+                  )}
                   {active_user?.category === "DEV" && (
                     <Button
                       variant="danger"
@@ -658,6 +669,13 @@ const Exchange_Rate = ({ set_page }) => {
         show_toast={show_toast}
         delete_data={delete_data}
         set_exchange_rate_list={set_exchange_rate_list}
+      />
+      <Set_Increment_ID
+        is_open={display_modal === "set_incremental_id"}
+        on_close={() => set_display_modal("")}
+        show_toast={show_toast}
+        current_id={current_id}
+        api_set_increment_id={api_set_exchange_rate_increment}
       />
     </React.Fragment>
   );

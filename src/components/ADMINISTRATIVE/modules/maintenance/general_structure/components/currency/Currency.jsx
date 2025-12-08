@@ -4,6 +4,7 @@ import { useToast } from "../../../../../layout/Toast_Provider";
 import { Get_TBL_INCREMENTAL_ID } from "api/real_time_db/incremental";
 import {
   api_get_currency_list,
+  api_set_currency_increment,
   api_truncate_currency,
 } from "api/firestore_db/maintenance/general_structure/tbl_currency_api";
 import {
@@ -19,6 +20,7 @@ import {
   SlidersHorizontal,
   CheckCircle2,
   Trash2,
+  FileDigit,
 } from "lucide-react";
 import Icon_Field from "assets/elements/Icon_Field";
 import Select_Field from "assets/elements/Select_Field";
@@ -30,6 +32,7 @@ import Create_Currency from "./functions/Create_Currency";
 import Edit_Currency from "./functions/Edit_Currency";
 import Delete_Currency from "./functions/Delete_Currency";
 import Upload_Currency from "./functions/Upload_Currency";
+import Set_Increment_ID from "assets/elements/modals/Set_Increment_ID";
 
 const HAS_FILTER = true;
 
@@ -52,6 +55,7 @@ const Currency = ({ set_page }) => {
     change_by: "",
   };
 
+  const [current_id, set_current_id] = useState(0);
   const [new_data, set_new_data] = useState({ ...def_currency_data });
   const [edit_data, set_edit_data] = useState({ ...def_currency_data });
   const [delete_data, set_delete_data] = useState({ ...def_currency_data });
@@ -73,6 +77,7 @@ const Currency = ({ set_page }) => {
         ...prev,
         id: value,
       }));
+      set_current_id(value);
     });
   }, []);
 
@@ -138,6 +143,10 @@ const Currency = ({ set_page }) => {
     }
     handle_get_currency_list();
     set_truncate_loading(false);
+  };
+
+  const handle_set_incremental_id = () => {
+    set_display_modal("set_incremental_id");
   };
 
   // + Client-Side Filtering
@@ -316,6 +325,17 @@ const Currency = ({ set_page }) => {
                   <h1 className="text-lg">Currency</h1>
                 </div>
                 <div className="flex gap-2">
+                  {active_user?.category === "DEV" && (
+                    <Button
+                      variant="success"
+                      icon={FileDigit}
+                      icon_position="left"
+                      width="w-[110px]"
+                      on_click={handle_set_incremental_id}
+                    >
+                      Set ID
+                    </Button>
+                  )}
                   {active_user?.category === "DEV" && (
                     <Button
                       variant="danger"
@@ -655,6 +675,13 @@ const Currency = ({ set_page }) => {
         show_toast={show_toast}
         delete_data={delete_data}
         set_currency_list={set_currency_list}
+      />
+      <Set_Increment_ID
+        is_open={display_modal === "set_incremental_id"}
+        on_close={() => set_display_modal("")}
+        show_toast={show_toast}
+        current_id={current_id}
+        api_set_increment_id={api_set_currency_increment}
       />
     </React.Fragment>
   );

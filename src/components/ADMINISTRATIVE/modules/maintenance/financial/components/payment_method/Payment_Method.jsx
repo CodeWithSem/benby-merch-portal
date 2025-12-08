@@ -4,6 +4,7 @@ import { useToast } from "../../../../../layout/Toast_Provider";
 import { Get_TBL_INCREMENTAL_ID } from "api/real_time_db/incremental";
 import {
   api_get_payment_method_list,
+  api_set_payment_method_increment,
   api_truncate_payment_method,
 } from "api/firestore_db/maintenance/financial/tbl_payment_method_api";
 import {
@@ -19,6 +20,7 @@ import {
   SlidersHorizontal,
   CheckCircle2,
   Trash2,
+  FileDigit,
 } from "lucide-react";
 import Icon_Field from "assets/elements/Icon_Field";
 import Select_Field from "assets/elements/Select_Field";
@@ -30,6 +32,7 @@ import Create_P_Method from "./functions/Create_P_Method";
 import Edit_P_Method from "./functions/Edit_P_Method";
 import Delete_P_Method from "./functions/Delete_P_Method";
 import Upload_P_Method from "./functions/Upload_P_Method";
+import Set_Increment_ID from "assets/elements/modals/Set_Increment_ID";
 
 const HAS_FILTER = true;
 
@@ -52,6 +55,7 @@ const Payment_Method = ({ set_page }) => {
     change_by: "",
   };
 
+  const [current_id, set_current_id] = useState(0);
   const [new_data, set_new_data] = useState({ ...def_payment_method_data });
   const [edit_data, set_edit_data] = useState({ ...def_payment_method_data });
   const [delete_data, set_delete_data] = useState({
@@ -61,6 +65,7 @@ const Payment_Method = ({ set_page }) => {
   const reset_new_data = () => {
     set_new_data((prev) => ({
       ...prev,
+      payment_method_code: "",
       payment_method_desc: "",
       created_by: "",
       change_date: "",
@@ -73,8 +78,9 @@ const Payment_Method = ({ set_page }) => {
       set_new_data((prev) => ({
         ...prev,
         id: value,
-        payment_method_code: `PM-${String(value).padStart(2, "0")}`,
+        // payment_method_code: `PM-${String(value).padStart(2, "0")}`,
       }));
+      set_current_id(value);
     });
   }, []);
 
@@ -99,15 +105,6 @@ const Payment_Method = ({ set_page }) => {
   ];
 
   const [payment_method_list, set_payment_method_list] = useState([]);
-  // ======================================================
-  // id: 1,
-  // payment_method_code: "PL-S-001",
-  // payment_method_desc: "Payment Method Description 1",
-  // created_by: "Admin",
-  // creation_date: "MM-DD-YYYY",
-  // change_by: "",
-  // change_date: "",
-  // ======================================================
 
   const handle_get_payment_method_list = async () => {
     set_loading_list(true);
@@ -144,6 +141,10 @@ const Payment_Method = ({ set_page }) => {
     }
     handle_get_payment_method_list();
     set_truncate_loading(false);
+  };
+
+  const handle_set_incremental_id = () => {
+    set_display_modal("set_incremental_id");
   };
 
   // + Client-Side Filtering
@@ -323,6 +324,17 @@ const Payment_Method = ({ set_page }) => {
                   <h1 className="text-lg">Payment Method</h1>
                 </div>
                 <div className="flex gap-2">
+                  {active_user?.category === "DEV" && (
+                    <Button
+                      variant="success"
+                      icon={FileDigit}
+                      icon_position="left"
+                      width="w-[110px]"
+                      on_click={handle_set_incremental_id}
+                    >
+                      Set ID
+                    </Button>
+                  )}
                   {active_user?.category === "DEV" && (
                     <Button
                       variant="danger"
@@ -662,6 +674,13 @@ const Payment_Method = ({ set_page }) => {
         show_toast={show_toast}
         delete_data={delete_data}
         set_payment_method_list={set_payment_method_list}
+      />
+      <Set_Increment_ID
+        is_open={display_modal === "set_incremental_id"}
+        on_close={() => set_display_modal("")}
+        show_toast={show_toast}
+        current_id={current_id}
+        api_set_increment_id={api_set_payment_method_increment}
       />
     </React.Fragment>
   );

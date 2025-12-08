@@ -4,6 +4,7 @@ import { useToast } from "../../../../../layout/Toast_Provider";
 import { Get_TBL_INCREMENTAL_ID } from "api/real_time_db/incremental";
 import {
   api_get_industry_type_list,
+  api_set_industry_type_increment,
   api_truncate_industry_type,
 } from "api/firestore_db/maintenance/general_structure/tbl_industry_type_api";
 import {
@@ -19,6 +20,7 @@ import {
   SlidersHorizontal,
   CheckCircle2,
   Trash2,
+  FileDigit,
 } from "lucide-react";
 import Icon_Field from "assets/elements/Icon_Field";
 import Select_Field from "assets/elements/Select_Field";
@@ -30,6 +32,7 @@ import Create_Industry_Type from "./functions/Create_Industry_Type";
 import Edit_Industry_Type from "./functions/Edit_Industry_Type";
 import Delete_Industry_Type from "./functions/Delete_Industry_Type";
 import Upload_Industry_Type from "./functions/Upload_Industry_Type";
+import Set_Increment_ID from "assets/elements/modals/Set_Increment_ID";
 
 const HAS_FILTER = true;
 
@@ -52,6 +55,7 @@ const Industry_Type = ({ set_page }) => {
     change_by: "",
   };
 
+  const [current_id, set_current_id] = useState(0);
   const [new_data, set_new_data] = useState({ ...def_industry_type_data });
   const [edit_data, set_edit_data] = useState({ ...def_industry_type_data });
   const [delete_data, set_delete_data] = useState({
@@ -61,6 +65,7 @@ const Industry_Type = ({ set_page }) => {
   const reset_new_data = () => {
     set_new_data((prev) => ({
       ...prev,
+      industry_type_code: "",
       industry_type_desc: "",
       created_by: "",
       change_date: "",
@@ -73,8 +78,9 @@ const Industry_Type = ({ set_page }) => {
       set_new_data((prev) => ({
         ...prev,
         id: value,
-        industry_type_code: `IND-T-${String(value).padStart(2, "0")}`,
+        // industry_type_code: `IND-T-${String(value).padStart(2, "0")}`,
       }));
+      set_current_id(value);
     });
   }, []);
 
@@ -95,15 +101,6 @@ const Industry_Type = ({ set_page }) => {
   ];
 
   const [industry_type_list, set_industry_type_list] = useState([]);
-  // ======================================================
-  // id: 1,
-  // industry_type_code: "PL-S-001",
-  // industry_type_desc: "Industry Type Description 1",
-  // created_by: "Admin",
-  // creation_date: "MM-DD-YYYY",
-  // change_by: "",
-  // change_date: "",
-  // ======================================================
 
   const handle_get_industry_type_list = async () => {
     set_loading_list(true);
@@ -140,6 +137,10 @@ const Industry_Type = ({ set_page }) => {
     }
     handle_get_industry_type_list();
     set_truncate_loading(false);
+  };
+
+  const handle_set_incremental_id = () => {
+    set_display_modal("set_incremental_id");
   };
 
   // + Client-Side Filtering
@@ -319,6 +320,17 @@ const Industry_Type = ({ set_page }) => {
                   <h1 className="text-lg">Industry Type</h1>
                 </div>
                 <div className="flex gap-2">
+                  {active_user?.category === "DEV" && (
+                    <Button
+                      variant="success"
+                      icon={FileDigit}
+                      icon_position="left"
+                      width="w-[110px]"
+                      on_click={handle_set_incremental_id}
+                    >
+                      Set ID
+                    </Button>
+                  )}
                   {active_user?.category === "DEV" && (
                     <Button
                       variant="danger"
@@ -658,6 +670,13 @@ const Industry_Type = ({ set_page }) => {
         show_toast={show_toast}
         delete_data={delete_data}
         set_industry_type_list={set_industry_type_list}
+      />
+      <Set_Increment_ID
+        is_open={display_modal === "set_incremental_id"}
+        on_close={() => set_display_modal("")}
+        show_toast={show_toast}
+        current_id={current_id}
+        api_set_increment_id={api_set_industry_type_increment}
       />
     </React.Fragment>
   );

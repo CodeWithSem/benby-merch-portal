@@ -4,6 +4,7 @@ import { useToast } from "../../../../../layout/Toast_Provider";
 import { Get_TBL_INCREMENTAL_ID } from "api/real_time_db/incremental";
 import {
   api_get_country_list,
+  api_set_country_increment,
   api_truncate_country,
 } from "api/firestore_db/maintenance/general_structure/tbl_country_api";
 import {
@@ -19,6 +20,7 @@ import {
   SlidersHorizontal,
   CheckCircle2,
   Trash2,
+  FileDigit,
 } from "lucide-react";
 import Icon_Field from "assets/elements/Icon_Field";
 import Select_Field from "assets/elements/Select_Field";
@@ -30,6 +32,7 @@ import Create_Country from "./functions/Create_Country";
 import Edit_Country from "./functions/Edit_Country";
 import Delete_Country from "./functions/Delete_Country";
 import Upload_Country from "./functions/Upload_Country";
+import Set_Increment_ID from "assets/elements/modals/Set_Increment_ID";
 
 const HAS_FILTER = true;
 
@@ -52,6 +55,7 @@ const Country = ({ set_page }) => {
     change_by: "",
   };
 
+  const [current_id, set_current_id] = useState(0);
   const [new_data, set_new_data] = useState({ ...def_country_data });
   const [edit_data, set_edit_data] = useState({ ...def_country_data });
   const [delete_data, set_delete_data] = useState({ ...def_country_data });
@@ -73,6 +77,7 @@ const Country = ({ set_page }) => {
         ...prev,
         id: value,
       }));
+      set_current_id(value);
     });
   }, []);
 
@@ -93,15 +98,6 @@ const Country = ({ set_page }) => {
   ];
 
   const [country_list, set_country_list] = useState([]);
-  // ======================================================
-  // id: 1,
-  // country_code: "Country-001",
-  // country_desc: "Country Description 1",
-  // created_by: "Admin",
-  // creation_date: "MM-DD-YYYY",
-  // change_by: "",
-  // change_date: "",
-  // ======================================================
 
   const handle_get_country_list = async () => {
     set_loading_list(true);
@@ -138,6 +134,10 @@ const Country = ({ set_page }) => {
     }
     handle_get_country_list();
     set_truncate_loading(false);
+  };
+
+  const handle_set_incremental_id = () => {
+    set_display_modal("set_incremental_id");
   };
 
   // + Client-Side Filtering
@@ -316,6 +316,17 @@ const Country = ({ set_page }) => {
                   <h1 className="text-lg">Country</h1>
                 </div>
                 <div className="flex gap-2">
+                  {active_user?.category === "DEV" && (
+                    <Button
+                      variant="success"
+                      icon={FileDigit}
+                      icon_position="left"
+                      width="w-[110px]"
+                      on_click={handle_set_incremental_id}
+                    >
+                      Set ID
+                    </Button>
+                  )}
                   {active_user?.category === "DEV" && (
                     <Button
                       variant="danger"
@@ -653,6 +664,13 @@ const Country = ({ set_page }) => {
         show_toast={show_toast}
         delete_data={delete_data}
         set_country_list={set_country_list}
+      />
+      <Set_Increment_ID
+        is_open={display_modal === "set_incremental_id"}
+        on_close={() => set_display_modal("")}
+        show_toast={show_toast}
+        current_id={current_id}
+        api_set_increment_id={api_set_country_increment}
       />
     </React.Fragment>
   );

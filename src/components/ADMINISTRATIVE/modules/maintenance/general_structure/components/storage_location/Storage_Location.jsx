@@ -4,6 +4,7 @@ import { useToast } from "../../../../../layout/Toast_Provider";
 import { Get_TBL_INCREMENTAL_ID } from "api/real_time_db/incremental";
 import {
   api_get_sloc_list,
+  api_set_sloc_increment,
   api_truncate_sloc,
 } from "api/firestore_db/maintenance/general_structure/tbl_sloc_api";
 import {
@@ -19,6 +20,7 @@ import {
   SlidersHorizontal,
   CheckCircle2,
   Trash2,
+  FileDigit,
 } from "lucide-react";
 import Icon_Field from "assets/elements/Icon_Field";
 import Select_Field from "assets/elements/Select_Field";
@@ -30,6 +32,7 @@ import Create_SLOC from "./functions/Create_SLOC";
 import Edit_SLOC from "./functions/Edit_SLOC";
 import Delete_SLOC from "./functions/Delete_SLOC";
 import Upload_SLOC from "./functions/Upload_SLOC";
+import Set_Increment_ID from "assets/elements/modals/Set_Increment_ID";
 
 const HAS_FILTER = true;
 
@@ -52,6 +55,7 @@ const Storage_Location = ({ set_page }) => {
     change_by: "",
   };
 
+  const [current_id, set_current_id] = useState(0);
   const [new_data, set_new_data] = useState({ ...def_sloc_data });
   const [edit_data, set_edit_data] = useState({ ...def_sloc_data });
   const [delete_data, set_delete_data] = useState({ ...def_sloc_data });
@@ -73,6 +77,7 @@ const Storage_Location = ({ set_page }) => {
         id: value,
         sloc_code: `SLOC-${String(value).padStart(3, "0")}`,
       }));
+      set_current_id(value);
     });
   }, []);
 
@@ -138,6 +143,10 @@ const Storage_Location = ({ set_page }) => {
     }
     handle_get_sloc_list();
     set_truncate_loading(false);
+  };
+
+  const handle_set_incremental_id = () => {
+    set_display_modal("set_incremental_id");
   };
 
   // + Client-Side Filtering
@@ -316,6 +325,17 @@ const Storage_Location = ({ set_page }) => {
                   <h1 className="text-lg">Storage Location</h1>
                 </div>
                 <div className="flex gap-2">
+                  {active_user?.category === "DEV" && (
+                    <Button
+                      variant="success"
+                      icon={FileDigit}
+                      icon_position="left"
+                      width="w-[110px]"
+                      on_click={handle_set_incremental_id}
+                    >
+                      Set ID
+                    </Button>
+                  )}
                   {active_user?.category === "DEV" && (
                     <Button
                       variant="danger"
@@ -651,6 +671,13 @@ const Storage_Location = ({ set_page }) => {
         show_toast={show_toast}
         delete_data={delete_data}
         set_sloc_list={set_sloc_list}
+      />
+      <Set_Increment_ID
+        is_open={display_modal === "set_incremental_id"}
+        on_close={() => set_display_modal("")}
+        show_toast={show_toast}
+        current_id={current_id}
+        api_set_increment_id={api_set_sloc_increment}
       />
     </React.Fragment>
   );

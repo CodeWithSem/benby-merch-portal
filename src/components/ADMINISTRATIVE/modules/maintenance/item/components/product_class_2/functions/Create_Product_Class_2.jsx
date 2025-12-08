@@ -67,40 +67,19 @@ const Create_Product_Class_2 = ({
       set_create_loading(true);
       const response = await api_create_product_class_2(
         new_data,
-        active_user?.username
+        active_user?.username,
+        show_toast
       );
       if (response.success) {
         console_log(response.data);
         set_product_class_2_list((prev) => [...prev, response.data]);
-        show_status("success");
         reset_new_data();
         handle_go_back("sub_level");
-      } else {
-        show_status("error");
       }
     } catch (error) {
       console.error("Failed to create a new data:", error);
-      show_status("error");
     } finally {
       close_confirm_modal();
-    }
-  };
-
-  const show_status = (status) => {
-    if (status === "success") {
-      show_toast({
-        type: "success",
-        title: "Created Successfully",
-        message: "A new record has been added.",
-        icon: <CheckCircle2 size={21} className="text-green-500" />,
-      });
-    } else {
-      show_toast({
-        type: "danger",
-        title: "Error",
-        message: "Something went wrong. Please try again.",
-        icon: <CircleX size={21} className="text-red-500" />,
-      });
     }
   };
 

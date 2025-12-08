@@ -21,6 +21,13 @@ const Create_IAC = ({
   const [is_confirm_modal_open, set_is_confirm_modal_open] = useState(false);
   const [create_loading, set_create_loading] = useState(false);
 
+  const handle_change_inv_acc_center_code = (value) => {
+    set_new_data((prev) => ({
+      ...prev,
+      inv_acc_center_code: value,
+    }));
+  };
+
   const handle_change_inv_acc_center_desc = (value) => {
     set_new_data((prev) => ({
       ...prev,
@@ -61,40 +68,19 @@ const Create_IAC = ({
       set_create_loading(true);
       const response = await api_create_inv_acc_center(
         new_data,
-        active_user?.username
+        active_user?.username,
+        show_toast
       );
       if (response.success) {
         console_log(response.data);
         set_inv_acc_center_list((prev) => [...prev, response.data]);
-        show_status("success");
         reset_new_data();
         handle_go_back("sub_level");
-      } else {
-        show_status("error");
       }
     } catch (error) {
       console.error("Failed to create a new data:", error);
-      show_status("error");
     } finally {
       close_confirm_modal();
-    }
-  };
-
-  const show_status = (status) => {
-    if (status === "success") {
-      show_toast({
-        type: "success",
-        title: "Created Successfully",
-        message: "A new record has been added.",
-        icon: <CheckCircle2 size={21} className="text-green-500" />,
-      });
-    } else {
-      show_toast({
-        type: "danger",
-        title: "Error",
-        message: "Something went wrong. Please try again.",
-        icon: <CircleX size={21} className="text-red-500" />,
-      });
     }
   };
 
@@ -221,8 +207,11 @@ const Create_IAC = ({
                 <Text_Field
                   label="Inv. Account Center Code"
                   type={"text"}
+                  placeholder="Enter code"
                   value={new_data.inv_acc_center_code || ""}
-                  disabled
+                  on_change={(e) =>
+                    handle_change_inv_acc_center_code(e.target.value)
+                  }
                 />
               </div>
               <div className="col-span-2">

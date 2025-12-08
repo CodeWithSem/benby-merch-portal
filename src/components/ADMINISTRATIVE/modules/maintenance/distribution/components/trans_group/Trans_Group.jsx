@@ -12,6 +12,7 @@ import { useToast } from "../../../../../layout/Toast_Provider";
 import { Use_App } from "context/app_context";
 import {
   api_get_trans_group_list,
+  api_set_trans_group_increment,
   api_truncate_trans_group,
 } from "api/firestore_db/maintenance/distribution/tbl_trans_group_api";
 import { Get_TBL_INCREMENTAL_ID } from "api/real_time_db/incremental";
@@ -28,6 +29,7 @@ import {
   Trash2,
   CheckCircle2,
   SlidersHorizontal,
+  FileDigit,
 } from "lucide-react";
 import Icon_Field from "assets/elements/Icon_Field";
 import Select_Field from "assets/elements/Select_Field";
@@ -39,6 +41,7 @@ import Create_Trans_Group from "./functions/Create_Trans_Group";
 import Edit_Trans_Group from "./functions/Edit_Trans_Group";
 import Delete_Trans_Group from "./functions/Delete_Trans_Group";
 import Upload_Trans_Group from "./functions/Upload_Trans_Group";
+import Set_Increment_ID from "assets/elements/modals/Set_Increment_ID";
 
 const HAS_FILTER = true;
 
@@ -61,6 +64,7 @@ const Trans_Group = ({ set_page }) => {
     change_by: "",
   };
 
+  const [current_id, set_current_id] = useState(0);
   const [new_data, set_new_data] = useState({ ...def_trans_group_data });
   const [edit_data, set_edit_data] = useState({ ...def_trans_group_data });
   const [delete_data, set_delete_data] = useState({ ...def_trans_group_data });
@@ -83,6 +87,7 @@ const Trans_Group = ({ set_page }) => {
         id: value,
         trans_group_code: `TR-GRP-${String(value).padStart(3, "0")}`,
       }));
+      set_current_id(value);
     });
   }, []);
 
@@ -143,6 +148,10 @@ const Trans_Group = ({ set_page }) => {
     }
     handle_get_trans_group_list();
     set_truncate_loading(false);
+  };
+
+  const handle_set_incremental_id = () => {
+    set_display_modal("set_incremental_id");
   };
 
   // + Client-Side Filtering
@@ -325,6 +334,17 @@ const Trans_Group = ({ set_page }) => {
                   <h1 className="text-lg">Transportation Group</h1>
                 </div>
                 <div className="flex gap-2">
+                  {active_user?.category === "DEV" && (
+                    <Button
+                      variant="success"
+                      icon={FileDigit}
+                      icon_position="left"
+                      width="w-[110px]"
+                      on_click={handle_set_incremental_id}
+                    >
+                      Set ID
+                    </Button>
+                  )}
                   {active_user?.category === "DEV" && (
                     <Button
                       variant="danger"
@@ -663,6 +683,13 @@ const Trans_Group = ({ set_page }) => {
         show_toast={show_toast}
         delete_data={delete_data}
         set_trans_group_list={set_trans_group_list}
+      />
+      <Set_Increment_ID
+        is_open={display_modal === "set_incremental_id"}
+        on_close={() => set_display_modal("")}
+        show_toast={show_toast}
+        current_id={current_id}
+        api_set_increment_id={api_set_trans_group_increment}
       />
     </React.Fragment>
   );
