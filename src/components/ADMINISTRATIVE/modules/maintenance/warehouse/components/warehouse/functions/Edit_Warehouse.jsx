@@ -71,7 +71,8 @@ const Edit_Warehouse = ({
       set_update_loading(true);
       const response = await api_update_warehouse(
         edit_data,
-        active_user?.username
+        active_user?.username,
+        show_toast
       );
       if (response.success) {
         console_log(response.data);
@@ -80,34 +81,12 @@ const Edit_Warehouse = ({
             item.id === response.data.id ? response.data : item
           )
         );
-        show_status("success");
         handle_go_back("sub_level");
-      } else {
-        show_status("error");
       }
     } catch (error) {
       console.error("Failed to create warehouse:", error);
-      show_status("error");
     } finally {
       close_confirm_modal();
-    }
-  };
-
-  const show_status = (status) => {
-    if (status === "success") {
-      show_toast({
-        type: "success",
-        title: "Updated Successfully",
-        message: "The record has been updated.",
-        icon: <CheckCircle2 size={21} className="text-green-500" />,
-      });
-    } else {
-      show_toast({
-        type: "danger",
-        title: "Error",
-        message: "Something went wrong. Please try again.",
-        icon: <CircleX size={21} className="text-red-500" />,
-      });
     }
   };
 

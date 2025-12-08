@@ -12,6 +12,7 @@ import { useToast } from "../../../../../layout/Toast_Provider";
 import { Use_App } from "context/app_context";
 import {
   api_get_warehouse_list,
+  api_set_warehouse_increment,
   api_truncate_warehouse,
 } from "api/firestore_db/maintenance/warehouse/tbl_warehouse_api";
 import { Get_TBL_INCREMENTAL_ID } from "api/real_time_db/incremental";
@@ -28,6 +29,7 @@ import {
   Trash2,
   CheckCircle2,
   SlidersHorizontal,
+  FileDigit,
 } from "lucide-react";
 import Icon_Field from "assets/elements/Icon_Field";
 import Select_Field from "assets/elements/Select_Field";
@@ -39,6 +41,7 @@ import Create_Warehouse from "./functions/Create_Warehouse";
 import Edit_Warehouse from "./functions/Edit_Warehouse";
 import Delete_Warehouse from "./functions/Delete_Warehouse";
 import Upload_Warehouse from "./functions/Upload_Warehouse";
+import Set_Increment_ID from "assets/elements/modals/Set_Increment_ID";
 
 const HAS_FILTER = true;
 
@@ -61,6 +64,7 @@ const Warehouse = ({ set_page }) => {
     change_by: "",
   };
 
+  const [current_id, set_current_id] = useState(0);
   const [new_data, set_new_data] = useState({ ...def_warehouse_data });
   const [edit_data, set_edit_data] = useState({ ...def_warehouse_data });
   const [delete_data, set_delete_data] = useState({ ...def_warehouse_data });
@@ -83,6 +87,7 @@ const Warehouse = ({ set_page }) => {
         id: value,
         warehouse_code: `WH-${String(value).padStart(3, "0")}`,
       }));
+      set_current_id(value);
     });
   }, []);
 
@@ -135,6 +140,10 @@ const Warehouse = ({ set_page }) => {
     }
     handle_get_warehouse_list();
     set_truncate_loading(false);
+  };
+
+  const handle_set_incremental_id = () => {
+    set_display_modal("set_incremental_id");
   };
 
   // + Client-Side Filtering
@@ -315,6 +324,17 @@ const Warehouse = ({ set_page }) => {
                   <h1 className="text-lg">Warehouse</h1>
                 </div>
                 <div className="flex gap-2">
+                  {active_user?.category === "DEV" && (
+                    <Button
+                      variant="success"
+                      icon={FileDigit}
+                      icon_position="left"
+                      width="w-[110px]"
+                      on_click={handle_set_incremental_id}
+                    >
+                      Set ID
+                    </Button>
+                  )}
                   {active_user?.category === "DEV" && (
                     <Button
                       variant="danger"
@@ -653,6 +673,13 @@ const Warehouse = ({ set_page }) => {
         show_toast={show_toast}
         delete_data={delete_data}
         set_warehouse_list={set_warehouse_list}
+      />
+      <Set_Increment_ID
+        is_open={display_modal === "set_incremental_id"}
+        on_close={() => set_display_modal("")}
+        show_toast={show_toast}
+        current_id={current_id}
+        api_set_increment_id={api_set_warehouse_increment}
       />
     </React.Fragment>
   );
