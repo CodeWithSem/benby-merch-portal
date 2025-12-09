@@ -65,6 +65,7 @@ const Purchase_Order = () => {
   // - Columns
 
   const [new_po_data, set_new_po_data] = useState({});
+  const [selected_item_list, set_selected_item_list] = useState([]);
 
   const [po_list, set_po_list] = useState([
     {
@@ -616,6 +617,8 @@ const Purchase_Order = () => {
           show_toast={show_toast}
           new_po_data={new_po_data}
           set_new_po_data={set_new_po_data}
+          selected_item_list={selected_item_list}
+          set_selected_item_list={set_selected_item_list}
         />
       )}
       {/* {page === "edit_po" && (

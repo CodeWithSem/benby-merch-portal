@@ -28,7 +28,6 @@ import {
   language_list,
   region_list,
 } from "../PO_DATA_MAP";
-import Select_Generic_Hierarchy from "assets/elements/modals/Select_Generic_Hierarchy";
 import { get_description } from "assets/scripts/functions/get_description";
 import Select_Branch from "../modals/select_hierarchy/Select_Branch";
 import Select_Plant from "../modals/select_hierarchy/Select_Plant";
@@ -39,10 +38,11 @@ const Create_New_PO = ({
   show_toast,
   new_po_data,
   set_new_po_data,
+  selected_item_list,
+  set_selected_item_list,
 }) => {
   const [active_tab, set_active_tab] = useState("delivery");
   const [display_modal, set_display_modal] = useState("");
-  const [selected_item_list, set_selected_item_list] = useState([]);
 
   const tabs = [
     { key: "delivery", title: "Delivery" },
@@ -109,12 +109,24 @@ const Create_New_PO = ({
     alert("Under Maintenance");
   };
 
-  const handle_save = () => {
-    // alert("Create PO");
-    console.table(new_po_data);
+  const handle_create = () => {
+    const items_with_tracking = selected_item_list.map((item) => ({
+      ...item,
+      quantity_open: item.quantity, // same as original quantity
+      quantity_left: item.quantity, // same as original quantity
+    }));
+
+    const final_po_data = {
+      ...new_po_data,
+      selected_item_list: items_with_tracking,
+    };
+
+    console.table(final_po_data);
   };
 
   const handle_go_back = () => {
+    set_new_po_data({});
+    set_selected_item_list([]);
     set_page("main");
   };
   // RETURN ORIGIN
@@ -364,7 +376,7 @@ const Create_New_PO = ({
                 size="lg"
                 icon={CirclePlus}
                 icon_position="left"
-                on_click={handle_save}
+                on_click={handle_create}
               >
                 Create
               </Button>
@@ -429,42 +441,6 @@ const Create_New_PO = ({
         set_data={set_new_po_data}
         set_selected_item_list={set_selected_item_list}
       />
-      {/* - Modals */}
-      {/* + Modals */}
-      {/* <Select_Vendor
-        is_open={display_modal === "select_vendor"}
-        on_close={() => set_display_modal("")}
-        width="max-w-[1000px]"
-        height="max-h-[700px]"
-        vendor_master_list={vendor_master_list}
-      />
-      <Select_Branch
-        is_open={display_modal === "select_branch"}
-        on_close={() => set_display_modal("")}
-        width="max-w-[1000px]"
-        height="max-h-[700px]"
-        branch_list={branch_list}
-      />
-      <Select_Plant
-        is_open={display_modal === "select_plant"}
-        on_close={() => set_display_modal("")}
-        width="max-w-[1000px]"
-        height="max-h-[700px]"
-        plant_list={plant_list}
-      />
-      <Select_SLOC
-        is_open={display_modal === "select_sloc"}
-        on_close={() => set_display_modal("")}
-        width="max-w-[1000px]"
-        height="max-h-[700px]"
-        sloc_list={sloc_list}
-      />
-      <Select_Item
-        is_open={display_modal === "select_item"}
-        on_close={() => set_display_modal("")}
-        width="max-w-[1000px]"
-        height="max-h-[700px]"
-      /> */}
       {/* - Modals */}
     </React.Fragment>
   );

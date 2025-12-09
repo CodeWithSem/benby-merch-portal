@@ -6,11 +6,11 @@ import Quantity_Field from "assets/elements/Quantity_Field";
 import Find_Field from "assets/elements/Find_Field";
 import Show_Item_Details from "./modals/Show_Item_Details";
 import { format_currency, format_percentage } from "assets/scripts/format";
-// import Edit_Item from "./modals/Edit_Item";
 import Button from "assets/elements/Button";
 import Remove_Item from "./modals/Remove_Item";
-import Select_Item from "../../modals/select_item/Select_Item";
+import Select_Item from "../../modals/item_modals/Select_Item";
 import Button_Action from "assets/elements/Button_Action";
+import Edit_Item from "../../modals/item_modals/Edit_Item";
 
 const PO_Items = ({
   new_po_data,
@@ -20,7 +20,7 @@ const PO_Items = ({
 }) => {
   const [display_item_modal, set_display_item_modal] = useState("");
   const [search_query, set_search_query] = useState("");
-  const [draggedIndex, setDraggedIndex] = useState(null);
+  const [dragged_index, set_dragged_index] = useState(null);
   const [selected_item_data, set_selected_item_data] = useState({
     item_code: "",
     item_desc: "",
@@ -28,6 +28,7 @@ const PO_Items = ({
     quantity: 1,
     total: "",
   });
+  const [edit_item_data, set_edit_item_data] = useState({});
   const [remove_item_data, set_remove_item_data] = useState({});
 
   const filtered_item_list = selected_item_list.filter((item) =>
@@ -82,29 +83,24 @@ const PO_Items = ({
     });
   };
 
-  const handleDragStart = (index) => {
-    setDraggedIndex(index);
+  const handle_drag_start = (index) => {
+    set_dragged_index(index);
   };
 
-  const handleDragOver = (e) => {
+  const handle_drag_over = (e) => {
     e.preventDefault(); // allow drop
   };
 
-  const handleDrop = (index) => {
-    if (draggedIndex === null) return;
+  const handle_drop = (index) => {
+    if (dragged_index === null) return;
 
     const items = [...selected_item_list];
-    const draggedItem = items[draggedIndex];
-    items.splice(draggedIndex, 1); // remove dragged item
+    const draggedItem = items[dragged_index];
+    items.splice(dragged_index, 1); // remove dragged item
     items.splice(index, 0, draggedItem); // insert at new position
     set_selected_item_list(items);
-    setDraggedIndex(null);
+    set_dragged_index(null);
   };
-
-  const gross_total = selected_item_list.reduce(
-    (sum, item) => sum + (item.total || 0),
-    0
-  );
 
   const handle_show_select_item_modal = () => {
     if (!new_po_data.branch_code) {
@@ -135,11 +131,17 @@ const PO_Items = ({
     set_display_item_modal("select_item");
   };
 
+  const gross_total = selected_item_list.reduce(
+    (sum, item) => sum + (item.total || 0),
+    0
+  );
+
   const handle_show_details = () => {
     set_display_item_modal("show_details");
   };
 
   const handle_edit_item = (item) => {
+    set_edit_item_data(item);
     set_display_item_modal("edit_item");
   };
 
@@ -216,9 +218,9 @@ const PO_Items = ({
                     <tr
                       key={item.item_code}
                       draggable
-                      onDragStart={() => handleDragStart(index)}
-                      onDragOver={handleDragOver}
-                      onDrop={() => handleDrop(index)}
+                      onDragStart={() => handle_drag_start(index)}
+                      onDragOver={handle_drag_over}
+                      onDrop={() => handle_drop(index)}
                       className="text-sm hover:bg-gray-50/50"
                     >
                       <td className="px-5 py-4 whitespace-nowrap text-gray-500 dark:text-gray-400">
@@ -293,14 +295,6 @@ const PO_Items = ({
                 on_change={(e) => handle_unit_price_change(e.target.value)}
               />
             </div>
-            {/* <div className="w-full lg:col-span-2">
-              <Text_Field
-                label="Unit"
-                type={"text"}
-                // value={}
-                disabled
-              />
-            </div> */}
             <div className="w-full lg:col-span-2">
               <Quantity_Field
                 label="Quantity"
@@ -399,11 +393,14 @@ const PO_Items = ({
         on_close={() => set_display_item_modal("")}
         width="max-w-[1280px]"
       />
-      {/* <Edit_Item
+      <Edit_Item
         is_open={display_item_modal === "edit_item"}
         on_close={() => set_display_item_modal("")}
         width="max-w-[1280px]"
-      /> */}
+        edit_item_data={edit_item_data}
+        set_edit_item_data={set_edit_item_data}
+        set_selected_item_list={set_selected_item_list}
+      />
       <Remove_Item
         is_open={display_item_modal === "remove_item"}
         on_close={() => set_display_item_modal("")}
