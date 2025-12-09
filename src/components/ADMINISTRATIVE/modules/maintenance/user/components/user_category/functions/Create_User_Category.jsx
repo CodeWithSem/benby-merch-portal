@@ -74,20 +74,17 @@ const Create_User_Category = ({
       set_create_loading(true);
       const response = await api_create_user_category(
         new_data,
-        active_user?.username
+        active_user?.username,
+        show_toast
       );
       if (response.success) {
         console_log(response.data);
         set_user_category_list((prev) => [...prev, response.data]);
-        show_status("success");
         reset_new_data();
         handle_go_back("sub_level");
-      } else {
-        show_status("error");
       }
     } catch (error) {
       console.error("Failed to create a new data:", error);
-      show_status("error");
     } finally {
       close_confirm_modal();
     }

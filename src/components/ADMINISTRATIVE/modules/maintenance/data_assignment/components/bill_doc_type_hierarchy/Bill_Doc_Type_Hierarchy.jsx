@@ -19,6 +19,7 @@ import { useToast } from "../../../../../layout/Toast_Provider";
 import { Use_App } from "context/app_context";
 import {
   api_get_bill_doc_type_hierarchy_list,
+  api_set_bill_doc_type_hierarchy_increment,
   api_truncate_bill_doc_type_hierarchy,
 } from "api/firestore_db/maintenance/data_assignment/tbl_bill_doc_type_hierarchy_api";
 import { Get_TBL_INCREMENTAL_ID } from "api/real_time_db/incremental";
@@ -40,6 +41,7 @@ import {
   CheckCircle2,
   SlidersHorizontal,
   CircleX,
+  FileDigit,
 } from "lucide-react";
 import Icon_Field from "assets/elements/Icon_Field";
 import Select_Field from "assets/elements/Select_Field";
@@ -52,6 +54,7 @@ import Create_Bill_Doc_Type_H from "./functions/Create_Bill_Doc_Type_H";
 import Edit_Bill_Doc_Type_H from "./functions/Edit_Bill_Doc_Type_H";
 import Delete_Bill_Doc_Type_H from "./functions/Delete_Bill_Doc_Type_H";
 import Upload_Bill_Doc_Type_H from "./functions/Upload_Bill_Doc_Type_H";
+import Set_Increment_ID from "assets/elements/modals/Set_Increment_ID";
 
 const HAS_FILTER = true;
 
@@ -130,6 +133,7 @@ const Bill_Doc_Type_Hierarchy = ({ set_page }) => {
     change_by: "",
   };
 
+  const [current_id, set_current_id] = useState(0);
   const [new_data, set_new_data] = useState({
     ...def_bill_doc_type_hierarchy_data,
   });
@@ -159,6 +163,7 @@ const Bill_Doc_Type_Hierarchy = ({ set_page }) => {
         ...prev,
         id: value,
       }));
+      set_current_id(value);
     });
   }, []);
 
@@ -225,6 +230,10 @@ const Bill_Doc_Type_Hierarchy = ({ set_page }) => {
     }
     handle_get_bill_doc_type_hierarchy_list();
     set_truncate_loading(false);
+  };
+
+  const handle_set_incremental_id = () => {
+    set_display_modal("set_incremental_id");
   };
 
   // + Client-Side Filtering
@@ -467,6 +476,17 @@ const Bill_Doc_Type_Hierarchy = ({ set_page }) => {
                   <h1 className="text-lg">Billing Document Type Hierarchy</h1>
                 </div>
                 <div className="flex gap-2">
+                  {active_user?.category === "DEV" && (
+                    <Button
+                      variant="success"
+                      icon={FileDigit}
+                      icon_position="left"
+                      width="w-[110px]"
+                      on_click={handle_set_incremental_id}
+                    >
+                      Set ID
+                    </Button>
+                  )}
                   {active_user?.category === "DEV" && (
                     <Button
                       variant="danger"
@@ -871,6 +891,13 @@ const Bill_Doc_Type_Hierarchy = ({ set_page }) => {
         deliv_doc_type_list={deliv_doc_type_list}
         bill_doc_type_list={bill_doc_type_list}
         bill_cancel_list={bill_cancel_list}
+      />
+      <Set_Increment_ID
+        is_open={display_modal === "set_incremental_id"}
+        on_close={() => set_display_modal("")}
+        show_toast={show_toast}
+        current_id={current_id}
+        api_set_increment_id={api_set_bill_doc_type_hierarchy_increment}
       />
       <Load_Screen
         is_open={display_modal === "load_screen"}

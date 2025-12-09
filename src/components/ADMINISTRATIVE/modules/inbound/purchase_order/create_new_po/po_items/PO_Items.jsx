@@ -1,50 +1,138 @@
 import React, { useState } from "react";
 import Text_Field from "assets/elements/Text_Field";
-import {
-  CirclePlus,
-  FileText,
-  Info,
-  Search,
-  SquarePen,
-  Trash2,
-} from "lucide-react";
+import { CirclePlus, CircleX, Edit, Info, Search, Trash } from "lucide-react";
 import Icon_Field from "assets/elements/Icon_Field";
 import Quantity_Field from "assets/elements/Quantity_Field";
 import Find_Field from "assets/elements/Find_Field";
 import Show_Item_Details from "./modals/Show_Item_Details";
 import { format_currency, format_percentage } from "assets/scripts/format";
-import Edit_Item from "./modals/Edit_Item";
+// import Edit_Item from "./modals/Edit_Item";
 import Button from "assets/elements/Button";
 import Remove_Item from "./modals/Remove_Item";
+import Select_Item from "../../modals/select_item/Select_Item";
+import Button_Action from "assets/elements/Button_Action";
 
-const PO_Items = ({ set_display_modal }) => {
+const PO_Items = ({
+  new_po_data,
+  show_toast,
+  selected_item_list,
+  set_selected_item_list,
+}) => {
   const [display_item_modal, set_display_item_modal] = useState("");
-  // + For Quantity Field
-  const [quantity, set_quantity] = useState(1);
-  // - For Quantity Field
-  const item_list = [
-    {
-      id: 1,
-      item_code: "ITM-000000001",
-      item_desc: 'Macbook Pro 13"',
-      quantity: "5",
-      unit_price: "100000",
-      discount: "0",
-      total: "500000",
-    },
-    {
-      id: 2,
-      item_code: "ITM-000000002",
-      item_desc: "iPhone 15 Pro Max",
-      quantity: "1",
-      unit_price: "60000",
-      discount: "0",
-      total: "60000",
-    },
-  ];
+  const [search_query, set_search_query] = useState("");
+  const [draggedIndex, setDraggedIndex] = useState(null);
+  const [selected_item_data, set_selected_item_data] = useState({
+    item_code: "",
+    item_desc: "",
+    unit_price: "",
+    quantity: 1,
+    total: "",
+  });
+  const [remove_item_data, set_remove_item_data] = useState({});
+
+  const filtered_item_list = selected_item_list.filter((item) =>
+    item.item_desc.toLowerCase().includes(search_query.toLowerCase())
+  );
+
+  const handle_quantity_change = (value) => {
+    set_selected_item_data((prev) => {
+      const updated_quantity = value === "" ? "" : Number(value);
+      return {
+        ...prev,
+        quantity: updated_quantity,
+        total: updated_quantity * prev.unit_price,
+      };
+    });
+  };
+
+  const handle_unit_price_change = (value) => {
+    const updated_unit_price = value === "" ? "" : Number(value);
+    set_selected_item_data((prev) => ({
+      ...prev,
+      unit_price: updated_unit_price,
+      total: prev.quantity * updated_unit_price,
+    }));
+  };
 
   const handle_add_item = () => {
-    alert("Add Item");
+    if (!selected_item_data || !selected_item_data.item_code) {
+      alert("Please select an item first.");
+      return;
+    }
+
+    // Optional: Check if the item already exists in the list
+    const exists = selected_item_list.some(
+      (item) => item.item_code === selected_item_data.item_code
+    );
+    if (exists) {
+      alert("This item is already added.");
+      return;
+    }
+
+    // Add the item to the list
+    set_selected_item_list((prev) => [...prev, selected_item_data]);
+
+    // Reset selected item data if needed
+    set_selected_item_data({
+      item_code: "",
+      item_desc: "",
+      quantity: 1,
+      unit_price: "",
+      total: 0,
+    });
+  };
+
+  const handleDragStart = (index) => {
+    setDraggedIndex(index);
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault(); // allow drop
+  };
+
+  const handleDrop = (index) => {
+    if (draggedIndex === null) return;
+
+    const items = [...selected_item_list];
+    const draggedItem = items[draggedIndex];
+    items.splice(draggedIndex, 1); // remove dragged item
+    items.splice(index, 0, draggedItem); // insert at new position
+    set_selected_item_list(items);
+    setDraggedIndex(null);
+  };
+
+  const gross_total = selected_item_list.reduce(
+    (sum, item) => sum + (item.total || 0),
+    0
+  );
+
+  const handle_show_select_item_modal = () => {
+    if (!new_po_data.branch_code) {
+      show_toast({
+        type: "danger",
+        title: "Invalid",
+        message: "Please select a branch.",
+        icon: <CircleX size={21} className="text-red-500" />,
+      });
+      return;
+    } else if (!new_po_data.plant_code) {
+      show_toast({
+        type: "danger",
+        title: "Invalid",
+        message: "Please select a plant.",
+        icon: <CircleX size={21} className="text-red-500" />,
+      });
+      return;
+    } else if (!new_po_data.sloc_code) {
+      show_toast({
+        type: "danger",
+        title: "Invalid",
+        message: "Please select a storage location.",
+        icon: <CircleX size={21} className="text-red-500" />,
+      });
+      return;
+    }
+    set_display_item_modal("select_item");
   };
 
   const handle_show_details = () => {
@@ -56,6 +144,7 @@ const PO_Items = ({ set_display_modal }) => {
   };
 
   const handle_remove_item = (item) => {
+    set_remove_item_data(item);
     set_display_item_modal("remove_item");
   };
   // RETURN ORIGIN
@@ -77,8 +166,8 @@ const PO_Items = ({ set_display_modal }) => {
                   placeholder="Search..."
                   icon={Search}
                   icon_position="left"
-                  // value={}
-                  // on_change={}
+                  value={search_query}
+                  on_change={(e) => set_search_query(e.target.value)}
                 />
               </div>
             </div>
@@ -98,11 +187,14 @@ const PO_Items = ({ set_display_modal }) => {
                     Quantity
                   </th>
                   <th className="px-5 py-4 font-semibold whitespace-nowrap text-gray-700 dark:text-gray-400">
-                    Unit Cost
+                    Unit
                   </th>
                   <th className="px-5 py-4 font-semibold whitespace-nowrap text-gray-700 dark:text-gray-400">
-                    Discount
+                    Unit Price
                   </th>
+                  {/* <th className="px-5 py-4 font-semibold whitespace-nowrap text-gray-700 dark:text-gray-400">
+                    Discount
+                  </th> */}
                   <th className="px-5 py-4 font-semibold whitespace-nowrap text-gray-700 dark:text-gray-400">
                     Total
                   </th>
@@ -110,65 +202,63 @@ const PO_Items = ({ set_display_modal }) => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100 bg-white dark:divide-gray-800 dark:bg-white/[0.03]">
-                {item_list.map((item, index) => (
-                  <tr key={item.id} className="text-sm hover:bg-gray-50/50">
-                    <td className="px-5 py-4 whitespace-nowrap text-gray-500 dark:text-gray-400">
-                      {index + 1}
-                    </td>
-                    <td className="px-5 py-4 font-medium whitespace-nowrap text-gray-800 dark:text-white/90">
-                      {item.item_desc}
-                    </td>
-                    <td className="px-5 py-4 whitespace-nowrap text-gray-500 dark:text-gray-400">
-                      {item.quantity}
-                    </td>
-                    <td className="px-5 py-4 whitespace-nowrap text-gray-500 dark:text-gray-400">
-                      {format_currency(item.unit_price, 2, true)}
-                    </td>
-                    <td className="px-5 py-4 whitespace-nowrap text-gray-500 dark:text-gray-400">
-                      {format_percentage(item.discount, 0)}
-                    </td>
-                    <td className="px-5 py-4 whitespace-nowrap text-gray-500 dark:text-gray-400">
-                      {format_currency(item.total, 2, true)}
-                    </td>
-                    <td className="px-5 py-4 whitespace-nowrap text-gray-500 dark:text-gray-400">
-                      <div className="flex gap-2">
-                        <div className="relative group flex justify-center items-center">
-                          <button
-                            className="text-gray-500 hover:text-sky-600 text-[12px] outline-none"
-                            onClick={() => handle_show_details(item)}
-                          >
-                            <FileText size={20} />
-                          </button>
-                          <span className="absolute bottom-full mb-1 left-1/2 transform -translate-x-1/2 px-2 py-1 text-xs text-white bg-sky-600 rounded opacity-0 group-hover:opacity-100 transition-opacity">
-                            Show Details
-                          </span>
-                        </div>
-                        <div className="relative group flex justify-center items-center">
-                          <button
-                            className="text-gray-500 hover:text-sky-600 text-[12px] outline-none"
-                            onClick={() => handle_edit_item(item)}
-                          >
-                            <SquarePen size={20} />
-                          </button>
-                          <span className="absolute bottom-full mb-1 left-1/2 transform -translate-x-1/2 px-2 py-1 text-xs text-white bg-sky-600 rounded opacity-0 group-hover:opacity-100 transition-opacity">
-                            Edit Item
-                          </span>
-                        </div>
-                        <div className="relative group flex justify-center items-center">
-                          <button
-                            className="text-gray-500 hover:text-red-600 text-[12px] mb-[1px] outline-none"
-                            onClick={() => handle_remove_item(item)}
-                          >
-                            <Trash2 size={20} />
-                          </button>
-                          <span className="absolute bottom-full mb-1 left-1/2 transform -translate-x-1/2 px-2 py-1 text-xs text-white bg-red-600 rounded opacity-0 group-hover:opacity-100 transition-opacity">
-                            Delete Item
-                          </span>
-                        </div>
-                      </div>
+                {filtered_item_list.length === 0 ? (
+                  <tr>
+                    <td
+                      colSpan={7}
+                      className="text-center py-4 text-gray-500 dark:text-gray-400"
+                    >
+                      No record found.
                     </td>
                   </tr>
-                ))}
+                ) : (
+                  filtered_item_list.map((item, index) => (
+                    <tr
+                      key={item.item_code}
+                      draggable
+                      onDragStart={() => handleDragStart(index)}
+                      onDragOver={handleDragOver}
+                      onDrop={() => handleDrop(index)}
+                      className="text-sm hover:bg-gray-50/50"
+                    >
+                      <td className="px-5 py-4 whitespace-nowrap text-gray-500 dark:text-gray-400">
+                        {index + 1}
+                      </td>
+                      <td className="px-5 py-4 font-medium whitespace-nowrap text-gray-800 dark:text-white/90">
+                        {item.item_desc}
+                      </td>
+                      <td className="px-5 py-4 whitespace-nowrap text-gray-500 dark:text-gray-400">
+                        {item.quantity}
+                      </td>
+                      <td className="px-5 py-4 whitespace-nowrap text-gray-500 dark:text-gray-400">
+                        {item.uom}
+                      </td>
+                      <td className="px-5 py-4 whitespace-nowrap text-gray-500 dark:text-gray-400">
+                        {format_currency(item.unit_price, 2, true)}
+                      </td>
+                      <td className="px-5 py-4 whitespace-nowrap text-gray-500 dark:text-gray-400">
+                        {format_currency(item.total, 2, true)}
+                      </td>
+                      <td className="px-5 py-4 whitespace-nowrap text-gray-500 dark:text-gray-400">
+                        <div className="flex gap-2">
+                          <Button_Action
+                            icon={Edit}
+                            tooltip="Edit Item"
+                            size={20}
+                            on_click={() => handle_edit_item(item)}
+                          />
+                          <Button_Action
+                            icon={Trash}
+                            variant="danger"
+                            tooltip="Remove Item"
+                            size={20}
+                            on_click={() => handle_remove_item(item)}
+                          />
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>
@@ -182,54 +272,76 @@ const PO_Items = ({ set_display_modal }) => {
               <Text_Field
                 label="Item Code"
                 type={"text"}
-                // value={}
+                value={selected_item_data.item_code}
                 disabled
               />
             </div>
             <div className="w-full lg:col-span-9">
               <Find_Field
                 label="Item Description"
-                // value={}
-                on_click={() => set_display_modal("select_item")}
+                value={selected_item_data.item_desc}
+                on_click={handle_show_select_item_modal}
                 disabled
               />
             </div>
-            <div className="w-full lg:col-span-4">
+            <div className="w-full lg:col-span-3">
               <Text_Field
                 label="Unit Price"
-                type={"text"}
-                // value={}
-                disabled
+                type={"number"}
+                placeholder={0}
+                value={selected_item_data.unit_price}
+                on_change={(e) => handle_unit_price_change(e.target.value)}
               />
             </div>
-            <div className="w-full lg:col-span-2">
+            {/* <div className="w-full lg:col-span-2">
               <Text_Field
                 label="Unit"
                 type={"text"}
                 // value={}
                 disabled
               />
-            </div>
+            </div> */}
             <div className="w-full lg:col-span-2">
               <Quantity_Field
                 label="Quantity"
-                value={quantity}
-                on_change={set_quantity}
                 placeholder="0"
+                value={selected_item_data.quantity}
+                on_change={handle_quantity_change}
                 min={1}
               />
             </div>
-            <div className="flex w-full items-end lg:col-span-2">
+            <div className="w-full lg:col-span-2">
+              <Text_Field
+                label="Unit"
+                type={"text"}
+                value={selected_item_data.uom}
+                disabled
+              />
+            </div>
+            <div className="w-full lg:col-span-3">
+              <Text_Field
+                label="Total"
+                type={"text"}
+                value={format_currency(selected_item_data.total || 0, 2, false)}
+                disabled
+              />
+            </div>
+            {/* <div className="flex w-full items-end lg:col-span-2">
               <Button variant="white" width="w-full">
                 Discount
               </Button>
-            </div>
+            </div> */}
             <div className="flex w-full items-end lg:col-span-2">
               <Button
                 variant="primary"
                 width="w-full"
                 icon={CirclePlus}
                 on_click={handle_add_item}
+                disabled={
+                  selected_item_data.item_code === "" ||
+                  selected_item_data.unit_price === "" ||
+                  selected_item_data.quantity === ""
+                }
               >
                 Add Item
               </Button>
@@ -271,8 +383,9 @@ const PO_Items = ({ set_display_modal }) => {
                 <span className="font-medium text-gray-700 dark:text-gray-400">
                   Total
                 </span>
+                {/* Sum up all the total in selected_item_list */}
                 <span className="text-lg font-semibold text-gray-800 dark:text-white/90">
-                  {format_currency(0, 2, true)}
+                  {format_currency(gross_total, 2, true)}
                 </span>
               </li>
             </ul>
@@ -286,15 +399,26 @@ const PO_Items = ({ set_display_modal }) => {
         on_close={() => set_display_item_modal("")}
         width="max-w-[1280px]"
       />
-      <Edit_Item
+      {/* <Edit_Item
         is_open={display_item_modal === "edit_item"}
         on_close={() => set_display_item_modal("")}
         width="max-w-[1280px]"
-      />
+      /> */}
       <Remove_Item
         is_open={display_item_modal === "remove_item"}
         on_close={() => set_display_item_modal("")}
         width="max-w-[920px]"
+        remove_item_data={remove_item_data}
+        set_selected_item_list={set_selected_item_list}
+      />
+      <Select_Item
+        is_open={display_item_modal === "select_item"}
+        on_close={() => set_display_item_modal("")}
+        branch_code={new_po_data.branch_code}
+        plant_code={new_po_data.plant_code}
+        sloc_code={new_po_data.sloc_code}
+        set_selected_item_data={set_selected_item_data}
+        selected_item_list={selected_item_list}
       />
       {/* - Modals */}
     </React.Fragment>

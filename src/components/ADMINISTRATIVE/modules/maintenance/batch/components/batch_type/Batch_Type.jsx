@@ -12,6 +12,7 @@ import { useToast } from "../../../../../layout/Toast_Provider";
 import { Use_App } from "context/app_context";
 import {
   api_get_batch_type_list,
+  api_set_batch_type_increment,
   api_truncate_batch_type,
 } from "api/firestore_db/maintenance/batch/tbl_batch_type_api";
 import { Get_TBL_INCREMENTAL_ID } from "api/real_time_db/incremental";
@@ -28,6 +29,7 @@ import {
   Trash2,
   CheckCircle2,
   SlidersHorizontal,
+  FileDigit,
 } from "lucide-react";
 import Icon_Field from "assets/elements/Icon_Field";
 import Select_Field from "assets/elements/Select_Field";
@@ -39,6 +41,7 @@ import Create_Batch_Type from "./functions/Create_Batch_Type";
 import Edit_Batch_Type from "./functions/Edit_Batch_Type";
 import Delete_Batch_Type from "./functions/Delete_Batch_Type";
 import Upload_Batch_Type from "./functions/Upload_Batch_Type";
+import Set_Increment_ID from "assets/elements/modals/Set_Increment_ID";
 
 const HAS_FILTER = true;
 
@@ -61,6 +64,7 @@ const Batch_Type = ({ set_page }) => {
     change_by: "",
   };
 
+  const [current_id, set_current_id] = useState(0);
   const [new_data, set_new_data] = useState({ ...def_batch_type_data });
   const [edit_data, set_edit_data] = useState({ ...def_batch_type_data });
   const [delete_data, set_delete_data] = useState({ ...def_batch_type_data });
@@ -83,6 +87,7 @@ const Batch_Type = ({ set_page }) => {
         id: value,
         batch_type_code: `BT-${String(value).padStart(2, "0")}`,
       }));
+      set_current_id(value);
     });
   }, []);
 
@@ -139,6 +144,10 @@ const Batch_Type = ({ set_page }) => {
     }
     handle_get_batch_type_list();
     set_truncate_loading(false);
+  };
+
+  const handle_set_incremental_id = () => {
+    set_display_modal("set_incremental_id");
   };
 
   // + Client-Side Filtering
@@ -319,6 +328,17 @@ const Batch_Type = ({ set_page }) => {
                   <h1 className="text-lg">Batch Type</h1>
                 </div>
                 <div className="flex gap-2">
+                  {active_user?.category === "DEV" && (
+                    <Button
+                      variant="success"
+                      icon={FileDigit}
+                      icon_position="left"
+                      width="w-[110px]"
+                      on_click={handle_set_incremental_id}
+                    >
+                      Set ID
+                    </Button>
+                  )}
                   {active_user?.category === "DEV" && (
                     <Button
                       variant="danger"
@@ -657,6 +677,13 @@ const Batch_Type = ({ set_page }) => {
         show_toast={show_toast}
         delete_data={delete_data}
         set_batch_type_list={set_batch_type_list}
+      />
+      <Set_Increment_ID
+        is_open={display_modal === "set_incremental_id"}
+        on_close={() => set_display_modal("")}
+        show_toast={show_toast}
+        current_id={current_id}
+        api_set_increment_id={api_set_batch_type_increment}
       />
     </React.Fragment>
   );

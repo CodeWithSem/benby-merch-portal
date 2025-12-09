@@ -613,6 +613,7 @@ const Purchase_Order = () => {
       {page === "po_creation" && (
         <Create_New_PO
           set_page={set_page}
+          show_toast={show_toast}
           new_po_data={new_po_data}
           set_new_po_data={set_new_po_data}
         />

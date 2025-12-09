@@ -71,7 +71,8 @@ const Edit_User_Category = ({
       set_update_loading(true);
       const response = await api_update_user_category(
         edit_data,
-        active_user?.username
+        active_user?.username,
+        show_toast
       );
       if (response.success) {
         console_log(response.data);
@@ -80,14 +81,10 @@ const Edit_User_Category = ({
             item.id === response.data.id ? response.data : item
           )
         );
-        show_status("success");
         handle_go_back("sub_level");
-      } else {
-        show_status("error");
       }
     } catch (error) {
       console.error("Failed to create user_category:", error);
-      show_status("error");
     } finally {
       close_confirm_modal();
     }

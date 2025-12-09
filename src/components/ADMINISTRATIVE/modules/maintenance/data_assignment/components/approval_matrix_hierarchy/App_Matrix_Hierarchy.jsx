@@ -3,10 +3,11 @@ import { useToast } from "../../../../../layout/Toast_Provider";
 import { Use_App } from "context/app_context";
 import {
   api_get_app_matrix_hierarchy_list,
+  api_set_app_matrix_hierarchy_increment,
   api_truncate_app_matrix_hierarchy,
 } from "api/firestore_db/maintenance/data_assignment/tbl_app_matrix_hierarchy_api";
 import { Get_TBL_INCREMENTAL_ID } from "api/real_time_db/incremental";
-import { api_get_app_matrix_list } from "api/firestore_db/tbl_app_matrix_api";
+import { api_get_app_matrix_list } from "api/firestore_db/maintenance/user/tbl_app_matrix_api";
 import { api_get_user_role_list } from "api/firestore_db/maintenance/user/tbl_user_role_api";
 import { get_description } from "assets/scripts/functions/get_description";
 import {
@@ -23,6 +24,7 @@ import {
   CheckCircle2,
   SlidersHorizontal,
   CircleX,
+  FileDigit,
 } from "lucide-react";
 import Icon_Field from "assets/elements/Icon_Field";
 import Select_Field from "assets/elements/Select_Field";
@@ -35,6 +37,7 @@ import Create_App_Matrix_H from "./functions/Create_App_Matrix_H";
 import Edit_App_Matrix_H from "./functions/Edit_App_Matrix_H";
 import Delete_App_Matrix_H from "./functions/Delete_App_Matrix_H";
 import Upload_App_Matrix_H from "./functions/Upload_App_Matrix_H";
+import Set_Increment_ID from "assets/elements/modals/Set_Increment_ID";
 
 const HAS_FILTER = true;
 
@@ -102,6 +105,7 @@ const App_Matrix_Hierarchy = ({ set_page }) => {
     change_by: "",
   };
 
+  const [current_id, set_current_id] = useState(0);
   const [new_data, set_new_data] = useState({
     ...def_app_matrix_hierarchy_data,
   });
@@ -130,6 +134,7 @@ const App_Matrix_Hierarchy = ({ set_page }) => {
         ...prev,
         id: value,
       }));
+      set_current_id(value);
     });
   }, []);
 
@@ -184,6 +189,10 @@ const App_Matrix_Hierarchy = ({ set_page }) => {
     }
     handle_get_app_matrix_hierarchy_list();
     set_truncate_loading(false);
+  };
+
+  const handle_set_incremental_id = () => {
+    set_display_modal("set_incremental_id");
   };
 
   // + Client-Side Filtering
@@ -421,6 +430,17 @@ const App_Matrix_Hierarchy = ({ set_page }) => {
                   <h1 className="text-lg">Approval Matrix Hierarchy</h1>
                 </div>
                 <div className="flex gap-2">
+                  {active_user?.category === "DEV" && (
+                    <Button
+                      variant="success"
+                      icon={FileDigit}
+                      icon_position="left"
+                      width="w-[110px]"
+                      on_click={handle_set_incremental_id}
+                    >
+                      Set ID
+                    </Button>
+                  )}
                   {active_user?.category === "DEV" && (
                     <Button
                       variant="danger"
@@ -803,6 +823,13 @@ const App_Matrix_Hierarchy = ({ set_page }) => {
         set_app_matrix_hierarchy_list={set_app_matrix_hierarchy_list}
         app_matrix_list={app_matrix_list}
         user_role_list={user_role_list}
+      />
+      <Set_Increment_ID
+        is_open={display_modal === "set_incremental_id"}
+        on_close={() => set_display_modal("")}
+        show_toast={show_toast}
+        current_id={current_id}
+        api_set_increment_id={api_set_app_matrix_hierarchy_increment}
       />
       <Load_Screen
         is_open={display_modal === "load_screen"}

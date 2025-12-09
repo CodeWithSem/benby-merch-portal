@@ -12,6 +12,7 @@ import { useToast } from "../../../../../layout/Toast_Provider";
 import { Use_App } from "context/app_context";
 import {
   api_get_item_return_reason_list,
+  api_set_item_return_reason_increment,
   api_truncate_item_return_reason,
 } from "api/firestore_db/maintenance/sales_order/tbl_item_return_reason_api";
 import { Get_TBL_INCREMENTAL_ID } from "api/real_time_db/incremental";
@@ -28,6 +29,7 @@ import {
   Trash2,
   CheckCircle2,
   SlidersHorizontal,
+  FileDigit,
 } from "lucide-react";
 import Icon_Field from "assets/elements/Icon_Field";
 import Select_Field from "assets/elements/Select_Field";
@@ -39,6 +41,7 @@ import Create_I_Return_Reason from "./functions/Create_I_Return_Reason";
 import Edit_I_Return_Reason from "./functions/Edit_I_Return_Reason";
 import Delete_I_Return_Reason from "./functions/Delete_I_Return_Reason";
 import Upload_I_Return_Reason from "./functions/Upload_I_Return_Reason";
+import Set_Increment_ID from "assets/elements/modals/Set_Increment_ID";
 
 const HAS_FILTER = true;
 
@@ -61,6 +64,7 @@ const Item_Return_Reason = ({ set_page }) => {
     change_by: "",
   };
 
+  const [current_id, set_current_id] = useState(0);
   const [new_data, set_new_data] = useState({ ...def_item_return_reason_data });
   const [edit_data, set_edit_data] = useState({
     ...def_item_return_reason_data,
@@ -87,6 +91,7 @@ const Item_Return_Reason = ({ set_page }) => {
         id: value,
         item_return_reason_code: `ITM-RR-${String(value).padStart(2, "0")}`,
       }));
+      set_current_id(value);
     });
   }, []);
 
@@ -147,6 +152,10 @@ const Item_Return_Reason = ({ set_page }) => {
     }
     handle_get_item_return_reason_list();
     set_truncate_loading(false);
+  };
+
+  const handle_set_incremental_id = () => {
+    set_display_modal("set_incremental_id");
   };
 
   // + Client-Side Filtering
@@ -330,6 +339,17 @@ const Item_Return_Reason = ({ set_page }) => {
                   <h1 className="text-lg">Item Return Reason</h1>
                 </div>
                 <div className="flex gap-2">
+                  {active_user?.category === "DEV" && (
+                    <Button
+                      variant="success"
+                      icon={FileDigit}
+                      icon_position="left"
+                      width="w-[110px]"
+                      on_click={handle_set_incremental_id}
+                    >
+                      Set ID
+                    </Button>
+                  )}
                   {active_user?.category === "DEV" && (
                     <Button
                       variant="danger"
@@ -670,6 +690,13 @@ const Item_Return_Reason = ({ set_page }) => {
         show_toast={show_toast}
         delete_data={delete_data}
         set_item_return_reason_list={set_item_return_reason_list}
+      />
+      <Set_Increment_ID
+        is_open={display_modal === "set_incremental_id"}
+        on_close={() => set_display_modal("")}
+        show_toast={show_toast}
+        current_id={current_id}
+        api_set_increment_id={api_set_item_return_reason_increment}
       />
     </React.Fragment>
   );

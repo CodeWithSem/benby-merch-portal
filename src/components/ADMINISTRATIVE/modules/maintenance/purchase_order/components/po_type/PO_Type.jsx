@@ -4,6 +4,7 @@ import { useToast } from "../../../../../layout/Toast_Provider";
 import { Get_TBL_INCREMENTAL_ID } from "api/real_time_db/incremental";
 import {
   api_get_po_type_list,
+  api_set_po_type_increment,
   api_truncate_po_type,
 } from "api/firestore_db/maintenance/purchase_order/tbl_po_type_api";
 import {
@@ -19,6 +20,7 @@ import {
   SlidersHorizontal,
   CheckCircle2,
   Trash2,
+  FileDigit,
 } from "lucide-react";
 import Icon_Field from "assets/elements/Icon_Field";
 import Select_Field from "assets/elements/Select_Field";
@@ -30,6 +32,7 @@ import Create_PO_Type from "./functions/Create_PO_Type";
 import Edit_PO_Type from "./functions/Edit_PO_Type";
 import Delete_PO_Type from "./functions/Delete_PO_Type";
 import Upload_PO_Type from "./functions/Upload_PO_Type";
+import Set_Increment_ID from "assets/elements/modals/Set_Increment_ID";
 
 const HAS_FILTER = true;
 
@@ -52,6 +55,7 @@ const PO_Type = ({ set_page }) => {
     change_by: "",
   };
 
+  const [current_id, set_current_id] = useState(0);
   const [new_data, set_new_data] = useState({ ...def_po_type_data });
   const [edit_data, set_edit_data] = useState({ ...def_po_type_data });
   const [delete_data, set_delete_data] = useState({ ...def_po_type_data });
@@ -73,6 +77,7 @@ const PO_Type = ({ set_page }) => {
         ...prev,
         id: value,
       }));
+      set_current_id(value);
     });
   }, []);
 
@@ -138,6 +143,10 @@ const PO_Type = ({ set_page }) => {
     }
     handle_get_po_type_list();
     set_truncate_loading(false);
+  };
+
+  const handle_set_incremental_id = () => {
+    set_display_modal("set_incremental_id");
   };
 
   // + Client-Side Filtering
@@ -316,6 +325,17 @@ const PO_Type = ({ set_page }) => {
                   <h1 className="text-lg">Purchase Order Type</h1>
                 </div>
                 <div className="flex gap-2">
+                  {active_user?.category === "DEV" && (
+                    <Button
+                      variant="success"
+                      icon={FileDigit}
+                      icon_position="left"
+                      width="w-[110px]"
+                      on_click={handle_set_incremental_id}
+                    >
+                      Set ID
+                    </Button>
+                  )}
                   {active_user?.category === "DEV" && (
                     <Button
                       variant="danger"
@@ -653,6 +673,13 @@ const PO_Type = ({ set_page }) => {
         show_toast={show_toast}
         delete_data={delete_data}
         set_po_type_list={set_po_type_list}
+      />
+      <Set_Increment_ID
+        is_open={display_modal === "set_incremental_id"}
+        on_close={() => set_display_modal("")}
+        show_toast={show_toast}
+        current_id={current_id}
+        api_set_increment_id={api_set_po_type_increment}
       />
     </React.Fragment>
   );

@@ -3,9 +3,18 @@ import Text_Field from "assets/elements/Text_Field";
 import Button from "assets/elements/Button";
 import { X } from "lucide-react";
 
-const Remove_Item = ({ is_open, on_close, width = "max-w-[700px]" }) => {
+const Remove_Item = ({
+  is_open,
+  on_close,
+  width = "max-w-[700px]",
+  remove_item_data,
+  set_selected_item_list,
+}) => {
   const handle_remove_item = () => {
-    alert("Remove Item");
+    set_selected_item_list((prev) =>
+      prev.filter((i) => i.item_code !== remove_item_data.item_code)
+    );
+    on_close();
   };
 
   return is_open ? (
@@ -40,7 +49,7 @@ const Remove_Item = ({ is_open, on_close, width = "max-w-[700px]" }) => {
                       <Text_Field
                         label="Item Code"
                         type={"text"}
-                        // value={""}
+                        value={remove_item_data.item_code}
                         disabled
                       />
                     </div>
@@ -48,7 +57,7 @@ const Remove_Item = ({ is_open, on_close, width = "max-w-[700px]" }) => {
                       <Text_Field
                         label="Item Description"
                         type={"text"}
-                        // value={""}
+                        value={remove_item_data.item_desc}
                         disabled
                       />
                     </div>

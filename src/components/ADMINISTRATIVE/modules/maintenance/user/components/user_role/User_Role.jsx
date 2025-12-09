@@ -11,6 +11,7 @@ import { useToast } from "../../../../../layout/Toast_Provider";
 import { Use_App } from "context/app_context";
 import {
   api_get_user_role_list,
+  api_set_user_role_increment,
   api_truncate_user_role,
 } from "api/firestore_db/maintenance/user/tbl_user_role_api";
 import { Get_TBL_INCREMENTAL_ID } from "api/real_time_db/incremental";
@@ -27,6 +28,7 @@ import {
   Trash2,
   CheckCircle2,
   SlidersHorizontal,
+  FileDigit,
 } from "lucide-react";
 import Icon_Field from "assets/elements/Icon_Field";
 import Select_Field from "assets/elements/Select_Field";
@@ -38,6 +40,7 @@ import Create_User_Role from "./functions/Create_User_Role";
 import Edit_User_Role from "./functions/Edit_User_Role";
 import Delete_User_Role from "./functions/Delete_User_Role";
 import Upload_User_Role from "./functions/Upload_User_Role";
+import Set_Increment_ID from "assets/elements/modals/Set_Increment_ID";
 
 const HAS_FILTER = true;
 
@@ -60,6 +63,7 @@ const User_Role = ({ set_page }) => {
     change_by: "",
   };
 
+  const [current_id, set_current_id] = useState(0);
   const [new_data, set_new_data] = useState({ ...def_user_role_data });
   const [edit_data, set_edit_data] = useState({ ...def_user_role_data });
   const [delete_data, set_delete_data] = useState({ ...def_user_role_data });
@@ -82,6 +86,7 @@ const User_Role = ({ set_page }) => {
         ...prev,
         id: value,
       }));
+      set_current_id(value);
     });
   }, []);
 
@@ -134,6 +139,10 @@ const User_Role = ({ set_page }) => {
     }
     handle_get_user_role_list();
     set_truncate_loading(false);
+  };
+
+  const handle_set_incremental_id = () => {
+    set_display_modal("set_incremental_id");
   };
 
   // + Client-Side Filtering
@@ -314,6 +323,17 @@ const User_Role = ({ set_page }) => {
                   <h1 className="text-lg">User Role</h1>
                 </div>
                 <div className="flex gap-2">
+                  {active_user?.category === "DEV" && (
+                    <Button
+                      variant="success"
+                      icon={FileDigit}
+                      icon_position="left"
+                      width="w-[110px]"
+                      on_click={handle_set_incremental_id}
+                    >
+                      Set ID
+                    </Button>
+                  )}
                   {active_user?.category === "DEV" && (
                     <Button
                       variant="danger"
@@ -652,6 +672,13 @@ const User_Role = ({ set_page }) => {
         show_toast={show_toast}
         delete_data={delete_data}
         set_user_role_list={set_user_role_list}
+      />
+      <Set_Increment_ID
+        is_open={display_modal === "set_incremental_id"}
+        on_close={() => set_display_modal("")}
+        show_toast={show_toast}
+        current_id={current_id}
+        api_set_increment_id={api_set_user_role_increment}
       />
     </React.Fragment>
   );

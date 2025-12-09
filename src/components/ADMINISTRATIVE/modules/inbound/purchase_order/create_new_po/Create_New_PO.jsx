@@ -34,9 +34,15 @@ import Select_Branch from "../modals/select_hierarchy/Select_Branch";
 import Select_Plant from "../modals/select_hierarchy/Select_Plant";
 import Select_SLOC from "../modals/select_hierarchy/Select_SLOC";
 
-const Create_New_PO = ({ set_page, new_po_data, set_new_po_data }) => {
+const Create_New_PO = ({
+  set_page,
+  show_toast,
+  new_po_data,
+  set_new_po_data,
+}) => {
   const [active_tab, set_active_tab] = useState("delivery");
   const [display_modal, set_display_modal] = useState("");
+  const [selected_item_list, set_selected_item_list] = useState([]);
 
   const tabs = [
     { key: "delivery", title: "Delivery" },
@@ -325,7 +331,12 @@ const Create_New_PO = ({ set_page, new_po_data, set_new_po_data }) => {
           </div>
           {/* - Section 2 */}
           {/* + Section 3 */}
-          <PO_Items set_display_modal={set_display_modal} />
+          <PO_Items
+            new_po_data={new_po_data}
+            show_toast={show_toast}
+            selected_item_list={selected_item_list}
+            set_selected_item_list={set_selected_item_list}
+          />
           {/* - Section 3 */}
           {/* + Section 4 */}
           <div className="p-4 sm:p-8 border-t">
@@ -392,6 +403,7 @@ const Create_New_PO = ({ set_page, new_po_data, set_new_po_data }) => {
         height="max-h-[700px]"
         branch_list={branch_list}
         set_data={set_new_po_data}
+        set_selected_item_list={set_selected_item_list}
       />
       <Select_Plant
         is_open={display_modal === "select_plant"}
@@ -403,6 +415,7 @@ const Create_New_PO = ({ set_page, new_po_data, set_new_po_data }) => {
         plant_list={plant_list}
         branch_h_list={branch_h_list}
         set_data={set_new_po_data}
+        set_selected_item_list={set_selected_item_list}
       />
       <Select_SLOC
         is_open={display_modal === "select_sloc"}
@@ -414,6 +427,7 @@ const Create_New_PO = ({ set_page, new_po_data, set_new_po_data }) => {
         sloc_list={sloc_list}
         plant_h_list={plant_h_list}
         set_data={set_new_po_data}
+        set_selected_item_list={set_selected_item_list}
       />
       {/* - Modals */}
       {/* + Modals */}

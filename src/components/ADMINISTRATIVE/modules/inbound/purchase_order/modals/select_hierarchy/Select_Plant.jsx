@@ -15,6 +15,7 @@ const Select_Plant = ({
   plant_list,
   branch_h_list,
   set_data,
+  set_selected_item_list,
 }) => {
   // + Client-Side Filtering
   const [filtered_branch_h_list, set_filtered_branch_h_list] = useState([]);
@@ -129,6 +130,7 @@ const Select_Plant = ({
       plant_code: selected_branch_h.plant_code,
       sloc_code: "",
     }));
+    set_selected_item_list([]);
     set_selected_branch_h(null);
     on_close();
   };

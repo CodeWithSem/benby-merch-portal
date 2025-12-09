@@ -8,7 +8,9 @@ import {
   deleteDoc,
   doc,
   getDocs,
+  query,
   setDoc,
+  where,
   writeBatch,
 } from "firebase/firestore";
 import { format_date_1, get_date_now } from "assets/scripts/format";
@@ -17,6 +19,7 @@ import {
   get_firestore_path,
   get_incremental_path,
 } from "api/db_path_contant";
+import { CheckCircle2, CircleX } from "lucide-react";
 
 // + [Get]
 export const api_get_bill_doc_type_hierarchy_list = async () => {
@@ -52,34 +55,88 @@ export const api_get_bill_doc_type_hierarchy_list = async () => {
 };
 // - [Get]
 // + [Create]
-export const api_create_bill_doc_type_hierarchy = async (new_data, user) => {
+export const api_create_bill_doc_type_hierarchy = async (
+  new_data,
+  user,
+  show_toast
+) => {
   try {
     const tbl_bill_doc_type_hierarchy_ref = collection(
       firestore_db,
       ...get_firestore_path(TABLES.BILLING_DOCUMENT_TYPE_HIERARCHY)
     );
 
+    // -----------------------------
+    // CREATE CUSTOM ID (EDIT AS NEEDED)
+    // -----------------------------
+    const custom_id = `${new_data.deliv_doc_type_code}_${new_data.bill_doc_type_code}_${new_data.bill_cancel_code}`;
+
+    // -------------------------------------
+    // VALIDATE DUPLICATE custom_id
+    // -------------------------------------
+    const q = query(
+      tbl_bill_doc_type_hierarchy_ref,
+      where("custom_id", "==", custom_id)
+    );
+
+    const qs = await getDocs(q);
+
+    if (!qs.empty) {
+      show_toast({
+        type: "danger",
+        title: "Error",
+        message: "The hierarchy already exists.",
+        icon: <CircleX size={21} className="text-red-500" />,
+      });
+      return {
+        success: false,
+        message: "This hierarchy already exists.",
+        id: custom_id,
+        status: "duplicate",
+      };
+    }
+
+    // -------------------------------------
+    // FINAL DATA (KEEP numeric id as doc ID)
+    // -------------------------------------
     const final_new_data = {
       ...new_data,
+      custom_id: custom_id,
       creation_date: format_date_1(get_date_now()),
       created_by: user || "N/A",
     };
 
+    // DO NOT REMOVE THESE LINES
     const doc_ref = doc(tbl_bill_doc_type_hierarchy_ref, String(new_data.id));
 
     await setDoc(doc_ref, final_new_data);
     await api_update_bill_doc_type_hierarchy_increment(new_data.id);
+
+    show_toast({
+      type: "success",
+      title: "Created Successfully",
+      message: "A new record has been added.",
+      icon: <CheckCircle2 size={21} className="text-green-500" />,
+    });
     return {
       success: true,
       message: "Data created successfully",
       id: doc_ref.id,
       data: final_new_data,
+      status: "success",
     };
   } catch (error) {
     console.error("Error adding data: ", error);
+    show_toast({
+      type: "danger",
+      title: "Error",
+      message: "Something went wrong. Please try again.",
+      icon: <CircleX size={21} className="text-red-500" />,
+    });
     return {
       success: false,
       message: error.message || "Failed to create data",
+      status: "error",
     };
   }
 };
@@ -110,7 +167,11 @@ export const api_update_bill_doc_type_hierarchy_increment = async (id) => {
 };
 // - [Update Incremental ID]
 // + [Update]
-export const api_update_bill_doc_type_hierarchy = async (edit_data, user) => {
+export const api_update_bill_doc_type_hierarchy = async (
+  edit_data,
+  user,
+  show_toast
+) => {
   try {
     if (!edit_data.id) {
       return {
@@ -119,7 +180,54 @@ export const api_update_bill_doc_type_hierarchy = async (edit_data, user) => {
       };
     }
 
-    const tbl_bill_doc_type_hierarchy_ref = doc(
+    // ---------------------------------------------------
+    // 0. REF TO COLLECTION FOR DUPLICATE VALIDATION
+    // ---------------------------------------------------
+    const tbl_bill_doc_type_hierarchy_ref = collection(
+      firestore_db,
+      "DB1_ERP_SYSTEM",
+      "TBL_BILLING_DOCUMENT_TYPE_HIERARCHY",
+      "DATA"
+    );
+
+    // ---------------------------------------------------
+    // 1. REGENERATE CUSTOM ID (edit as needed)
+    // ---------------------------------------------------
+    const custom_id = `${edit_data.deliv_doc_type_code}_${edit_data.bill_doc_type_code}_${edit_data.bill_cancel_code}`;
+
+    // ---------------------------------------------------
+    // 2. CHECK DUPLICATE custom_id (exclude same ID)
+    // ---------------------------------------------------
+    const q_custom = query(
+      tbl_bill_doc_type_hierarchy_ref,
+      where("custom_id", "==", custom_id)
+    );
+
+    const custom_snap = await getDocs(q_custom);
+
+    if (!custom_snap.empty) {
+      const existing = custom_snap.docs[0];
+
+      // If another record exists with same custom_id → DUPLICATE
+      if (existing.id !== String(edit_data.id)) {
+        show_toast({
+          type: "danger",
+          title: "Error",
+          message: "The hierarchy already exists.",
+          icon: <CircleX size={21} className="text-red-500" />,
+        });
+        return {
+          success: false,
+          message: "This bill_doc_type hierarchy already exists.",
+          status: "custom_id_duplicate",
+        };
+      }
+    }
+
+    // ---------------------------------------------------
+    // 3. PROCEED WITH UPDATE
+    // ---------------------------------------------------
+    const doc_ref = doc(
       firestore_db,
       "DB1_ERP_SYSTEM",
       "TBL_BILLING_DOCUMENT_TYPE_HIERARCHY",
@@ -129,11 +237,19 @@ export const api_update_bill_doc_type_hierarchy = async (edit_data, user) => {
 
     const updated_edit_data = {
       ...edit_data,
+      custom_id: custom_id,
       change_date: format_date_1(get_date_now()),
       change_by: user || "N/A",
     };
 
-    await setDoc(tbl_bill_doc_type_hierarchy_ref, updated_edit_data);
+    await setDoc(doc_ref, updated_edit_data);
+
+    show_toast({
+      type: "success",
+      title: "Updated Successfully",
+      message: "The record has been updated.",
+      icon: <CheckCircle2 size={21} className="text-green-500" />,
+    });
 
     return {
       success: true,
@@ -143,6 +259,12 @@ export const api_update_bill_doc_type_hierarchy = async (edit_data, user) => {
     };
   } catch (error) {
     console.error("Error updating data: ", error);
+    show_toast({
+      type: "danger",
+      title: "Error",
+      message: "Something went wrong. Please try again.",
+      icon: <CircleX size={21} className="text-red-500" />,
+    });
     return {
       success: false,
       message: error.message || "Failed to update data",
@@ -275,3 +397,34 @@ export const api_reset_bill_doc_type_hierarchy_increment = async () => {
   }
 };
 // - [Reset Incremental ID]
+// + [Set Incremental ID Manually]
+export const api_set_bill_doc_type_hierarchy_increment = async (new_id) => {
+  if (typeof new_id !== "number" || new_id <= 0) {
+    return {
+      success: false,
+      message: "Invalid ID. It must be a positive number.",
+    };
+  }
+
+  try {
+    const tbl_bill_doc_type_hierarchy_incre_ref = ref(
+      realtime_db,
+      get_incremental_path(TABLES.BILLING_DOCUMENT_TYPE_HIERARCHY)
+    );
+
+    await set(tbl_bill_doc_type_hierarchy_incre_ref, new_id);
+
+    return {
+      success: true,
+      message: "Incremental ID set successfully",
+      value: new_id,
+    };
+  } catch (error) {
+    console.error("Error setting incremental ID:", error);
+    return {
+      success: false,
+      message: error.message || "Failed to set incremental ID",
+    };
+  }
+};
+// - [Set Incremental ID Manually]

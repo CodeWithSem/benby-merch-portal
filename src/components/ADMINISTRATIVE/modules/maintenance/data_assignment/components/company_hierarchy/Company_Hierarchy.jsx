@@ -3,6 +3,7 @@ import { useToast } from "../../../../../layout/Toast_Provider";
 import { Use_App } from "context/app_context";
 import {
   api_get_company_hierarchy_list,
+  api_set_company_hierarchy_increment,
   api_truncate_company_hierarchy,
 } from "api/firestore_db/maintenance/data_assignment/tbl_company_hierarchy_api";
 import { Get_TBL_INCREMENTAL_ID } from "api/real_time_db/incremental";
@@ -24,6 +25,7 @@ import {
   CheckCircle2,
   SlidersHorizontal,
   CircleX,
+  FileDigit,
 } from "lucide-react";
 import Icon_Field from "assets/elements/Icon_Field";
 import Select_Field from "assets/elements/Select_Field";
@@ -36,6 +38,7 @@ import Create_Company_H from "./functions/Create_Company_H";
 import Edit_Company_H from "./functions/Edit_Company_H";
 import Delete_Company_H from "./functions/Delete_Company_H";
 import Upload_Company_H from "./functions/Upload_Company_H";
+import Set_Increment_ID from "assets/elements/modals/Set_Increment_ID";
 
 const HAS_FILTER = true;
 
@@ -114,6 +117,7 @@ const Company_Hierarchy = ({ set_page }) => {
     change_by: "",
   };
 
+  const [current_id, set_current_id] = useState(0);
   const [new_data, set_new_data] = useState({ ...def_company_hierarchy_data });
   const [edit_data, set_edit_data] = useState({
     ...def_company_hierarchy_data,
@@ -141,6 +145,7 @@ const Company_Hierarchy = ({ set_page }) => {
         ...prev,
         id: value,
       }));
+      set_current_id(value);
     });
   }, []);
 
@@ -194,6 +199,10 @@ const Company_Hierarchy = ({ set_page }) => {
     }
     handle_get_company_hierarchy_list();
     set_truncate_loading(false);
+  };
+
+  const handle_set_incremental_id = () => {
+    set_display_modal("set_incremental_id");
   };
 
   // + Client-Side Filtering
@@ -428,6 +437,17 @@ const Company_Hierarchy = ({ set_page }) => {
                   <h1 className="text-lg">Company Hierarchy</h1>
                 </div>
                 <div className="flex gap-2">
+                  {active_user?.category === "DEV" && (
+                    <Button
+                      variant="success"
+                      icon={FileDigit}
+                      icon_position="left"
+                      width="w-[110px]"
+                      on_click={handle_set_incremental_id}
+                    >
+                      Set ID
+                    </Button>
+                  )}
                   {active_user?.category === "DEV" && (
                     <Button
                       variant="danger"
@@ -824,6 +844,13 @@ const Company_Hierarchy = ({ set_page }) => {
         company_list={company_list}
         purc_org_list={purc_org_list}
         purc_group_list={purc_group_list}
+      />
+      <Set_Increment_ID
+        is_open={display_modal === "set_incremental_id"}
+        on_close={() => set_display_modal("")}
+        show_toast={show_toast}
+        current_id={current_id}
+        api_set_increment_id={api_set_company_hierarchy_increment}
       />
       <Load_Screen
         is_open={display_modal === "load_screen"}

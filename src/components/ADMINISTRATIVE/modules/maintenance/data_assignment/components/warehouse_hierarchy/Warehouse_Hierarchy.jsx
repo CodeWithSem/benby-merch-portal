@@ -5,6 +5,7 @@ import { api_get_warehouse_list } from "api/firestore_db/maintenance/warehouse/t
 import { api_get_stype_list } from "api/firestore_db/maintenance/warehouse/tbl_stype_api";
 import {
   api_get_warehouse_hierarchy_list,
+  api_set_warehouse_hierarchy_increment,
   api_truncate_warehouse_hierarchy,
 } from "api/firestore_db/maintenance/data_assignment/tbl_warehouse_hierarchy_api";
 import { Get_TBL_INCREMENTAL_ID } from "api/real_time_db/incremental";
@@ -23,6 +24,7 @@ import {
   CheckCircle2,
   SlidersHorizontal,
   CircleX,
+  FileDigit,
 } from "lucide-react";
 import Icon_Field from "assets/elements/Icon_Field";
 import Select_Field from "assets/elements/Select_Field";
@@ -35,6 +37,7 @@ import Create_Warehouse_H from "./functions/Create_Warehouse_H";
 import Edit_Warehouse_H from "./functions/Edit_Warehouse_H";
 import Delete_Warehouse_H from "./functions/Delete_Warehouse_H";
 import Upload_Warehouse_H from "./functions/Upload_Warehouse_H";
+import Set_Increment_ID from "assets/elements/modals/Set_Increment_ID";
 
 const HAS_FILTER = true;
 
@@ -102,6 +105,7 @@ const Warehouse_Hierarchy = ({ set_page }) => {
     change_by: "",
   };
 
+  const [current_id, set_current_id] = useState(0);
   const [new_data, set_new_data] = useState({
     ...def_warehouse_hierarchy_data,
   });
@@ -130,6 +134,7 @@ const Warehouse_Hierarchy = ({ set_page }) => {
         ...prev,
         id: value,
       }));
+      set_current_id(value);
     });
   }, []);
 
@@ -182,6 +187,10 @@ const Warehouse_Hierarchy = ({ set_page }) => {
     }
     handle_get_warehouse_hierarchy_list();
     set_truncate_loading(false);
+  };
+
+  const handle_set_incremental_id = () => {
+    set_display_modal("set_incremental_id");
   };
 
   // + Client-Side Filtering
@@ -417,6 +426,17 @@ const Warehouse_Hierarchy = ({ set_page }) => {
                   <h1 className="text-lg">Warehouse Hierarchy</h1>
                 </div>
                 <div className="flex gap-2">
+                  {active_user?.category === "DEV" && (
+                    <Button
+                      variant="success"
+                      icon={FileDigit}
+                      icon_position="left"
+                      width="w-[110px]"
+                      on_click={handle_set_incremental_id}
+                    >
+                      Set ID
+                    </Button>
+                  )}
                   {active_user?.category === "DEV" && (
                     <Button
                       variant="danger"
@@ -793,6 +813,13 @@ const Warehouse_Hierarchy = ({ set_page }) => {
         set_warehouse_hierarchy_list={set_warehouse_hierarchy_list}
         warehouse_list={warehouse_list}
         stype_list={stype_list}
+      />
+      <Set_Increment_ID
+        is_open={display_modal === "set_incremental_id"}
+        on_close={() => set_display_modal("")}
+        show_toast={show_toast}
+        current_id={current_id}
+        api_set_increment_id={api_set_warehouse_hierarchy_increment}
       />
       <Load_Screen
         is_open={display_modal === "load_screen"}

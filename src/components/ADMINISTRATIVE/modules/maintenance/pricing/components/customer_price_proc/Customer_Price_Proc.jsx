@@ -12,6 +12,7 @@ import { useToast } from "../../../../../layout/Toast_Provider";
 import { Use_App } from "context/app_context";
 import {
   api_get_customer_price_proc_list,
+  api_set_customer_price_proc_increment,
   api_truncate_customer_price_proc,
 } from "api/firestore_db/maintenance/pricing/tbl_customer_price_proc_api";
 import { Get_TBL_INCREMENTAL_ID } from "api/real_time_db/incremental";
@@ -28,6 +29,7 @@ import {
   Trash2,
   CheckCircle2,
   SlidersHorizontal,
+  FileDigit,
 } from "lucide-react";
 import Icon_Field from "assets/elements/Icon_Field";
 import Select_Field from "assets/elements/Select_Field";
@@ -39,6 +41,7 @@ import Create_C_Price_Proc from "./functions/Create_C_Price_Proc";
 import Edit_C_Price_Proc from "./functions/Edit_C_Price_Proc";
 import Delete_C_Price_Proc from "./functions/Delete_C_Price_Proc";
 import Upload_C_Price_Proc from "./functions/Upload_C_Price_Proc";
+import Set_Increment_ID from "assets/elements/modals/Set_Increment_ID";
 
 const HAS_FILTER = true;
 
@@ -61,6 +64,7 @@ const Customer_Price_Proc = ({ set_page }) => {
     change_by: "",
   };
 
+  const [current_id, set_current_id] = useState(0);
   const [new_data, set_new_data] = useState({
     ...def_customer_price_proc_data,
   });
@@ -89,6 +93,7 @@ const Customer_Price_Proc = ({ set_page }) => {
         id: value,
         customer_price_proc_code: `C-PP-${String(value).padStart(3, "0")}`,
       }));
+      set_current_id(value);
     });
   }, []);
 
@@ -149,6 +154,10 @@ const Customer_Price_Proc = ({ set_page }) => {
     }
     handle_get_customer_price_proc_list();
     set_truncate_loading(false);
+  };
+
+  const handle_set_incremental_id = () => {
+    set_display_modal("set_incremental_id");
   };
 
   // + Client-Side Filtering
@@ -334,6 +343,17 @@ const Customer_Price_Proc = ({ set_page }) => {
                   <h1 className="text-lg">Customer Pricing Procedure</h1>
                 </div>
                 <div className="flex gap-2">
+                  {active_user?.category === "DEV" && (
+                    <Button
+                      variant="success"
+                      icon={FileDigit}
+                      icon_position="left"
+                      width="w-[110px]"
+                      on_click={handle_set_incremental_id}
+                    >
+                      Set ID
+                    </Button>
+                  )}
                   {active_user?.category === "DEV" && (
                     <Button
                       variant="danger"
@@ -674,6 +694,13 @@ const Customer_Price_Proc = ({ set_page }) => {
         show_toast={show_toast}
         delete_data={delete_data}
         set_customer_price_proc_list={set_customer_price_proc_list}
+      />
+      <Set_Increment_ID
+        is_open={display_modal === "set_incremental_id"}
+        on_close={() => set_display_modal("")}
+        show_toast={show_toast}
+        current_id={current_id}
+        api_set_increment_id={api_set_customer_price_proc_increment}
       />
     </React.Fragment>
   );

@@ -15,6 +15,7 @@ const Select_SLOC = ({
   sloc_list,
   plant_h_list,
   set_data,
+  set_selected_item_list,
 }) => {
   // + Client-Side Filtering
   const [filtered_plant_h_list, set_filtered_plant_h_list] = useState([]);
@@ -128,6 +129,7 @@ const Select_SLOC = ({
       ...prev,
       sloc_code: selected_plant_h.sloc_code,
     }));
+    set_selected_item_list([]);
     set_selected_plant_h(null);
     on_close();
   };

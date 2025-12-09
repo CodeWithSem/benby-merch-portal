@@ -12,6 +12,7 @@ import { useToast } from "../../../../../layout/Toast_Provider";
 import { Use_App } from "context/app_context";
 import {
   api_get_truck_type_desig_list,
+  api_set_truck_type_desig_increment,
   api_truncate_truck_type_desig,
 } from "api/firestore_db/maintenance/truck/tbl_truck_type_desig_api";
 import { Get_TBL_INCREMENTAL_ID } from "api/real_time_db/incremental";
@@ -28,6 +29,7 @@ import {
   Trash2,
   CheckCircle2,
   SlidersHorizontal,
+  FileDigit,
 } from "lucide-react";
 import Icon_Field from "assets/elements/Icon_Field";
 import Select_Field from "assets/elements/Select_Field";
@@ -39,6 +41,7 @@ import Create_Truck_Type_Desig from "./functions/Create_Truck_Type_Desig";
 import Edit_Truck_Type_Desig from "./functions/Edit_Truck_Type_Desig";
 import Delete_Truck_Type_Desig from "./functions/Delete_Truck_Type_Desig";
 import Upload_Truck_Type_Desig from "./functions/Upload_Truck_Type_Desig";
+import Set_Increment_ID from "assets/elements/modals/Set_Increment_ID";
 
 const HAS_FILTER = true;
 
@@ -61,6 +64,7 @@ const Truck_Type_Desig = ({ set_page }) => {
     change_by: "",
   };
 
+  const [current_id, set_current_id] = useState(0);
   const [new_data, set_new_data] = useState({ ...def_truck_type_desig_data });
   const [edit_data, set_edit_data] = useState({ ...def_truck_type_desig_data });
   const [delete_data, set_delete_data] = useState({
@@ -85,6 +89,7 @@ const Truck_Type_Desig = ({ set_page }) => {
         id: value,
         truck_type_desig_code: `TRK-TD-${String(value).padStart(2, "0")}`,
       }));
+      set_current_id(value);
     });
   }, []);
 
@@ -145,6 +150,10 @@ const Truck_Type_Desig = ({ set_page }) => {
     }
     handle_get_truck_type_desig_list();
     set_truncate_loading(false);
+  };
+
+  const handle_set_incremental_id = () => {
+    set_display_modal("set_incremental_id");
   };
 
   // + Client-Side Filtering
@@ -328,6 +337,17 @@ const Truck_Type_Desig = ({ set_page }) => {
                   <h1 className="text-lg">Truck Type Designation</h1>
                 </div>
                 <div className="flex gap-2">
+                  {active_user?.category === "DEV" && (
+                    <Button
+                      variant="success"
+                      icon={FileDigit}
+                      icon_position="left"
+                      width="w-[110px]"
+                      on_click={handle_set_incremental_id}
+                    >
+                      Set ID
+                    </Button>
+                  )}
                   {active_user?.category === "DEV" && (
                     <Button
                       variant="danger"
@@ -666,6 +686,13 @@ const Truck_Type_Desig = ({ set_page }) => {
         show_toast={show_toast}
         delete_data={delete_data}
         set_truck_type_desig_list={set_truck_type_desig_list}
+      />
+      <Set_Increment_ID
+        is_open={display_modal === "set_incremental_id"}
+        on_close={() => set_display_modal("")}
+        show_toast={show_toast}
+        current_id={current_id}
+        api_set_increment_id={api_set_truck_type_desig_increment}
       />
     </React.Fragment>
   );

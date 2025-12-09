@@ -8,7 +8,9 @@ import {
   deleteDoc,
   doc,
   getDocs,
+  query,
   setDoc,
+  where,
   writeBatch,
 } from "firebase/firestore";
 import { format_date_1, get_date_now } from "assets/scripts/format";
@@ -17,6 +19,7 @@ import {
   get_firestore_path,
   get_incremental_path,
 } from "api/db_path_contant";
+import { CheckCircle2, CircleX } from "lucide-react";
 
 // + [Get]
 export const api_get_customer_price_proc_list = async () => {
@@ -52,13 +55,66 @@ export const api_get_customer_price_proc_list = async () => {
 };
 // - [Get]
 // + [Create]
-export const api_create_customer_price_proc = async (new_data, user) => {
+export const api_create_customer_price_proc = async (
+  new_data,
+  user,
+  show_toast
+) => {
   try {
     const tbl_customer_price_proc_ref = collection(
       firestore_db,
       ...get_firestore_path(TABLES.CUSTOMER_PRICING_PROCEDURE)
     );
 
+    // ---------------------------------------------
+    // 1. CHECK DUPLICATE customer_price_proc_code
+    // ---------------------------------------------
+    const q_code = query(
+      tbl_customer_price_proc_ref,
+      where("customer_price_proc_code", "==", new_data.customer_price_proc_code)
+    );
+    const snap_code = await getDocs(q_code);
+
+    if (!snap_code.empty) {
+      show_toast({
+        type: "danger",
+        title: "Error",
+        message: "The code already exists.",
+        icon: <CircleX size={21} className="text-red-500" />,
+      });
+      return {
+        success: false,
+        message: `The code already exists.`,
+        status: "code_duplicate",
+      };
+    }
+
+    // ---------------------------------------------
+    // 2. CHECK DUPLICATE customer_price_proc_desc
+    // ---------------------------------------------
+    const q_desc = query(
+      tbl_customer_price_proc_ref,
+      where("customer_price_proc_desc", "==", new_data.customer_price_proc_desc)
+    );
+    const snap_desc = await getDocs(q_desc);
+
+    if (!snap_desc.empty) {
+      show_toast({
+        type: "danger",
+        title: "Error",
+        message: "The description already exists.",
+        icon: <CircleX size={21} className="text-red-500" />,
+      });
+      return {
+        success: false,
+        message: `The description already exists.`,
+        status: "desc_duplicate",
+      };
+    }
+
+    // ---------------------------------------------
+    // 3. CREATE NEW DATA
+    // ---------------------------------------------
     const final_new_data = {
       ...new_data,
       creation_date: format_date_1(get_date_now()),
@@ -69,14 +125,30 @@ export const api_create_customer_price_proc = async (new_data, user) => {
 
     await setDoc(doc_ref, final_new_data);
     await api_update_customer_price_proc_increment(new_data.id);
+
+    show_toast({
+      type: "success",
+      title: "Created Successfully",
+      message: "A new record has been added.",
+      icon: <CheckCircle2 size={21} className="text-green-500" />,
+    });
+
     return {
       success: true,
-      message: "Data created successfully",
+      message: "A new record has been added.",
       id: doc_ref.id,
       data: final_new_data,
     };
   } catch (error) {
     console.error("Error adding data: ", error);
+
+    show_toast({
+      type: "danger",
+      title: "Error",
+      message: "Something went wrong. Please try again.",
+      icon: <CircleX size={21} className="text-red-500" />,
+    });
+
     return {
       success: false,
       message: error.message || "Failed to create data",
@@ -110,8 +182,15 @@ export const api_update_customer_price_proc_increment = async (id) => {
 };
 // - [Update Incremental ID]
 // + [Update]
-export const api_update_customer_price_proc = async (edit_data, user) => {
+export const api_update_customer_price_proc = async (
+  edit_data,
+  user,
+  show_toast
+) => {
   try {
+    // ---------------------------------------------------
+    // 0. VALIDATE ID
+    // ---------------------------------------------------
     if (!edit_data.id) {
       return {
         success: false,
@@ -119,13 +198,48 @@ export const api_update_customer_price_proc = async (edit_data, user) => {
       };
     }
 
-    const tbl_customer_price_proc_ref = doc(
-      firestore_db,
-      "DB1_ERP_SYSTEM",
-      "TBL_CUSTOMER_PRICING_PROCEDURE",
-      "DATA",
-      String(edit_data.id)
+    // Firestore path setup
+    const tbl_path = get_firestore_path(TABLES.CUSTOMER_PRICING_PROCEDURE);
+    const tbl_customer_price_proc_ref = collection(firestore_db, ...tbl_path);
+
+    // ---------------------------------------------------
+    // 1. CHECK DUPLICATE customer_price_proc_desc (exclude same ID)
+    // ---------------------------------------------------
+    const q_desc = query(
+      tbl_customer_price_proc_ref,
+      where(
+        "customer_price_proc_desc",
+        "==",
+        edit_data.customer_price_proc_desc
+      )
     );
+
+    const desc_snap = await getDocs(q_desc);
+
+    if (!desc_snap.empty) {
+      const existing = desc_snap.docs[0];
+
+      // If another record exists with same desc → DUPLICATE
+      if (existing.id !== String(edit_data.id)) {
+        show_toast({
+          type: "danger",
+          title: "Error",
+          message: "The description already exists.",
+          icon: <CircleX size={21} className="text-red-500" />,
+        });
+
+        return {
+          success: false,
+          message: "The description already exists.",
+          status: "desc_duplicate",
+        };
+      }
+    }
+
+    // ---------------------------------------------------
+    // 2. PROCEED WITH UPDATE
+    // ---------------------------------------------------
+    const doc_ref = doc(firestore_db, ...tbl_path, String(edit_data.id));
 
     const updated_edit_data = {
       ...edit_data,
@@ -133,16 +247,31 @@ export const api_update_customer_price_proc = async (edit_data, user) => {
       change_by: user || "N/A",
     };
 
-    await setDoc(tbl_customer_price_proc_ref, updated_edit_data);
+    await setDoc(doc_ref, updated_edit_data);
+
+    show_toast({
+      type: "success",
+      title: "Updated Successfully",
+      message: "The record has been updated.",
+      icon: <CheckCircle2 size={21} className="text-green-500" />,
+    });
 
     return {
       success: true,
-      message: "Data updated successfully",
+      message: "The record has been updated.",
       id: edit_data.id,
       data: updated_edit_data,
     };
   } catch (error) {
     console.error("Error updating data: ", error);
+
+    show_toast({
+      type: "danger",
+      title: "Error",
+      message: "Something went wrong. Please try again.",
+      icon: <CircleX size={21} className="text-red-500" />,
+    });
+
     return {
       success: false,
       message: error.message || "Failed to update data",
@@ -273,3 +402,34 @@ export const api_reset_customer_price_proc_increment = async () => {
   }
 };
 // - [Reset Incremental ID]
+// + [Set Incremental ID Manually]
+export const api_set_customer_price_proc_increment = async (new_id) => {
+  if (typeof new_id !== "number" || new_id <= 0) {
+    return {
+      success: false,
+      message: "Invalid ID. It must be a positive number.",
+    };
+  }
+
+  try {
+    const tbl_customer_price_proc_incre_ref = ref(
+      realtime_db,
+      get_incremental_path(TABLES.CUSTOMER_PRICING_PROCEDURE)
+    );
+
+    await set(tbl_customer_price_proc_incre_ref, new_id);
+
+    return {
+      success: true,
+      message: "Incremental ID set successfully",
+      value: new_id,
+    };
+  } catch (error) {
+    console.error("Error setting incremental ID:", error);
+    return {
+      success: false,
+      message: error.message || "Failed to set incremental ID",
+    };
+  }
+};
+// - [Set Incremental ID Manually]

@@ -11,6 +11,7 @@ import { useToast } from "../../../../../layout/Toast_Provider";
 import { Use_App } from "context/app_context";
 import {
   api_get_shipment_route_list,
+  api_set_shipment_route_increment,
   api_truncate_shipment_route,
 } from "api/firestore_db/maintenance/shipment/tbl_shipment_route_api";
 import { Get_TBL_INCREMENTAL_ID } from "api/real_time_db/incremental";
@@ -27,6 +28,7 @@ import {
   Trash2,
   CheckCircle2,
   SlidersHorizontal,
+  FileDigit,
 } from "lucide-react";
 import Icon_Field from "assets/elements/Icon_Field";
 import Select_Field from "assets/elements/Select_Field";
@@ -38,6 +40,7 @@ import Create_Shipment_Route from "./functions/Create_Shipment_Route";
 import Edit_Shipment_Route from "./functions/Edit_Shipment_Route";
 import Delete_Shipment_Route from "./functions/Delete_Shipment_Route";
 import Upload_Shipment_Route from "./functions/Upload_Shipment_Route";
+import Set_Increment_ID from "assets/elements/modals/Set_Increment_ID";
 
 const HAS_FILTER = true;
 
@@ -60,6 +63,7 @@ const Shipment_Route = ({ set_page }) => {
     change_by: "",
   };
 
+  const [current_id, set_current_id] = useState(0);
   const [new_data, set_new_data] = useState({ ...def_shipment_route_data });
   const [edit_data, set_edit_data] = useState({ ...def_shipment_route_data });
   const [delete_data, set_delete_data] = useState({
@@ -84,6 +88,7 @@ const Shipment_Route = ({ set_page }) => {
         ...prev,
         id: value,
       }));
+      set_current_id(value);
     });
   }, []);
 
@@ -144,6 +149,10 @@ const Shipment_Route = ({ set_page }) => {
     }
     handle_get_shipment_route_list();
     set_truncate_loading(false);
+  };
+
+  const handle_set_incremental_id = () => {
+    set_display_modal("set_incremental_id");
   };
 
   // + Client-Side Filtering
@@ -325,6 +334,17 @@ const Shipment_Route = ({ set_page }) => {
                   <h1 className="text-lg">Shipment Route</h1>
                 </div>
                 <div className="flex gap-2">
+                  {active_user?.category === "DEV" && (
+                    <Button
+                      variant="success"
+                      icon={FileDigit}
+                      icon_position="left"
+                      width="w-[110px]"
+                      on_click={handle_set_incremental_id}
+                    >
+                      Set ID
+                    </Button>
+                  )}
                   {active_user?.category === "DEV" && (
                     <Button
                       variant="danger"
@@ -663,6 +683,13 @@ const Shipment_Route = ({ set_page }) => {
         show_toast={show_toast}
         delete_data={delete_data}
         set_shipment_route_list={set_shipment_route_list}
+      />
+      <Set_Increment_ID
+        is_open={display_modal === "set_incremental_id"}
+        on_close={() => set_display_modal("")}
+        show_toast={show_toast}
+        current_id={current_id}
+        api_set_increment_id={api_set_shipment_route_increment}
       />
     </React.Fragment>
   );
