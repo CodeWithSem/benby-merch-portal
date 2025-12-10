@@ -12,6 +12,8 @@ import {
   FileUp,
   FileInput,
   Database,
+  Trash2,
+  FileDigit,
 } from "lucide-react";
 import { useToast } from "../../../layout/Toast_Provider";
 import { format_date_1 } from "assets/scripts/format";
@@ -22,8 +24,6 @@ import Button from "assets/elements/Button";
 import Checkbox_Field from "assets/elements/Checkbox_Field";
 import Date_Field from "assets/elements/Date_Field";
 import Create_New_PO from "./create_new_po/Create_New_PO";
-// import Edit_PO from "./edit_po/Edit_PO";
-// import Post_View_PO from "./post_view_po/Post_View_PO";
 import Select_PO_Type from "./modals/select_po_type/Select_PO_Type";
 import Delete_PO from "./modals/delete_po/Delete_PO";
 import Button_Action from "assets/elements/Button_Action";
@@ -32,59 +32,113 @@ import {
   purc_org_list,
   purc_group_list,
   po_type_list,
-  vendor_master_list,
+  purchase_order_list,
   branch_list,
   plant_list,
   sloc_list,
   po_type_h_list,
+  vendor_master_list,
 } from "./PO_DATA_MAP";
 import Select_Generic from "assets/elements/modals/Select_Generic";
+import { Get_TBL_INCREMENTAL_ID } from "api/real_time_db/incremental";
+import {
+  api_get_purchase_order_list_by_date,
+  api_set_purchase_order_increment,
+  api_truncate_purchase_order,
+} from "api/firestore_db/inbound/purchase_order/tbl_purchase_order_api";
+import { Use_App } from "context/app_context";
+import Set_Increment_ID from "assets/elements/modals/Set_Increment_ID";
+import { get_description } from "assets/scripts/functions/get_description";
+import Spinner from "assets/elements/Spinner";
+import Edit_PO from "./edit_po/Edit_PO";
+import Post_View_PO from "./post_view_po/Post_View_PO";
 
 const Purchase_Order = () => {
+  const { active_user } = Use_App();
   const { show_toast } = useToast();
   // + Variables
   const [show_filter, set_show_filter] = useState(false);
   const [page, set_page] = useState("main");
   const [display_modal, set_display_modal] = useState("");
   const [for_posting, set_for_posting] = useState(false);
+  const [loading_list, set_loading_list] = useState(false);
+  const [truncate_loading, set_truncate_loading] = useState(false);
   const today = format_date_1(new Date());
   const [start_date, set_start_date] = useState(today);
   const [end_date, set_end_date] = useState(today);
   const [show_load_data_button, set_show_load_data_button] = useState(false);
   // - Variables
 
+  const [current_id, set_current_id] = useState(0);
+  const [new_po_data, set_new_po_data] = useState({});
+  const [edit_po_data, set_edit_po_data] = useState({});
+  const [view_po_data, set_view_po_data] = useState({});
+  const [selected_item_list, set_selected_item_list] = useState([]);
+  const [selected_approval_list, set_selected_approval_list] = useState([]);
+
+  useEffect(() => {
+    Get_TBL_INCREMENTAL_ID("TBL_PURCHASE_ORDER", (value) => {
+      set_new_po_data((prev) => ({
+        ...prev,
+        id: value,
+        po_number: `PO-${String(value).padStart(9, "0")}`,
+      }));
+      set_current_id(value);
+    });
+  }, []);
+
   // + Columns
   const columns = [
     { key: "po_number", label: "PO Number", sortable: true },
-    { key: "po_type", label: "PO Type", sortable: true },
-    { key: "company", label: "Company", sortable: true },
+    { key: "po_type_code", label: "PO Type", sortable: true },
+    { key: "od_company_code", label: "Company", sortable: true },
+    { key: "vendor_code", label: "Vendor", sortable: true },
     { key: "creation_date", label: "Creation Date", sortable: true },
-    { key: "status", label: "Status", sortable: true },
+    { key: "po_status", label: "Status", sortable: true },
     { key: "actions", label: "", sortable: false },
   ];
   // - Columns
 
-  const [new_po_data, set_new_po_data] = useState({});
-  const [selected_item_list, set_selected_item_list] = useState([]);
+  const [po_list, set_po_list] = useState([]);
 
-  const [po_list, set_po_list] = useState([
-    {
-      id: 1,
-      po_number: "PO-XXXXXXXXX",
-      po_type: "QSPO",
-      company: "QS IT Services",
-      creation_date: "MM-DD-YYYY",
-      creation_time: "HH:MM:SS",
-      status: "Pending",
-    },
-  ]);
+  const handle_get_purchase_order_list = async () => {
+    set_loading_list(true);
+    const response = await api_get_purchase_order_list_by_date(
+      start_date,
+      end_date,
+      show_toast
+    );
+    if (response.success) {
+      set_po_list(response.data);
+    } else {
+      console.error(response.message);
+    }
+    set_loading_list(false);
+    set_show_load_data_button(false);
+  };
+
+  useEffect(() => {
+    handle_get_purchase_order_list();
+  }, []);
+
+  const handle_truncate = async () => {
+    set_truncate_loading(true);
+    await api_truncate_purchase_order(show_toast);
+    handle_get_purchase_order_list();
+    set_truncate_loading(false);
+    set_display_modal("");
+  };
+
+  const handle_set_incremental_id = () => {
+    set_display_modal("set_incremental_id");
+  };
 
   // + Client-Side Filtering
   const [filtered_po_list, set_filtered_po_list] = useState([]);
   const [loading, set_loading] = useState(false);
   const [show_entries, set_show_entries] = useState(5);
   const [current_page, set_current_page] = useState(1);
-  const [sort_by, set_sort_by] = useState("timestamp");
+  const [sort_by, set_sort_by] = useState("id");
   const [sort_order, set_sort_order] = useState("asc");
   const [search_query, set_search_query] = useState("");
   const [debounced_query, set_debounced_query] = useState("");
@@ -217,17 +271,26 @@ const Purchase_Order = () => {
     alert("Under Maintenance");
   };
 
-  const handle_view_po = () => {
+  const handle_view_po = (data) => {
     set_for_posting(false);
+    set_view_po_data(data);
+    set_selected_item_list(data.selected_item_list);
+    set_selected_approval_list(data.selected_approval_list);
     set_page("post_view_po");
   };
 
-  const handle_post_po = () => {
+  const handle_post_po = (data) => {
     set_for_posting(true);
+    set_view_po_data(data);
+    set_selected_item_list(data.selected_item_list);
+    set_selected_approval_list(data.selected_approval_list);
     set_page("post_view_po");
   };
 
-  const handle_edit_po = () => {
+  const handle_edit_po = (data) => {
+    set_edit_po_data(data);
+    set_selected_item_list(data.selected_item_list);
+    set_selected_approval_list(data.selected_approval_list);
     set_page("edit_po");
   };
 
@@ -246,7 +309,7 @@ const Purchase_Order = () => {
   };
 
   const handle_load_data = () => {
-    set_show_load_data_button(false);
+    handle_get_purchase_order_list();
   };
 
   // RETURN ORIGIN
@@ -284,6 +347,29 @@ const Purchase_Order = () => {
               <div className="flex flex-wrap items-center justify-between gap-3 p-5">
                 <h1 className="text-lg">Purchase Order</h1>
                 <div className="flex gap-2">
+                  {active_user?.category === "DEV" && (
+                    <Button
+                      variant="success"
+                      icon={FileDigit}
+                      icon_position="left"
+                      width="w-[110px]"
+                      on_click={handle_set_incremental_id}
+                    >
+                      Set ID
+                    </Button>
+                  )}
+                  {active_user?.category === "DEV" && (
+                    <Button
+                      variant="danger"
+                      icon={Trash2}
+                      icon_position="left"
+                      width="w-[110px]"
+                      loading={truncate_loading}
+                      on_click={handle_truncate}
+                    >
+                      Truncate
+                    </Button>
+                  )}
                   <Button
                     variant="primary"
                     icon={PlusCircle}
@@ -324,6 +410,7 @@ const Purchase_Order = () => {
                       variant="primary"
                       icon={Database}
                       icon_position="left"
+                      loading={loading_list}
                       on_click={handle_load_data}
                     >
                       Load Data
@@ -360,7 +447,7 @@ const Purchase_Order = () => {
                         variant="white"
                         icon={RefreshCw}
                         icon_position="left"
-                        //   on_click={() => load_data()}
+                        on_click={handle_get_purchase_order_list}
                       ></Button>
                     </div>
                     <div className="w-full mt-4 md:mt-0 md:w-[600px]">
@@ -449,9 +536,9 @@ const Purchase_Order = () => {
                   </div>
                   {/* + Table */}
                   <div className="overflow-x-auto">
-                    {loading ? (
-                      <div className="p-6 text-center text-gray-500 text-sm">
-                        Loading...
+                    {loading_list ? (
+                      <div className="p-6 flex justify-center items-center text-gray-500 text-sm">
+                        <Spinner />
                       </div>
                     ) : filtered_po_list.length === 0 ? (
                       <div className="p-6 text-center text-gray-500 text-sm">
@@ -509,16 +596,39 @@ const Purchase_Order = () => {
                             // + Cell Renderer
                             const render_cell = (col, row) => {
                               const value = row[col.key];
-                              if (col.key === "status") {
+                              if (col.key === "od_company_code") {
+                                return get_description(
+                                  row.od_company_code,
+                                  company_list,
+                                  "company_code",
+                                  "company_desc"
+                                );
+                              }
+                              if (col.key === "vendor_code") {
+                                return get_description(
+                                  row.vendor_code,
+                                  vendor_master_list,
+                                  "vendor_code",
+                                  "vendor_desc"
+                                );
+                              }
+                              if (col.key === "po_status") {
+                                const po_status_classes = {
+                                  Draft: "bg-gray-100 text-gray-500",
+                                  Pending: "bg-yellow-100 text-yellow-500",
+                                  Posted: "bg-orange-100 text-orange-500",
+                                  Approved: "bg-green-100 text-green-500",
+                                  Rejected: "bg-red-100 text-red-500",
+                                };
+
                                 return (
                                   <span
                                     className={`inline-flex items-center justify-center gap-1 rounded-full px-3 py-0.5 text-xs font-medium ${
-                                      row.status === "Posted"
-                                        ? "bg-green-100 text-green-500"
-                                        : "bg-yellow-100 text-yellow-600"
+                                      po_status_classes[row.po_status] ||
+                                      "bg-gray-100 text-gray-500"
                                     }`}
                                   >
-                                    {row.status}
+                                    {row.po_status}
                                   </span>
                                 );
                               }
@@ -529,23 +639,28 @@ const Purchase_Order = () => {
                                       <Button_Action
                                         icon={View}
                                         tooltip="View Record"
-                                        on_click={() => handle_view_po(row.id)}
+                                        on_click={() => handle_view_po(row)}
                                       />
                                     </div>
-                                    <div className="relative group flex jusity-center items-center">
-                                      <Button_Action
-                                        icon={FileInput}
-                                        tooltip="Post Record"
-                                        on_click={() => handle_post_po(row.id)}
-                                      />
-                                    </div>
-                                    <div className="relative group flex jusity-center items-center">
-                                      <Button_Action
-                                        icon={Edit}
-                                        tooltip="Edit Record"
-                                        on_click={() => handle_edit_po(row.id)}
-                                      />
-                                    </div>
+                                    {row.po_status === "Pending" && (
+                                      <div className="relative group flex jusity-center items-center">
+                                        <Button_Action
+                                          icon={FileInput}
+                                          tooltip="Post Record"
+                                          on_click={() => handle_post_po(row)}
+                                        />
+                                      </div>
+                                    )}
+                                    {(row.po_status === "Draft" ||
+                                      row.po_status === "Pending") && (
+                                      <div className="relative group flex jusity-center items-center">
+                                        <Button_Action
+                                          icon={Edit}
+                                          tooltip="Edit Record"
+                                          on_click={() => handle_edit_po(row)}
+                                        />
+                                      </div>
+                                    )}
                                     <div className="relative group flex jusity-center items-center">
                                       <Button_Action
                                         class_name="mb-[1px]"
@@ -614,25 +729,46 @@ const Purchase_Order = () => {
       {page === "po_creation" && (
         <Create_New_PO
           set_page={set_page}
+          active_user={active_user}
           show_toast={show_toast}
           new_po_data={new_po_data}
           set_new_po_data={set_new_po_data}
           selected_item_list={selected_item_list}
           set_selected_item_list={set_selected_item_list}
+          selected_approval_list={selected_approval_list}
+          set_selected_approval_list={set_selected_approval_list}
+          set_po_list={set_po_list}
         />
       )}
-      {/* {page === "edit_po" && (
+      {page === "edit_po" && (
         <Edit_PO
           set_page={set_page}
-          vendor_master_list={vendor_master_list}
-          branch_list={branch_list}
-          plant_list={plant_list}
-          sloc_list={sloc_list}
+          active_user={active_user}
+          show_toast={show_toast}
+          edit_po_data={edit_po_data}
+          set_edit_po_data={set_edit_po_data}
+          selected_item_list={selected_item_list}
+          set_selected_item_list={set_selected_item_list}
+          selected_approval_list={selected_approval_list}
+          set_selected_approval_list={set_selected_approval_list}
+          set_po_list={set_po_list}
         />
-      )} */}
-      {/* {page === "post_view_po" && (
-        <Post_View_PO set_page={set_page} for_posting={for_posting} />
-      )} */}
+      )}
+      {page === "post_view_po" && (
+        <Post_View_PO
+          set_page={set_page}
+          active_user={active_user}
+          show_toast={show_toast}
+          view_po_data={view_po_data}
+          set_view_po_data={set_view_po_data}
+          selected_item_list={selected_item_list}
+          set_selected_item_list={set_selected_item_list}
+          selected_approval_list={selected_approval_list}
+          set_selected_approval_list={set_selected_approval_list}
+          set_po_list={set_po_list}
+          for_posting={for_posting}
+        />
+      )}
       {/* - Pages */}
       {/* + Modals */}
       {select_modal_configs.map((cfg) => (
@@ -670,6 +806,13 @@ const Purchase_Order = () => {
         is_open={display_modal === "delete_po"}
         on_close={() => set_display_modal("")}
         width="max-w-[1280px]"
+      />
+      <Set_Increment_ID
+        is_open={display_modal === "set_incremental_id"}
+        on_close={() => set_display_modal("")}
+        show_toast={show_toast}
+        current_id={current_id}
+        api_set_increment_id={api_set_purchase_order_increment}
       />
       {/* - Modals */}
     </React.Fragment>

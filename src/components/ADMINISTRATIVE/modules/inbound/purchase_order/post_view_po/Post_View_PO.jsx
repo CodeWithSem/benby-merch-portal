@@ -1,7 +1,8 @@
 import React, { useState } from "react";
+import { get_date_now, format_date_1 } from "assets/scripts/format";
+import { ChevronLeft, CirclePlus, Eye, FileInput, Save } from "lucide-react";
 import Text_Field from "assets/elements/Text_Field";
 import Button from "assets/elements/Button";
-import { ChevronLeft, FileInput } from "lucide-react";
 import Text_Code_Field from "assets/elements/Text_Code_Field";
 import Delivery from "./po_details/Delivery";
 import Address from "./po_details/Address";
@@ -10,11 +11,48 @@ import PO_Status from "./po_details/PO_Status";
 import Shipment from "./po_details/Shipment";
 import Approval from "./po_details/Approval";
 import PO_Items from "./po_items/PO_Items";
-import { format_date_1, get_date_now } from "assets/scripts/format";
+import Select_Generic from "assets/elements/modals/Select_Generic";
+import {
+  branch_h_list,
+  branch_list,
+  plant_h_list,
+  plant_list,
+  po_type_list,
+  sloc_list,
+  vendor_master_list,
+  payment_term_list,
+  incoterms_list,
+  city_list,
+  country_list,
+  district_list,
+  language_list,
+  region_list,
+} from "../PO_DATA_MAP";
+import { get_description } from "assets/scripts/functions/get_description";
+import Select_Branch from "../modals/select_hierarchy/Select_Branch";
+import Select_Plant from "../modals/select_hierarchy/Select_Plant";
+import Select_SLOC from "../modals/select_hierarchy/Select_SLOC";
+import {
+  api_create_purchase_order,
+  api_post_purchase_order,
+} from "api/firestore_db/inbound/purchase_order/tbl_purchase_order_api";
 
-const Post_View_PO = ({ set_page, for_posting }) => {
+const Post_View_PO = ({
+  set_page,
+  active_user,
+  show_toast,
+  view_po_data,
+  set_view_po_data,
+  selected_item_list,
+  set_selected_item_list,
+  selected_approval_list,
+  set_selected_approval_list,
+  set_po_list,
+  for_posting,
+}) => {
   const [active_tab, set_active_tab] = useState("delivery");
-  const [is_confirm_modal_open, set_is_confirm_modal_open] = useState(false);
+  const [display_modal, set_display_modal] = useState("");
+  const [post_loading, set_post_loading] = useState(false);
 
   const tabs = [
     { key: "delivery", title: "Delivery" },
@@ -25,63 +63,95 @@ const Post_View_PO = ({ set_page, for_posting }) => {
     { key: "approval", title: "Approval" },
   ];
 
-  const handle_post_po = () => {
-    alert("Post PO");
+  const select_modal_configs = [
+    {
+      key: "select_vendor",
+      label: "Vendor",
+      width: "max-w-[800px]",
+      list: vendor_master_list,
+      column: ["Vendor"],
+      show_creation_date: true,
+      code: [
+        "vendor_code",
+        "aci_payment_term_code",
+        "ac_incoterms_code",
+        "aci_currency",
+        "ad_street",
+        "ad_postal_code",
+        "ad_city_code",
+        "ad_district_code",
+        "ad_region_code",
+        "ad_country_code",
+        "ad_language_code",
+        "ad_telephone",
+        "ad_fax",
+        "ad_mobile",
+        "ad_email",
+      ],
+      desc: ["vendor_desc"],
+      lookup: [vendor_master_list],
+      target: [
+        "vendor_code",
+        "de_payment_term_code",
+        "de_incoterms_code",
+        "de_currency",
+        "ad_street",
+        "ad_postal_code",
+        "ad_city_code",
+        "ad_district_code",
+        "ad_region_code",
+        "ad_country_code",
+        "ad_language_code",
+        "ad_telephone",
+        "ad_fax",
+        "ad_mobile",
+        "ad_email",
+      ],
+    },
+  ];
+
+  const handle_preview = () => {
+    alert("Under Maintenance");
+  };
+
+  const handle_save_as_draft = () => {
+    alert("Under Maintenance");
+  };
+
+  const handle_post = async () => {
+    const final_po_data = {
+      ...view_po_data,
+      po_status: "Posted",
+    };
+
+    // console.log(final_po_data);
+    // console.table(final_po_data);
+
+    try {
+      set_post_loading(true);
+      const response = await api_post_purchase_order(
+        final_po_data,
+        active_user?.username,
+        show_toast
+      );
+      if (response.success) {
+        set_po_list((prev) =>
+          prev.map((item) =>
+            item.id === response.data.id ? response.data : item
+          )
+        );
+        handle_go_back();
+      }
+    } catch (error) {
+      console.error("Failed to create a new data:", error);
+    }
   };
 
   const handle_go_back = () => {
+    set_selected_item_list([]);
+    set_selected_approval_list([]);
     set_page("main");
   };
-
-  const Confirm_Modal = () => {
-    return (
-      <React.Fragment>
-        <div className="fixed inset-0 flex items-center justify-center z-[100]">
-          {/* + Blur */}
-          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm z-[101]"></div>
-          {/* - Blur */}
-          {/* + Modal Content */}
-          <div
-            className={`relative bg-white rounded-lg shadow-xl max-w-[500px] w-full p-10 m-5 z-[102]`}
-          >
-            {/* Modal Body */}
-            <div className="w-full flex justify-center items-center text-lg md:text-xl font-bold mb-4">
-              Confirm Purchase Order Posting
-            </div>
-            <p className="w-full text-center text-sm leading-6 text-gray-500 dark:text-gray-400 pt-4">
-              You are about to post this Purchase Order. Once posted, it will be
-              finalized and no further changes can be made.
-            </p>
-            <p className="w-full text-center text-sm leading-6 text-gray-500 dark:text-gray-400 pt-4">
-              Please review all order details — including supplier, items,
-              quantities, and total amount — before proceeding.
-            </p>
-            <p className="w-full text-center text-sm leading-6 text-gray-500 dark:text-gray-400 py-4">
-              Are you sure you want to continue?
-            </p>
-            <div className="flex justify-center gap-2 mt-4">
-              <Button
-                width="w-[100px]"
-                variant="primary"
-                on_click={handle_post_po}
-              >
-                Yes
-              </Button>
-              <Button
-                width="w-[100px]"
-                variant="white"
-                on_click={() => set_is_confirm_modal_open(false)}
-              >
-                No
-              </Button>
-            </div>
-          </div>
-          {/* - Modal Content */}
-        </div>
-      </React.Fragment>
-    );
-  };
-
   // RETURN ORIGIN
   return (
     <React.Fragment>
@@ -117,7 +187,7 @@ const Post_View_PO = ({ set_page, for_posting }) => {
               <li className="flex items-center gap-1.5 text-sm text-gray-500">
                 <span>/</span>
                 <span className="text-gray-800">
-                  {for_posting ? "Post PO" : "View PO"}
+                  {for_posting ? "Post" : "View"}
                 </span>
               </li>
             </ol>
@@ -136,10 +206,9 @@ const Post_View_PO = ({ set_page, for_posting }) => {
                 on_click={handle_go_back}
               ></Button>
               <h1 className="text-lg">
-                {for_posting ? "Post Purchase Order" : "View Purchase Order"}
+                {for_posting ? "Post" : "View"} Purchase Order
               </h1>
             </div>
-
             <div className="flex gap-2">
               <div className="text-gray-500 text-sm tracking-wider">
                 {format_date_1(get_date_now())}
@@ -150,66 +219,100 @@ const Post_View_PO = ({ set_page, for_posting }) => {
           {/* + Section 1 */}
           <div className="p-5 sm:p-6 border-t">
             <div className="w-full">
-              <div className="space-y-6">
-                <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
-                  <div className="col-span-full">
-                    <Text_Field
-                      label="PO Number"
-                      type={"text"}
-                      // value={""}
-                      disabled
-                    />
-                  </div>
-                  <div className="col-span-full">
-                    <Text_Code_Field
-                      label="PO Type"
-                      // code_value={search_value}
-                      // text_value={search_value}
-                      code_width="150px"
-                      show_search_button={false}
-                      disabled
-                    />
-                  </div>
-                  <div className="col-span-full">
-                    <Text_Code_Field
-                      label="Vendor"
-                      // code_value={search_value}
-                      // text_value={search_value}
-                      code_width="150px"
-                      show_search_button={false}
-                      disabled
-                    />
-                  </div>
-                  <div className="col-span-full">
-                    <Text_Code_Field
-                      label="Branch"
-                      // code_value={search_value}
-                      // text_value={search_value}
-                      code_width="150px"
-                      show_search_button={false}
-                      disabled
-                    />
-                  </div>
-                  <div className="col-span-full">
-                    <Text_Code_Field
-                      label="Plant / DC"
-                      // code_value={search_value}
-                      // text_value={search_value}
-                      code_width="150px"
-                      show_search_button={false}
-                      disabled
-                    />
-                  </div>
-                  <div className="col-span-full">
-                    <Text_Code_Field
-                      label="SLOC"
-                      // code_value={search_value}
-                      // text_value={search_value}
-                      code_width="150px"
-                      show_search_button={false}
-                      disabled
-                    />
-                  </div>
+              <div className="grid grid-cols-1 gap-5">
+                <div>
+                  <Text_Field
+                    label="PO Number"
+                    type={"text"}
+                    value={view_po_data.po_number}
+                    disabled
+                  />
+                </div>
+                <div>
+                  <Text_Code_Field
+                    label="PO Type"
+                    code_width="150px"
+                    show_search_button={false}
+                    code_value={view_po_data.po_type_code}
+                    text_value={get_description(
+                      view_po_data.po_type_code,
+                      po_type_list,
+                      "po_type_code",
+                      "po_type_desc"
+                    )}
+                    bg_dis_color="bg-slate-50"
+                    text_dis_color="text-slate-500"
+                    disabled
+                  />
+                </div>
+                <div>
+                  <Text_Code_Field
+                    label="Vendor"
+                    code_width="150px"
+                    show_search_button={false}
+                    code_value={view_po_data.vendor_code}
+                    text_value={get_description(
+                      view_po_data.vendor_code,
+                      vendor_master_list,
+                      "vendor_code",
+                      "vendor_desc"
+                    )}
+                    bg_dis_color="bg-slate-50"
+                    text_dis_color="text-slate-500"
+                    disabled
+                  />
+                </div>
+                <div>
+                  <Text_Code_Field
+                    label="Branch"
+                    code_width="150px"
+                    show_search_button={false}
+                    code_value={view_po_data.branch_code}
+                    text_value={get_description(
+                      view_po_data.branch_code,
+                      branch_list,
+                      "branch_code",
+                      "branch_desc"
+                    )}
+                    bg_dis_color="bg-slate-50"
+                    text_dis_color="text-slate-500"
+                    disabled
+                  />
+                </div>
+                <div>
+                  <Text_Code_Field
+                    label="Plant"
+                    code_width="150px"
+                    show_search_button={false}
+                    code_value={view_po_data.plant_code}
+                    text_value={get_description(
+                      view_po_data.plant_code,
+                      plant_list,
+                      "plant_code",
+                      "plant_desc"
+                    )}
+                    bg_dis_color="bg-slate-50"
+                    text_dis_color="text-slate-500"
+                    disabled
+                  />
+                </div>
+
+                <div>
+                  <Text_Code_Field
+                    label="Storage Location"
+                    code_width="150px"
+                    show_search_button={false}
+                    code_value={view_po_data.sloc_code}
+                    text_value={get_description(
+                      view_po_data.sloc_code,
+                      sloc_list,
+                      "sloc_code",
+                      "sloc_desc"
+                    )}
+                    bg_dis_color="bg-slate-50"
+                    text_dis_color="text-slate-500"
+                    disabled
+                  />
                 </div>
               </div>
             </div>
@@ -217,9 +320,9 @@ const Post_View_PO = ({ set_page, for_posting }) => {
           {/* - Section 1 */}
           {/* + Section 2 */}
           <div className="p-5 sm:p-6 border-t">
-            {/* + Tab Navigation */}
             <div className="w-full bg-white rounded-lg border">
-              <div className="w-full border-b p-2">
+              {/* + Tab Navigation */}
+              <div className="w-full border-b p-2 select-none">
                 <nav className="flex overflow-x-auto rounded-lg bg-gray-100 p-1 dark:bg-gray-900 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-200 dark:[&::-webkit-scrollbar-thumb]:bg-gray-600 [&::-webkit-scrollbar-track]:bg-white dark:[&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar]:h-1.5">
                   {tabs.map((tab) => (
                     <button
@@ -239,43 +342,151 @@ const Post_View_PO = ({ set_page, for_posting }) => {
               {/* - Tab Navigation */}
               {/* + Tab Content */}
               <div className="p-6">
-                {active_tab === "delivery" && <Delivery />}
-                {active_tab === "address" && <Address />}
-                {active_tab === "org_data" && <Org_Data />}
+                {active_tab === "delivery" && (
+                  <Delivery
+                    view_po_data={view_po_data}
+                    payment_term_list={payment_term_list}
+                    incoterms_list={incoterms_list}
+                    selected_item_list={selected_item_list}
+                  />
+                )}
+                {active_tab === "address" && (
+                  <Address
+                    view_po_data={view_po_data}
+                    city_list={city_list}
+                    country_list={country_list}
+                    district_list={district_list}
+                    language_list={language_list}
+                    region_list={region_list}
+                  />
+                )}
+                {active_tab === "org_data" && (
+                  <Org_Data view_po_data={view_po_data} />
+                )}
                 {active_tab === "po_status" && <PO_Status />}
-                {active_tab === "shipment" && <Shipment />}
-                {active_tab === "approval" && <Approval />}
+                {active_tab === "shipment" && (
+                  <Shipment
+                    view_po_data={view_po_data}
+                    set_view_po_data={set_view_po_data}
+                  />
+                )}
+                {active_tab === "approval" && (
+                  <Approval
+                    display_modal={display_modal}
+                    set_display_modal={set_display_modal}
+                    selected_approval_list={selected_approval_list}
+                    set_selected_approval_list={set_selected_approval_list}
+                    view_po_data={view_po_data}
+                    set_view_po_data={set_view_po_data}
+                  />
+                )}
               </div>
               {/* - Tab Content */}
             </div>
           </div>
           {/* - Section 2 */}
           {/* + Section 3 */}
-          <PO_Items />
+          <PO_Items
+            view_po_data={view_po_data}
+            show_toast={show_toast}
+            selected_item_list={selected_item_list}
+            set_selected_item_list={set_selected_item_list}
+          />
           {/* - Section 3 */}
           {/* + Section 4 */}
-          {for_posting && (
-            <div className="p-4 sm:p-8 border-t">
-              <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
+          <div className="p-4 sm:p-8 border-t">
+            <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
+              <Button
+                variant="white"
+                size="lg"
+                width="w-[140px]"
+                icon={Eye}
+                icon_position="left"
+                on_click={handle_preview}
+              >
+                Preview
+              </Button>
+              {for_posting && (
                 <Button
                   variant="primary"
                   size="lg"
+                  width="w-[120px]"
                   icon={FileInput}
                   icon_position="left"
-                  on_click={() => set_is_confirm_modal_open(true)}
+                  loading={post_loading}
+                  on_click={handle_post}
                 >
-                  Post PO
+                  Post
                 </Button>
-                <Button variant="white" size="lg" on_click={handle_go_back}>
-                  Cancel
-                </Button>
-              </div>
+              )}
+              <Button
+                variant="white"
+                size="lg"
+                width="w-[120px]"
+                on_click={handle_go_back}
+                disabled={post_loading}
+              >
+                Cancel
+              </Button>
             </div>
-          )}
+          </div>
           {/* - Section 4 */}
         </div>
       </div>
-      {is_confirm_modal_open && <Confirm_Modal />}
+      {/* + Modals */}
+      {select_modal_configs.map((cfg) => (
+        <Select_Generic
+          key={cfg.key}
+          is_open={display_modal === cfg.key}
+          on_close={() => set_display_modal("")}
+          width={cfg.width}
+          height="max-h-[1280px]"
+          modal_label={cfg.label}
+          show_creation_date={cfg.show_creation_date}
+          column_names={cfg.column}
+          source_list={cfg.list}
+          source_code={cfg.code}
+          source_desc={cfg.desc}
+          lookup_lists={cfg.lookup}
+          target_field={cfg.target}
+          set_data={set_view_po_data}
+          on_after_select={cfg.on_after_select}
+        />
+      ))}
+      <Select_Branch
+        is_open={display_modal === "select_branch"}
+        on_close={() => set_display_modal("")}
+        width="max-w-[1000px]"
+        height="max-h-[700px]"
+        branch_list={branch_list}
+        set_data={set_view_po_data}
+        set_selected_item_list={set_selected_item_list}
+      />
+      <Select_Plant
+        is_open={display_modal === "select_plant"}
+        on_close={() => set_display_modal("")}
+        width="max-w-[1000px]"
+        height="max-h-[700px]"
+        selected_branch_code={view_po_data.branch_code}
+        branch_list={branch_list}
+        plant_list={plant_list}
+        branch_h_list={branch_h_list}
+        set_data={set_view_po_data}
+        set_selected_item_list={set_selected_item_list}
+      />
+      <Select_SLOC
+        is_open={display_modal === "select_sloc"}
+        on_close={() => set_display_modal("")}
+        width="max-w-[1000px]"
+        height="max-h-[700px]"
+        selected_plant_code={view_po_data.plant_code}
+        plant_list={plant_list}
+        sloc_list={sloc_list}
+        plant_h_list={plant_h_list}
+        set_data={set_view_po_data}
+        set_selected_item_list={set_selected_item_list}
+      />
+      {/* - Modals */}
     </React.Fragment>
   );
 };

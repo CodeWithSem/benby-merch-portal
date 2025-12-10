@@ -1,75 +1,72 @@
 import React, { useState, useEffect } from "react";
 import Checkbox_Field from "assets/elements/Checkbox_Field";
 import Text_Field from "assets/elements/Text_Field";
-import Select_Field from "assets/elements/Select_Field";
+import Find_Field from "assets/elements/Find_Field";
+import {
+  app_matrix_h_list,
+  app_matrix_list,
+  user_role_list,
+} from "../../PO_DATA_MAP";
+import Select_Generic from "assets/elements/modals/Select_Generic";
+import { get_description } from "assets/scripts/functions/get_description";
 
-const Approval = () => {
-  const app_matrix_list = [
+const Approval = ({
+  display_modal,
+  set_display_modal,
+  selected_approval_list,
+  set_selected_approval_list,
+  edit_po_data,
+  set_edit_po_data,
+}) => {
+  const select_modal_configs = [
     {
-      id: 1,
-      app_matrix_code: "A",
-      app_matrix_desc: "Approval Matrix A",
-      approval_roles: `[{ "no": 1, "key": "president", "Label": "President" },{ "no": 2, "key": "vice_president", "Label": "Vice President" }]`,
-    },
-    {
-      id: 2,
-      app_matrix_code: "B",
-      app_matrix_desc: "Approval Matrix B",
-      approval_roles: `[{ "no": 1, "key": "op_manager", "Label": "Operation Manager" },{ "no": 2, "key": "log_officer", "Label": "Logistic Officer" }]`,
+      key: "select_ap_app_matrix",
+      label: "Approval Matrix",
+      width: "max-w-[800px]",
+      list: app_matrix_list,
+      column: ["Approval Matrix"],
+      code: ["app_matrix_code"],
+      desc: ["app_matrix_desc"],
+      lookup: [app_matrix_list],
+      target: ["ap_app_matrix_code"],
     },
   ];
-  const [selected_matrix_id, set_selected_matrix_id] = useState(null);
-  const [current_roles, set_current_roles] = useState([]);
-  const [selected_roles, set_selected_roles] = useState({});
-
-  const matrix_options = app_matrix_list.map((matrix) => ({
-    value: matrix.id,
-    label: matrix.app_matrix_desc,
-  }));
 
   useEffect(() => {
-    const selected_matrix = app_matrix_list.find(
-      (matrix) => matrix.id === selected_matrix_id
-    );
+    const matrix_code = edit_po_data.ap_app_matrix_code;
 
-    if (selected_matrix) {
-      const parsed_roles = JSON.parse(selected_matrix.approval_roles);
-      set_current_roles(parsed_roles);
-      set_selected_roles({});
-    } else {
-      set_current_roles([]);
-      set_selected_roles({});
+    if (!matrix_code) {
+      set_selected_approval_list([]);
+      return;
     }
-  }, [selected_matrix_id]);
 
-  const handle_change_matrix = (value) => {
-    set_selected_matrix_id(Number(value));
-  };
-
-  const handle_change_checkbox_role = (role_key, is_checked) => {
-    set_selected_roles((prev) => ({
-      ...prev,
-      [role_key]: is_checked,
-    }));
-  };
-
-  const handle_save_data = () => {
-    const roles_with_status = current_roles.map((role) => ({
-      ...role,
-      is_checked: selected_roles[role.key] || false,
-    }));
-
-    const final_roles_to_save = roles_with_status.filter(
-      (role) => role.is_checked
+    // Filter roles based on selected matrix
+    const filtered = app_matrix_h_list.filter(
+      (item) => item.app_matrix_code === matrix_code
     );
 
-    const data_to_save = {
-      matrix_id: selected_matrix_id,
-      approval_roles: JSON.stringify(final_roles_to_save),
-    };
+    set_selected_approval_list((prevRoles) => {
+      // Map new roles, preserve is_included if already exists
+      return filtered.map((item) => {
+        const role_info = user_role_list.find(
+          (r) => r.user_role_code === item.user_role_code
+        );
 
-    console.log(data_to_save);
-  };
+        // Check if this role already exists in previous state
+        const existing = prevRoles.find(
+          (r) => r.user_role_code === item.user_role_code
+        );
+
+        return {
+          user_role_code: item.user_role_code,
+          user_role_desc: role_info
+            ? role_info.user_role_desc
+            : item.user_role_code,
+          is_included: existing ? existing.is_included : true,
+        };
+      });
+    });
+  }, [edit_po_data.ap_app_matrix_code]);
 
   // RETURN ORIGIN
   return (
@@ -78,12 +75,16 @@ const Approval = () => {
       <div className="rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6 dark:border-gray-800 dark:bg-gray-900">
         <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
           <div>
-            <Select_Field
+            <Find_Field
               label="Approval Matrix"
-              value={selected_matrix_id || ""}
-              on_change={(e) => handle_change_matrix(e.target.value)}
-              options={matrix_options}
-              placeholder="Select Option"
+              value={get_description(
+                edit_po_data.ap_app_matrix_code,
+                app_matrix_list,
+                "app_matrix_code",
+                "app_matrix_desc"
+              )} //--> ap_app_matrix_code
+              on_click={() => set_display_modal("select_ap_app_matrix")}
+              disabled
             />
           </div>
           <div>
@@ -101,17 +102,21 @@ const Approval = () => {
       <div className="mt-5 rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6 dark:border-gray-800 dark:bg-gray-900">
         <h1 className="mb-5 font-semibold text-sky-700">Approval Roles</h1>
         <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
-          {current_roles.length > 0 ? (
-            current_roles.map((role) => (
-              <div key={role.key} className="col-span-full">
+          {selected_approval_list.length > 0 ? (
+            selected_approval_list.map((role, index) => (
+              <div key={role.user_role_code} className="col-span-full">
                 <Checkbox_Field
-                  label={role.Label}
+                  label={role.user_role_desc}
                   box_size={24}
                   icon_size={14}
-                  checked={!!selected_roles[role.key]}
-                  on_change={(e) =>
-                    handle_change_checkbox_role(role.key, e.target.checked)
-                  }
+                  checked={role.is_included}
+                  on_change={() => {
+                    set_selected_approval_list((prev) =>
+                      prev.map((r, i) =>
+                        i === index ? { ...r, is_included: !r.is_included } : r
+                      )
+                    );
+                  }}
                 />
               </div>
             ))
@@ -125,6 +130,26 @@ const Approval = () => {
         </div>
       </div>
       {/* - Section 2 */}
+      {/* + Modals */}
+      {select_modal_configs.map((cfg) => (
+        <Select_Generic
+          key={cfg.key}
+          is_open={display_modal === cfg.key}
+          on_close={() => set_display_modal("")}
+          // width="max-w-[1000px]"
+          width={cfg.width}
+          height="max-h-[600px]"
+          modal_label={cfg.label}
+          column_names={cfg.column}
+          source_list={cfg.list}
+          source_code={cfg.code}
+          source_desc={cfg.desc}
+          lookup_lists={cfg.lookup}
+          target_field={cfg.target}
+          set_data={set_edit_po_data}
+        />
+      ))}
+      {/* - Modals */}
     </React.Fragment>
   );
 };

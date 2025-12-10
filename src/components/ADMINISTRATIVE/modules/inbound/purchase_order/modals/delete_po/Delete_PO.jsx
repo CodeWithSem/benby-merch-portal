@@ -113,6 +113,8 @@ const Delete_PO = ({ is_open, on_close, width = "max-w-[700px]" }) => {
                             // text_value={search_value}
                             code_width="150px"
                             show_search_button={false}
+                            bg_dis_color="bg-slate-50"
+                            text_dis_color="text-slate-500"
                             disabled
                           />
                         </div>
@@ -123,6 +125,8 @@ const Delete_PO = ({ is_open, on_close, width = "max-w-[700px]" }) => {
                             // text_value={search_value}
                             code_width="150px"
                             show_search_button={false}
+                            bg_dis_color="bg-slate-50"
+                            text_dis_color="text-slate-500"
                             disabled
                           />
                         </div>
@@ -133,6 +137,8 @@ const Delete_PO = ({ is_open, on_close, width = "max-w-[700px]" }) => {
                             // text_value={search_value}
                             code_width="150px"
                             show_search_button={false}
+                            bg_dis_color="bg-slate-50"
+                            text_dis_color="text-slate-500"
                             disabled
                           />
                         </div>
@@ -143,6 +149,8 @@ const Delete_PO = ({ is_open, on_close, width = "max-w-[700px]" }) => {
                             // text_value={search_value}
                             code_width="150px"
                             show_search_button={false}
+                            bg_dis_color="bg-slate-50"
+                            text_dis_color="text-slate-500"
                             disabled
                           />
                         </div>
@@ -153,6 +161,8 @@ const Delete_PO = ({ is_open, on_close, width = "max-w-[700px]" }) => {
                             // text_value={search_value}
                             code_width="150px"
                             show_search_button={false}
+                            bg_dis_color="bg-slate-50"
+                            text_dis_color="text-slate-500"
                             disabled
                           />
                         </div>

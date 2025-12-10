@@ -32,17 +32,23 @@ import { get_description } from "assets/scripts/functions/get_description";
 import Select_Branch from "../modals/select_hierarchy/Select_Branch";
 import Select_Plant from "../modals/select_hierarchy/Select_Plant";
 import Select_SLOC from "../modals/select_hierarchy/Select_SLOC";
+import { api_create_purchase_order } from "api/firestore_db/inbound/purchase_order/tbl_purchase_order_api";
 
 const Create_New_PO = ({
   set_page,
+  active_user,
   show_toast,
   new_po_data,
   set_new_po_data,
   selected_item_list,
   set_selected_item_list,
+  selected_approval_list,
+  set_selected_approval_list,
+  set_po_list,
 }) => {
   const [active_tab, set_active_tab] = useState("delivery");
   const [display_modal, set_display_modal] = useState("");
+  const [create_loading, set_create_loading] = useState(false);
 
   const tabs = [
     { key: "delivery", title: "Delivery" },
@@ -97,7 +103,6 @@ const Create_New_PO = ({
         "ad_mobile",
         "ad_email",
       ],
-      // on_after_select: () => set_page("po_creation"),
     },
   ];
 
@@ -109,24 +114,55 @@ const Create_New_PO = ({
     alert("Under Maintenance");
   };
 
-  const handle_create = () => {
+  const handle_create = async () => {
     const items_with_tracking = selected_item_list.map((item) => ({
       ...item,
-      quantity_open: item.quantity, // same as original quantity
-      quantity_left: item.quantity, // same as original quantity
+      quantity_open: item.quantity,
+      quantity_left: item.quantity,
     }));
 
     const final_po_data = {
       ...new_po_data,
       selected_item_list: items_with_tracking,
+      selected_approval_list: selected_approval_list.map((role) => ({
+        ...role,
+        approval_status: "Pending",
+      })),
+      // selected_approval_list: selected_approval_list
+      //   .filter((role) => role.is_included)
+      //   .map((role) => ({
+      //     ...role,
+      //     approval_status: "Pending",
+      //   })),
+      po_status: "Pending",
     };
 
-    console.table(final_po_data);
+    // console.log(final_po_data);
+    // console.table(final_po_data);
+
+    try {
+      set_create_loading(true);
+      const response = await api_create_purchase_order(
+        final_po_data,
+        active_user?.username,
+        show_toast
+      );
+      if (response.success) {
+        set_po_list((prev) => [...prev, response.data]);
+        handle_go_back();
+      }
+    } catch (error) {
+      console.error("Failed to create a new data:", error);
+    }
   };
 
   const handle_go_back = () => {
-    set_new_po_data({});
+    set_new_po_data((prev) => ({
+      id: prev.id,
+      po_number: prev.po_number,
+    }));
     set_selected_item_list([]);
+    set_selected_approval_list([]);
     set_page("main");
   };
   // RETURN ORIGIN
@@ -163,7 +199,7 @@ const Create_New_PO = ({
               </li>
               <li className="flex items-center gap-1.5 text-sm text-gray-500">
                 <span>/</span>
-                <span className="text-gray-800">Create New PO</span>
+                <span className="text-gray-800">Create</span>
               </li>
             </ol>
           </nav>
@@ -197,7 +233,7 @@ const Create_New_PO = ({
                   <Text_Field
                     label="PO Number"
                     type={"text"}
-                    value={"AUTO GENERATED"}
+                    value={new_po_data.po_number}
                     disabled
                   />
                 </div>
@@ -264,7 +300,6 @@ const Create_New_PO = ({
                     disabled
                   />
                 </div>
-
                 <div>
                   <Text_Code_Field
                     label="Storage Location"
@@ -314,6 +349,7 @@ const Create_New_PO = ({
                     new_po_data={new_po_data}
                     payment_term_list={payment_term_list}
                     incoterms_list={incoterms_list}
+                    selected_item_list={selected_item_list}
                   />
                 )}
                 {active_tab === "address" && (
@@ -336,7 +372,16 @@ const Create_New_PO = ({
                     set_new_po_data={set_new_po_data}
                   />
                 )}
-                {active_tab === "approval" && <Approval />}
+                {active_tab === "approval" && (
+                  <Approval
+                    display_modal={display_modal}
+                    set_display_modal={set_display_modal}
+                    selected_approval_list={selected_approval_list}
+                    set_selected_approval_list={set_selected_approval_list}
+                    new_po_data={new_po_data}
+                    set_new_po_data={set_new_po_data}
+                  />
+                )}
               </div>
               {/* - Tab Content */}
             </div>
@@ -356,6 +401,7 @@ const Create_New_PO = ({
               <Button
                 variant="white"
                 size="lg"
+                width="w-[140px]"
                 icon={Eye}
                 icon_position="left"
                 on_click={handle_preview}
@@ -365,6 +411,7 @@ const Create_New_PO = ({
               <Button
                 variant="primary"
                 size="lg"
+                width="w-[180px]"
                 icon={Save}
                 icon_position="left"
                 on_click={handle_save_as_draft}
@@ -374,13 +421,21 @@ const Create_New_PO = ({
               <Button
                 variant="primary"
                 size="lg"
+                width="w-[120px]"
                 icon={CirclePlus}
                 icon_position="left"
+                loading={create_loading}
                 on_click={handle_create}
               >
                 Create
               </Button>
-              <Button variant="white" size="lg" on_click={handle_go_back}>
+              <Button
+                variant="white"
+                size="lg"
+                width="w-[120px]"
+                on_click={handle_go_back}
+                disabled={create_loading}
+              >
                 Cancel
               </Button>
             </div>

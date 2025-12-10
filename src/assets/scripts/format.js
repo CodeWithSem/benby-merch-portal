@@ -23,7 +23,30 @@ export function get_date_now() {
   return date_now;
 }
 // - Get Date Now
+// + Convert Date to Sort
+export const convert_date_to_sort = (str) => {
+  const [mm, dd, yyyy] = str.split("-");
+  return `${yyyy}-${mm}-${dd}`; // sortable
+};
+// - Convert Date to Sort
+// Format yyyy-mm-dd (sortable)
+export function format_date_sort(date_input) {
+  let date;
 
+  if (typeof date_input === "string") {
+    date = new Date(date_input);
+  } else if (date_input instanceof Date) {
+    date = date_input;
+  } else {
+    return "";
+  }
+
+  const yyyy = date.getFullYear();
+  const mm = String(date.getMonth() + 1).padStart(2, "0");
+  const dd = String(date.getDate()).padStart(2, "0");
+
+  return `${yyyy}-${mm}-${dd}`;
+}
 // + Format Date 1 (mm-dd-yyyy)
 export function format_date_1(date_input) {
   let date;
@@ -45,7 +68,6 @@ export function format_date_1(date_input) {
   return `${mm}-${dd}-${yyyy}`;
 }
 // - Format Date 1 (mm-dd-yyyy)
-
 // + Format Date 2 (mm-dd-yyyy with time)
 export function format_date_2(date, format) {
   const pad = (n) => n.toString().padStart(2, "0");

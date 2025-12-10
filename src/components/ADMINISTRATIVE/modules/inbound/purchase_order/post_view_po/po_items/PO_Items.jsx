@@ -1,33 +1,159 @@
-import React from "react";
-import { Search } from "lucide-react";
+import React, { useState } from "react";
+import Text_Field from "assets/elements/Text_Field";
+import { CirclePlus, CircleX, Edit, Info, Search, Trash } from "lucide-react";
 import Icon_Field from "assets/elements/Icon_Field";
+import Quantity_Field from "assets/elements/Quantity_Field";
+import Find_Field from "assets/elements/Find_Field";
+import Show_Item_Details from "./modals/Show_Item_Details";
 import { format_currency, format_percentage } from "assets/scripts/format";
+import Button from "assets/elements/Button";
+import Remove_Item from "./modals/Remove_Item";
+import Select_Item from "../../modals/item_modals/Select_Item";
+import Button_Action from "assets/elements/Button_Action";
+import Edit_Item from "../../modals/item_modals/Edit_Item";
 
-const PO_Items = () => {
-  const item_list = [
-    {
-      id: 1,
-      item_code: "ITM-000000001",
-      item_desc: 'Macbook Pro 13"',
-      quantity: "5",
-      unit_price: "100000",
-      discount: "0",
-      total: "500000",
-    },
-    {
-      id: 2,
-      item_code: "ITM-000000002",
-      item_desc: "iPhone 15 Pro Max",
-      quantity: "1",
-      unit_price: "60000",
-      discount: "0",
-      total: "60000",
-    },
-  ];
+const PO_Items = ({
+  view_po_data,
+  show_toast,
+  selected_item_list,
+  set_selected_item_list,
+}) => {
+  const [display_item_modal, set_display_item_modal] = useState("");
+  const [search_query, set_search_query] = useState("");
+  const [dragged_index, set_dragged_index] = useState(null);
+  const [selected_item_data, set_selected_item_data] = useState({
+    item_code: "",
+    item_desc: "",
+    unit_price: "",
+    quantity: 1,
+    total: "",
+  });
+  const [edit_item_data, set_edit_item_data] = useState({});
+  const [remove_item_data, set_remove_item_data] = useState({});
+
+  const filtered_item_list = selected_item_list.filter((item) =>
+    item.item_desc.toLowerCase().includes(search_query.toLowerCase())
+  );
+
+  const handle_quantity_change = (value) => {
+    set_selected_item_data((prev) => {
+      const updated_quantity = value === "" ? "" : Number(value);
+      return {
+        ...prev,
+        quantity: updated_quantity,
+        total: updated_quantity * prev.unit_price,
+      };
+    });
+  };
+
+  const handle_unit_price_change = (value) => {
+    const updated_unit_price = value === "" ? "" : Number(value);
+    set_selected_item_data((prev) => ({
+      ...prev,
+      unit_price: updated_unit_price,
+      total: prev.quantity * updated_unit_price,
+    }));
+  };
+
+  const handle_add_item = () => {
+    if (!selected_item_data || !selected_item_data.item_code) {
+      alert("Please select an item first.");
+      return;
+    }
+
+    // Optional: Check if the item already exists in the list
+    const exists = selected_item_list.some(
+      (item) => item.item_code === selected_item_data.item_code
+    );
+    if (exists) {
+      alert("This item is already added.");
+      return;
+    }
+
+    // Add the item to the list
+    set_selected_item_list((prev) => [...prev, selected_item_data]);
+
+    // Reset selected item data if needed
+    set_selected_item_data({
+      item_code: "",
+      item_desc: "",
+      quantity: 1,
+      unit_price: "",
+      total: 0,
+    });
+  };
+
+  const handle_drag_start = (index) => {
+    set_dragged_index(index);
+  };
+
+  const handle_drag_over = (e) => {
+    e.preventDefault(); // allow drop
+  };
+
+  const handle_drop = (index) => {
+    if (dragged_index === null) return;
+
+    const items = [...selected_item_list];
+    const draggedItem = items[dragged_index];
+    items.splice(dragged_index, 1); // remove dragged item
+    items.splice(index, 0, draggedItem); // insert at new position
+    set_selected_item_list(items);
+    set_dragged_index(null);
+  };
+
+  const handle_show_select_item_modal = () => {
+    if (!view_po_data.branch_code) {
+      show_toast({
+        type: "danger",
+        title: "Invalid",
+        message: "Please select a branch.",
+        icon: <CircleX size={21} className="text-red-500" />,
+      });
+      return;
+    } else if (!view_po_data.plant_code) {
+      show_toast({
+        type: "danger",
+        title: "Invalid",
+        message: "Please select a plant.",
+        icon: <CircleX size={21} className="text-red-500" />,
+      });
+      return;
+    } else if (!view_po_data.sloc_code) {
+      show_toast({
+        type: "danger",
+        title: "Invalid",
+        message: "Please select a storage location.",
+        icon: <CircleX size={21} className="text-red-500" />,
+      });
+      return;
+    }
+    set_display_item_modal("select_item");
+  };
+
+  const gross_total = selected_item_list.reduce(
+    (sum, item) => sum + (item.total || 0),
+    0
+  );
+
+  const handle_show_details = () => {
+    set_display_item_modal("show_details");
+  };
+
+  const handle_edit_item = (item) => {
+    set_edit_item_data(item);
+    set_display_item_modal("edit_item");
+  };
+
+  const handle_remove_item = (item) => {
+    set_remove_item_data(item);
+    set_display_item_modal("remove_item");
+  };
   // RETURN ORIGIN
   return (
     <React.Fragment>
       <div className="flex flex-col gap-5 border-t p-5 sm:p-6">
+        {/* + Item List */}
         <div className="overflow-hidden rounded-lg border border-gray-200 bg-white pt-4 dark:border-gray-800 dark:bg-white/[0.03]">
           <div className="flex flex-col gap-5 px-6 md:pl-6 md:pr-3 mb-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
@@ -38,15 +164,17 @@ const PO_Items = () => {
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center md:w-[500px]">
               <div className="w-full">
                 <Icon_Field
-                  name="search"
+                  item_desc="search"
                   placeholder="Search..."
                   icon={Search}
                   icon_position="left"
+                  value={search_query}
+                  on_change={(e) => set_search_query(e.target.value)}
                 />
               </div>
             </div>
           </div>
-          {/* + Item List */}
+          {/* + Table */}
           <div className="max-w-full overflow-x-auto custom-scrollbar">
             <table className="min-w-full text-left text-sm text-gray-700 dark:border-gray-800">
               <thead className="bg-gray-50 dark:bg-gray-900">
@@ -61,47 +189,65 @@ const PO_Items = () => {
                     Quantity
                   </th>
                   <th className="px-5 py-4 font-semibold whitespace-nowrap text-gray-700 dark:text-gray-400">
-                    Unit Cost
+                    Unit
                   </th>
                   <th className="px-5 py-4 font-semibold whitespace-nowrap text-gray-700 dark:text-gray-400">
-                    Discount
+                    Unit Price
                   </th>
+                  {/* <th className="px-5 py-4 font-semibold whitespace-nowrap text-gray-700 dark:text-gray-400">
+                    Discount
+                  </th> */}
                   <th className="px-5 py-4 font-semibold whitespace-nowrap text-gray-700 dark:text-gray-400">
                     Total
                   </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100 bg-white dark:divide-gray-800 dark:bg-white/[0.03]">
-                {item_list.map((item, index) => (
-                  <tr key={item.id} className="text-sm hover:bg-gray-50/50">
-                    <td className="px-5 py-4 whitespace-nowrap text-gray-500 dark:text-gray-400">
-                      {index + 1}
-                    </td>
-                    <td className="px-5 py-4 font-medium whitespace-nowrap text-gray-800 dark:text-white/90">
-                      {item.item_desc}
-                    </td>
-                    <td className="px-5 py-4 whitespace-nowrap text-gray-500 dark:text-gray-400">
-                      {item.quantity}
-                    </td>
-                    <td className="px-5 py-4 whitespace-nowrap text-gray-500 dark:text-gray-400">
-                      {format_currency(item.unit_price, 2, true)}
-                    </td>
-                    <td className="px-5 py-4 whitespace-nowrap text-gray-500 dark:text-gray-400">
-                      {format_percentage(item.discount, 0)}
-                    </td>
-                    <td className="px-5 py-4 whitespace-nowrap text-gray-500 dark:text-gray-400">
-                      {format_currency(item.total, 2, true)}
+                {filtered_item_list.length === 0 ? (
+                  <tr>
+                    <td
+                      colSpan={7}
+                      className="text-center py-4 text-gray-500 dark:text-gray-400"
+                    >
+                      No record found.
                     </td>
                   </tr>
-                ))}
+                ) : (
+                  filtered_item_list.map((item, index) => (
+                    <tr
+                      key={item.item_code}
+                      className="text-sm hover:bg-gray-50/50"
+                    >
+                      <td className="px-5 py-4 whitespace-nowrap text-gray-500 dark:text-gray-400">
+                        {index + 1}
+                      </td>
+                      <td className="px-5 py-4 font-medium whitespace-nowrap text-gray-800 dark:text-white/90">
+                        {item.item_desc}
+                      </td>
+                      <td className="px-5 py-4 whitespace-nowrap text-gray-500 dark:text-gray-400">
+                        {item.quantity}
+                      </td>
+                      <td className="px-5 py-4 whitespace-nowrap text-gray-500 dark:text-gray-400">
+                        {item.uom}
+                      </td>
+                      <td className="px-5 py-4 whitespace-nowrap text-gray-500 dark:text-gray-400">
+                        {format_currency(item.unit_price, 2, true)}
+                      </td>
+                      <td className="px-5 py-4 whitespace-nowrap text-gray-500 dark:text-gray-400">
+                        {format_currency(item.total, 2, true)}
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>
-          {/* - Item List */}
+          {/* - Table */}
         </div>
+        {/* - Item List */}
         {/* + Order Summary */}
         <div className="flex flex-wrap justify-between sm:justify-end">
-          <div className="mt-2 mr-2 w-full space-y-1 text-right sm:w-[270px]">
+          <div className="mt-6 w-full space-y-1 text-right sm:w-[270px]">
             <p className="mb-4 text-left text-sm font-medium text-gray-800 dark:text-white/90">
               Order summary
             </p>
@@ -126,8 +272,9 @@ const PO_Items = () => {
                 <span className="font-medium text-gray-700 dark:text-gray-400">
                   Total
                 </span>
+                {/* Sum up all the total in selected_item_list */}
                 <span className="text-lg font-semibold text-gray-800 dark:text-white/90">
-                  {format_currency(0, 2, true)}
+                  {format_currency(gross_total, 2, true)}
                 </span>
               </li>
             </ul>
@@ -135,6 +282,37 @@ const PO_Items = () => {
         </div>
         {/* - Order Summary */}
       </div>
+      {/* + Modals */}
+      <Show_Item_Details
+        is_open={display_item_modal === "show_details"}
+        on_close={() => set_display_item_modal("")}
+        width="max-w-[1280px]"
+      />
+      <Edit_Item
+        is_open={display_item_modal === "edit_item"}
+        on_close={() => set_display_item_modal("")}
+        width="max-w-[1280px]"
+        edit_item_data={edit_item_data}
+        set_edit_item_data={set_edit_item_data}
+        set_selected_item_list={set_selected_item_list}
+      />
+      <Remove_Item
+        is_open={display_item_modal === "remove_item"}
+        on_close={() => set_display_item_modal("")}
+        width="max-w-[920px]"
+        remove_item_data={remove_item_data}
+        set_selected_item_list={set_selected_item_list}
+      />
+      <Select_Item
+        is_open={display_item_modal === "select_item"}
+        on_close={() => set_display_item_modal("")}
+        branch_code={view_po_data.branch_code}
+        plant_code={view_po_data.plant_code}
+        sloc_code={view_po_data.sloc_code}
+        set_selected_item_data={set_selected_item_data}
+        selected_item_list={selected_item_list}
+      />
+      {/* - Modals */}
     </React.Fragment>
   );
 };

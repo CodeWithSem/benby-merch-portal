@@ -304,7 +304,6 @@ export const api_update_vendor_master = async (edit_data, user, show_toast) => {
   }
 };
 // - [Update]
-
 // + [Bulk Upload]
 export const api_bulk_upload_vendor_master = async (upload_data_list) => {
   if (!Array.isArray(upload_data_list) || upload_data_list.length === 0) {

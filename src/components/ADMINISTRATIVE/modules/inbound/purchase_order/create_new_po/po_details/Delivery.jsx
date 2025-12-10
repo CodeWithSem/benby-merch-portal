@@ -1,8 +1,18 @@
 import React, { useState } from "react";
 import Text_Field from "assets/elements/Text_Field";
 import { get_description } from "assets/scripts/functions/get_description";
+import { format_currency } from "assets/scripts/format";
 
-const Delivery = ({ new_po_data, payment_term_list, incoterms_list }) => {
+const Delivery = ({
+  new_po_data,
+  payment_term_list,
+  incoterms_list,
+  selected_item_list,
+}) => {
+  const net_value = selected_item_list.reduce(
+    (sum, item) => sum + (item.total || 0),
+    0
+  );
   // RETURN ORIGIN
   return (
     <React.Fragment>
@@ -55,7 +65,7 @@ const Delivery = ({ new_po_data, payment_term_list, incoterms_list }) => {
             <Text_Field
               label="Net Value"
               type={"text"}
-              // value={}
+              value={format_currency(net_value, 2, false)}
               disabled
             />
           </div>

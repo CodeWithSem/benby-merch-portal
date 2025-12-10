@@ -7,10 +7,26 @@ import Text_Code_Field from "assets/elements/Text_Code_Field";
 import Text_Field from "assets/elements/Text_Field";
 import Verify_Field from "assets/elements/Verify_Field";
 import Batch_Details from "./batch_details/Batch_Details";
+import { get_description } from "assets/scripts/functions/get_description";
+import Select_Branch from "../modals/select_hierarchy/Select_Branch";
+import Select_Plant from "../modals/select_hierarchy/Select_Plant";
+import Select_SLOC from "../modals/select_hierarchy/Select_SLOC";
+import {
+  branch_h_list,
+  branch_list,
+  plant_h_list,
+  plant_list,
+  sloc_list,
+} from "../BATCH_DATA_MAP";
 
-const Create_New_Batch = ({ set_page }) => {
-  const { show_toast } = useToast();
+const Create_New_Batch = ({
+  set_page,
+  show_toast,
+  new_batch_data,
+  set_new_batch_data,
+}) => {
   const [active_tab, set_active_tab] = useState("batch_details");
+  const [display_modal, set_display_modal] = useState("");
 
   const handle_go_back = () => {
     set_page("main");
@@ -80,47 +96,71 @@ const Create_New_Batch = ({ set_page }) => {
           {/* + Section 1 */}
           <div className="p-5 sm:p-6 border-t">
             <div className="grid grid-cols-1 gap-5">
-              <Text_Code_Field
-                label="Branch"
-                code_width="150px"
-                show_search_button={false}
-                disabled
-              />
-              <Text_Code_Field
-                label="Plant / DC"
-                code_width="150px"
-                show_search_button={false}
-                disabled
-              />
-              <Text_Code_Field
-                label="SLOC"
-                code_width="150px"
-                show_search_button={false}
-                disabled
-              />
+              <div>
+                <Text_Code_Field
+                  label="Branch"
+                  code_width="150px"
+                  show_search_button={true}
+                  code_value={new_batch_data.branch_code}
+                  text_value={get_description(
+                    new_batch_data.branch_code,
+                    branch_list,
+                    "branch_code",
+                    "branch_desc"
+                  )}
+                  on_click={() => set_display_modal("select_branch")}
+                  disabled
+                />
+              </div>
+              <div>
+                <Text_Code_Field
+                  label="Plant"
+                  code_width="150px"
+                  show_search_button={!!new_batch_data.branch_code}
+                  code_value={new_batch_data.plant_code}
+                  text_value={get_description(
+                    new_batch_data.plant_code,
+                    plant_list,
+                    "plant_code",
+                    "plant_desc"
+                  )}
+                  on_click={() => set_display_modal("select_plant")}
+                  disabled
+                />
+              </div>
+              <div>
+                <Text_Code_Field
+                  label="Storage Location"
+                  code_width="150px"
+                  show_search_button={!!new_batch_data.plant_code}
+                  code_value={new_batch_data.sloc_code}
+                  text_value={get_description(
+                    new_batch_data.sloc_code,
+                    sloc_list,
+                    "sloc_code",
+                    "sloc_desc"
+                  )}
+                  on_click={() => set_display_modal("select_sloc")}
+                  disabled
+                />
+              </div>
               <Text_Code_Field
                 label="Item"
                 code_width="150px"
                 show_search_button={false}
                 disabled
               />
-              <Verify_Field
+              <Text_Field
                 label="Batch Code"
-                name="verify_code"
-                placeholder="Enter batch code"
-                // value={text_verify}
-                // on_change={(e) => {
-                //   set_text_verify(e.target.value);
-                //   set_verify_status("");
-                // }}
-                // on_verify={handle_verify}
-                // verify_status={verify_status}
-                show_find_button={false}
+                type={"text"}
+                placeholder={"Enter code"}
+                // value={}
+                // on_change={handle_text_change}
               />
               <Text_Field
                 label="Batch Description"
                 type={"text"}
-                placeholder={"Enter batch description"}
+                placeholder={"Enter description"}
                 // value={}
                 // on_change={handle_text_change}
               />
@@ -173,6 +213,41 @@ const Create_New_Batch = ({ set_page }) => {
           {/* - Section 3 */}
         </div>
       </div>
+      {/* + Modals */}
+      <Select_Branch
+        is_open={display_modal === "select_branch"}
+        on_close={() => set_display_modal("")}
+        width="max-w-[1000px]"
+        height="max-h-[700px]"
+        branch_list={branch_list}
+        set_data={set_new_batch_data}
+        // set_selected_item_list={set_selected_item_list}
+      />
+      <Select_Plant
+        is_open={display_modal === "select_plant"}
+        on_close={() => set_display_modal("")}
+        width="max-w-[1000px]"
+        height="max-h-[700px]"
+        selected_branch_code={new_batch_data.branch_code}
+        branch_list={branch_list}
+        plant_list={plant_list}
+        branch_h_list={branch_h_list}
+        set_data={set_new_batch_data}
+        // set_selected_item_list={set_selected_item_list}
+      />
+      <Select_SLOC
+        is_open={display_modal === "select_sloc"}
+        on_close={() => set_display_modal("")}
+        width="max-w-[1000px]"
+        height="max-h-[700px]"
+        selected_plant_code={new_batch_data.plant_code}
+        plant_list={plant_list}
+        sloc_list={sloc_list}
+        plant_h_list={plant_h_list}
+        set_data={set_new_batch_data}
+        // set_selected_item_list={set_selected_item_list}
+      />
+      {/* - Modals */}
     </React.Fragment>
   );
 };

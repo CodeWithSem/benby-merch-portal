@@ -15,7 +15,6 @@ import { branch_list, plant_list, sloc_list } from "./BATCH_DATA_MAP";
 import Icon_Field from "assets/elements/Icon_Field";
 import Select_Field from "assets/elements/Select_Field";
 import Button from "assets/elements/Button";
-import Text_Code_Field from "assets/elements/Text_Code_Field";
 import Pagination from "assets/elements/Pagination";
 import Create_New_Batch from "./create_new_batch/Create_New_Batch";
 import Edit_Batch from "./edit_batch/Edit_Batch";
@@ -31,6 +30,7 @@ const Batch = () => {
   const { show_toast } = useToast();
   const [page, set_page] = useState("main");
   const [display_modal, set_display_modal] = useState("");
+  const [loading_list, set_loading_list] = useState(false);
   const [selected_branch, set_selected_branch] = useState({
     branch_code: "BR-0001",
   });
@@ -42,9 +42,14 @@ const Batch = () => {
     item_code: "ITM-000000001",
   });
 
+  const [new_batch_data, set_new_batch_data] = useState({});
+
   const columns = [
     { key: "batch_code", label: "Batch Code", sortable: true },
     { key: "batch_desc", label: "Batch Description", sortable: true },
+    { key: "item_code", label: "Item", sortable: true },
+    { key: "manufacture_date", label: "Manufacturing Date", sortable: true },
+    { key: "sled_bbd", label: "SLED / BBD", sortable: true },
     { key: "creation_date", label: "Creation Date", sortable: true },
     { key: "actions", label: "", sortable: false },
   ];
@@ -58,6 +63,8 @@ const Batch = () => {
       plant_code: "PL-0001",
       sloc_code: "SL-0001",
       item_code: "ITM-000000001",
+      manufacture_date: "MM-DD-YYYY",
+      sled_bbd: "MM-DD-YYYY",
       creation_date: "MM-DD-YYYY",
     },
     {
@@ -68,14 +75,15 @@ const Batch = () => {
       plant_code: "PL-0002",
       sloc_code: "SL-0002",
       item_code: "ITM-000000002",
+      manufacture_date: "MM-DD-YYYY",
+      sled_bbd: "MM-DD-YYYY",
       creation_date: "MM-DD-YYYY",
     },
   ]);
 
   // + Client-Side Filtering
   const [filtered_batch_list, set_filtered_batch_list] = useState([]);
-  const [loading, set_loading] = useState(false);
-  const [select_option, set_select_option] = useState(5);
+  const [show_entries, set_show_entries] = useState(5);
   const [current_page, set_current_page] = useState(1);
   const [sort_by, set_sort_by] = useState("timestamp");
   const [sort_order, set_sort_order] = useState("asc");
@@ -90,22 +98,8 @@ const Batch = () => {
     return () => clearTimeout(timer);
   }, [search_query]);
 
-  const get_filtered_batch_list = () => {
-    return batch_list.filter((data) => {
-      if (selected_branch && data.branch_code !== selected_branch.branch_code)
-        return false;
-      if (selected_plant && data.plant_code !== selected_plant.plant_code)
-        return false;
-      if (selected_sloc && data.sloc_code !== selected_sloc.sloc_code)
-        return false;
-      if (selected_item && data.item_code !== selected_item.item_code)
-        return false;
-      return true;
-    });
-  };
-
   useEffect(() => {
-    let temp = get_filtered_batch_list();
+    let temp = [...batch_list];
 
     if (debounced_query.trim() !== "") {
       const q = debounced_query.toLowerCase();
@@ -128,8 +122,8 @@ const Batch = () => {
       return 0;
     });
 
-    const start_idx = (current_page - 1) * select_option;
-    const end_idx = start_idx + select_option;
+    const start_idx = (current_page - 1) * show_entries;
+    const end_idx = start_idx + show_entries;
     set_filtered_batch_list(temp.slice(start_idx, end_idx));
   }, [
     batch_list,
@@ -141,12 +135,12 @@ const Batch = () => {
     sort_by,
     sort_order,
     current_page,
-    select_option,
+    show_entries,
   ]);
 
   const total_pages = Math.ceil(
     (debounced_query
-      ? get_filtered_batch_list().filter((u) =>
+      ? batch_list.filter((u) =>
           columns.some((col) => {
             if (col.key === "actions") return false;
             const val = u[col.key];
@@ -156,7 +150,7 @@ const Batch = () => {
               .includes(debounced_query.toLowerCase());
           })
         ).length
-      : get_filtered_batch_list().length) / select_option
+      : batch_list.length) / show_entries
   );
 
   const handle_sort = (column) => {
@@ -239,40 +233,6 @@ const Batch = () => {
             {/* - Header */}
             {/* + Section 1 */}
             <div className="p-5 sm:p-6 border-t">
-              <div className="grid grid-cols-1 gap-5">
-                <Text_Code_Field
-                  label="Branch"
-                  code_width="150px"
-                  show_search_button={true}
-                  on_click={() => set_display_modal("select_branch")}
-                  disabled
-                />
-                <Text_Code_Field
-                  label="Plant / DC"
-                  code_width="150px"
-                  show_search_button={true}
-                  on_click={() => set_display_modal("select_plant")}
-                  disabled
-                />
-                <Text_Code_Field
-                  label="SLOC"
-                  code_width="150px"
-                  show_search_button={true}
-                  on_click={() => set_display_modal("select_sloc")}
-                  disabled
-                />
-                <Text_Code_Field
-                  label="Item"
-                  code_width="150px"
-                  show_search_button={true}
-                  on_click={() => set_display_modal("select_item")}
-                  disabled
-                />
-              </div>
-            </div>
-            {/* - Section 1 */}
-            {/* + Section 2 */}
-            <div className="p-5 sm:p-6 border-t">
               {/* + Batch List */}
               <div className="w-full border rounded-lg">
                 <div className="w-full md:flex md:justify-between p-4 gap-4">
@@ -281,9 +241,9 @@ const Batch = () => {
                     <div className="w-[90px]">
                       <Select_Field
                         name="option"
-                        value={select_option}
+                        value={show_entries}
                         on_change={(e) => {
-                          set_select_option(Number(e.target.value));
+                          set_show_entries(Number(e.target.value));
                           set_current_page(1);
                         }}
                         options={[
@@ -315,7 +275,7 @@ const Batch = () => {
                   </div>
                 </div>
                 <div className="overflow-x-auto">
-                  {loading ? (
+                  {loading_list ? (
                     <div className="p-6 text-center text-gray-500 text-sm">
                       Loading...
                     </div>
@@ -438,12 +398,19 @@ const Batch = () => {
               </div>
               {/* - Batch List */}
             </div>
-            {/* - Section 2 */}
+            {/* - Section 1 */}
           </div>
         </div>
       )}
       {/* + Pages */}
-      {page === "batch_creation" && <Create_New_Batch set_page={set_page} />}
+      {page === "batch_creation" && (
+        <Create_New_Batch
+          set_page={set_page}
+          show_toast={show_toast}
+          new_batch_data={new_batch_data}
+          set_new_batch_data={set_new_batch_data}
+        />
+      )}
       {page === "edit_batch" && <Edit_Batch set_page={set_page} />}
       {page === "view_batch" && <VIew_Batch set_page={set_page} />}
       {/* - Pages */}

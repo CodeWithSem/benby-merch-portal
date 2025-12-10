@@ -1,16 +1,7 @@
-import React, { useState } from "react";
+import React from "react";
 import Text_Field from "assets/elements/Text_Field";
-import Date_Field from "assets/elements/Date_Field";
-import { format_date_1 } from "assets/scripts/format";
-import {
-  handle_date_change_function,
-  handle_text_change_function,
-} from "assets/scripts/functions/input_functions";
 
-const Shipment = ({ view_po_data, set_view_po_data }) => {
-  const handle_text_change = handle_text_change_function(set_view_po_data);
-  const handle_date_change = handle_date_change_function(set_view_po_data);
-
+const Shipment = () => {
   // RETURN ORIGIN
   return (
     <React.Fragment>
@@ -20,9 +11,9 @@ const Shipment = ({ view_po_data, set_view_po_data }) => {
         <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
           <div>
             <Text_Field
-              label="Original Date"
+              label="Container Size"
               type={"text"}
-              value={view_po_data.sh_original_date} //--> sh_original_date
+              // value={}
               disabled
             />
           </div>
@@ -30,7 +21,7 @@ const Shipment = ({ view_po_data, set_view_po_data }) => {
             <Text_Field
               label="Container Size"
               type={"text"}
-              value={view_po_data.sh_container_size} //--> sh_container_size
+              // value={}
               disabled
             />
           </div>
@@ -38,7 +29,7 @@ const Shipment = ({ view_po_data, set_view_po_data }) => {
             <Text_Field
               label="Shipping Line"
               type={"text"}
-              value={view_po_data.sh_shipping_line} //--> sh_shipping_line
+              // value={}
               disabled
             />
           </div>
@@ -46,7 +37,7 @@ const Shipment = ({ view_po_data, set_view_po_data }) => {
             <Text_Field
               label="Container Number"
               type={"text"}
-              value={view_po_data.sh_container_no} //--> sh_shipping_no
+              // value={}
               disabled
             />
           </div>
@@ -61,7 +52,7 @@ const Shipment = ({ view_po_data, set_view_po_data }) => {
             <Text_Field
               label="Virtual Stopo"
               type={"text"}
-              value={view_po_data.sh_virtual_stopo} //--> sh_virtual_stopo
+              // value={}
               disabled
             />
           </div>
@@ -69,7 +60,7 @@ const Shipment = ({ view_po_data, set_view_po_data }) => {
             <Text_Field
               label="Virtual Branch Group"
               type={"text"}
-              value={view_po_data.sh_virtual_branch_group} //--> sh_virtual_branch_group
+              // value={}
               disabled
             />
           </div>

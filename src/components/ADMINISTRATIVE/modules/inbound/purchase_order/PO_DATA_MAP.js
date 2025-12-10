@@ -500,3 +500,74 @@ export const item_ext_pu_list = [
     sloc_code: "SLOC-01",
   },
 ];
+
+export const app_matrix_list = [
+  {
+    id: 1,
+    app_matrix_code: "A",
+    app_matrix_desc: "Approval Matrix A",
+    creation_date: "MM-DD-YYYY",
+  },
+  {
+    id: 2,
+    app_matrix_code: "B",
+    app_matrix_desc: "Approval Matrix B",
+    creation_date: "MM-DD-YYYY",
+  },
+];
+
+export const user_role_list = [
+  {
+    id: 1,
+    user_role_code: "PR",
+    user_role_desc: "President",
+  },
+  {
+    id: 2,
+    user_role_code: "VP",
+    user_role_desc: "Vice President",
+  },
+  {
+    id: 3,
+    user_role_code: "SM",
+    user_role_desc: "Sales Manager",
+  },
+  {
+    id: 4,
+    user_role_code: "LG",
+    user_role_desc: "Logistic Manager",
+  },
+  {
+    id: 5,
+    user_role_code: "WM",
+    user_role_desc: "Warehouse Manager",
+  },
+];
+
+export const app_matrix_h_list = [
+  {
+    id: 1,
+    app_matrix_code: "A",
+    user_role_code: "PR",
+  },
+  {
+    id: 2,
+    app_matrix_code: "A",
+    user_role_code: "VP",
+  },
+  {
+    id: 3,
+    app_matrix_code: "B",
+    user_role_code: "SM",
+  },
+  {
+    id: 4,
+    app_matrix_code: "B",
+    user_role_code: "LG",
+  },
+  {
+    id: 5,
+    app_matrix_code: "B",
+    user_role_code: "WM",
+  },
+];
