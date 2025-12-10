@@ -168,3 +168,51 @@ export const item_ext_pu_list = [
     sloc_code: "SLOC-01",
   },
 ];
+
+export const period_ind_list = [
+  {
+    id: 1,
+    period_ind_code: "D",
+    period_ind_desc: "Days",
+    creation_date: "MM-DD-YYYY",
+  },
+  {
+    id: 2,
+    period_ind_code: "W",
+    period_ind_desc: "Weeks",
+    creation_date: "MM-DD-YYYY",
+  },
+  {
+    id: 3,
+    period_ind_code: "M",
+    period_ind_desc: "Months",
+    creation_date: "MM-DD-YYYY",
+  },
+  {
+    id: 4,
+    period_ind_code: "Y",
+    period_ind_desc: "Years",
+    creation_date: "MM-DD-YYYY",
+  },
+];
+
+export const batch_type_list = [
+  {
+    id: 1,
+    batch_type_code: "BT-01",
+    batch_type_desc: "Batch Type A",
+    creation_date: "MM-DD-YYYY",
+  },
+  {
+    id: 2,
+    batch_type_code: "BT-02",
+    batch_type_desc: "Batch Type B",
+    creation_date: "MM-DD-YYYY",
+  },
+  {
+    id: 2,
+    batch_type_code: "BT-03",
+    batch_type_desc: "Batch Type C",
+    creation_date: "MM-DD-YYYY",
+  },
+];

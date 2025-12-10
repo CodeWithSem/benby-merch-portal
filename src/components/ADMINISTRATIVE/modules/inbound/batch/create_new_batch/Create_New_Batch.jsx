@@ -14,10 +14,13 @@ import Select_SLOC from "../modals/select_hierarchy/Select_SLOC";
 import {
   branch_h_list,
   branch_list,
+  item_master_list,
   plant_h_list,
   plant_list,
   sloc_list,
 } from "../BATCH_DATA_MAP";
+import Select_Item from "../modals/item_modals/Select_Item";
+import { handle_text_change_function } from "assets/scripts/functions/input_functions";
 
 const Create_New_Batch = ({
   set_page,
@@ -26,7 +29,14 @@ const Create_New_Batch = ({
   set_new_batch_data,
 }) => {
   const [active_tab, set_active_tab] = useState("batch_details");
+  const [create_loading, set_create_loading] = useState(false);
   const [display_modal, set_display_modal] = useState("");
+
+  const handle_text_change = handle_text_change_function(set_new_batch_data);
+
+  const handle_create = () => {
+    console.table(new_batch_data);
+  };
 
   const handle_go_back = () => {
     set_page("main");
@@ -147,22 +157,30 @@ const Create_New_Batch = ({
               <Text_Code_Field
                 label="Item"
                 code_width="150px"
-                show_search_button={false}
+                show_search_button={!!new_batch_data.sloc_code}
+                code_value={new_batch_data.item_code}
+                text_value={get_description(
+                  new_batch_data.item_code,
+                  item_master_list,
+                  "item_code",
+                  "item_desc"
+                )}
+                on_click={() => set_display_modal("select_item")}
                 disabled
               />
               <Text_Field
                 label="Batch Code"
                 type={"text"}
                 placeholder={"Enter code"}
-                // value={}
-                // on_change={handle_text_change}
+                value={new_batch_data.batch_code} //--> batch_code
+                on_change={handle_text_change("batch_code")}
               />
               <Text_Field
                 label="Batch Description"
                 type={"text"}
                 placeholder={"Enter description"}
-                // value={}
-                // on_change={handle_text_change}
+                value={new_batch_data.batch_desc} //--> batch_desc
+                on_change={handle_text_change("batch_desc")}
               />
             </div>
           </div>
@@ -188,7 +206,14 @@ const Create_New_Batch = ({
               {/* - Tab Navigation */}
               {/* + Tab Content */}
               <div className="p-6">
-                {active_tab === "batch_details" && <Batch_Details />}
+                {active_tab === "batch_details" && (
+                  <Batch_Details
+                    display_modal={display_modal}
+                    set_display_modal={set_display_modal}
+                    new_batch_data={new_batch_data}
+                    set_new_batch_data={set_new_batch_data}
+                  />
+                )}
               </div>
               {/* - Tab Content */}
             </div>
@@ -202,6 +227,8 @@ const Create_New_Batch = ({
                 size="lg"
                 icon={CirclePlus}
                 icon_position="left"
+                loading={create_loading}
+                on_click={handle_create}
               >
                 Create
               </Button>
@@ -246,6 +273,15 @@ const Create_New_Batch = ({
         plant_h_list={plant_h_list}
         set_data={set_new_batch_data}
         // set_selected_item_list={set_selected_item_list}
+      />
+      <Select_Item
+        is_open={display_modal === "select_item"}
+        on_close={() => set_display_modal("")}
+        branch_code={new_batch_data.branch_code}
+        plant_code={new_batch_data.plant_code}
+        sloc_code={new_batch_data.sloc_code}
+        set_data={set_new_batch_data}
+        // selected_item_list={selected_item_list}
       />
       {/* - Modals */}
     </React.Fragment>

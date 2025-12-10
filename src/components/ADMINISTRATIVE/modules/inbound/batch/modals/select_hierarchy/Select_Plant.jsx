@@ -128,6 +128,7 @@ const Select_Plant = ({
       ...prev,
       plant_code: selected_branch_h.plant_code,
       sloc_code: "",
+      item_code: "",
     }));
     set_selected_branch_h(null);
     on_close();

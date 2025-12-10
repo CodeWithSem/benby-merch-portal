@@ -127,6 +127,7 @@ const Select_SLOC = ({
     set_data((prev) => ({
       ...prev,
       sloc_code: selected_plant_h.sloc_code,
+      item_code: "",
     }));
     set_selected_plant_h(null);
     on_close();

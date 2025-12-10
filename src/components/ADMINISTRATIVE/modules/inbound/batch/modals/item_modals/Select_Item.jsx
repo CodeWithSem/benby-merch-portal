@@ -4,75 +4,103 @@ import Icon_Field from "assets/elements/Icon_Field";
 import Checkbox_Field from "assets/elements/Checkbox_Field";
 import Button from "assets/elements/Button";
 import Pagination_Modal from "assets/elements/Pagination_Modal";
+import { item_ext_pu_list, item_master_list } from "../../BATCH_DATA_MAP";
 
-const Select_Branch = ({
+const Select_Item = ({
   is_open,
   on_close,
+  branch_code,
+  plant_code,
+  sloc_code,
+  set_data,
   width = "max-w-[700px]",
   height = "h-[500px]",
-  branch_list,
-  set_data,
 }) => {
-  // + Client-Side Filtering
-  const [filtered_branch_list, set_filtered_branch_list] = useState([]);
+  const [item_list, set_item_list] = useState([]);
+  const [filtered_item_list, set_filtered_item_list] = useState([]);
   const [current_page, set_current_page] = useState(1);
-  const [rows_per_page, set_rows_per_page] = useState(5);
+  const [rows_per_page] = useState(5);
   const [search_query, set_search_query] = useState("");
-  const [selected_branch, set_selected_branch] = useState(null);
+  const [selected_item, set_selected_item] = useState(null);
 
+  // ---------------------------------------------------
+  // LOAD ITEMS from local arrays
+  // ---------------------------------------------------
   useEffect(() => {
-    let data = [...branch_list];
+    // Filter item_ext_pu_list by branch, plant, sloc
+    const filtered_ext = item_ext_pu_list.filter(
+      (item) =>
+        item.branch_code === branch_code &&
+        item.plant_code === plant_code &&
+        item.sloc_code === sloc_code
+    );
 
-    if (search_query.trim() !== "") {
+    // Lookup item_desc from item_master_list
+    const final_items = filtered_ext.map((item) => {
+      const master = item_master_list.find(
+        (m) => m.item_code === item.item_code
+      );
+      return {
+        ...item,
+        item_desc: master?.item_desc || "-",
+      };
+    });
+
+    set_item_list(final_items);
+    set_current_page(1);
+    // setSelectedItem(null);
+  }, [is_open, branch_code, plant_code, sloc_code]);
+
+  // ---------------------------------------------------
+  // SEARCH + PAGINATION
+  // ---------------------------------------------------
+  useEffect(() => {
+    let data = [...item_list];
+
+    if (search_query.trim()) {
       const q = search_query.toLowerCase();
       data = data.filter(
-        (data) =>
-          data.branch_code.toLowerCase().includes(q) ||
-          data.branch_desc.toLowerCase().includes(q)
+        (d) =>
+          d.item_code.toLowerCase().includes(q) ||
+          d.item_desc.toLowerCase().includes(q)
       );
     }
 
     const start_idx = (current_page - 1) * rows_per_page;
     const end_idx = start_idx + rows_per_page;
-    set_filtered_branch_list(data.slice(start_idx, end_idx));
-  }, [branch_list, search_query, current_page, rows_per_page]);
+    set_filtered_item_list(data.slice(start_idx, end_idx));
+  }, [item_list, search_query, current_page, rows_per_page]);
 
   const total_pages = Math.ceil(
-    branch_list.filter(
-      (data) =>
-        data.branch_code.toLowerCase().includes(search_query.toLowerCase()) ||
-        data.branch_desc.toLowerCase().includes(search_query.toLowerCase())
+    item_list.filter(
+      (d) =>
+        d.item_code.toLowerCase().includes(search_query.toLowerCase()) ||
+        d.item_desc.toLowerCase().includes(search_query.toLowerCase())
     ).length / rows_per_page
   );
 
-  const handle_page_change = (page) => set_current_page(page);
-  // - Client-Side Filtering
-
-  const handle_select_branch = () => {
-    if (!selected_branch) {
-      alert("Please select a branch before proceeding.");
+  const handle_select_item = () => {
+    if (!selected_item) {
+      alert("Please select an item before proceeding.");
       return;
     }
+    // alert(`Selected: ${selected_item.item_desc}`);
     set_data((prev) => ({
       ...prev,
-      branch_code: selected_branch.branch_code,
-      plant_code: "",
-      sloc_code: "",
-      item_code: "",
+      item_code: selected_item.item_code,
     }));
-    set_selected_branch(null);
+    set_selected_item(null);
     on_close();
   };
 
-  // RETURN ORIGIN
+  // ---------------------------------------------------
+  // RETURN ORIGINAL UI (unchanged)
+  // ---------------------------------------------------
   return is_open ? (
     <React.Fragment>
       <div className="fixed inset-0 flex items-center justify-center z-[97] px-4">
-        {/* + Blur */}
         <div className="absolute inset-0 bg-black/50 backdrop-blur-sm z-[98]"></div>
-        {/* - Blur */}
 
-        {/* + Modal Content */}
         <div
           className={`relative bg-white rounded-lg shadow-xl ${width} w-full py-7 m-5 z-[99]`}
         >
@@ -82,12 +110,11 @@ const Select_Branch = ({
           >
             <X size={20} />
           </button>
-          {/* + Modal Label */}
+
           <div className="text-lg md:text-xl font-bold mb-5 px-7">
-            Branch Selection
+            Item Selection
           </div>
-          {/* - Modal Label */}
-          {/* + Modal Body */}
+
           <div className={`w-full overflow-y-auto ${height} scrollbar-custom`}>
             <div className="overflow-hidden border border-gray-200 bg-white pt-4">
               <div className="flex flex-col gap-5 px-6 mb-4 sm:flex-row sm:items-center sm:justify-between">
@@ -105,112 +132,106 @@ const Select_Branch = ({
                   />
                 </div>
               </div>
-              {/* + Table */}
+
               <div className="max-w-full overflow-x-auto custom-scrollbar">
                 <table className="min-w-full whitespace-nowrap">
                   <thead className="border-gray-100 border-y bg-gray-50">
                     <tr className="font-semibold text-xs">
                       <th className="px-6 py-3 w-[80px]"></th>
                       <th className="px-6 py-3 text-gray-500 text-left">
-                        Branch
+                        Item
                       </th>
-                      <th className="px-6 py-3 text-gray-500 text-left">
+                      {/* <th className="px-6 py-3 text-gray-500 text-left">
                         Creation Date
-                      </th>
+                      </th> */}
                     </tr>
                   </thead>
 
                   <tbody className="divide-y divide-gray-100">
-                    {filtered_branch_list.length === 0 ? (
+                    {filtered_item_list.length === 0 ? (
                       <tr>
                         <td
-                          colSpan={3}
+                          colSpan={4}
                           className="text-center py-6 text-gray-500 text-sm"
                         >
                           No data found
                         </td>
                       </tr>
                     ) : (
-                      filtered_branch_list.map((data) => (
+                      filtered_item_list.map((data) => (
                         <tr
                           key={data.id}
                           className={`hover:bg-sky-50/50 cursor-pointer text-[12px] ${
-                            selected_branch?.id === data.id ? "bg-sky-50" : ""
+                            selected_item?.id === data.id ? "bg-sky-50" : ""
                           }`}
-                          onClick={() => set_selected_branch(data)}
+                          onClick={() => set_selected_item(data)}
                         >
                           <td className="px-5 py-4 sm:px-6 text-center">
-                            <div className="flex justify-center items-center">
-                              <Checkbox_Field
-                                name="check"
-                                box_size={18}
-                                icon_size={12}
-                                checked={selected_branch?.id === data.id}
-                                on_change={() => set_selected_branch(data)}
-                              />
-                            </div>
+                            <Checkbox_Field
+                              name="check"
+                              box_size={18}
+                              icon_size={12}
+                              checked={selected_item?.id === data.id}
+                              on_change={() => set_selected_item(data)}
+                            />
                           </td>
+
                           <td className="px-5 py-4 sm:px-6">
-                            <div className="block font-medium text-gray-800">
+                            <div className="block font-medium">
                               <span className="block text-gray-500 text-[10px]">
-                                {data.branch_code}
+                                {data.item_code}
                               </span>
-                              <span className="block text-gray-800 text-[13px]">
-                                {data.branch_desc}
+                              <span className="block text-gray-800 text-sm">
+                                {data.item_desc}
                               </span>
                             </div>
                           </td>
-                          <td className="px-6 py-3 text-gray-700 tracking-wide">
+                          {/* <td className="px-6 py-3 text-gray-700 tracking-wide">
                             {data.creation_date}
-                          </td>
+                          </td> */}
                         </tr>
                       ))
                     )}
                   </tbody>
                 </table>
               </div>
-              {/* - Table */}
             </div>
           </div>
-          {/* - Modal Body */}
-          {/* + Modal Footer */}
+
           <div className="flex flex-col items-center sm:flex-row sm:justify-between gap-3 mt-5 px-7">
-            {/* + Pagination */}
             {total_pages > 0 && (
               <div className="w-full sm:w-auto">
                 <Pagination_Modal
                   current_page={current_page}
                   total_pages={total_pages}
-                  on_page_change={handle_page_change}
+                  on_page_change={set_current_page}
                 />
               </div>
             )}
-            {/* - Pagination */}
-            {/* + Action Buttons */}
+
             <div className="flex justify-center sm:justify-end gap-2 w-full">
               <Button
                 variant="primary"
-                on_click={handle_select_branch}
-                class_name="w-full md:w-[100px]"
-                disabled={!selected_branch}
+                on_click={handle_select_item}
+                className="w-full md:w-[100px]"
+                disabled={!selected_item}
               >
                 Proceed
               </Button>
+
               <Button
                 variant="white"
                 on_click={on_close}
-                class_name="w-full md:w-[100px]"
+                className="w-full md:w-[100px]"
               >
                 Close
               </Button>
             </div>
-            {/* - Action Buttons */}
           </div>
-          {/* - Modal Footer */}
         </div>
       </div>
     </React.Fragment>
   ) : null;
 };
 
-export default Select_Branch;
+export default Select_Item;
