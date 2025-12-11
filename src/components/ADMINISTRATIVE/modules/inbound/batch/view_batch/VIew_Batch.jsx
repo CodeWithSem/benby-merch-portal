@@ -1,13 +1,22 @@
 import React, { useState } from "react";
-import { ChevronLeft, CirclePlus } from "lucide-react";
-import { useToast } from "../../../../layout/Toast_Provider";
+import { ChevronLeft } from "lucide-react";
 import Button from "assets/elements/Button";
 import Text_Code_Field from "assets/elements/Text_Code_Field";
 import Text_Field from "assets/elements/Text_Field";
 import Batch_Details from "./batch_details/Batch_Details";
+import { get_description } from "assets/scripts/functions/get_description";
+import {
+  branch_list,
+  item_master_list,
+  plant_list,
+  sloc_list,
+} from "../BATCH_DATA_MAP";
+import Select_Item from "../modals/item_modals/Select_Item";
+import { handle_text_change_function } from "assets/scripts/functions/input_functions";
+import { api_create_batch_master } from "api/firestore_db/inbound/batch/tbl_batch_master_api";
+import { validate_required_fields } from "assets/scripts/functions/validate_fields";
 
-const VIew_Batch = ({ set_page }) => {
-  const { show_toast } = useToast();
+const View_Batch = ({ set_page, view_batch_data }) => {
   const [active_tab, set_active_tab] = useState("batch_details");
 
   const handle_go_back = () => {
@@ -48,7 +57,7 @@ const VIew_Batch = ({ set_page }) => {
               </li>
               <li className="flex items-center gap-1.5 text-sm text-gray-500">
                 <span>/</span>
-                <span className="text-gray-800">View Batch</span>
+                <span className="text-gray-800">View</span>
               </li>
             </ol>
           </nav>
@@ -70,7 +79,7 @@ const VIew_Batch = ({ set_page }) => {
 
             <div className="flex gap-2">
               <div className="text-gray-500 text-sm tracking-wider">
-                MM-DD-YYYY
+                {view_batch_data.creation_date}
               </div>
             </div>
           </div>
@@ -78,40 +87,82 @@ const VIew_Batch = ({ set_page }) => {
           {/* + Section 1 */}
           <div className="p-5 sm:p-6 border-t">
             <div className="grid grid-cols-1 gap-5">
-              <Text_Code_Field
-                label="Branch"
-                code_width="150px"
-                show_search_button={false}
-                disabled
-              />
-              <Text_Code_Field
-                label="Plant / DC"
-                code_width="150px"
-                show_search_button={false}
-                disabled
-              />
-              <Text_Code_Field
-                label="SLOC"
-                code_width="150px"
-                show_search_button={false}
-                disabled
-              />
+              <div>
+                <Text_Code_Field
+                  label="Branch"
+                  code_width="150px"
+                  show_search_button={false}
+                  code_value={view_batch_data.branch_code}
+                  text_value={get_description(
+                    view_batch_data.branch_code,
+                    branch_list,
+                    "branch_code",
+                    "branch_desc"
+                  )}
+                  bg_dis_color="bg-slate-50"
+                  text_dis_color="text-slate-500"
+                  disabled
+                />
+              </div>
+              <div>
+                <Text_Code_Field
+                  label="Plant"
+                  code_width="150px"
+                  show_search_button={false}
+                  code_value={view_batch_data.plant_code}
+                  text_value={get_description(
+                    view_batch_data.plant_code,
+                    plant_list,
+                    "plant_code",
+                    "plant_desc"
+                  )}
+                  bg_dis_color="bg-slate-50"
+                  text_dis_color="text-slate-500"
+                  disabled
+                />
+              </div>
+              <div>
+                <Text_Code_Field
+                  label="Storage Location"
+                  code_width="150px"
+                  show_search_button={false}
+                  code_value={view_batch_data.sloc_code}
+                  text_value={get_description(
+                    view_batch_data.sloc_code,
+                    sloc_list,
+                    "sloc_code",
+                    "sloc_desc"
+                  )}
+                  bg_dis_color="bg-slate-50"
+                  text_dis_color="text-slate-500"
+                  disabled
+                />
+              </div>
               <Text_Code_Field
                 label="Item"
                 code_width="150px"
                 show_search_button={false}
+                code_value={view_batch_data.item_code}
+                text_value={get_description(
+                  view_batch_data.item_code,
+                  item_master_list,
+                  "item_code",
+                  "item_desc"
+                )}
+                bg_dis_color="bg-slate-50"
+                text_dis_color="text-slate-500"
                 disabled
               />
               <Text_Field
                 label="Batch Code"
                 type={"text"}
-                // value={}
+                value={view_batch_data.batch_code} //--> batch_code
                 disabled
               />
               <Text_Field
                 label="Batch Description"
                 type={"text"}
-                // value={}
+                value={view_batch_data.batch_desc} //--> batch_desc
                 disabled
               />
             </div>
@@ -138,16 +189,32 @@ const VIew_Batch = ({ set_page }) => {
               {/* - Tab Navigation */}
               {/* + Tab Content */}
               <div className="p-6">
-                {active_tab === "batch_details" && <Batch_Details />}
+                {active_tab === "batch_details" && (
+                  <Batch_Details view_batch_data={view_batch_data} />
+                )}
               </div>
               {/* - Tab Content */}
             </div>
           </div>
           {/* - Section 2 */}
+          {/* + Section 3 */}
+          <div className="p-4 sm:p-8 border-t">
+            <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
+              <Button
+                variant="white"
+                size="lg"
+                width="w-[120px]"
+                on_click={handle_go_back}
+              >
+                Close
+              </Button>
+            </div>
+          </div>
+          {/* - Section 3 */}
         </div>
       </div>
     </React.Fragment>
   );
 };
 
-export default VIew_Batch;
+export default View_Batch;

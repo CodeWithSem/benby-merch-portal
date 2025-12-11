@@ -5,8 +5,15 @@ import Button from "assets/elements/Button";
 import Text_Field from "assets/elements/Text_Field";
 import GR_Items from "./gr_items/GR_Items";
 
-const Create_New_GR = ({ set_page }) => {
+const Create_New_GR = ({
+  set_page,
+  batch_list,
+  new_gr_data,
+  set_new_gr_data,
+}) => {
   const handle_create_gr = () => {
+    // console.table(new_gr_data);
+    console.log(batch_list);
     alert("Under Maintenance");
   };
 
@@ -82,7 +89,7 @@ const Create_New_GR = ({ set_page }) => {
                       <Text_Field
                         label="PO Number"
                         type="text"
-                        value="PO-XXXXXXXXX"
+                        value={new_gr_data.po_number}
                         disabled
                       />
                     </div>
@@ -100,9 +107,9 @@ const Create_New_GR = ({ set_page }) => {
                   <div className="grid grid-cols-1 gap-5">
                     <div className="col-span-full">
                       <Text_Field
-                        label="Creation Date"
+                        label="PO Creation Date"
                         type="text"
-                        value="MM-DD-YYYY"
+                        value={new_gr_data.creation_date}
                         disabled
                       />
                     </div>
@@ -113,7 +120,11 @@ const Create_New_GR = ({ set_page }) => {
           </div>
           {/* - Section 1 */}
           {/* + Section 2 */}
-          <GR_Items />
+          <GR_Items
+            batch_list={batch_list}
+            new_gr_data={new_gr_data}
+            set_new_gr_data={set_new_gr_data}
+          />
           {/* - Section 2 */}
           {/* + Section 3 */}
           <div className="p-4 sm:p-8 border-t">

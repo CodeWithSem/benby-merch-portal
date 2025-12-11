@@ -1,47 +1,50 @@
 import React, { useState } from "react";
-import { Info, PackageSearch, Search } from "lucide-react";
+import { Info, PackagePlus, Search } from "lucide-react";
 import Text_Field from "assets/elements/Text_Field";
 import Icon_Field from "assets/elements/Icon_Field";
 import Select_Batch from "../../modals/Select_Batch";
+import Button from "assets/elements/Button";
 
-const GR_Items = () => {
+const GR_Items = ({ batch_list, new_gr_data, set_new_gr_data }) => {
   const [selected_item_id, set_selected_item_id] = useState(null);
+  const [selected_receive_item, set_selected_receive_item] = useState({});
   const [display_item_modal, set_display_item_modal] = useState("");
-  const [item_list, set_item_list] = useState([
-    {
-      id: 1,
-      item_code: "ITM-000000001",
-      item_desc: 'Macbook Pro 13"',
-      open_quantity: 5,
-      unit: "PC",
-    },
-    {
-      id: 2,
-      item_code: "ITM-000000002",
-      item_desc: "iPhone 15 Pro Max",
-      open_quantity: 2,
-      unit: "PC",
-    },
-  ]);
 
-  const handle_change_qty = (e, id) => {
-    const new_value = e.target.value;
-    set_item_list((prev) =>
-      prev.map((item) =>
-        item.id === id ? { ...item, delivered_quantity: new_value } : item
-      )
-    );
-  };
-
-  const handle_select_batch = (item) => {
+  const handle_select_receive_item = (item) => {
+    set_selected_receive_item(item);
     set_display_item_modal("select_batch");
   };
 
-  // RETURN ORIGIN
+  // Callback from Select_Batch
+  const handle_batches_proceed = ({ selected_batches, quantity_received }) => {
+    // Update the selected item in new_gr_data
+    const updated_items = new_gr_data.selected_item_list.map((item) =>
+      item.id === selected_receive_item.id
+        ? {
+            ...item,
+            batch_list: selected_batches, // <-- store the selected batches per item
+            quantity_received: quantity_received,
+            quantity_left: item.quantity_open - quantity_received,
+            batch:
+              selected_batches.length === 1
+                ? selected_batches[0].batch_code
+                : selected_batches.length > 1
+                ? "Multiple Batches"
+                : "",
+          }
+        : item
+    );
+
+    set_new_gr_data({
+      ...new_gr_data,
+      selected_item_list: updated_items,
+    });
+  };
+
   return (
     <React.Fragment>
       <div className="flex flex-col gap-5 border-t p-5 sm:p-6">
-        {/* + Item List */}
+        {/* Item List */}
         <div className="overflow-hidden rounded-lg border border-gray-200 bg-white pt-4">
           <div className="flex flex-col gap-5 px-6 mb-4 sm:flex-row sm:items-center sm:justify-between">
             <h1 className="font-semibold text-gray-600 whitespace-nowrap">
@@ -56,75 +59,81 @@ const GR_Items = () => {
               />
             </div>
           </div>
-          {/* + Table */}
+
           <div className="max-w-full overflow-x-auto custom-scrollbar">
-            <table className="min-w-full text-left text-sm text-gray-700 whitespace-nowrap">
+            <table className="min-w-full text-left text-gray-700 whitespace-nowrap">
               <thead className="bg-gray-50">
-                <tr className="border-b border-t text-sm">
+                <tr className="border-b border-t text-xs">
                   <th className="px-5 py-4 font-semibold border-r">No.</th>
                   <th className="px-5 py-4 font-semibold border-r">
                     Item Description
                   </th>
-                  <th className="px-5 py-4 font-semibold border-r">Open Qty</th>
-                  <th className="px-5 py-4 font-semibold border-r">Unit</th>
                   <th className="px-5 py-4 font-semibold border-r">
-                    Delivered Qty
+                    Original Qty
                   </th>
-                  <th className="px-5 py-4 font-semibold">Batch</th>
+                  <th className="px-5 py-4 font-semibold border-r">Unit</th>
+                  <th className="px-5 py-4 font-semibold border-r">Open Qty</th>
+                  <th className="px-5 py-4 font-semibold border-r">
+                    Received Qty
+                  </th>
+                  <th className="px-5 py-4 font-semibold border-r">Left Qty</th>
+                  <th className="px-5 py-4 font-semibold border-r">Batch</th>
+                  <th className="px-5 py-4 font-semibold"></th>
                 </tr>
               </thead>
               <tbody className="divide-y bg-white">
-                {item_list.map((data, index) => (
+                {new_gr_data.selected_item_list.map((item, index) => (
                   <tr
-                    key={data.id}
-                    className={`text-sm cursor-pointer ${
-                      selected_item_id === data.id
+                    key={item.id}
+                    className={`text-xs cursor-pointer ${
+                      selected_item_id === item.id
                         ? "bg-sky-50"
                         : "hover:bg-gray-50/50"
                     }`}
-                    onClick={() => set_selected_item_id(data.id)}
+                    onClick={() => set_selected_item_id(item.id)}
                   >
                     <td className="px-5 py-4 text-gray-500 border-r">
                       {index + 1}
                     </td>
                     <td className="px-5 py-4 font-medium text-gray-800 whitespace-normal break-words border-r">
-                      {data.item_desc}
+                      {item.item_desc}
                     </td>
                     <td className="px-5 py-4 text-gray-600 border-r">
-                      {data.open_quantity}
+                      {item.quantity}
                     </td>
                     <td className="px-5 py-4 text-gray-600 border-r">
-                      {data.unit}
+                      {item.uom}
                     </td>
-                    <td className="px-5 py-4 text-gray-600 w-[160px] border-r">
-                      <Text_Field
-                        type={"number"}
-                        value={data.delivered_quantity}
-                        on_change={(e) => handle_change_qty(e, data.id)}
-                        placeholder={"0"}
-                        int_only={true}
-                      />
+                    <td className="px-5 py-4 text-gray-600 border-r">
+                      {item.quantity_open}
                     </td>
-                    <td className="px-5 py-4 text-gray-600 w-[200px]">
-                      <div className="flex items-center justify-between">
-                        <span className="block truncate w-[150px]">--</span>
-                        <button
-                          className="text-gray-500 hover:text-sky-600 text-[12px] mb-[1px] outline-none ml-2"
-                          onClick={() => handle_select_batch(data)}
-                        >
-                          <PackageSearch size={24} />
-                        </button>
-                      </div>
+                    <td className="px-5 py-4 text-gray-600 border-r">
+                      {item.quantity_received}
+                    </td>
+                    <td className="px-5 py-4 text-gray-600 border-r">
+                      {item.quantity_left}
+                    </td>
+                    <td className="px-5 py-4 text-gray-600 border-r">
+                      {item.batch}
+                    </td>
+                    <td className="px-5 py-2 text-gray-600">
+                      <Button
+                        variant="primary"
+                        size="sm"
+                        icon={PackagePlus}
+                        icon_position="left"
+                        on_click={() => handle_select_receive_item(item)}
+                      >
+                        Receive
+                      </Button>
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
-          {/* - Table */}
         </div>
-        {/* - Item List */}
-        {/* + Footer */}
+
         <div className="mt-5 flex items-center gap-2 text-gray-500">
           <Info size={18} />
           <p className="text-sm">
@@ -132,16 +141,21 @@ const GR_Items = () => {
             Receipt.
           </p>
         </div>
-        {/* - Footer */}
       </div>
-      {/* + Modals */}
+
+      {/* Modal */}
       <Select_Batch
         is_open={display_item_modal === "select_batch"}
         on_close={() => set_display_item_modal("")}
-        width="max-w-[1200px]"
-        height="max-h-[700px]"
+        width="max-w-[1000px]"
+        height="max-h-[500px]"
+        batch_list={batch_list}
+        selected_receive_item={selected_receive_item}
+        selected_batches_param={
+          selected_receive_item?.batch_list || [] // <-- pre-fill batches for the item
+        }
+        on_proceed={handle_batches_proceed} // <-- update parent data directly
       />
-      {/* - Modals */}
     </React.Fragment>
   );
 };

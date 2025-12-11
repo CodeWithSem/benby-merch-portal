@@ -210,7 +210,7 @@ export const batch_type_list = [
     creation_date: "MM-DD-YYYY",
   },
   {
-    id: 2,
+    id: 3,
     batch_type_code: "BT-03",
     batch_type_desc: "Batch Type C",
     creation_date: "MM-DD-YYYY",

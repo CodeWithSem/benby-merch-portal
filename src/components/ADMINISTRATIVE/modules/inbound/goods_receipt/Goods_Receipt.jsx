@@ -28,6 +28,7 @@ import Post_View_GR from "./post_view_gr/Post_View_GR";
 import Select_PO from "./modals/select_po/Select_PO";
 import Delete_GR from "./modals/delete_gr/Delete_GR";
 import Button_Action from "assets/elements/Button_Action";
+import { api_get_batch_master_list } from "api/firestore_db/inbound/batch/tbl_batch_master_api";
 
 const Goods_Receipt = () => {
   const { show_toast } = useToast();
@@ -36,15 +37,18 @@ const Goods_Receipt = () => {
   const [display_modal, set_display_modal] = useState("");
   const [for_posting, set_for_posting] = useState(false);
   const today = format_date_1(new Date());
-  const [start_date, set_start_date] = useState(today);
-  const [end_date, set_end_date] = useState(today);
+  const [gr_start_date, set_gr_start_date] = useState(today);
+  const [gr_end_date, set_gr_end_date] = useState(today);
+  const [po_start_date, set_po_start_date] = useState(today);
+  const [po_end_date, set_po_end_date] = useState(today);
   const [show_load_data_button, set_show_load_data_button] = useState(false);
+
+  const [new_gr_data, set_new_gr_data] = useState({});
 
   const columns = [
     { key: "po_number", label: "PO Number", sortable: true },
     { key: "gr_number", label: "GR Number", sortable: true },
     { key: "po_type", label: "PO Type", sortable: true },
-    { key: "company", label: "Company", sortable: true },
     { key: "creation_date", label: "Creation Date", sortable: true },
     { key: "status", label: "Status", sortable: true },
     { key: "actions", label: "", sortable: false },
@@ -56,7 +60,6 @@ const Goods_Receipt = () => {
       po_number: "PO-0000001",
       gr_number: "GR-0000001",
       po_type: "LFPO",
-      company_code: "COM-0001",
       creation_date: "06-05-2025",
       status: "Pending",
     },
@@ -158,6 +161,21 @@ const Goods_Receipt = () => {
   const handle_page_change = (page) => set_current_page(page);
   // - Client-Side Filtering
 
+  const [batch_list, set_batch_list] = useState([]);
+
+  const handle_get_batch_master_list = async () => {
+    const response = await api_get_batch_master_list();
+    if (response.success) {
+      set_batch_list(response.data);
+    } else {
+      console.error(response.message);
+    }
+  };
+
+  useEffect(() => {
+    handle_get_batch_master_list();
+  }, []);
+
   const handle_create_new_gr = () => {
     set_display_modal("select_po");
   };
@@ -184,13 +202,13 @@ const Goods_Receipt = () => {
     set_display_modal("delete_gr");
   };
 
-  const handle_change_start_date = (value) => {
-    set_start_date(format_date_1(value));
+  const handle_change_gr_start_date = (value) => {
+    set_gr_start_date(format_date_1(value));
     set_show_load_data_button(true);
   };
 
-  const handle_change_end_date = (value) => {
-    set_end_date(format_date_1(value));
+  const handle_change_gr_end_date = (value) => {
+    set_gr_end_date(format_date_1(value));
     set_show_load_data_button(true);
   };
 
@@ -257,14 +275,16 @@ const Goods_Receipt = () => {
                 <div className="grid grid-cols-1 gap-5 md:w-[250px]">
                   <Date_Field
                     label="Start Date"
-                    value={start_date}
-                    on_change={(e) => handle_change_start_date(e.target.value)}
+                    value={gr_start_date}
+                    on_change={(e) =>
+                      handle_change_gr_start_date(e.target.value)
+                    }
                     placeholder="Select Date"
                   />
                   <Date_Field
                     label="End Date"
-                    value={end_date}
-                    on_change={(e) => handle_change_end_date(e.target.value)}
+                    value={gr_end_date}
+                    on_change={(e) => handle_change_gr_end_date(e.target.value)}
                     placeholder="Select Date"
                   />
                   {show_load_data_button && (
@@ -569,7 +589,14 @@ const Goods_Receipt = () => {
         </React.Fragment>
       )}
       {/* + Pages */}
-      {page === "gr_creation" && <Create_New_GR set_page={set_page} />}
+      {page === "gr_creation" && (
+        <Create_New_GR
+          set_page={set_page}
+          batch_list={batch_list}
+          new_gr_data={new_gr_data}
+          set_new_gr_data={set_new_gr_data}
+        />
+      )}
       {page === "edit_gr" && <Edit_GR set_page={set_page} />}
       {page === "post_view_gr" && (
         <Post_View_GR set_page={set_page} for_posting={for_posting} />
@@ -579,11 +606,16 @@ const Goods_Receipt = () => {
       <Select_PO
         is_open={display_modal === "select_po"}
         on_close={() => set_display_modal("")}
-        width="max-w-[1280px]"
+        width="max-w-[1000px]"
         height="max-h-[700px]"
-        set_page={set_page}
-        company_list={company_list}
+        show_toast={show_toast}
+        po_start_date={po_start_date}
+        set_po_start_date={set_po_start_date}
+        po_end_date={po_end_date}
+        set_po_end_date={set_po_end_date}
         po_type_list={po_type_list}
+        set_new_gr_data={set_new_gr_data}
+        set_page={set_page}
       />
       <Delete_GR
         is_open={display_modal === "delete_gr"}

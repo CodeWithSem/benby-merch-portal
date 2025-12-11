@@ -21,21 +21,117 @@ import {
 } from "../BATCH_DATA_MAP";
 import Select_Item from "../modals/item_modals/Select_Item";
 import { handle_text_change_function } from "assets/scripts/functions/input_functions";
+import { api_create_batch_master } from "api/firestore_db/inbound/batch/tbl_batch_master_api";
+import { validate_required_fields } from "assets/scripts/functions/validate_fields";
 
 const Create_New_Batch = ({
   set_page,
+  active_user,
   show_toast,
   new_batch_data,
   set_new_batch_data,
+  set_batch_list,
 }) => {
   const [active_tab, set_active_tab] = useState("batch_details");
+  const [is_confirm_modal_open, set_is_confirm_modal_open] = useState(false);
   const [create_loading, set_create_loading] = useState(false);
   const [display_modal, set_display_modal] = useState("");
 
   const handle_text_change = handle_text_change_function(set_new_batch_data);
 
-  const handle_create = () => {
-    console.table(new_batch_data);
+  const validate_batch_data_fields = () => {
+    const is_valid = validate_required_fields({
+      data: new_batch_data,
+      fields: [
+        { name: "branch_code", label: "Branch" },
+        { name: "plant_code", label: "Plant" },
+        { name: "sloc_code", label: "Storage Location" },
+        { name: "item_code", label: "Item" },
+        { name: "batch_code", label: "Batch Code" },
+        { name: "batch_desc", label: "Batch Description" },
+        { name: "manufacture_date", label: "Manufacturing Date" },
+        { name: "sled_bbd", label: "SLED / BBD" },
+        { name: "batch_type_code", label: "Batch Type" },
+        { name: "period_ind", label: "Period Indicator" },
+      ],
+      show_toast,
+    });
+
+    return is_valid;
+  };
+
+  const handle_create = async () => {
+    if (!validate_batch_data_fields()) {
+      close_confirm_modal();
+      return;
+    }
+    try {
+      set_create_loading(true);
+      const response = await api_create_batch_master(
+        new_batch_data,
+        active_user?.username,
+        show_toast
+      );
+      if (response.success) {
+        set_batch_list((prev) => [...prev, response.data]);
+        set_new_batch_data({});
+        handle_go_back();
+      }
+    } catch (error) {
+      console.error("Failed to create a new data:", error);
+    } finally {
+      close_confirm_modal();
+    }
+  };
+
+  const close_confirm_modal = () => {
+    set_is_confirm_modal_open(false);
+    set_create_loading(false);
+  };
+
+  const Confirm_Modal = () => {
+    return (
+      <React.Fragment>
+        <div className="fixed inset-0 flex items-center justify-center z-[100]">
+          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm z-[101]"></div>
+          <div
+            className={`relative bg-white rounded-lg shadow-xl max-w-[500px] w-full p-10 m-5 z-[102]`}
+          >
+            <div className="w-full flex justify-center items-center text-lg md:text-xl font-bold mb-4">
+              Confirm Batch Creation
+            </div>
+            <p className="w-full text-center text-sm leading-6 text-gray-500 dark:text-gray-400 pt-4">
+              You are about to create a new Batch. Once created, it will be
+              added to the database.
+            </p>
+            <p className="w-full text-center text-sm leading-6 text-gray-500 dark:text-gray-400 pt-4">
+              Please review all the details — before proceeding.
+            </p>
+            <p className="w-full text-center text-sm leading-6 text-gray-500 dark:text-gray-400 py-4">
+              Are you sure you want to continue?
+            </p>
+            <div className="flex justify-center gap-2 mt-4">
+              <Button
+                width="w-[100px]"
+                variant="primary"
+                loading={create_loading}
+                on_click={handle_create}
+              >
+                Yes
+              </Button>
+              <Button
+                width="w-[100px]"
+                variant="white"
+                on_click={() => set_is_confirm_modal_open(false)}
+                disabled={create_loading}
+              >
+                No
+              </Button>
+            </div>
+          </div>
+        </div>
+      </React.Fragment>
+    );
   };
 
   const handle_go_back = () => {
@@ -76,7 +172,7 @@ const Create_New_Batch = ({
               </li>
               <li className="flex items-center gap-1.5 text-sm text-gray-500">
                 <span>/</span>
-                <span className="text-gray-800">Create New Batch</span>
+                <span className="text-gray-800">Create</span>
               </li>
             </ol>
           </nav>
@@ -225,14 +321,19 @@ const Create_New_Batch = ({
               <Button
                 variant="primary"
                 size="lg"
+                width="w-[120px]"
                 icon={CirclePlus}
                 icon_position="left"
-                loading={create_loading}
-                on_click={handle_create}
+                on_click={() => set_is_confirm_modal_open(true)}
               >
                 Create
               </Button>
-              <Button variant="white" size="lg" on_click={handle_go_back}>
+              <Button
+                variant="white"
+                size="lg"
+                width="w-[120px]"
+                on_click={handle_go_back}
+              >
                 Cancel
               </Button>
             </div>
@@ -260,7 +361,6 @@ const Create_New_Batch = ({
         plant_list={plant_list}
         branch_h_list={branch_h_list}
         set_data={set_new_batch_data}
-        // set_selected_item_list={set_selected_item_list}
       />
       <Select_SLOC
         is_open={display_modal === "select_sloc"}
@@ -272,7 +372,6 @@ const Create_New_Batch = ({
         sloc_list={sloc_list}
         plant_h_list={plant_h_list}
         set_data={set_new_batch_data}
-        // set_selected_item_list={set_selected_item_list}
       />
       <Select_Item
         is_open={display_modal === "select_item"}
@@ -281,8 +380,8 @@ const Create_New_Batch = ({
         plant_code={new_batch_data.plant_code}
         sloc_code={new_batch_data.sloc_code}
         set_data={set_new_batch_data}
-        // selected_item_list={selected_item_list}
       />
+      {is_confirm_modal_open && <Confirm_Modal />}
       {/* - Modals */}
     </React.Fragment>
   );

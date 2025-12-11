@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState } from "react";
 import { Database, Search, X } from "lucide-react";
 import Icon_Field from "assets/elements/Icon_Field";
 import Checkbox_Field from "assets/elements/Checkbox_Field";
@@ -6,61 +6,60 @@ import Button from "assets/elements/Button";
 import Pagination_Modal from "assets/elements/Pagination_Modal";
 import Date_Field from "assets/elements/Date_Field";
 import { format_date_1 } from "assets/scripts/format";
+import { api_get_purchase_order_list_by_date } from "api/firestore_db/inbound/purchase_order/tbl_purchase_order_api";
+import Spinner from "assets/elements/Spinner";
 
 const Select_PO = ({
   is_open,
   on_close,
   width = "max-w-[700px]",
   height = "h-[500px]",
-  set_page,
-  company_list,
+  show_toast,
+  po_start_date,
+  set_po_start_date,
+  po_end_date,
+  set_po_end_date,
   po_type_list,
+  set_new_gr_data,
+  set_page,
 }) => {
-  const [po_list, set_po_list] = useState([
-    {
-      id: 1,
-      po_number: "PO-0000001",
-      po_type_code: "PT-0001",
-      company_code: "COM-0001",
-      creation_date: "06-05-2025",
-    },
-    {
-      id: 2,
-      po_number: "PO-0000002",
-      po_type_code: "PT-0002",
-      company_code: "COM-0001",
-      creation_date: "06-05-2025",
-    },
-  ]);
-
-  const today = format_date_1(new Date());
-  const [start_date, set_start_date] = useState(today);
-  const [end_date, set_end_date] = useState(today);
   const [show_load_data_button, set_show_load_data_button] = useState(false);
+  const [loading_list, set_loading_list] = useState(false);
+  const [selected_po, set_selected_po] = useState({});
+  const [po_list, set_po_list] = useState([]);
 
   // + Client-Side Filtering
   const [filtered_po_list, set_filtered_po_list] = useState([]);
+  const [show_entries, set_show_entries] = useState(5);
   const [current_page, set_current_page] = useState(1);
-  const [rows_per_page, set_rows_per_page] = useState(5);
+  const [sort_by, set_sort_by] = useState("id");
+  const [sort_order, set_sort_order] = useState("asc");
   const [search_query, set_search_query] = useState("");
   const [debounced_query, set_debounced_query] = useState("");
-  const [selected_po, set_selected_po] = useState(null);
+  const [total_pages, set_total_pages] = useState(0);
+  // - Client-Side Filtering
 
-  const company_map = useMemo(
-    () =>
-      Object.fromEntries(
-        company_list.map((c) => [c.company_code, c.company_desc])
-      ),
-    [company_list]
-  );
-  const po_type_map = useMemo(
-    () =>
-      Object.fromEntries(
-        po_type_list.map((p) => [p.po_type_code, p.po_type_desc])
-      ),
-    [po_type_list]
-  );
+  const handle_get_purchase_order_list = async () => {
+    set_loading_list(true);
+    const response = await api_get_purchase_order_list_by_date(
+      po_start_date,
+      po_end_date,
+      show_toast
+    );
+    if (response.success) {
+      set_po_list(response.data);
+    } else {
+      console.error(response.message);
+    }
+    set_loading_list(false);
+    set_show_load_data_button(false);
+  };
 
+  useEffect(() => {
+    handle_get_purchase_order_list();
+  }, []);
+
+  // --- Debounce Search ---
   useEffect(() => {
     const timer = setTimeout(() => {
       set_debounced_query(search_query);
@@ -69,85 +68,86 @@ const Select_PO = ({
     return () => clearTimeout(timer);
   }, [search_query]);
 
+  // --- Filter, Sort & Paginate ---
   useEffect(() => {
-    let data = [...po_list];
+    let temp = [...po_list];
 
+    // --- SEARCH ---
     if (debounced_query.trim() !== "") {
       const q = debounced_query.toLowerCase();
 
-      data = data.filter((po) => {
+      temp = temp.filter((po) => {
         const po_type = po_type_list.find(
           (p) => p.po_type_code === po.po_type_code
         );
-        const company = company_list.find(
-          (c) => c.company_code === po.company_code
-        );
 
-        const combined = [
+        const fields = [
           po.po_number,
           po.po_type_code,
           po_type?.po_type_desc,
-          po.company_code,
-          company?.company_desc,
-        ]
-          .filter(Boolean)
-          .join(" ")
-          .toLowerCase();
+          po.creation_date,
+        ];
 
-        return combined.includes(q);
+        return fields.some((f) => f?.toString().toLowerCase().includes(q));
       });
     }
 
-    const start_idx = (current_page - 1) * rows_per_page;
-    const end_idx = start_idx + rows_per_page;
-    set_filtered_po_list(data.slice(start_idx, end_idx));
-  }, [po_list, debounced_query, current_page, rows_per_page]);
+    // --- SORT ---
+    temp.sort((a, b) => {
+      const val_a = a[sort_by];
+      const val_b = b[sort_by];
+      if (val_a == null) return 1;
+      if (val_b == null) return -1;
+      if (val_a < val_b) return sort_order === "asc" ? -1 : 1;
+      if (val_a > val_b) return sort_order === "asc" ? 1 : -1;
+      return 0;
+    });
 
-  const total_pages = Math.ceil(
-    po_list.filter((po) => {
-      const po_type_desc = po_type_map[po.po_type_code] || "";
-      const company_desc = company_map[po.company_code] || "";
-      const q = debounced_query.toLowerCase();
-      return (
-        po.po_number.toLowerCase().includes(q) ||
-        po_type_desc.toLowerCase().includes(q) ||
-        company_desc.toLowerCase().includes(q)
-      );
-    }).length / rows_per_page
-  );
+    // --- TOTAL PAGES ---
+    set_total_pages(Math.ceil(temp.length / show_entries));
+
+    // --- PAGINATION ---
+    const start_idx = (current_page - 1) * show_entries;
+    const end_idx = start_idx + show_entries;
+    set_filtered_po_list(temp.slice(start_idx, end_idx));
+  }, [
+    po_list,
+    debounced_query,
+    sort_by,
+    sort_order,
+    current_page,
+    show_entries,
+    po_type_list,
+  ]);
 
   const handle_page_change = (page) => set_current_page(page);
-  // - Client-Side Filtering
 
   const handle_proceed = () => {
-    console.log(selected_po);
     set_page("gr_creation");
+    set_new_gr_data(selected_po);
     set_selected_po(null);
     on_close();
   };
 
-  const handle_change_start_date = (value) => {
-    set_start_date(format_date_1(value));
+  const handle_change_po_start_date = (value) => {
+    set_po_start_date(format_date_1(value));
     set_show_load_data_button(true);
   };
 
-  const handle_change_end_date = (value) => {
-    set_end_date(format_date_1(value));
+  const handle_change_po_end_date = (value) => {
+    set_po_end_date(format_date_1(value));
     set_show_load_data_button(true);
   };
 
-  const handle_load_data = () => {
-    set_show_load_data_button(false);
-  };
+  const handle_load_data = () => handle_get_purchase_order_list();
 
   if (!is_open) return null;
 
-  // RETURN ORIGIN
   return (
     <div className="fixed inset-0 flex items-center justify-center z-[97] px-4">
       {/* + Blur */}
       <div className="absolute inset-0 bg-black/50 backdrop-blur-sm z-[98]"></div>
-      {/* - Blur */}
+
       {/* + Modal Content */}
       <div
         className={`relative bg-white rounded-lg shadow-xl ${width} w-full py-7 m-5 z-[99]`}
@@ -158,25 +158,25 @@ const Select_PO = ({
         >
           <X size={20} />
         </button>
-        {/* + Modal Label */}
+
         <div className="text-lg md:text-xl font-bold mb-5 px-7">
           Purchase Order Selection
         </div>
-        {/* - Modal Label */}
-        {/* + Modal Body */}
+
         <div className={`w-full overflow-y-auto ${height} scrollbar-custom`}>
           <div className="overflow-hidden border border-gray-200 bg-white pt-4">
+            {/* Date Filters */}
             <div className="px-6 mb-5 grid grid-cols-1 gap-5 md:w-[800px] md:grid-cols-3">
               <Date_Field
                 label="Start Date"
-                value={start_date}
-                on_change={(e) => handle_change_start_date(e.target.value)}
+                value={po_start_date}
+                on_change={(e) => handle_change_po_start_date(e.target.value)}
                 placeholder="Select Date"
               />
               <Date_Field
                 label="End Date"
-                value={end_date}
-                on_change={(e) => handle_change_end_date(e.target.value)}
+                value={po_end_date}
+                on_change={(e) => handle_change_po_end_date(e.target.value)}
                 placeholder="Select Date"
               />
               <div className="flex w-full items-end">
@@ -192,6 +192,8 @@ const Select_PO = ({
                 )}
               </div>
             </div>
+
+            {/* Search */}
             <div className="flex flex-col gap-5 px-6 mb-4 sm:flex-row sm:items-center sm:justify-between">
               <div className="w-full">
                 <Icon_Field
@@ -204,7 +206,8 @@ const Select_PO = ({
                 />
               </div>
             </div>
-            {/* + Table */}
+
+            {/* Table */}
             <div className="max-w-full overflow-x-auto custom-scrollbar">
               <table className="min-w-full whitespace-nowrap">
                 <thead className="border-gray-100 border-y bg-gray-50">
@@ -217,18 +220,24 @@ const Select_PO = ({
                       PO Type
                     </th>
                     <th className="px-6 py-3 text-gray-500 text-left">
-                      Company
-                    </th>
-                    <th className="px-6 py-3 text-gray-500 text-left">
                       Creation Date
                     </th>
                   </tr>
                 </thead>
+
                 <tbody className="divide-y divide-gray-100">
-                  {filtered_po_list.length === 0 ? (
+                  {loading_list ? (
+                    <tr>
+                      <td colSpan={4} className="py-6">
+                        <div className="flex justify-center items-center">
+                          <Spinner />
+                        </div>
+                      </td>
+                    </tr>
+                  ) : filtered_po_list.length === 0 ? (
                     <tr>
                       <td
-                        colSpan={5}
+                        colSpan={4}
                         className="text-center py-6 text-gray-500 text-sm"
                       >
                         No data found
@@ -238,9 +247,6 @@ const Select_PO = ({
                     filtered_po_list.map((po) => {
                       const po_type = po_type_list.find(
                         (p) => p.po_type_code === po.po_type_code
-                      );
-                      const company = company_list.find(
-                        (c) => c.company_code === po.company_code
                       );
 
                       return (
@@ -252,25 +258,23 @@ const Select_PO = ({
                           onClick={() => set_selected_po(po)}
                         >
                           <td className="px-5 py-4 sm:px-6 text-center">
-                            <div className="flex justify-center items-center">
-                              <Checkbox_Field
-                                name="check"
-                                box_size={20}
-                                icon_size={14}
-                                checked={selected_po?.id === po.id}
-                                on_change={() => set_selected_po(po)}
-                              />
-                            </div>
+                            <Checkbox_Field
+                              name="check"
+                              box_size={20}
+                              icon_size={14}
+                              checked={selected_po?.id === po.id}
+                              on_change={() => set_selected_po(po)}
+                            />
                           </td>
 
                           <td className="px-5 py-4 sm:px-6">
-                            <div className="block font-medium text-gray-800">
+                            <div className="font-medium text-gray-800">
                               {po.po_number}
                             </div>
                           </td>
 
                           <td className="px-5 py-4 sm:px-6">
-                            <div className="block font-medium">
+                            <div className="font-medium">
                               <span className="block text-gray-500 text-[10px]">
                                 {po_type?.po_type_code || "-"}
                               </span>
@@ -279,18 +283,9 @@ const Select_PO = ({
                               </span>
                             </div>
                           </td>
+
                           <td className="px-5 py-4 sm:px-6">
-                            <div className="block font-medium">
-                              <span className="block text-gray-500 text-[10px]">
-                                {company?.company_code || "-"}
-                              </span>
-                              <span className="block text-gray-800">
-                                {company?.company_desc || "-"}
-                              </span>
-                            </div>
-                          </td>
-                          <td className="px-5 py-4 sm:px-6">
-                            <div className="block font-medium text-gray-800 tracking-wide">
+                            <div className="font-medium text-gray-800 tracking-wide">
                               {po.creation_date}
                             </div>
                           </td>
@@ -304,43 +299,38 @@ const Select_PO = ({
             {/* - Table */}
           </div>
         </div>
-        {/* - Modal Body */}
-        {/* + Modal Footer */}
+
+        {/* Footer */}
         <div className="flex flex-col items-center sm:flex-row sm:justify-between gap-3 mt-5 px-7">
-          {/* + Pagination */}
-          {total_pages > 0 && (
-            <div className="w-full sm:w-auto">
+          <div>
+            {total_pages > 0 && (
               <Pagination_Modal
                 current_page={current_page}
                 total_pages={total_pages}
                 on_page_change={handle_page_change}
               />
-            </div>
-          )}
-          {/* - Pagination */}
-          {/* + Action Buttons */}
+            )}
+          </div>
           <div className="flex justify-center sm:justify-end gap-2 w-full">
             <Button
               variant="primary"
               on_click={handle_proceed}
               class_name="w-full md:w-[100px]"
-              disabled={!selected_po}
+              disabled={!selected_po || po_list.length === 0}
             >
               Proceed
             </Button>
+
             <Button
               variant="white"
               on_click={on_close}
-              class_name="w-full md:w-[100px]"
+              className="w-full md:w-[100px]"
             >
               Close
             </Button>
           </div>
-          {/*  Action Buttons */}
         </div>
-        {/* - Modal Footer */}
       </div>
-      {/* - Modal Content */}
     </div>
   );
 };

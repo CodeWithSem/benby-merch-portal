@@ -4,6 +4,7 @@ export const TABLES = {
   // + Inbound Module ==================================
   PURCHASE_ORDER: "TBL_PURCHASE_ORDER",
   VENDOR_MASTER: "TBL_VENDOR_MASTER",
+  BATCH_MASTER: "TBL_BATCH_MASTER",
   // - Inbound Module ==================================
   // + Warhouse Module =================================
   ITEM_MASTER: "TBL_ITEM_MASTER",

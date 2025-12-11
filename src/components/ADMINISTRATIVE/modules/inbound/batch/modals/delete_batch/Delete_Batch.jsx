@@ -3,12 +3,34 @@ import Text_Field from "assets/elements/Text_Field";
 import Button from "assets/elements/Button";
 import { X } from "lucide-react";
 import Text_Code_Field from "assets/elements/Text_Code_Field";
+import { item_master_list } from "../../BATCH_DATA_MAP";
+import { get_description } from "assets/scripts/functions/get_description";
+import { api_delete_batch_master } from "api/firestore_db/inbound/batch/tbl_batch_master_api";
 
-const Delete_Batch = ({ is_open, on_close, width = "max-w-[700px]" }) => {
+const Delete_Batch = ({
+  is_open,
+  on_close,
+  width = "max-w-[700px]",
+  show_toast,
+  delete_batch_data,
+  set_batch_list,
+}) => {
   const [is_confirm_modal_open, set_is_confirm_modal_open] = useState(false);
+  const [delete_loading, set_delete_loading] = useState(false);
 
-  const handle_delete_batch = () => {
-    alert("Delete Batch");
+  const handle_delete = async (id) => {
+    try {
+      set_delete_loading(true);
+      const response = await api_delete_batch_master(id, show_toast);
+      if (response.success) {
+        set_batch_list((prev) => prev.filter((item) => item.id !== id));
+        on_close();
+      }
+    } catch (error) {
+      console.error(error);
+    } finally {
+      set_delete_loading(false);
+    }
   };
 
   const Confirm_Modal = () => {
@@ -40,7 +62,8 @@ const Delete_Batch = ({ is_open, on_close, width = "max-w-[700px]" }) => {
               <Button
                 width="w-[100px]"
                 variant="danger"
-                on_click={handle_delete_batch}
+                loading={delete_loading}
+                on_click={() => handle_delete(delete_batch_data.id)}
               >
                 Yes
               </Button>
@@ -48,6 +71,7 @@ const Delete_Batch = ({ is_open, on_close, width = "max-w-[700px]" }) => {
                 width="w-[100px]"
                 variant="white"
                 on_click={() => set_is_confirm_modal_open(false)}
+                disabled={delete_loading}
               >
                 No
               </Button>
@@ -99,10 +123,17 @@ const Delete_Batch = ({ is_open, on_close, width = "max-w-[700px]" }) => {
                         <div>
                           <Text_Code_Field
                             label="Item"
-                            // code_value={search_value}
-                            // text_value={search_value}
                             code_width="150px"
                             show_search_button={false}
+                            code_value={delete_batch_data.item_code}
+                            text_value={get_description(
+                              delete_batch_data.item_code,
+                              item_master_list,
+                              "item_code",
+                              "item_desc"
+                            )}
+                            bg_dis_color="bg-slate-50"
+                            text_dis_color="text-slate-500"
                             disabled
                           />
                         </div>
@@ -110,6 +141,7 @@ const Delete_Batch = ({ is_open, on_close, width = "max-w-[700px]" }) => {
                           <Text_Field
                             label="Batch Code"
                             type={"text"}
+                            value={delete_batch_data.batch_code} //--> batch_code
                             disabled
                           />
                         </div>
@@ -117,6 +149,7 @@ const Delete_Batch = ({ is_open, on_close, width = "max-w-[700px]" }) => {
                           <Text_Field
                             label="Batch Description"
                             type={"text"}
+                            value={delete_batch_data.batch_desc} //--> batch_desc
                             disabled
                           />
                         </div>

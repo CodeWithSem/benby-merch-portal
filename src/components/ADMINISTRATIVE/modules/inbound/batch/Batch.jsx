@@ -9,6 +9,7 @@ import {
   PlusCircle,
   RefreshCw,
   FileUp,
+  Trash2,
 } from "lucide-react";
 import { useToast } from "../../../layout/Toast_Provider";
 import { branch_list, plant_list, sloc_list } from "./BATCH_DATA_MAP";
@@ -22,70 +23,73 @@ import Select_Branch from "./modals/Select_Branch";
 import Select_Plant from "./modals/Select_Plant";
 import Select_SLOC from "./modals/Select_SLOC";
 import Select_Item from "./modals/Select_Item";
-import VIew_Batch from "./view_batch/VIew_Batch";
+import View_Batch from "./view_batch/View_Batch";
 import Delete_Batch from "./modals/delete_batch/Delete_Batch";
 import Button_Action from "assets/elements/Button_Action";
+import { Use_App } from "context/app_context";
+import {
+  api_get_batch_master_list,
+  api_truncate_batch_master,
+} from "api/firestore_db/inbound/batch/tbl_batch_master_api";
+import Spinner from "assets/elements/Spinner";
 
 const Batch = () => {
+  const { active_user } = Use_App();
   const { show_toast } = useToast();
   const [page, set_page] = useState("main");
   const [display_modal, set_display_modal] = useState("");
   const [loading_list, set_loading_list] = useState(false);
-  const [selected_branch, set_selected_branch] = useState({
-    branch_code: "BR-0001",
-  });
-  const [selected_plant, set_selected_plant] = useState({
-    plant_code: "PL-0001",
-  });
-  const [selected_sloc, set_selected_sloc] = useState({ sloc_code: "SL-0001" });
-  const [selected_item, set_selected_item] = useState({
-    item_code: "ITM-000000001",
-  });
+  const [truncate_loading, set_truncate_loading] = useState(false);
 
   const [new_batch_data, set_new_batch_data] = useState({});
+  const [edit_batch_data, set_edit_batch_data] = useState({});
+  const [delete_batch_data, set_delete_batch_data] = useState({});
+  const [view_batch_data, set_view_batch_data] = useState({});
 
   const columns = [
+    { key: "index", label: "#", sortable: false },
     { key: "batch_code", label: "Batch Code", sortable: true },
     { key: "batch_desc", label: "Batch Description", sortable: true },
-    { key: "item_code", label: "Item", sortable: true },
+    { key: "item_code", label: "Item Code", sortable: true },
     { key: "manufacture_date", label: "Manufacturing Date", sortable: true },
     { key: "sled_bbd", label: "SLED / BBD", sortable: true },
-    { key: "creation_date", label: "Creation Date", sortable: true },
+    // { key: "creation_date", label: "Creation Date", sortable: true },
     { key: "actions", label: "", sortable: false },
   ];
 
-  const [batch_list, set_batch_list] = useState([
-    {
-      id: 1,
-      batch_code: "000000001-B-001",
-      batch_desc: "Batch Description 1",
-      branch_code: "BR-0001",
-      plant_code: "PL-0001",
-      sloc_code: "SL-0001",
-      item_code: "ITM-000000001",
-      manufacture_date: "MM-DD-YYYY",
-      sled_bbd: "MM-DD-YYYY",
-      creation_date: "MM-DD-YYYY",
-    },
-    {
-      id: 2,
-      batch_code: "000000002-B-002",
-      batch_desc: "Batch Description 2",
-      branch_code: "BR-0002",
-      plant_code: "PL-0002",
-      sloc_code: "SL-0002",
-      item_code: "ITM-000000002",
-      manufacture_date: "MM-DD-YYYY",
-      sled_bbd: "MM-DD-YYYY",
-      creation_date: "MM-DD-YYYY",
-    },
-  ]);
+  const [batch_list, set_batch_list] = useState([]);
+
+  const handle_get_batch_master_list = async () => {
+    set_loading_list(true);
+    const response = await api_get_batch_master_list();
+    if (response.success) {
+      set_batch_list(response.data);
+    } else {
+      console.error(response.message);
+    }
+    set_loading_list(false);
+  };
+
+  useEffect(() => {
+    handle_get_batch_master_list();
+  }, []);
+
+  const handle_truncate_batch_master_list = async () => {
+    set_truncate_loading(true);
+    const response = await api_truncate_batch_master(show_toast);
+    if (response.success) {
+      handle_get_batch_master_list();
+    } else {
+      console.error(response.message);
+    }
+    set_truncate_loading(false);
+  };
 
   // + Client-Side Filtering
   const [filtered_batch_list, set_filtered_batch_list] = useState([]);
   const [show_entries, set_show_entries] = useState(5);
   const [current_page, set_current_page] = useState(1);
-  const [sort_by, set_sort_by] = useState("timestamp");
+  const [sort_by, set_sort_by] = useState("id");
   const [sort_order, set_sort_order] = useState("asc");
   const [search_query, set_search_query] = useState("");
   const [debounced_query, set_debounced_query] = useState("");
@@ -124,13 +128,14 @@ const Batch = () => {
 
     const start_idx = (current_page - 1) * show_entries;
     const end_idx = start_idx + show_entries;
-    set_filtered_batch_list(temp.slice(start_idx, end_idx));
+    const sliced = temp.slice(start_idx, end_idx);
+    const indexed_data = sliced.map((item, i) => ({
+      ...item,
+      index: start_idx + i + 1,
+    }));
+    set_filtered_batch_list(indexed_data);
   }, [
     batch_list,
-    selected_branch,
-    selected_plant,
-    selected_sloc,
-    selected_item,
     debounced_query,
     sort_by,
     sort_order,
@@ -170,13 +175,21 @@ const Batch = () => {
 
   const handle_upload_batch = () => alert("Under Maintenance");
 
-  const handle_view_batch = (id) => set_page("view_batch");
+  const handle_view_batch = (data) => {
+    console.table(data);
+    set_view_batch_data(data);
+    set_page("view_batch");
+  };
 
-  const handle_edit_batch = (id) => {
+  const handle_edit_batch = (data) => {
+    set_edit_batch_data(data);
     set_page("edit_batch");
   };
 
-  const handle_delete_batch = (id) => set_display_modal("delete_batch");
+  const handle_delete_batch = (data) => {
+    set_delete_batch_data(data);
+    set_display_modal("delete_batch");
+  };
 
   // RETURN ORIGIN
   return (
@@ -212,6 +225,19 @@ const Batch = () => {
             <div className="flex flex-wrap items-center justify-between gap-3 p-5">
               <h1 className="text-lg">Batch</h1>
               <div className="flex gap-2">
+                {active_user?.category === "DEV" && (
+                  <Button
+                    variant="danger"
+                    icon={Trash2}
+                    icon_position="left"
+                    width="w-[110px]"
+                    loading={truncate_loading}
+                    on_click={handle_truncate_batch_master_list}
+                    disabled={batch_list.length === 0}
+                  >
+                    Truncate
+                  </Button>
+                )}
                 <Button
                   variant="primary"
                   icon={PlusCircle}
@@ -258,6 +284,7 @@ const Batch = () => {
                       variant="white"
                       icon={RefreshCw}
                       icon_position="left"
+                      on_click={handle_get_batch_master_list}
                     />
                   </div>
                   <div className="w-full mt-4 md:mt-0 md:w-[600px]">
@@ -276,8 +303,8 @@ const Batch = () => {
                 </div>
                 <div className="overflow-x-auto">
                   {loading_list ? (
-                    <div className="p-6 text-center text-gray-500 text-sm">
-                      Loading...
+                    <div className="p-6 flex justify-center items-center text-gray-500 text-sm">
+                      <Spinner />
                     </div>
                   ) : filtered_batch_list.length === 0 ? (
                     <div className="p-6 text-center text-gray-500 text-sm">
@@ -328,6 +355,9 @@ const Batch = () => {
                         {filtered_batch_list.map((row, idx) => {
                           const render_cell = (col, row) => {
                             const value = row[col.key];
+                            if (col.key === "index") {
+                              return <span>{row.index}</span>;
+                            }
                             if (col.key === "actions") {
                               return (
                                 <div className="flex gap-2">
@@ -335,14 +365,14 @@ const Batch = () => {
                                     <Button_Action
                                       icon={View}
                                       tooltip="View Record"
-                                      on_click={() => handle_view_batch(row.id)}
+                                      on_click={() => handle_view_batch(row)}
                                     />
                                   </div>
                                   <div className="relative group flex jusity-center items-center">
                                     <Button_Action
                                       icon={Edit}
                                       tooltip="Edit Record"
-                                      on_click={() => handle_edit_batch(row.id)}
+                                      on_click={() => handle_edit_batch(row)}
                                     />
                                   </div>
                                   <div className="relative group flex jusity-center items-center">
@@ -351,9 +381,7 @@ const Batch = () => {
                                       icon={Trash}
                                       variant="danger"
                                       tooltip="Delete Record"
-                                      on_click={() =>
-                                        handle_delete_batch(row.id)
-                                      }
+                                      on_click={() => handle_delete_batch(row)}
                                     />
                                   </div>
                                 </div>
@@ -406,13 +434,26 @@ const Batch = () => {
       {page === "batch_creation" && (
         <Create_New_Batch
           set_page={set_page}
+          active_user={active_user}
           show_toast={show_toast}
           new_batch_data={new_batch_data}
           set_new_batch_data={set_new_batch_data}
+          set_batch_list={set_batch_list}
         />
       )}
-      {page === "edit_batch" && <Edit_Batch set_page={set_page} />}
-      {page === "view_batch" && <VIew_Batch set_page={set_page} />}
+      {page === "edit_batch" && (
+        <Edit_Batch
+          set_page={set_page}
+          active_user={active_user}
+          show_toast={show_toast}
+          edit_batch_data={edit_batch_data}
+          set_edit_batch_data={set_edit_batch_data}
+          set_batch_list={set_batch_list}
+        />
+      )}
+      {page === "view_batch" && (
+        <View_Batch set_page={set_page} view_batch_data={view_batch_data} />
+      )}
       {/* - Pages */}
       {/* + Modals */}
       <Select_Branch
@@ -447,6 +488,9 @@ const Batch = () => {
         on_close={() => set_display_modal("")}
         width="max-w-[1000px]"
         height="max-h-[700px]"
+        show_toast={show_toast}
+        delete_batch_data={delete_batch_data}
+        set_batch_list={set_batch_list}
       />
       {/* - Modals */}
     </React.Fragment>
