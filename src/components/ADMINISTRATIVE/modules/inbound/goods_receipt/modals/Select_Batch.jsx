@@ -239,7 +239,7 @@ const Select_Batch = ({
                         current_page={current_page}
                         total_pages={total_pages}
                         on_page_change={set_current_page}
-                        show_simple_page={true}
+                        // show_simple_page={true}
                       />
                     </div>
                   )}
@@ -321,6 +321,12 @@ const Select_Batch = ({
                     disabled
                   />
                   <Text_Field
+                    label="Total Batch Qty"
+                    type="text"
+                    value={total_batch_qty}
+                    disabled
+                  />
+                  <Text_Field
                     label="Received Quantity"
                     type="number"
                     placeholder="0"
@@ -330,12 +336,6 @@ const Select_Batch = ({
                       set_quantity_received(parseInt(e.target.value) || "")
                     }
                     disabled={for_posting}
-                  />
-                  <Text_Field
-                    label="Total Batch Qty"
-                    type="text"
-                    value={total_batch_qty}
-                    disabled
                   />
                 </div>
               </div>

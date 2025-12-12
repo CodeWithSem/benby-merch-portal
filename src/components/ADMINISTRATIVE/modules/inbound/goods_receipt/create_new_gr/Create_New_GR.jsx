@@ -12,9 +12,38 @@ const Create_New_GR = ({
   set_new_gr_data,
 }) => {
   const handle_create_gr = () => {
-    // console.table(new_gr_data);
-    console.log(batch_list);
-    alert("Under Maintenance");
+    const received_items = new_gr_data.selected_item_list.filter(
+      (item) => item.quantity_received && item.quantity_received > 0
+    );
+    const gr_data = {
+      id: 1,
+      po_number: new_gr_data.po_number,
+      gr_number: "n/a",
+      creation_date: "MM-DD-YYYY",
+      received_item_list: received_items,
+    };
+
+    const { id } = new_gr_data;
+    const cleaned_parent = { id };
+    const cleaned = new_gr_data.selected_item_list.map(
+      ({ batch, batch_list, quantity_received, quantity_left, ...rest }) => ({
+        ...rest,
+        quantity_open: quantity_left, // set quantity_open = quantity_left
+        quantity_left: quantity_left,
+      })
+    );
+    const new_po_data = {
+      ...cleaned_parent,
+      selected_item_list: cleaned,
+    };
+
+    console.log("GR DATA");
+    console.log(gr_data);
+    console.log("PO DATA");
+    console.log(new_po_data);
+    console.log("ORIGINAL PO DATA");
+    console.log(new_gr_data);
+    // alert("Under Maintenance");
   };
 
   const handle_go_back = () => {
