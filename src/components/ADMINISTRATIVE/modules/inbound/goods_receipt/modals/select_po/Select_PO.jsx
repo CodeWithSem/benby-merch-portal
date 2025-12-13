@@ -23,7 +23,7 @@ const Select_PO = ({
   set_new_gr_data,
   set_page,
 }) => {
-  const [show_load_data_button, set_show_load_data_button] = useState(false);
+  const [show_load_data_button, set_show_load_data_button] = useState(true);
   const [loading_list, set_loading_list] = useState(false);
   const [selected_po, set_selected_po] = useState({});
   const [po_list, set_po_list] = useState([]);
@@ -52,7 +52,7 @@ const Select_PO = ({
       console.error(response.message);
     }
     set_loading_list(false);
-    set_show_load_data_button(false);
+    // set_show_load_data_button(false);
   };
 
   useEffect(() => {
@@ -70,7 +70,10 @@ const Select_PO = ({
 
   // --- Filter, Sort & Paginate ---
   useEffect(() => {
-    let temp = [...po_list];
+    let temp = po_list.filter(
+      (po) =>
+        po.po_status === "Approved" || po.po_status === "Partially Received"
+    );
 
     // --- SEARCH ---
     if (debounced_query.trim() !== "") {
@@ -131,12 +134,12 @@ const Select_PO = ({
 
   const handle_change_po_start_date = (value) => {
     set_po_start_date(format_date_1(value));
-    set_show_load_data_button(true);
+    // set_show_load_data_button(true);
   };
 
   const handle_change_po_end_date = (value) => {
     set_po_end_date(format_date_1(value));
-    set_show_load_data_button(true);
+    // set_show_load_data_button(true);
   };
 
   const handle_load_data = () => handle_get_purchase_order_list();
@@ -184,7 +187,9 @@ const Select_PO = ({
                   <Button
                     variant="primary"
                     icon={Database}
+                    width="w-[150px]"
                     icon_position="left"
+                    loading={loading_list}
                     on_click={handle_load_data}
                   >
                     Load Data

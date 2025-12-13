@@ -5,7 +5,7 @@ import Icon_Field from "assets/elements/Icon_Field";
 import Select_Batch from "../../modals/Select_Batch";
 import Button from "assets/elements/Button";
 
-const GR_Items = ({ batch_list, new_gr_data, set_new_gr_data }) => {
+const GR_Items = ({ show_toast, batch_list, new_gr_data, set_new_gr_data }) => {
   const [selected_item_id, set_selected_item_id] = useState(null);
   const [selected_receive_item, set_selected_receive_item] = useState({});
   const [display_item_modal, set_display_item_modal] = useState("");
@@ -82,53 +82,55 @@ const GR_Items = ({ batch_list, new_gr_data, set_new_gr_data }) => {
                 </tr>
               </thead>
               <tbody className="divide-y bg-white">
-                {new_gr_data.selected_item_list.map((item, index) => (
-                  <tr
-                    key={item.id}
-                    className={`text-xs cursor-pointer ${
-                      selected_item_id === item.id
-                        ? "bg-sky-50"
-                        : "hover:bg-gray-50/50"
-                    }`}
-                    onClick={() => set_selected_item_id(item.id)}
-                  >
-                    <td className="px-5 py-4 text-gray-500 border-r">
-                      {index + 1}
-                    </td>
-                    <td className="px-5 py-4 font-medium text-gray-800 whitespace-normal break-words border-r">
-                      {item.item_desc}
-                    </td>
-                    <td className="px-5 py-4 text-gray-600 border-r">
-                      {item.quantity}
-                    </td>
-                    <td className="px-5 py-4 text-gray-600 border-r">
-                      {item.uom}
-                    </td>
-                    <td className="px-5 py-4 text-gray-600 border-r">
-                      {item.quantity_open}
-                    </td>
-                    <td className="px-5 py-4 text-gray-600 border-r">
-                      {item.quantity_received}
-                    </td>
-                    <td className="px-5 py-4 text-gray-600 border-r">
-                      {item.quantity_left}
-                    </td>
-                    <td className="px-5 py-4 text-gray-600 border-r">
-                      {item.batch}
-                    </td>
-                    <td className="px-5 py-2 text-gray-600">
-                      <Button
-                        variant="primary"
-                        size="sm"
-                        icon={PackagePlus}
-                        icon_position="left"
-                        on_click={() => handle_select_receive_item(item)}
-                      >
-                        Receive
-                      </Button>
-                    </td>
-                  </tr>
-                ))}
+                {new_gr_data.selected_item_list
+                  .filter((item) => Number(item.quantity_open) > 0)
+                  .map((item, index) => (
+                    <tr
+                      key={item.id}
+                      className={`text-xs cursor-pointer ${
+                        selected_item_id === item.id
+                          ? "bg-sky-50"
+                          : "hover:bg-gray-50/50"
+                      }`}
+                      onClick={() => set_selected_item_id(item.id)}
+                    >
+                      <td className="px-5 py-4 text-gray-500 border-r">
+                        {index + 1}
+                      </td>
+                      <td className="px-5 py-4 font-medium text-gray-800 whitespace-normal break-words border-r">
+                        {item.item_desc}
+                      </td>
+                      <td className="px-5 py-4 text-gray-600 border-r">
+                        {item.quantity}
+                      </td>
+                      <td className="px-5 py-4 text-gray-600 border-r">
+                        {item.uom}
+                      </td>
+                      <td className="px-5 py-4 text-gray-600 border-r">
+                        {item.quantity_open}
+                      </td>
+                      <td className="px-5 py-4 text-gray-600 border-r">
+                        {item.quantity_received}
+                      </td>
+                      <td className="px-5 py-4 text-gray-600 border-r">
+                        {item.quantity_left}
+                      </td>
+                      <td className="px-5 py-4 text-gray-600 border-r">
+                        {item.batch}
+                      </td>
+                      <td className="px-5 py-2 text-gray-600">
+                        <Button
+                          variant="primary"
+                          size="sm"
+                          icon={PackagePlus}
+                          icon_position="left"
+                          on_click={() => handle_select_receive_item(item)}
+                        >
+                          Receive
+                        </Button>
+                      </td>
+                    </tr>
+                  ))}
               </tbody>
             </table>
           </div>
@@ -149,6 +151,7 @@ const GR_Items = ({ batch_list, new_gr_data, set_new_gr_data }) => {
         on_close={() => set_display_item_modal("")}
         width="max-w-[1000px]"
         height="max-h-[500px]"
+        show_toast={show_toast}
         batch_list={batch_list}
         selected_receive_item={selected_receive_item}
         selected_batches_param={

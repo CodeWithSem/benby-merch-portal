@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Text_Field from "assets/elements/Text_Field";
 import Button from "assets/elements/Button";
-import { Search, X } from "lucide-react";
+import { CheckCircle2, ChevronsDown, CircleX, Search, X } from "lucide-react";
 import Icon_Field from "assets/elements/Icon_Field";
 import Checkbox_Field from "assets/elements/Checkbox_Field";
 import Pagination_Modal from "assets/elements/Pagination_Modal";
@@ -11,6 +11,7 @@ const Select_Batch = ({
   on_close,
   width = "max-w-[700px]",
   height = "max-h-[500px]",
+  show_toast,
   for_posting = false,
   selected_batches_param = [],
   batch_list,
@@ -28,13 +29,13 @@ const Select_Batch = ({
 
   // Initialize modal state
   useEffect(() => {
-    if (is_open) {
-      set_selected_batches(selected_batches_param || []);
-      set_quantity_received(selected_receive_item?.quantity_received || "");
-      set_open_qty(selected_receive_item?.quantity_open || 0);
-      set_current_page(1);
-    }
-  }, [is_open, selected_receive_item, selected_batches_param]);
+    if (!is_open) return;
+
+    set_selected_batches(selected_batches_param || []);
+    set_quantity_received(selected_receive_item?.quantity_received ?? "");
+    set_open_qty(selected_receive_item?.quantity_open ?? 0);
+    set_current_page(1);
+  }, [is_open, selected_receive_item?.id]);
 
   // Select/Deselect batch
   const handle_select_batch = (batch) => {
@@ -107,17 +108,32 @@ const Select_Batch = ({
     const qty_received = parseInt(quantity_received || 0);
 
     if (qty_received <= 0) {
-      alert("Quantity Received must be greater than 0");
+      show_toast({
+        type: "danger",
+        title: "Invalid",
+        message: "Received quantity must be greater than 0.",
+        icon: <CircleX size={21} className="text-red-500" />,
+      });
       return;
     }
 
     if (qty_received > selected_receive_item.quantity_open) {
-      alert("Quantity Received cannot exceed Open Qty");
+      show_toast({
+        type: "danger",
+        title: "Invalid",
+        message: "Received quantity cannot exceed open quantity.",
+        icon: <CircleX size={21} className="text-red-500" />,
+      });
       return;
     }
 
     if (total_batch_qty !== qty_received) {
-      alert("Total batch quantities must equal Quantity Received");
+      show_toast({
+        type: "danger",
+        title: "Invalid",
+        message: "Batch and received quantity must be equal.",
+        icon: <CircleX size={21} className="text-red-500" />,
+      });
       return;
     }
 
@@ -246,6 +262,9 @@ const Select_Batch = ({
                 </div>
               </div>
             )}
+            <div className={`w-full flex justify-center items-center`}>
+              <ChevronsDown size={32} color="#0284C7" />
+            </div>
             {/* Selected Batch List */}
             <div className={`w-full`}>
               <div className="overflow-hidden rounded-lg border border-gray-200 bg-white pt-4">
@@ -321,7 +340,7 @@ const Select_Batch = ({
                     disabled
                   />
                   <Text_Field
-                    label="Total Batch Qty"
+                    label="Total Batch Quantity"
                     type="text"
                     value={total_batch_qty}
                     disabled

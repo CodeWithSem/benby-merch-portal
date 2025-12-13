@@ -9,6 +9,7 @@ import {
   writeBatch,
   query,
   where,
+  updateDoc,
 } from "firebase/firestore";
 import {
   convert_date_to_sort,
@@ -220,6 +221,81 @@ export const api_update_purchase_order = async (
   }
 };
 // - [Update]
+// + [Update Selected Item List + PO Status]
+export const api_update_po_selected_item_list = async (
+  po_id,
+  selected_item_list,
+  show_toast
+) => {
+  try {
+    if (!po_id) {
+      return {
+        success: false,
+        message: "PO ID is required.",
+      };
+    }
+
+    if (!Array.isArray(selected_item_list)) {
+      return {
+        success: false,
+        message: "Selected item list is invalid.",
+      };
+    }
+
+    // ---------------------------------------------------
+    // 1. DETERMINE PO STATUS
+    // ---------------------------------------------------
+    const is_fully_received = selected_item_list.every(
+      (item) => Number(item.quantity_left) === 0
+    );
+
+    const po_status = is_fully_received
+      ? "Fully Received"
+      : "Partially Received";
+
+    // ---------------------------------------------------
+    // 2. UPDATE FIRESTORE
+    // ---------------------------------------------------
+    const tbl_path = get_firestore_path(TABLES.PURCHASE_ORDER);
+    const doc_ref = doc(firestore_db, ...tbl_path, String(po_id));
+
+    await updateDoc(doc_ref, {
+      selected_item_list,
+      po_status,
+    });
+
+    show_toast({
+      type: "success",
+      title: "Updated Successfully",
+      message: "The record has been updated.",
+      icon: <CheckCircle2 size={21} className="text-green-500" />,
+    });
+
+    return {
+      success: true,
+      id: po_id,
+      data: {
+        selected_item_list,
+        po_status,
+      },
+    };
+  } catch (error) {
+    console.error("Error updating PO selected_item_list: ", error);
+
+    show_toast({
+      type: "danger",
+      title: "Error",
+      message: "Something went wrong. Please try again.",
+      icon: <CircleX size={21} className="text-red-500" />,
+    });
+
+    return {
+      success: false,
+      message: error.message || "Failed to update data",
+    };
+  }
+};
+// - [Update Selected Item List + PO Status]
 // + [Post]
 export const api_post_purchase_order = async (post_data, user, show_toast) => {
   try {

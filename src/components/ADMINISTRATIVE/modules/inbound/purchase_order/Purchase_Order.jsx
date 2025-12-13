@@ -66,7 +66,15 @@ const Purchase_Order = () => {
   const today = format_date_1(new Date());
   const [start_date, set_start_date] = useState(today);
   const [end_date, set_end_date] = useState(today);
-  const [show_load_data_button, set_show_load_data_button] = useState(false);
+  const [show_load_data_button, set_show_load_data_button] = useState(true);
+  const [status_filters, set_status_filters] = useState({
+    Draft: true,
+    Pending: true,
+    Approved: true,
+    Posted: true,
+    "Partially Received": true,
+    "Fully Received": true,
+  });
   // - Variables
 
   const [current_id, set_current_id] = useState(0);
@@ -114,7 +122,7 @@ const Purchase_Order = () => {
       console.error(response.message);
     }
     set_loading_list(false);
-    set_show_load_data_button(false);
+    // set_show_load_data_button(false);
   };
 
   useEffect(() => {
@@ -166,6 +174,17 @@ const Purchase_Order = () => {
   useEffect(() => {
     let temp = [...po_list];
 
+    // ---------------------------------------------------
+    // PO STATUS FILTER
+    // ---------------------------------------------------
+    const active_statuses = Object.keys(status_filters).filter(
+      (status) => status_filters[status]
+    );
+
+    if (active_statuses.length > 0) {
+      temp = temp.filter((po) => active_statuses.includes(po.po_status));
+    }
+
     if (debounced_query.trim() !== "") {
       const q = debounced_query.toLowerCase();
       temp = temp.filter((u) =>
@@ -197,6 +216,7 @@ const Purchase_Order = () => {
     sort_order,
     current_page,
     show_entries,
+    status_filters,
   ]);
 
   const total_pages = Math.ceil(
@@ -263,6 +283,13 @@ const Purchase_Order = () => {
     },
   ];
 
+  const toggle_status_filter = (status) => {
+    set_status_filters((prev) => ({
+      ...prev,
+      [status]: !prev[status],
+    }));
+  };
+
   const handle_create_new_po = () => {
     set_display_modal("select_po_type_h");
   };
@@ -300,12 +327,12 @@ const Purchase_Order = () => {
 
   const handle_change_start_date = (value) => {
     set_start_date(format_date_1(value));
-    set_show_load_data_button(true);
+    // set_show_load_data_button(true);
   };
 
   const handle_change_end_date = (value) => {
     set_end_date(format_date_1(value));
-    set_show_load_data_button(true);
+    // set_show_load_data_button(true);
   };
 
   const handle_load_data = () => {
@@ -392,7 +419,7 @@ const Purchase_Order = () => {
               {/* + Section 1 */}
               <div className="p-5 sm:p-6 border-t">
                 {/* + Date Range Filter */}
-                <div className="grid grid-cols-1 gap-5 md:w-[250px]">
+                <div className="grid grid-cols-1 gap-5 md:w-[220px]">
                   <Date_Field
                     label="Start Date"
                     value={start_date}
@@ -480,43 +507,61 @@ const Purchase_Order = () => {
                                 className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40"
                                 onClick={() => set_show_filter(false)}
                               ></div>
-                              <div className="absolute top-full mt-2 right-0 z-50 bg-white border rounded-lg shadow-md p-4 w-[260px]">
+                              <div className="absolute top-full mt-2 right-0 z-50 bg-white border rounded-lg shadow-md p-4 w-[260px] mb-[40]">
                                 <div className="mt-2">
                                   <h1 className="mb-3 text-gray-600 text-sm">
                                     PO Status
                                   </h1>
                                   <div className="grid grid-cols-1 gap-3">
                                     <Checkbox_Field
-                                      label="Posted"
-                                      box_size={24}
-                                      icon_size={14}
-                                      checked={false}
-                                      on_change={(e) => alert(e.target.checked)}
+                                      label="Draft"
+                                      checked={status_filters["Draft"]}
+                                      on_change={() =>
+                                        toggle_status_filter("Draft")
+                                      }
                                     />
                                     <Checkbox_Field
                                       label="Pending"
-                                      box_size={24}
-                                      icon_size={14}
-                                      checked={false}
-                                      on_change={(e) => alert(e.target.checked)}
+                                      checked={status_filters["Pending"]}
+                                      on_change={() =>
+                                        toggle_status_filter("Pending")
+                                      }
                                     />
                                     <Checkbox_Field
-                                      label="Draft"
-                                      box_size={24}
-                                      icon_size={14}
-                                      checked={false}
-                                      on_change={(e) => alert(e.target.checked)}
+                                      label="Approved"
+                                      checked={status_filters["Approved"]}
+                                      on_change={() =>
+                                        toggle_status_filter("Approved")
+                                      }
+                                    />
+                                    <Checkbox_Field
+                                      label="Posted"
+                                      checked={status_filters["Posted"]}
+                                      on_change={() =>
+                                        toggle_status_filter("Posted")
+                                      }
+                                    />
+                                    <Checkbox_Field
+                                      label="Partially Received"
+                                      checked={
+                                        status_filters["Partially Received"]
+                                      }
+                                      on_change={() =>
+                                        toggle_status_filter(
+                                          "Partially Received"
+                                        )
+                                      }
+                                    />
+                                    <Checkbox_Field
+                                      label="Fully Received"
+                                      checked={status_filters["Fully Received"]}
+                                      on_change={() =>
+                                        toggle_status_filter("Fully Received")
+                                      }
                                     />
                                   </div>
                                 </div>
                                 <div className="flex justify-end gap-2 mt-5">
-                                  <Button
-                                    size="sm"
-                                    variant="primary"
-                                    on_click={() => set_show_filter(false)}
-                                  >
-                                    Apply
-                                  </Button>
                                   <Button
                                     size="sm"
                                     variant="secondary"
@@ -616,8 +661,12 @@ const Purchase_Order = () => {
                                 const po_status_classes = {
                                   Draft: "bg-gray-100 text-gray-500",
                                   Pending: "bg-yellow-100 text-yellow-500",
+                                  "Partially Received":
+                                    "bg-yellow-100 text-yellow-500",
                                   Posted: "bg-orange-100 text-orange-500",
                                   Approved: "bg-green-100 text-green-500",
+                                  "Fully Received":
+                                    "bg-green-100 text-green-500",
                                   Rejected: "bg-red-100 text-red-500",
                                 };
 

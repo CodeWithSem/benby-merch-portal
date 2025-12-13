@@ -4,46 +4,58 @@ import { format_date_1, get_date_now } from "assets/scripts/format";
 import Button from "assets/elements/Button";
 import Text_Field from "assets/elements/Text_Field";
 import GR_Items from "./gr_items/GR_Items";
+import { api_update_po_selected_item_list } from "api/firestore_db/inbound/purchase_order/tbl_purchase_order_api";
 
 const Create_New_GR = ({
   set_page,
+  show_toast,
   batch_list,
   new_gr_data,
   set_new_gr_data,
 }) => {
-  const handle_create_gr = () => {
-    const received_items = new_gr_data.selected_item_list.filter(
-      (item) => item.quantity_received && item.quantity_received > 0
-    );
-    const gr_data = {
-      id: 1,
-      po_number: new_gr_data.po_number,
-      gr_number: "n/a",
-      creation_date: "MM-DD-YYYY",
-      received_item_list: received_items,
-    };
+  const handle_create_gr = async () => {
+    try {
+      const received_items = new_gr_data.selected_item_list.filter(
+        (item) => item.quantity_received && item.quantity_received > 0
+      );
+      const gr_data = {
+        id: 1,
+        po_id: new_gr_data.id,
+        po_number: new_gr_data.po_number,
+        gr_number: "n/a",
+        creation_date: "MM-DD-YYYY",
+        received_item_list: received_items,
+      };
 
-    const { id } = new_gr_data;
-    const cleaned_parent = { id };
-    const cleaned = new_gr_data.selected_item_list.map(
-      ({ batch, batch_list, quantity_received, quantity_left, ...rest }) => ({
-        ...rest,
-        quantity_open: quantity_left, // set quantity_open = quantity_left
-        quantity_left: quantity_left,
-      })
-    );
-    const new_po_data = {
-      ...cleaned_parent,
-      selected_item_list: cleaned,
-    };
+      const { id } = new_gr_data;
+      const cleaned_parent = { id };
+      const cleaned = new_gr_data.selected_item_list.map(
+        ({ batch, batch_list, quantity_received, quantity_left, ...rest }) => ({
+          ...rest,
+          quantity_open: quantity_left, // set quantity_open = quantity_left
+          quantity_left: quantity_left,
+        })
+      );
+      const new_po_data = {
+        ...cleaned_parent,
+        selected_item_list: cleaned,
+      };
 
-    console.log("GR DATA");
-    console.log(gr_data);
-    console.log("PO DATA");
-    console.log(new_po_data);
-    console.log("ORIGINAL PO DATA");
-    console.log(new_gr_data);
-    // alert("Under Maintenance");
+      // await api_update_po_selected_item_list(
+      //   new_po_data.id,
+      //   new_po_data.selected_item_list,
+      //   show_toast
+      // );
+
+      console.log("GR DATA");
+      console.log(gr_data);
+      console.log("PO DATA");
+      console.log(new_po_data);
+      console.log("ORIGINAL PO DATA");
+      console.log(new_gr_data);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const handle_go_back = () => {
@@ -150,6 +162,7 @@ const Create_New_GR = ({
           {/* - Section 1 */}
           {/* + Section 2 */}
           <GR_Items
+            show_toast={show_toast}
             batch_list={batch_list}
             new_gr_data={new_gr_data}
             set_new_gr_data={set_new_gr_data}

@@ -41,7 +41,7 @@ const Goods_Receipt = () => {
   const [gr_end_date, set_gr_end_date] = useState(today);
   const [po_start_date, set_po_start_date] = useState(today);
   const [po_end_date, set_po_end_date] = useState(today);
-  const [show_load_data_button, set_show_load_data_button] = useState(false);
+  const [show_load_data_button, set_show_load_data_button] = useState(true);
 
   const [new_gr_data, set_new_gr_data] = useState({});
 
@@ -204,16 +204,16 @@ const Goods_Receipt = () => {
 
   const handle_change_gr_start_date = (value) => {
     set_gr_start_date(format_date_1(value));
-    set_show_load_data_button(true);
+    // set_show_load_data_button(true);
   };
 
   const handle_change_gr_end_date = (value) => {
     set_gr_end_date(format_date_1(value));
-    set_show_load_data_button(true);
+    // set_show_load_data_button(true);
   };
 
   const handle_load_data = () => {
-    set_show_load_data_button(false);
+    // set_show_load_data_button(false);
   };
 
   // RETURN ORIGIN
@@ -272,7 +272,7 @@ const Goods_Receipt = () => {
               {/* - Header */}
               {/* + Section 1 */}
               <div className="p-5 sm:p-6 border-t">
-                <div className="grid grid-cols-1 gap-5 md:w-[250px]">
+                <div className="grid grid-cols-1 gap-5 md:w-[220px]">
                   <Date_Field
                     label="Start Date"
                     value={gr_start_date}
@@ -291,7 +291,9 @@ const Goods_Receipt = () => {
                     <Button
                       variant="primary"
                       icon={Database}
+                      // width="w-[150px]"
                       icon_position="left"
+                      loading={loading}
                       on_click={handle_load_data}
                     >
                       Load Data
@@ -592,6 +594,7 @@ const Goods_Receipt = () => {
       {page === "gr_creation" && (
         <Create_New_GR
           set_page={set_page}
+          show_toast={show_toast}
           batch_list={batch_list}
           new_gr_data={new_gr_data}
           set_new_gr_data={set_new_gr_data}
