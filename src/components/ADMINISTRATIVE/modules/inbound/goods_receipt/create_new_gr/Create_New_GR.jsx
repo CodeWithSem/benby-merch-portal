@@ -1,60 +1,92 @@
 import React, { useState } from "react";
-import { ChevronLeft, CirclePlus } from "lucide-react";
+import { ChevronLeft, CirclePlus, CircleX } from "lucide-react";
 import { format_date_1, get_date_now } from "assets/scripts/format";
 import Button from "assets/elements/Button";
 import Text_Field from "assets/elements/Text_Field";
 import GR_Items from "./gr_items/GR_Items";
 import { api_update_po_selected_item_list } from "api/firestore_db/inbound/purchase_order/tbl_purchase_order_api";
+import { api_create_goods_receipt } from "api/firestore_db/inbound/goods_receipt/tbl_goods_receipt_api";
 
 const Create_New_GR = ({
   set_page,
+  active_user,
   show_toast,
   batch_list,
+  selected_po_data,
+  set_selected_po_data,
   new_gr_data,
-  set_new_gr_data,
+  set_gr_list,
 }) => {
+  const [create_loading, set_create_loading] = useState(false);
   const handle_create_gr = async () => {
     try {
-      const received_items = new_gr_data.selected_item_list.filter(
-        (item) => item.quantity_received && item.quantity_received > 0
-      );
-      const gr_data = {
-        id: 1,
-        po_id: new_gr_data.id,
-        po_number: new_gr_data.po_number,
-        gr_number: "n/a",
-        creation_date: "MM-DD-YYYY",
-        received_item_list: received_items,
-      };
+      set_create_loading(true);
+      const {
+        id: po_id,
+        po_number,
+        po_type_code: po_type,
+        creation_date: po_creation_date,
+        selected_item_list,
+      } = selected_po_data;
 
-      const { id } = new_gr_data;
-      const cleaned_parent = { id };
-      const cleaned = new_gr_data.selected_item_list.map(
+      const received_item_list = selected_item_list.filter(
+        ({ quantity_received }) => quantity_received > 0
+      );
+
+      if (!received_item_list.length) {
+        show_toast({
+          type: "danger",
+          title: "Invalid",
+          message: "No received items to create GR.",
+          icon: <CircleX size={21} className="text-red-500" />,
+        });
+
+        return;
+      }
+      const cleaned_item_list = selected_item_list.map(
         ({ batch, batch_list, quantity_received, quantity_left, ...rest }) => ({
           ...rest,
-          quantity_open: quantity_left, // set quantity_open = quantity_left
-          quantity_left: quantity_left,
+          quantity_open: quantity_left,
+          quantity_left,
         })
       );
-      const new_po_data = {
-        ...cleaned_parent,
-        selected_item_list: cleaned,
+
+      await api_update_po_selected_item_list(
+        po_id,
+        cleaned_item_list,
+        show_toast
+      );
+
+      const gr_data = {
+        ...new_gr_data,
+        po_id,
+        po_number,
+        po_type,
+        po_creation_date,
+        received_item_list,
+        gr_status: "Pending",
       };
 
-      // await api_update_po_selected_item_list(
-      //   new_po_data.id,
-      //   new_po_data.selected_item_list,
-      //   show_toast
-      // );
+      const response = await api_create_goods_receipt(
+        gr_data,
+        active_user?.username,
+        show_toast
+      );
 
-      console.log("GR DATA");
-      console.log(gr_data);
-      console.log("PO DATA");
-      console.log(new_po_data);
-      console.log("ORIGINAL PO DATA");
-      console.log(new_gr_data);
+      if (!response?.success) return;
+
+      console.log("GR DATA", gr_data);
+      console.log("PO DATA", {
+        id: po_id,
+        selected_item_list: cleaned_item_list,
+      });
+
+      set_gr_list((prev) => [...prev, response.data]);
+      handle_go_back();
     } catch (error) {
-      console.log(error);
+      console.error("handle_create_gr error:", error);
+    } finally {
+      set_create_loading(false);
     }
   };
 
@@ -130,7 +162,7 @@ const Create_New_GR = ({
                       <Text_Field
                         label="PO Number"
                         type="text"
-                        value={new_gr_data.po_number}
+                        value={selected_po_data.po_number}
                         disabled
                       />
                     </div>
@@ -138,7 +170,7 @@ const Create_New_GR = ({
                       <Text_Field
                         label="GR Number"
                         type="text"
-                        value="AUTO GENERATED"
+                        value={new_gr_data.gr_number}
                         disabled
                       />
                     </div>
@@ -150,7 +182,7 @@ const Create_New_GR = ({
                       <Text_Field
                         label="PO Creation Date"
                         type="text"
-                        value={new_gr_data.creation_date}
+                        value={selected_po_data.creation_date}
                         disabled
                       />
                     </div>
@@ -164,8 +196,8 @@ const Create_New_GR = ({
           <GR_Items
             show_toast={show_toast}
             batch_list={batch_list}
-            new_gr_data={new_gr_data}
-            set_new_gr_data={set_new_gr_data}
+            selected_po_data={selected_po_data}
+            set_selected_po_data={set_selected_po_data}
           />
           {/* - Section 2 */}
           {/* + Section 3 */}
@@ -174,13 +206,21 @@ const Create_New_GR = ({
               <Button
                 variant="primary"
                 size="lg"
+                width="w-[120px]"
                 icon={CirclePlus}
                 icon_position="left"
+                loading={create_loading}
                 on_click={handle_create_gr}
               >
                 Create
               </Button>
-              <Button variant="white" size="lg" on_click={handle_go_back}>
+              <Button
+                variant="white"
+                size="lg"
+                width="w-[120px]"
+                on_click={handle_go_back}
+                disabled={create_loading}
+              >
                 Cancel
               </Button>
             </div>

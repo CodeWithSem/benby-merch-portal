@@ -20,7 +20,8 @@ const Select_PO = ({
   po_end_date,
   set_po_end_date,
   po_type_list,
-  set_new_gr_data,
+  set_selected_po_data,
+  gr_list,
   set_page,
 }) => {
   const [show_load_data_button, set_show_load_data_button] = useState(true);
@@ -57,7 +58,7 @@ const Select_PO = ({
 
   useEffect(() => {
     handle_get_purchase_order_list();
-  }, []);
+  }, [gr_list]);
 
   // --- Debounce Search ---
   useEffect(() => {
@@ -127,7 +128,11 @@ const Select_PO = ({
 
   const handle_proceed = () => {
     set_page("gr_creation");
-    set_new_gr_data(selected_po);
+    set_selected_po_data((prev) => ({
+      ...prev,
+      ...selected_po,
+    }));
+    // set_selected_po_data((prev) => ({ ...prev, selected_po })); // this dont...
     set_selected_po(null);
     on_close();
   };

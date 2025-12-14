@@ -5,7 +5,12 @@ import Icon_Field from "assets/elements/Icon_Field";
 import Select_Batch from "../../modals/Select_Batch";
 import Button from "assets/elements/Button";
 
-const GR_Items = ({ show_toast, batch_list, new_gr_data, set_new_gr_data }) => {
+const GR_Items = ({
+  show_toast,
+  batch_list,
+  selected_po_data,
+  set_selected_po_data,
+}) => {
   const [selected_item_id, set_selected_item_id] = useState(null);
   const [selected_receive_item, set_selected_receive_item] = useState({});
   const [display_item_modal, set_display_item_modal] = useState("");
@@ -17,8 +22,8 @@ const GR_Items = ({ show_toast, batch_list, new_gr_data, set_new_gr_data }) => {
 
   // Callback from Select_Batch
   const handle_batches_proceed = ({ selected_batches, quantity_received }) => {
-    // Update the selected item in new_gr_data
-    const updated_items = new_gr_data.selected_item_list.map((item) =>
+    // Update the selected item in selected_po_data
+    const updated_items = selected_po_data.selected_item_list.map((item) =>
       item.id === selected_receive_item.id
         ? {
             ...item,
@@ -35,8 +40,8 @@ const GR_Items = ({ show_toast, batch_list, new_gr_data, set_new_gr_data }) => {
         : item
     );
 
-    set_new_gr_data({
-      ...new_gr_data,
+    set_selected_po_data({
+      ...selected_po_data,
       selected_item_list: updated_items,
     });
   };
@@ -82,7 +87,7 @@ const GR_Items = ({ show_toast, batch_list, new_gr_data, set_new_gr_data }) => {
                 </tr>
               </thead>
               <tbody className="divide-y bg-white">
-                {new_gr_data.selected_item_list
+                {selected_po_data.selected_item_list
                   .filter((item) => Number(item.quantity_open) > 0)
                   .map((item, index) => (
                     <tr

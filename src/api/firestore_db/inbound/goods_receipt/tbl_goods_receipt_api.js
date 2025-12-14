@@ -162,3 +162,101 @@ export const api_update_goods_receipt_increment = async (id) => {
   }
 };
 // - [Update Incremental ID]
+// + [Truncate]
+export const api_truncate_goods_receipt = async (show_toast) => {
+  try {
+    const tbl_goods_receipt_ref = collection(
+      firestore_db,
+      ...get_firestore_path(TABLES.GOODS_RECEIPT)
+    );
+
+    const snapshot = await getDocs(tbl_goods_receipt_ref);
+
+    const delete_promises = snapshot.docs.map((document) =>
+      deleteDoc(doc(tbl_goods_receipt_ref, document.id))
+    );
+
+    await Promise.all(delete_promises);
+    await api_reset_goods_receipt_increment();
+
+    show_toast({
+      type: "success",
+      title: "Truncated Successfully",
+      message: "You have deleted all the record.",
+      icon: <CheckCircle2 size={21} className="text-green-500" />,
+    });
+
+    return {
+      success: true,
+      message: "Table has been cleared successfully",
+    };
+  } catch (error) {
+    console.error("Error truncating the table: ", error);
+    show_toast({
+      type: "danger",
+      title: "Error",
+      message: "Something went wrong. Please try again.",
+      icon: <CircleX size={21} className="text-red-500" />,
+    });
+    return {
+      success: false,
+      message: error.message || "Failed to truncate the table",
+    };
+  }
+};
+// - [Truncate]
+// + [Reset Incremental ID]
+export const api_reset_goods_receipt_increment = async () => {
+  try {
+    const tbl_goods_receipt_incre_ref = ref(
+      realtime_db,
+      get_incremental_path(TABLES.GOODS_RECEIPT)
+    );
+
+    await set(tbl_goods_receipt_incre_ref, 1);
+
+    return {
+      success: true,
+      message: "Data incremental has been reset",
+      value: 1,
+    };
+  } catch (error) {
+    console.error("Error on reset incremental:", error);
+    return {
+      success: false,
+      message: error.message,
+    };
+  }
+};
+// - [Reset Incremental ID]
+// + [Set Incremental ID Manually]
+export const api_set_goods_receipt_increment = async (new_id) => {
+  if (typeof new_id !== "number" || new_id <= 0) {
+    return {
+      success: false,
+      message: "Invalid ID. It must be a positive number.",
+    };
+  }
+
+  try {
+    const tbl_goods_receipt_incre_ref = ref(
+      realtime_db,
+      get_incremental_path(TABLES.GOODS_RECEIPT)
+    );
+
+    await set(tbl_goods_receipt_incre_ref, new_id);
+
+    return {
+      success: true,
+      message: "Incremental ID set successfully",
+      value: new_id,
+    };
+  } catch (error) {
+    console.error("Error setting incremental ID:", error);
+    return {
+      success: false,
+      message: error.message || "Failed to set incremental ID",
+    };
+  }
+};
+// - [Set Incremental ID Manually]

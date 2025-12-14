@@ -264,13 +264,6 @@ export const api_update_po_selected_item_list = async (
       po_status,
     });
 
-    show_toast({
-      type: "success",
-      title: "Updated Successfully",
-      message: "The record has been updated.",
-      icon: <CheckCircle2 size={21} className="text-green-500" />,
-    });
-
     return {
       success: true,
       id: po_id,
@@ -281,14 +274,6 @@ export const api_update_po_selected_item_list = async (
     };
   } catch (error) {
     console.error("Error updating PO selected_item_list: ", error);
-
-    show_toast({
-      type: "danger",
-      title: "Error",
-      message: "Something went wrong. Please try again.",
-      icon: <CircleX size={21} className="text-red-500" />,
-    });
-
     return {
       success: false,
       message: error.message || "Failed to update data",
