@@ -1,6 +1,9 @@
 export const DB_ROOT = "DB1_ERP_SYSTEM";
 
 export const TABLES = {
+  // + User Management Module ==========================
+  AUTHENTICATION: "TBL_AUTHENTICATION",
+  // - User Management Module ==========================
   // + Inbound Module ==================================
   PURCHASE_ORDER: "TBL_PURCHASE_ORDER",
   GOODS_RECEIPT: "TBL_GOODS_RECEIPT",

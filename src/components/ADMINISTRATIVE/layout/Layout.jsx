@@ -36,6 +36,7 @@ import Personnel_Maint from "../modules/maintenance/personnel/Personnel_Maint";
 import Truck_Maint from "../modules/maintenance/truck/Truck_Maint";
 import Shipment_Maint from "../modules/maintenance/shipment/Shipment_Maint";
 import User_Maint from "../modules/maintenance/user/User_Maint";
+import User_Management from "../modules/user_management/User_Management";
 
 const Layout = () => {
   const [active_item, set_active_item] = useState(() => {
@@ -78,6 +79,8 @@ const Layout = () => {
       //   return <Edit_Profile />;
       case "Dashboard":
         return <Dashboard />;
+      case "User Management":
+        return <User_Management />;
       case "Inbound-Purchase Order":
         return <Purchase_Order />;
       case "Inbound-Goods Receipt":

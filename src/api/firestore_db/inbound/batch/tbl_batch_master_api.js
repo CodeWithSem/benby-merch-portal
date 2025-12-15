@@ -14,11 +14,7 @@ import {
   writeBatch,
 } from "firebase/firestore";
 import { format_date_1, get_date_now } from "assets/scripts/format";
-import {
-  TABLES,
-  get_firestore_path,
-  get_incremental_path,
-} from "api/db_path_contant";
+import { TABLES, get_firestore_path } from "api/db_path_contant";
 import { CheckCircle2, CircleX } from "lucide-react";
 
 // + [Get]
