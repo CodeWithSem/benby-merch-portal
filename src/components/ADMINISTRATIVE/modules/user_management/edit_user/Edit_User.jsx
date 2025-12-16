@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { ChevronLeft, CirclePlus } from "lucide-react";
+import { ChevronLeft, CirclePlus, RefreshCcwDot } from "lucide-react";
 import { format_date_1, get_date_now } from "assets/scripts/format";
 import Button from "assets/elements/Button";
 import Text_Field from "assets/elements/Text_Field";
@@ -10,18 +10,18 @@ import Password_Field from "assets/elements/Password_Field";
 import { user_category_list, user_role_list } from "../USER_DATA_MAP";
 import Select_Generic from "assets/elements/modals/Select_Generic";
 import { get_description } from "assets/scripts/functions/get_description";
-import { register_user } from "api/firestore_db/authentication/tbl_authentication_api";
+import { api_update_user } from "api/firestore_db/authentication/tbl_authentication_api";
 
-const Create_New_User = ({
+const Edit_User = ({
   set_page,
   active_user,
   show_toast,
-  new_user_data,
-  set_new_user_data,
+  edit_user_data,
+  set_edit_user_data,
   set_user_list,
 }) => {
   const [is_confirm_modal_open, set_is_confirm_modal_open] = useState(false);
-  const [create_loading, set_create_loading] = useState(false);
+  const [update_loading, set_update_loading] = useState(false);
   const [display_modal, set_display_modal] = useState("");
 
   const select_modal_configs = [
@@ -49,11 +49,11 @@ const Create_New_User = ({
     },
   ];
 
-  const handle_text_change = handle_text_change_function(set_new_user_data);
+  const handle_text_change = handle_text_change_function(set_edit_user_data);
 
   const validate_batch_data_fields = () => {
     const is_valid = validate_required_fields({
-      data: new_user_data,
+      data: edit_user_data,
       fields: [{ name: "username", label: "Username" }],
       show_toast,
     });
@@ -61,38 +61,43 @@ const Create_New_User = ({
     return is_valid;
   };
 
-  const handle_create = async () => {
+  const handle_update = async () => {
     if (!validate_batch_data_fields()) {
       close_confirm_modal();
       return;
     }
 
     try {
-      set_create_loading(true);
+      set_update_loading(true);
 
       const {
+        id, // 🔑 REQUIRED
         first_name,
         last_name,
         email,
         username,
-        password,
         user_category_code,
         user_role_code,
-      } = new_user_data;
+      } = edit_user_data;
 
-      const result = await register_user(
-        first_name,
-        last_name,
-        email,
-        username,
-        password,
-        user_category_code,
-        user_role_code,
+      const result = await api_update_user(
+        id,
+        {
+          first_name,
+          last_name,
+          email,
+          username,
+          category: user_category_code,
+          role: user_role_code,
+        },
         active_user?.username,
         show_toast
       );
 
-      set_user_list((prev) => [...prev, result]);
+      // 🔄 Update list instead of pushing
+      set_user_list((prev) =>
+        prev.map((user) => (user.id === id ? { ...user, ...result } : user))
+      );
 
       set_page("main");
     } catch (error) {
@@ -104,7 +109,7 @@ const Create_New_User = ({
 
   const close_confirm_modal = () => {
     set_is_confirm_modal_open(false);
-    set_create_loading(false);
+    set_update_loading(false);
   };
 
   const Confirm_Modal = () => {
@@ -116,10 +121,10 @@ const Create_New_User = ({
             className={`relative bg-white rounded-lg shadow-xl max-w-[500px] w-full p-10 m-5 z-[102]`}
           >
             <div className="w-full flex justify-center items-center text-lg md:text-xl font-bold mb-4">
-              Confirm User Creation
+              Confirm User Update
             </div>
             <p className="w-full text-center text-sm leading-6 text-gray-500 dark:text-gray-400 pt-4">
-              You are about to create a new User. Once created, it will be added
+              You are about to edit this User. Once edited, it will be updated
               to the database.
             </p>
             <p className="w-full text-center text-sm leading-6 text-gray-500 dark:text-gray-400 pt-4">
@@ -132,8 +137,8 @@ const Create_New_User = ({
               <Button
                 width="w-[100px]"
                 variant="primary"
-                loading={create_loading}
-                on_click={handle_create}
+                loading={update_loading}
+                on_click={handle_update}
               >
                 Yes
               </Button>
@@ -141,7 +146,7 @@ const Create_New_User = ({
                 width="w-[100px]"
                 variant="white"
                 on_click={() => set_is_confirm_modal_open(false)}
-                disabled={create_loading}
+                disabled={update_loading}
               >
                 No
               </Button>
@@ -190,7 +195,7 @@ const Create_New_User = ({
               </li>
               <li className="flex items-center gap-1.5 text-sm text-gray-500">
                 <span>/</span>
-                <span className="text-gray-800">Create</span>
+                <span className="text-gray-800">Edit</span>
               </li>
             </ol>
           </nav>
@@ -207,7 +212,7 @@ const Create_New_User = ({
                 width="w-[20px]"
                 on_click={handle_go_back}
               ></Button>
-              <h1 className="text-lg">User Creation</h1>
+              <h1 className="text-lg">Edit User</h1>
             </div>
 
             <div className="flex gap-2">
@@ -225,7 +230,7 @@ const Create_New_User = ({
                   label="First Name"
                   type={"text"}
                   placeholder={"Enter first name"}
-                  value={new_user_data.first_name} //--> first_name
+                  value={edit_user_data.first_name} //--> first_name
                   on_change={handle_text_change("first_name")}
                 />
               </div>
@@ -234,7 +239,7 @@ const Create_New_User = ({
                   label="Last Name"
                   type={"text"}
                   placeholder={"Enter last name"}
-                  value={new_user_data.last_name} //--> last_name
+                  value={edit_user_data.last_name} //--> last_name
                   on_change={handle_text_change("last_name")}
                 />
               </div>
@@ -243,7 +248,7 @@ const Create_New_User = ({
                   label="Email"
                   type={"text"}
                   placeholder={"Enter email"}
-                  value={new_user_data.email} //--> email
+                  value={edit_user_data.email} //--> email
                   on_change={handle_text_change("email")}
                 />
               </div>
@@ -252,24 +257,15 @@ const Create_New_User = ({
                   label="Username"
                   type={"text"}
                   placeholder={"Enter username"}
-                  value={new_user_data.username} //--> username
-                  on_change={handle_text_change("username")}
-                />
-              </div>
-              <div className="col-span-full">
-                <Password_Field
-                  label="Password"
-                  type={"text"}
-                  placeholder={"Enter password"}
-                  value={new_user_data.password} //--> password
-                  on_change={handle_text_change("password")}
+                  value={edit_user_data.username} //--> username
+                  disabled
                 />
               </div>
               <div>
                 <Find_Field
                   label="User Category"
                   value={get_description(
-                    new_user_data.user_category_code,
+                    edit_user_data.user_category_code,
                     user_category_list,
                     "user_category_code",
                     "user_category_desc"
@@ -282,7 +278,7 @@ const Create_New_User = ({
                 <Find_Field
                   label="User Role"
                   value={get_description(
-                    new_user_data.user_role_code,
+                    edit_user_data.user_role_code,
                     user_role_list,
                     "user_role_code",
                     "user_role_desc"
@@ -301,11 +297,11 @@ const Create_New_User = ({
                 variant="primary"
                 size="lg"
                 width="w-[120px]"
-                icon={CirclePlus}
+                icon={RefreshCcwDot}
                 icon_position="left"
                 on_click={() => set_is_confirm_modal_open(true)}
               >
-                Create
+                Update
               </Button>
               <Button
                 variant="white"
@@ -337,7 +333,7 @@ const Create_New_User = ({
           source_desc={cfg.desc}
           lookup_lists={cfg.lookup}
           target_field={cfg.target}
-          set_data={set_new_user_data}
+          set_data={set_edit_user_data}
         />
       ))}
       {/* - Modals */}
@@ -345,4 +341,4 @@ const Create_New_User = ({
   );
 };
 
-export default Create_New_User;
+export default Edit_User;

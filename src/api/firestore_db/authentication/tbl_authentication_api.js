@@ -5,11 +5,14 @@ import {
   getDocs,
   addDoc,
   serverTimestamp,
+  updateDoc,
+  doc,
 } from "firebase/firestore";
 import bcrypt from "bcryptjs";
 import { firestore_db } from "assets/scripts/firebase";
 import { TABLES, get_firestore_path } from "api/db_path_contant";
-import { format_date_2 } from "assets/scripts/format";
+import { format_date_1, format_date_2 } from "assets/scripts/format";
+import { CheckCircle2, CircleX } from "lucide-react";
 
 // + [Get]
 export const api_get_user_master_list = async () => {
@@ -46,13 +49,15 @@ export const api_get_user_master_list = async () => {
 // - [Get]
 // + [Register]
 export const register_user = async (
-  username,
-  password,
-  email,
   first_name,
   last_name,
+  email,
+  username,
+  password,
   category,
-  created_by
+  role,
+  created_by,
+  show_toast
 ) => {
   try {
     const users_ref = collection(
@@ -66,26 +71,41 @@ export const register_user = async (
     const snapshot = await getDocs(q);
 
     if (!snapshot.empty) {
+      show_toast({
+        type: "danger",
+        title: "Error",
+        message: "Username already exists.",
+        icon: <CircleX size={21} className="text-red-500" />,
+      });
       throw new Error("Username already exists");
     }
 
     const hashed_password = await bcrypt.hash(password, 10);
 
     const new_user = {
-      username: username,
-      password: hashed_password,
-      email: email,
       first_name,
       last_name,
+      email: email,
+      username: username,
+      password: hashed_password,
       category,
+      role,
       created_by,
-      creation_date: format_date_2(new Date(), "military"),
+      creation_date: format_date_1(new Date()),
+      // creation_date: format_date_2(new Date(), "military"),
       updated_by: "",
       updated_date: "",
       timestamp: serverTimestamp(),
     };
 
     const doc_ref = await addDoc(users_ref, new_user);
+
+    show_toast({
+      type: "success",
+      title: "Created Successfully",
+      message: "A new user has been added.",
+      icon: <CheckCircle2 size={21} className="text-green-500" />,
+    });
 
     return {
       id: doc_ref.id,
@@ -134,6 +154,80 @@ export const login_user = async (username, password) => {
   }
 };
 // - [Login]
+// + [Update]
+export const api_update_user = async (
+  user_id,
+  { first_name, last_name, email, username, category, role },
+  updated_by,
+  show_toast
+) => {
+  try {
+    if (!user_id) {
+      throw new Error("User ID is required.");
+    }
+
+    const users_ref = collection(
+      firestore_db,
+      "DB1_ERP_SYSTEM",
+      "TBL_AUTHENTICATION",
+      "DATA"
+    );
+
+    // 🔒 Check username uniqueness (exclude current user)
+    const q = query(users_ref, where("username", "==", username));
+    const snapshot = await getDocs(q);
+
+    const duplicate = snapshot.docs.find((doc) => doc.id !== user_id);
+    if (duplicate) {
+      show_toast({
+        type: "danger",
+        title: "Error",
+        message: "Username already exists.",
+        icon: <CircleX size={21} className="text-red-500" />,
+      });
+      throw new Error("Username already exists");
+    }
+
+    const update_payload = {
+      first_name,
+      last_name,
+      email,
+      username,
+      category,
+      role,
+      updated_by,
+      updated_date: format_date_1(new Date()),
+      timestamp: serverTimestamp(),
+    };
+
+    const user_doc_ref = doc(
+      firestore_db,
+      "DB1_ERP_SYSTEM",
+      "TBL_AUTHENTICATION",
+      "DATA",
+      user_id
+    );
+
+    await updateDoc(user_doc_ref, update_payload);
+
+    show_toast({
+      type: "success",
+      title: "Updated Successfully",
+      message: "User information has been updated.",
+      icon: <CheckCircle2 size={21} className="text-green-500" />,
+    });
+
+    return {
+      success: true,
+      id: user_id,
+      ...update_payload,
+    };
+  } catch (error) {
+    console.error("Error updating user:", error);
+    throw error;
+  }
+};
+// - [Update]
 // + [Truncate]
 export const api_truncate_user_master = async (show_toast) => {
   try {

@@ -4,8 +4,8 @@ import delphys_logo from "../../assets/images/delphys-sidebar-logo.png";
 import auth_img from "../../assets/images/auth-image.png";
 import Button from "assets/elements/Button";
 import { useToast } from "../ADMINISTRATIVE/layout/Toast_Provider";
-import { login_user } from "../../api/firestore_auth_api"; // ✅ Firestore-only login function
 import { Use_App } from "../../context/app_context";
+import { login_user } from "api/firestore_db/authentication/tbl_authentication_api";
 
 const Login = () => {
   const { set_active_user, set_page } = Use_App();

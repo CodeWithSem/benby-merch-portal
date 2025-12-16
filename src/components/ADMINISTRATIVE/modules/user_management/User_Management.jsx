@@ -24,6 +24,8 @@ import {
   api_truncate_user_master,
 } from "api/firestore_db/authentication/tbl_authentication_api";
 import Create_New_User from "./create_new_user/Create_New_User";
+import Edit_User from "./edit_user/Edit_User";
+import View_User from "./view_user/View_User";
 
 const User_Management = () => {
   const { active_user } = Use_App();
@@ -40,8 +42,10 @@ const User_Management = () => {
 
   const columns = [
     { key: "index", label: "#", sortable: false },
-    { key: "user_name", label: "Username", sortable: true },
+    { key: "username", label: "Username", sortable: true },
     { key: "name", label: "Name", sortable: true },
+    { key: "category", label: "Category", sortable: true },
+    { key: "role", label: "Role", sortable: true },
     { key: "creation_date", label: "Creation Date", sortable: true },
     { key: "actions", label: "", sortable: false },
   ];
@@ -169,15 +173,22 @@ const User_Management = () => {
 
   const handle_upload_batch = () => alert("Under Maintenance");
 
-  const handle_view_batch = (data) => {
-    console.table(data);
-    set_view_user_data(data);
-    set_page("view_batch");
+  const handle_view_user = (data) => {
+    set_view_user_data({
+      ...data,
+      user_category_code: data.category,
+      user_role_code: data.role,
+    });
+    set_page("view_user");
   };
 
-  const handle_edit_batch = (data) => {
-    set_edit_user_data(data);
-    set_page("edit_batch");
+  const handle_edit_user = (data) => {
+    set_edit_user_data({
+      ...data,
+      user_category_code: data.category,
+      user_role_code: data.role,
+    });
+    set_page("edit_user");
   };
 
   const handle_delete_batch = (data) => {
@@ -352,6 +363,13 @@ const User_Management = () => {
                             if (col.key === "index") {
                               return <span>{row.index}</span>;
                             }
+                            if (col.key === "name") {
+                              return (
+                                <span>
+                                  {row.first_name} {row.last_name}
+                                </span>
+                              );
+                            }
                             if (col.key === "actions") {
                               return (
                                 <div className="flex gap-2">
@@ -359,14 +377,14 @@ const User_Management = () => {
                                     <Button_Action
                                       icon={View}
                                       tooltip="View Record"
-                                      on_click={() => handle_view_batch(row)}
+                                      on_click={() => handle_view_user(row)}
                                     />
                                   </div>
                                   <div className="relative group flex jusity-center items-center">
                                     <Button_Action
                                       icon={Edit}
                                       tooltip="Edit Record"
-                                      on_click={() => handle_edit_batch(row)}
+                                      on_click={() => handle_edit_user(row)}
                                     />
                                   </div>
                                   <div className="relative group flex jusity-center items-center">
@@ -435,8 +453,8 @@ const User_Management = () => {
           set_user_list={set_user_list}
         />
       )}
-      {/* {page === "edit_batch" && (
-        <Edit_Batch
+      {page === "edit_user" && (
+        <Edit_User
           set_page={set_page}
           active_user={active_user}
           show_toast={show_toast}
@@ -444,10 +462,10 @@ const User_Management = () => {
           set_edit_user_data={set_edit_user_data}
           set_user_list={set_user_list}
         />
-      )} */}
-      {/* {page === "view_batch" && (
-        <View_Batch set_page={set_page} view_user_data={view_user_data} />
-      )} */}
+      )}
+      {page === "view_user" && (
+        <View_User set_page={set_page} view_user_data={view_user_data} />
+      )}
       {/* - Pages */}
       {/* + Modals */}
       {/* <Delete_Batch
