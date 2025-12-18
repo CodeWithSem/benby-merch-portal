@@ -11,10 +11,6 @@ import {
   plant_list,
   sloc_list,
 } from "../BATCH_DATA_MAP";
-import Select_Item from "../modals/item_modals/Select_Item";
-import { handle_text_change_function } from "assets/scripts/functions/input_functions";
-import { api_create_batch_master } from "api/firestore_db/inbound/batch/tbl_batch_master_api";
-import { validate_required_fields } from "assets/scripts/functions/validate_fields";
 
 const View_Batch = ({ set_page, view_batch_data }) => {
   const [active_tab, set_active_tab] = useState("batch_details");

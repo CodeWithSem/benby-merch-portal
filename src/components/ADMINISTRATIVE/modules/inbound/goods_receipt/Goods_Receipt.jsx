@@ -6,8 +6,6 @@ import {
   Search,
   ChevronDown,
   ChevronUp,
-  Edit,
-  Trash,
   View,
   PlusCircle,
   RefreshCw,
@@ -17,6 +15,7 @@ import {
   Database,
   FileDigit,
   Trash2,
+  FileX,
 } from "lucide-react";
 import Select_Field from "assets/elements/Select_Field";
 import Icon_Field from "assets/elements/Icon_Field";
@@ -25,8 +24,6 @@ import Date_Field from "assets/elements/Date_Field";
 import Checkbox_Field from "assets/elements/Checkbox_Field";
 import Pagination from "assets/elements/Pagination";
 import Create_New_GR from "./create_new_gr/Create_New_GR";
-import Edit_GR from "./edit_gr/Edit_GR";
-import Post_View_GR from "./post_view_gr/Post_View_GR";
 import Select_PO from "./modals/select_po/Select_PO";
 import Delete_GR from "./modals/delete_gr/Delete_GR";
 import Button_Action from "assets/elements/Button_Action";
@@ -39,6 +36,8 @@ import {
 import { Use_App } from "context/app_context";
 import { Get_TBL_INCREMENTAL_ID } from "api/real_time_db/incremental";
 import Set_Increment_ID from "assets/elements/modals/Set_Increment_ID";
+import Post_View_GR from "./post_view_gr/Post_View_GR";
+import Reverse_GR from "./reverse_gr/Reverse_GR";
 
 const Goods_Receipt = () => {
   const { active_user } = Use_App();
@@ -58,6 +57,8 @@ const Goods_Receipt = () => {
 
   const [selected_po_data, set_selected_po_data] = useState({});
   const [new_gr_data, set_new_gr_data] = useState({});
+  const [view_gr_data, set_view_gr_data] = useState({});
+  const [reverse_gr_data, set_reverse_gr_data] = useState({});
   const [current_id, set_current_id] = useState(0);
 
   useEffect(() => {
@@ -232,22 +233,25 @@ const Goods_Receipt = () => {
     alert("Under Maintenance");
   };
 
-  const handle_view_gr = () => {
+  const handle_view_gr = (data) => {
     set_for_posting(false);
+    set_view_gr_data(data);
     set_page("post_view_gr");
   };
 
-  const handle_post_gr = () => {
+  const handle_post_gr = (data) => {
     set_for_posting(true);
+    set_view_gr_data(data);
     set_page("post_view_gr");
   };
 
-  const handle_edit_gr = (id) => {
-    set_page("edit_gr");
+  const handle_edit_gr = async (gr_data) => {
+    // Edit function here.
   };
 
-  const handle_delete_gr = () => {
-    set_display_modal("delete_gr");
+  const handle_reverse_gr = (data) => {
+    set_reverse_gr_data(data);
+    set_page("reverse_gr");
   };
 
   const handle_change_gr_start_date = (value) => {
@@ -569,6 +573,7 @@ const Goods_Receipt = () => {
                                   Approved: "bg-green-100 text-green-500",
                                   "Fully Received":
                                     "bg-green-100 text-green-500",
+                                  Reversed: "bg-red-100 text-red-500",
                                   Rejected: "bg-red-100 text-red-500",
                                 };
 
@@ -592,34 +597,31 @@ const Goods_Receipt = () => {
                                       <Button_Action
                                         icon={View}
                                         tooltip="View Record"
-                                        on_click={() => handle_view_gr(row.id)}
+                                        on_click={() => handle_view_gr(row)}
                                       />
                                     </div>
-                                    <div className="relative group flex jusity-center items-center">
-                                      <Button_Action
-                                        icon={FileInput}
-                                        tooltip="Post Record"
-                                        on_click={() => handle_post_gr(row.id)}
-                                      />
-                                    </div>
-                                    <div className="relative group flex jusity-center items-center">
-                                      <Button_Action
-                                        icon={Edit}
-                                        tooltip="Edit Record"
-                                        on_click={() => handle_edit_gr(row.id)}
-                                      />
-                                    </div>
-                                    <div className="relative group flex jusity-center items-center">
-                                      <Button_Action
-                                        class_name="mb-[1px]"
-                                        icon={Trash}
-                                        variant="danger"
-                                        tooltip="Delete Record"
-                                        on_click={() =>
-                                          handle_delete_gr(row.id)
-                                        }
-                                      />
-                                    </div>
+                                    {row.gr_status !== "Reversed" && (
+                                      <div className="relative group flex jusity-center items-center">
+                                        <Button_Action
+                                          icon={FileInput}
+                                          tooltip="Post Record"
+                                          on_click={() => handle_post_gr(row)}
+                                        />
+                                      </div>
+                                    )}
+
+                                    {row.gr_status !== "Reversed" && (
+                                      <div className="relative group flex jusity-center items-center">
+                                        <Button_Action
+                                          icon={FileX}
+                                          variant="danger"
+                                          tooltip="Reversal"
+                                          on_click={() =>
+                                            handle_reverse_gr(row)
+                                          }
+                                        />
+                                      </div>
+                                    )}
                                   </div>
                                 );
                               }
@@ -687,9 +689,24 @@ const Goods_Receipt = () => {
           set_gr_list={set_gr_list}
         />
       )}
-      {page === "edit_gr" && <Edit_GR set_page={set_page} />}
       {page === "post_view_gr" && (
-        <Post_View_GR set_page={set_page} for_posting={for_posting} />
+        <Post_View_GR
+          set_page={set_page}
+          active_user={active_user}
+          show_toast={show_toast}
+          view_gr_data={view_gr_data}
+          for_posting={for_posting}
+          set_gr_list={set_gr_list}
+        />
+      )}
+      {page === "reverse_gr" && (
+        <Reverse_GR
+          set_page={set_page}
+          active_user={active_user}
+          show_toast={show_toast}
+          reverse_gr_data={reverse_gr_data}
+          set_gr_list={set_gr_list}
+        />
       )}
       {/* - Pages */}
       {/* + Modals */}

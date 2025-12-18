@@ -10,6 +10,7 @@ import {
   query,
   where,
   updateDoc,
+  getDoc,
 } from "firebase/firestore";
 import {
   convert_date_to_sort,
@@ -162,6 +163,147 @@ export const api_update_goods_receipt_increment = async (id) => {
   }
 };
 // - [Update Incremental ID]
+// + [Post]
+export const api_post_goods_receipt = async (post_data, user, show_toast) => {
+  try {
+    if (!post_data.id) {
+      return {
+        success: false,
+        message: "ID is required for update.",
+      };
+    }
+
+    const tbl_path = get_firestore_path(TABLES.GOODS_RECEIPT);
+
+    // ---------------------------------------------------
+    // 1. PROCEED WITH UPDATE
+    // ---------------------------------------------------
+    const doc_ref = doc(firestore_db, ...tbl_path, String(post_data.id));
+
+    const updated_post_data = {
+      ...post_data,
+      post_date: format_date_1(get_date_now()),
+      post_by: user || "N/A",
+    };
+
+    await setDoc(doc_ref, updated_post_data);
+
+    show_toast({
+      type: "success",
+      title: "Posted Successfully",
+      message: "The record has been posted.",
+      icon: <CheckCircle2 size={21} className="text-green-500" />,
+    });
+
+    return {
+      success: true,
+      message: "Data posted successfully",
+      id: post_data.id,
+      data: updated_post_data,
+    };
+  } catch (error) {
+    console.error("Error posting data: ", error);
+
+    show_toast({
+      type: "danger",
+      title: "Error",
+      message: "Something went wrong. Please try again.",
+      icon: <CircleX size={21} className="text-red-500" />,
+    });
+
+    return {
+      success: false,
+      message: error.message || "Failed to post data",
+    };
+  }
+};
+// - [Post]
+// + [Reversal]
+export const api_reverse_goods_receipt = async (
+  gr_data,
+  username,
+  show_toast
+) => {
+  try {
+    // 1. Get the related PO
+    const po_ref = doc(
+      firestore_db,
+      ...get_firestore_path(TABLES.PURCHASE_ORDER),
+      String(gr_data.po_id)
+    );
+    const po_snap = await getDoc(po_ref);
+
+    if (!po_snap.exists()) {
+      show_toast({
+        type: "danger",
+        title: "Error",
+        message: "Purchase order not found.",
+        icon: <CircleX size={21} className="text-red-500" />,
+      });
+      return { success: false, message: "PO not found." };
+    }
+
+    const po_data = po_snap.data();
+
+    // 2. Reset all quantities in PO selected_item_list
+    const reset_items = po_data.selected_item_list.map((item) => ({
+      ...item,
+      quantity_open: item.quantity, // reset to original quantity
+      quantity_left: item.quantity, // reset to original quantity
+    }));
+
+    // 3. Update the PO
+    await updateDoc(po_ref, {
+      selected_item_list: reset_items,
+      po_status: "Posted", // <-- update PO status here
+    });
+
+    // 4. Update all GRs of this PO to status "Reversed"
+    const tbl_goods_receipt_ref = collection(
+      firestore_db,
+      ...get_firestore_path(TABLES.GOODS_RECEIPT)
+    );
+    const q = query(tbl_goods_receipt_ref, where("po_id", "==", gr_data.po_id));
+    const gr_query_snap = await getDocs(q);
+
+    const batch_updates = [];
+    gr_query_snap.forEach((doc_snap) => {
+      const gr_ref = doc(
+        firestore_db,
+        ...get_firestore_path(TABLES.GOODS_RECEIPT),
+        String(doc_snap.id)
+      );
+      batch_updates.push(
+        updateDoc(gr_ref, {
+          gr_status: "Reversed",
+          reversed_by: username,
+          reversed_at: new Date(),
+        })
+      );
+    });
+
+    await Promise.all(batch_updates);
+
+    show_toast({
+      type: "success",
+      title: "Reversed Successfully",
+      message: "The record has been reversed.",
+      icon: <CheckCircle2 size={21} className="text-green-500" />,
+    });
+
+    return { success: true, data: { ...gr_data, gr_status: "Reversed" } };
+  } catch (error) {
+    console.error(error);
+    show_toast({
+      type: "danger",
+      title: "Error",
+      message: "Something went wrong. Please try again.",
+      icon: <CircleX size={21} className="text-red-500" />,
+    });
+    return { success: false, message: error.message };
+  }
+};
+// - [Reversal]
 // + [Truncate]
 export const api_truncate_goods_receipt = async (show_toast) => {
   try {

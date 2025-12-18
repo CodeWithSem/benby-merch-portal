@@ -2,11 +2,11 @@ import React, { useState } from "react";
 import { Info, Search } from "lucide-react";
 import Icon_Field from "assets/elements/Icon_Field";
 
-const GR_Items = ({ view_gr_data, for_posting }) => {
+const GR_Items = ({ reverse_gr_data, for_posting }) => {
   const [selected_item_id, set_selected_item_id] = useState(0);
   const [search_query, set_search_query] = useState("");
 
-  const filtered_items = view_gr_data?.received_item_list?.filter((item) =>
+  const filtered_items = reverse_gr_data?.received_item_list?.filter((item) =>
     item.item_desc?.toLowerCase().includes(search_query.toLowerCase())
   );
 

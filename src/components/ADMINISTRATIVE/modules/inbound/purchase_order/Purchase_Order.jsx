@@ -663,7 +663,7 @@ const Purchase_Order = () => {
                                   Pending: "bg-yellow-100 text-yellow-500",
                                   "Partially Received":
                                     "bg-yellow-100 text-yellow-500",
-                                  Posted: "bg-orange-100 text-orange-500",
+                                  Posted: "bg-green-100 text-green-500",
                                   Approved: "bg-green-100 text-green-500",
                                   "Fully Received":
                                     "bg-green-100 text-green-500",

@@ -72,8 +72,7 @@ const Select_PO = ({
   // --- Filter, Sort & Paginate ---
   useEffect(() => {
     let temp = po_list.filter(
-      (po) =>
-        po.po_status === "Approved" || po.po_status === "Partially Received"
+      (po) => po.po_status === "Posted" || po.po_status === "Partially Received"
     );
 
     // --- SEARCH ---

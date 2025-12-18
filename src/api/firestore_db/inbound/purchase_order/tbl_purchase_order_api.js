@@ -224,8 +224,7 @@ export const api_update_purchase_order = async (
 // + [Update Selected Item List + PO Status]
 export const api_update_po_selected_item_list = async (
   po_id,
-  selected_item_list,
-  show_toast
+  selected_item_list
 ) => {
   try {
     if (!po_id) {

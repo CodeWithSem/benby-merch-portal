@@ -17,6 +17,7 @@ const Create_New_GR = ({
   new_gr_data,
   set_gr_list,
 }) => {
+  const [is_confirm_modal_open, set_is_confirm_modal_open] = useState(false);
   const [create_loading, set_create_loading] = useState(false);
   const handle_create_gr = async () => {
     try {
@@ -34,13 +35,13 @@ const Create_New_GR = ({
       );
 
       if (!received_item_list.length) {
+        close_confirm_modal();
         show_toast({
           type: "danger",
           title: "Invalid",
           message: "No received items to create GR.",
           icon: <CircleX size={21} className="text-red-500" />,
         });
-
         return;
       }
       const cleaned_item_list = selected_item_list.map(
@@ -86,8 +87,58 @@ const Create_New_GR = ({
     } catch (error) {
       console.error("handle_create_gr error:", error);
     } finally {
-      set_create_loading(false);
+      close_confirm_modal();
     }
+  };
+
+  const close_confirm_modal = () => {
+    set_is_confirm_modal_open(false);
+    set_create_loading(false);
+  };
+
+  const Confirm_Modal = () => {
+    return (
+      <React.Fragment>
+        <div className="fixed inset-0 flex items-center justify-center z-[100]">
+          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm z-[101]"></div>
+          <div
+            className={`relative bg-white rounded-lg shadow-xl max-w-[500px] w-full p-10 m-5 z-[102]`}
+          >
+            <div className="w-full flex justify-center items-center text-lg md:text-xl font-bold mb-4">
+              Confirm Goods Receipt Creation
+            </div>
+            <p className="w-full text-center text-sm leading-6 text-gray-500 dark:text-gray-400 pt-4">
+              You are about to create a new Goods Receipt. Once created, it will
+              be added to the database.
+            </p>
+            <p className="w-full text-center text-sm leading-6 text-gray-500 dark:text-gray-400 pt-4">
+              Please review all the details — before proceeding.
+            </p>
+            <p className="w-full text-center text-sm leading-6 text-gray-500 dark:text-gray-400 py-4">
+              Are you sure you want to continue?
+            </p>
+            <div className="flex justify-center gap-2 mt-4">
+              <Button
+                width="w-[100px]"
+                variant="primary"
+                loading={create_loading}
+                on_click={handle_create_gr}
+              >
+                Yes
+              </Button>
+              <Button
+                width="w-[100px]"
+                variant="white"
+                on_click={() => set_is_confirm_modal_open(false)}
+                disabled={create_loading}
+              >
+                No
+              </Button>
+            </div>
+          </div>
+        </div>
+      </React.Fragment>
+    );
   };
 
   const handle_go_back = () => {
@@ -209,8 +260,8 @@ const Create_New_GR = ({
                 width="w-[120px]"
                 icon={CirclePlus}
                 icon_position="left"
-                loading={create_loading}
-                on_click={handle_create_gr}
+                disabled={create_loading}
+                on_click={() => set_is_confirm_modal_open(true)}
               >
                 Create
               </Button>
@@ -228,6 +279,7 @@ const Create_New_GR = ({
           {/* - Section 3 */}
         </div>
       </div>
+      {is_confirm_modal_open && <Confirm_Modal />}
     </React.Fragment>
   );
 };
