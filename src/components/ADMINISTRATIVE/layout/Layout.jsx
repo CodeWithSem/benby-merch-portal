@@ -37,6 +37,8 @@ import Truck_Maint from "../modules/maintenance/truck/Truck_Maint";
 import Shipment_Maint from "../modules/maintenance/shipment/Shipment_Maint";
 import User_Maint from "../modules/maintenance/user/User_Maint";
 import User_Management from "../modules/user_management/User_Management";
+import WM_Order from "../modules/warehouse/wm_order/WM_Order";
+import Storage_Bin from "../modules/warehouse/storage_bin/Storage_Bin";
 
 const Layout = () => {
   const [active_item, set_active_item] = useState(() => {
@@ -99,6 +101,10 @@ const Layout = () => {
         return <Customer />;
       case "Outbound-Truck":
         return <Truck />;
+      case "Warehouse-WM Order":
+        return <WM_Order />;
+      case "Warehouse-Storage Bin":
+        return <Storage_Bin />;
       case "Warehouse-Stock Transfer":
         return <Stock_Transfer />;
       case "Warehouse-Inventory Master":

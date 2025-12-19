@@ -48,11 +48,15 @@ const Goods_Receipt = () => {
   const [loading_list, set_loading_list] = useState(false);
   const [truncate_loading, set_truncate_loading] = useState(false);
   const [for_posting, set_for_posting] = useState(false);
-  const today = format_date_1(new Date());
-  const [gr_start_date, set_gr_start_date] = useState(today);
-  const [gr_end_date, set_gr_end_date] = useState(today);
-  const [po_start_date, set_po_start_date] = useState(today);
-  const [po_end_date, set_po_end_date] = useState(today);
+  const now = new Date();
+  const first_day_of_month = new Date(now.getFullYear(), now.getMonth(), 1);
+  const last_day_of_month = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+  const start = format_date_1(first_day_of_month);
+  const end = format_date_1(last_day_of_month);
+  const [gr_start_date, set_gr_start_date] = useState(start);
+  const [gr_end_date, set_gr_end_date] = useState(end);
+  const [po_start_date, set_po_start_date] = useState(start);
+  const [po_end_date, set_po_end_date] = useState(end);
   const [show_load_data_button, set_show_load_data_button] = useState(true);
 
   const [selected_po_data, set_selected_po_data] = useState({});

@@ -21,6 +21,13 @@ const Create_STYPE = ({
   const [is_confirm_modal_open, set_is_confirm_modal_open] = useState(false);
   const [create_loading, set_create_loading] = useState(false);
 
+  const handle_change_stype_code = (value) => {
+    set_new_data((prev) => ({
+      ...prev,
+      stype_code: value,
+    }));
+  };
+
   const handle_change_stype_desc = (value) => {
     set_new_data((prev) => ({
       ...prev,
@@ -200,8 +207,9 @@ const Create_STYPE = ({
                 <Text_Field
                   label="Storage Type Code"
                   type={"text"}
+                  placeholder="Enter code"
                   value={new_data.stype_code || ""}
-                  disabled
+                  on_change={(e) => handle_change_stype_code(e.target.value)}
                 />
               </div>
               <div className="col-span-2">

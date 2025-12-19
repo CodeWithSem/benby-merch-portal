@@ -71,6 +71,8 @@ const Sidebar = ({
       name: "Warehouse",
       icon: <Warehouse size={18} />,
       sub_items: [
+        "WM Order",
+        "Storage Bin",
         "Stock Transfer",
         "Inventory Master",
         "Item Master",

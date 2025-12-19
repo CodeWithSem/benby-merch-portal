@@ -11,6 +11,7 @@ export const TABLES = {
   VENDOR_MASTER: "TBL_VENDOR_MASTER",
   // - Inbound Module ==================================
   // + Warhouse Module =================================
+  STORAGE_BIN: "TBL_STORAGE_BIN",
   ITEM_MASTER: "TBL_ITEM_MASTER",
   ITEM_EXT_SALES_DATA: "TBL_ITEM_EXT_SALES_DATA",
   ITEM_EXT_SALES_DATA_PLANT: "TBL_ITEM_EXT_SALES_DATA_PLANT",

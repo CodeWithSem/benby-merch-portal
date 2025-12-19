@@ -141,3 +141,7 @@ export const def_vendor_data = {
   aci_currency: "",
   aci_tax_liable: true,
 };
+
+export const def_sbin_data = {
+  id: 0,
+};

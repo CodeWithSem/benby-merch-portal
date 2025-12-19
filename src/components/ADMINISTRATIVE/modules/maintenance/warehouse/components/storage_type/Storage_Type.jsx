@@ -63,6 +63,7 @@ const Storage_Type = ({ set_page }) => {
   const reset_new_data = () => {
     set_new_data((prev) => ({
       ...prev,
+      stype_code: "",
       stype_desc: "",
       created_by: "",
       change_date: "",
@@ -75,7 +76,7 @@ const Storage_Type = ({ set_page }) => {
       set_new_data((prev) => ({
         ...prev,
         id: value,
-        stype_code: `STYPE-${String(value).padStart(3, "0")}`,
+        // stype_code: `STYPE-${String(value).padStart(3, "0")}`,
       }));
       set_current_id(value);
     });

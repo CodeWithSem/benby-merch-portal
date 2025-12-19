@@ -442,31 +442,31 @@ export const item_master_list = [
     id: 1,
     item_code: "ITM-00001",
     item_desc: "Sisters Sanitary Napkin Net Side (Night-use) 8",
-    pu_ordering_uom: "PC",
+    pu_ordering_uom: "CS",
   },
   {
     id: 2,
     item_code: "ITM-00002",
     item_desc: "Super Twins Pants Jumbo Pack Medium 52s",
-    pu_ordering_uom: "PC",
+    pu_ordering_uom: "CS",
   },
   {
     id: 3,
     item_code: "ITM-00003",
     item_desc: "Twins Lampein Pants Medium 30s",
-    pu_ordering_uom: "PC",
+    pu_ordering_uom: "CS",
   },
   {
     id: 4,
     item_code: "ITM-00004",
     item_desc: "Cherub Scented Wipes 15s",
-    pu_ordering_uom: "PC",
+    pu_ordering_uom: "CS",
   },
   {
     id: 5,
     item_code: "ITM-00005",
     item_desc: "Fasclean Tipid Pack Sampaguita 50g",
-    pu_ordering_uom: "PC",
+    pu_ordering_uom: "CS",
   },
 ];
 

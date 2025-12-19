@@ -23,23 +23,19 @@ import Pagination from "assets/elements/Pagination";
 import Button from "assets/elements/Button";
 import Checkbox_Field from "assets/elements/Checkbox_Field";
 import Date_Field from "assets/elements/Date_Field";
-import Create_New_PO from "./create_new_po/Create_New_PO";
-import Select_PO_Type from "./modals/select_po_type/Select_PO_Type";
-import Delete_PO from "./modals/delete_po/Delete_PO";
+// import Create_New_PO from "./create_new_po/Create_New_PO";
+// import Select_PO_Type from "./modals/select_po_type/Select_PO_Type";
+// import Delete_PO from "./modals/delete_po/Delete_PO";
 import Button_Action from "assets/elements/Button_Action";
-import {
-  company_list,
-  purc_org_list,
-  purc_group_list,
-  po_type_list,
-  purchase_order_list,
-  branch_list,
-  plant_list,
-  sloc_list,
-  po_type_h_list,
-  vendor_master_list,
-} from "./PO_DATA_MAP";
-import Select_Generic from "assets/elements/modals/Select_Generic";
+// import {
+//   company_list,
+//   purc_org_list,
+//   purc_group_list,
+//   po_type_list,
+//   po_type_h_list,
+//   vendor_master_list,
+// } from "./PO_DATA_MAP";
+// import Select_Generic from "assets/elements/modals/Select_Generic";
 import { Get_TBL_INCREMENTAL_ID } from "api/real_time_db/incremental";
 import {
   api_get_purchase_order_list_by_date,
@@ -50,10 +46,11 @@ import { Use_App } from "context/app_context";
 import Set_Increment_ID from "assets/elements/modals/Set_Increment_ID";
 import { get_description } from "assets/scripts/functions/get_description";
 import Spinner from "assets/elements/Spinner";
-import Edit_PO from "./edit_po/Edit_PO";
-import Post_View_PO from "./post_view_po/Post_View_PO";
+import Select_DO from "./modals/select_do/Select_DO";
+// import Edit_PO from "./edit_po/Edit_PO";
+// import Post_View_PO from "./post_view_po/Post_View_PO";
 
-const Purchase_Order = () => {
+const WM_Order = () => {
   const { active_user } = Use_App();
   const { show_toast } = useToast();
   // + Variables
@@ -70,7 +67,10 @@ const Purchase_Order = () => {
   const end = format_date_1(last_day_of_month);
   const [start_date, set_start_date] = useState(start);
   const [end_date, set_end_date] = useState(end);
+  const [gr_start_date, set_gr_start_date] = useState(start);
+  const [gr_end_date, set_gr_end_date] = useState(end);
   const [show_load_data_button, set_show_load_data_button] = useState(true);
+  const [selected_gr_data, set_selected_gr_data] = useState({});
   const [status_filters, set_status_filters] = useState({
     Draft: true,
     Pending: true,
@@ -89,11 +89,11 @@ const Purchase_Order = () => {
   const [selected_approval_list, set_selected_approval_list] = useState([]);
 
   useEffect(() => {
-    Get_TBL_INCREMENTAL_ID("TBL_PURCHASE_ORDER", (value) => {
+    Get_TBL_INCREMENTAL_ID("TBL_WM_ORDER", (value) => {
       set_new_po_data((prev) => ({
         ...prev,
         id: value,
-        po_number: `PO-${String(value).padStart(9, "0")}`,
+        wmo_number: `WMO-${String(value).padStart(9, "0")}`,
       }));
       set_current_id(value);
     });
@@ -102,17 +102,25 @@ const Purchase_Order = () => {
   // + Columns
   const columns = [
     { key: "index", label: "No.", sortable: false },
+    { key: "wmo_number", label: "WM Order Number", sortable: true },
+    { key: "do_number", label: "DO Number", sortable: true },
     { key: "po_number", label: "PO Number", sortable: true },
-    { key: "po_type_code", label: "PO Type", sortable: true },
-    { key: "od_company_code", label: "Company", sortable: true },
-    { key: "vendor_code", label: "Vendor", sortable: true },
     { key: "creation_date", label: "Creation Date", sortable: true },
-    { key: "po_status", label: "Status", sortable: true },
+    { key: "wmo_status", label: "Status", sortable: true },
     { key: "actions", label: "", sortable: false },
   ];
   // - Columns
 
-  const [po_list, set_po_list] = useState([]);
+  const [wm_order_list, set_wm_order_list] = useState([
+    {
+      id: 1,
+      wmo_number: "WMO-0001",
+      do_number: "GR-0001",
+      po_number: "PO-0001",
+      creation_date: "MM-DD-YYYY",
+      wmo_status: "Pending",
+    },
+  ]);
 
   const handle_get_purchase_order_list = async () => {
     set_loading_list(true);
@@ -122,7 +130,7 @@ const Purchase_Order = () => {
       show_toast
     );
     if (response.success) {
-      set_po_list(response.data);
+      set_wm_order_list(response.data);
     } else {
       console.error(response.message);
     }
@@ -131,7 +139,7 @@ const Purchase_Order = () => {
   };
 
   useEffect(() => {
-    handle_get_purchase_order_list();
+    // handle_get_purchase_order_list();
   }, []);
 
   const handle_truncate = async () => {
@@ -147,7 +155,7 @@ const Purchase_Order = () => {
   };
 
   // + Client-Side Filtering
-  const [filtered_po_list, set_filtered_po_list] = useState([]);
+  const [filtered_wm_order_list, set_filtered_wm_order_list] = useState([]);
   const [show_entries, set_show_entries] = useState(5);
   const [current_page, set_current_page] = useState(1);
   const [sort_by, set_sort_by] = useState("id");
@@ -164,49 +172,28 @@ const Purchase_Order = () => {
   }, [search_query]);
 
   useEffect(() => {
-    let temp = [...po_list];
+    let temp = [...wm_order_list];
 
     // ---------------------------------------------------
-    // PO STATUS FILTER
+    // WM ORDER STATUS FILTER
     // ---------------------------------------------------
     const active_statuses = Object.keys(status_filters).filter(
       (status) => status_filters[status]
     );
 
     if (active_statuses.length > 0) {
-      temp = temp.filter((po) => active_statuses.includes(po.po_status));
+      temp = temp.filter((po) => active_statuses.includes(po.wmo_status));
     }
 
     if (debounced_query.trim() !== "") {
       const q = debounced_query.toLowerCase();
-
-      temp = temp.filter((u) => {
-        const vendor_desc = get_description(
-          u.vendor_code,
-          vendor_master_list,
-          "vendor_code",
-          "vendor_desc"
-        );
-
-        const company_desc = get_description(
-          u.od_company_code,
-          company_list,
-          "company_code",
-          "company_desc"
-        );
-
-        return (
-          // Search raw fields
-          columns.some((col) => {
-            if (col.key === "actions") return false;
-            const val = u[col.key];
-            return val?.toString().toLowerCase().includes(q);
-          }) ||
-          // Search derived descriptions
-          vendor_desc.toLowerCase().includes(q) ||
-          company_desc.toLowerCase().includes(q)
-        );
-      });
+      temp = temp.filter((u) =>
+        columns.some((col) => {
+          if (col.key === "actions") return false;
+          const val = u[col.key];
+          return val?.toString().toLowerCase().includes(q);
+        })
+      );
     }
 
     temp.sort((a, b) => {
@@ -227,9 +214,9 @@ const Purchase_Order = () => {
     const start_idx = (current_page - 1) * show_entries;
     const end_idx = start_idx + show_entries;
 
-    set_filtered_po_list(temp.slice(start_idx, end_idx));
+    set_filtered_wm_order_list(temp.slice(start_idx, end_idx));
   }, [
-    po_list,
+    wm_order_list,
     debounced_query,
     sort_by,
     sort_order,
@@ -239,29 +226,18 @@ const Purchase_Order = () => {
   ]);
 
   const total_pages = Math.ceil(
-    po_list.filter((u) => {
-      if (!debounced_query.trim()) return true;
-
-      const q = debounced_query.toLowerCase();
-
-      const vendor_desc =
-        vendor_master_list.find((v) => v.vendor_code === u.vendor_code)
-          ?.vendor_desc || "";
-
-      const company_desc =
-        company_list.find((c) => c.company_code === u.od_company_code)
-          ?.company_desc || "";
-
-      return (
-        columns.some((col) => {
-          if (col.key === "actions") return false;
-          const val = u[col.key];
-          return val?.toString().toLowerCase().includes(q);
-        }) ||
-        vendor_desc.toLowerCase().includes(q) ||
-        company_desc.toLowerCase().includes(q)
-      );
-    }).length / show_entries
+    (debounced_query
+      ? wm_order_list.filter((u) =>
+          columns.some((col) => {
+            if (col.key === "actions") return false;
+            const val = u[col.key];
+            return val
+              ?.toString()
+              .toLowerCase()
+              .includes(debounced_query.toLowerCase());
+          })
+        ).length
+      : wm_order_list.length) / show_entries
   );
 
   const handle_sort = (column) => {
@@ -277,42 +253,6 @@ const Purchase_Order = () => {
   const handle_page_change = (page) => set_current_page(page);
   // - Client-Side Filtering
 
-  const select_modal_configs = [
-    {
-      key: "select_po_type_h",
-      label: "PO Type Hierarchy",
-      show_creation_date: false,
-      width: "max-w-[1200px]",
-      list: po_type_h_list,
-      column: [
-        "PO Type",
-        "Company",
-        "Purchasing Organization",
-        "Purchasing Group",
-      ],
-      code: [
-        "po_type_code",
-        "company_code",
-        "purc_org_code",
-        "purc_group_code",
-      ],
-      desc: [
-        "po_type_desc",
-        "company_desc",
-        "purc_org_desc",
-        "purc_group_desc",
-      ],
-      lookup: [po_type_list, company_list, purc_org_list, purc_group_list],
-      target: [
-        "po_type_code",
-        "od_company_code",
-        "od_purc_org_code",
-        "od_purc_group_code",
-      ],
-      on_after_select: () => set_page("po_creation"),
-    },
-  ];
-
   const toggle_status_filter = (status) => {
     set_status_filters((prev) => ({
       ...prev,
@@ -321,7 +261,7 @@ const Purchase_Order = () => {
   };
 
   const handle_create_new_po = () => {
-    set_display_modal("select_po_type_h");
+    set_display_modal("select_do");
   };
 
   const handle_upload_po = () => {
@@ -393,7 +333,7 @@ const Purchase_Order = () => {
                   </li>
                   <li className="flex items-center gap-1.5 text-sm text-gray-500">
                     <span>/</span>
-                    <span className="text-gray-800">Purchase Order</span>
+                    <span className="text-gray-800">WM Order</span>
                   </li>
                 </ol>
               </nav>
@@ -402,7 +342,7 @@ const Purchase_Order = () => {
             <div className="w-full bg-white rounded-lg border">
               {/* + Header */}
               <div className="flex flex-wrap items-center justify-between gap-3 p-5">
-                <h1 className="text-lg">Purchase Order</h1>
+                <h1 className="text-lg">WM Order</h1>
                 <div className="flex gap-2">
                   {active_user?.category === "DEV" && (
                     <Button
@@ -433,7 +373,7 @@ const Purchase_Order = () => {
                     icon_position="left"
                     on_click={handle_create_new_po}
                   >
-                    Create New PO
+                    Create New WM Order
                   </Button>
                   <Button
                     variant="primary"
@@ -615,7 +555,7 @@ const Purchase_Order = () => {
                       <div className="p-6 flex justify-center items-center text-gray-500 text-sm">
                         <Spinner />
                       </div>
-                    ) : filtered_po_list.length === 0 ? (
+                    ) : filtered_wm_order_list.length === 0 ? (
                       <div className="p-6 text-center text-gray-500 text-sm">
                         No data found
                       </div>
@@ -667,28 +607,28 @@ const Purchase_Order = () => {
                           </tr>
                         </thead>
                         <tbody className="bg-white">
-                          {filtered_po_list.map((row, idx) => {
+                          {filtered_wm_order_list.map((row, idx) => {
                             // + Cell Renderer
                             const render_cell = (col, row) => {
                               const value = row[col.key];
-                              if (col.key === "od_company_code") {
-                                return get_description(
-                                  row.od_company_code,
-                                  company_list,
-                                  "company_code",
-                                  "company_desc"
-                                );
-                              }
-                              if (col.key === "vendor_code") {
-                                return get_description(
-                                  row.vendor_code,
-                                  vendor_master_list,
-                                  "vendor_code",
-                                  "vendor_desc"
-                                );
-                              }
-                              if (col.key === "po_status") {
-                                const po_status_classes = {
+                              //   if (col.key === "od_company_code") {
+                              //     return get_description(
+                              //       row.od_company_code,
+                              //       company_list,
+                              //       "company_code",
+                              //       "company_desc"
+                              //     );
+                              //   }
+                              //   if (col.key === "vendor_code") {
+                              //     return get_description(
+                              //       row.vendor_code,
+                              //       vendor_master_list,
+                              //       "vendor_code",
+                              //       "vendor_desc"
+                              //     );
+                              //   }
+                              if (col.key === "wmo_status") {
+                                const wmo_status_classes = {
                                   Draft: "bg-gray-100 text-gray-500",
                                   Pending: "bg-yellow-100 text-yellow-500",
                                   "Partially Received":
@@ -703,11 +643,11 @@ const Purchase_Order = () => {
                                 return (
                                   <span
                                     className={`inline-flex items-center justify-center gap-1 rounded-full px-3 py-0.5 text-xs font-medium ${
-                                      po_status_classes[row.po_status] ||
+                                      wmo_status_classes[row.wmo_status] ||
                                       "bg-gray-100 text-gray-500"
                                     }`}
                                   >
-                                    {row.po_status}
+                                    {row.wmo_status}
                                   </span>
                                 );
                               }
@@ -721,7 +661,7 @@ const Purchase_Order = () => {
                                         on_click={() => handle_view_po(row)}
                                       />
                                     </div>
-                                    {row.po_status === "Pending" && (
+                                    {row.wmo_status === "Pending" && (
                                       <div className="relative group flex jusity-center items-center">
                                         <Button_Action
                                           icon={FileInput}
@@ -730,8 +670,8 @@ const Purchase_Order = () => {
                                         />
                                       </div>
                                     )}
-                                    {(row.po_status === "Draft" ||
-                                      row.po_status === "Pending") && (
+                                    {(row.wmo_status === "Draft" ||
+                                      row.wmo_status === "Pending") && (
                                       <div className="relative group flex jusity-center items-center">
                                         <Button_Action
                                           icon={Edit}
@@ -805,7 +745,7 @@ const Purchase_Order = () => {
         </React.Fragment>
       )}
       {/* + Pages */}
-      {page === "po_creation" && (
+      {/* {page === "po_creation" && (
         <Create_New_PO
           set_page={set_page}
           active_user={active_user}
@@ -816,10 +756,10 @@ const Purchase_Order = () => {
           set_selected_item_list={set_selected_item_list}
           selected_approval_list={selected_approval_list}
           set_selected_approval_list={set_selected_approval_list}
-          set_po_list={set_po_list}
+          set_wm_order_list={set_wm_order_list}
         />
-      )}
-      {page === "edit_po" && (
+      )} */}
+      {/* {page === "edit_po" && (
         <Edit_PO
           set_page={set_page}
           active_user={active_user}
@@ -830,10 +770,10 @@ const Purchase_Order = () => {
           set_selected_item_list={set_selected_item_list}
           selected_approval_list={selected_approval_list}
           set_selected_approval_list={set_selected_approval_list}
-          set_po_list={set_po_list}
+          set_wm_order_list={set_wm_order_list}
         />
-      )}
-      {page === "post_view_po" && (
+      )} */}
+      {/* {page === "post_view_po" && (
         <Post_View_PO
           set_page={set_page}
           active_user={active_user}
@@ -844,13 +784,13 @@ const Purchase_Order = () => {
           set_selected_item_list={set_selected_item_list}
           selected_approval_list={selected_approval_list}
           set_selected_approval_list={set_selected_approval_list}
-          set_po_list={set_po_list}
+          set_wm_order_list={set_wm_order_list}
           for_posting={for_posting}
         />
-      )}
+      )} */}
       {/* - Pages */}
       {/* + Modals */}
-      {select_modal_configs.map((cfg) => (
+      {/* {select_modal_configs.map((cfg) => (
         <Select_Generic
           key={cfg.key}
           is_open={display_modal === cfg.key}
@@ -868,34 +808,37 @@ const Purchase_Order = () => {
           set_data={set_new_po_data}
           on_after_select={cfg.on_after_select}
         />
-      ))}
+      ))} */}
       {/* - Modals */}
-      <Select_PO_Type
-        is_open={display_modal === "select_po_type"}
+      <Select_DO
+        is_open={display_modal === "select_do"}
         on_close={() => set_display_modal("")}
-        width="max-w-[1280px]"
+        width="max-w-[1000px]"
         height="max-h-[700px]"
+        show_toast={show_toast}
+        gr_start_date={gr_start_date}
+        set_gr_start_date={set_gr_start_date}
+        gr_end_date={gr_end_date}
+        set_gr_end_date={set_gr_end_date}
+        set_selected_gr_data={set_selected_gr_data}
+        wm_order_list={wm_order_list}
         set_page={set_page}
-        company_list={company_list}
-        purc_org_list={purc_org_list}
-        purc_group_list={purc_group_list}
-        po_type_list={po_type_list}
       />
-      <Delete_PO
+      {/* <Delete_PO
         is_open={display_modal === "delete_po"}
         on_close={() => set_display_modal("")}
         width="max-w-[1280px]"
-      />
-      <Set_Increment_ID
+      /> */}
+      {/* <Set_Increment_ID
         is_open={display_modal === "set_incremental_id"}
         on_close={() => set_display_modal("")}
         show_toast={show_toast}
         current_id={current_id}
         api_set_increment_id={api_set_purchase_order_increment}
-      />
+      /> */}
       {/* - Modals */}
     </React.Fragment>
   );
 };
 
-export default Purchase_Order;
+export default WM_Order;
