@@ -113,6 +113,7 @@ export const api_create_sbin = async (new_data, user, show_toast) => {
     // ---------------------------------------------
     const final_new_data = {
       ...new_data,
+      is_available: true,
       creation_date: format_date_1(get_date_now()),
       created_by: user || "N/A",
     };

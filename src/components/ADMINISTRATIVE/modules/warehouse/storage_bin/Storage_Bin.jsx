@@ -73,6 +73,7 @@ const Storage_Bin = () => {
     { key: "warehouse_code", label: "Warehouse Code", sortable: true },
     { key: "stype_code", label: "Storage Type Code", sortable: true },
     { key: "creation_date", label: "Creation Date", sortable: true },
+    { key: "is_available", label: "Status", sortable: false },
     { key: "actions", label: "", sortable: false },
   ];
 
@@ -390,6 +391,26 @@ const Storage_Bin = () => {
                             const value = row[col.key];
                             if (col.key === "index") {
                               return <span>{row.index}</span>;
+                            }
+                            if (col.key === "is_available") {
+                              function bin_status(status) {
+                                if (status) {
+                                  return "bg-green-100 text-green-500";
+                                } else {
+                                  return "bg-red-100 text-red-500";
+                                }
+                              }
+
+                              return (
+                                <span
+                                  className={`inline-flex items-center justify-center gap-1 rounded-full px-3 py-0.5 text-xs font-medium ${
+                                    bin_status(row.is_available) ||
+                                    "bg-gray-100 text-gray-500"
+                                  }`}
+                                >
+                                  {row.is_available ? "Available" : "Occupied"}
+                                </span>
+                              );
                             }
                             if (col.key === "actions") {
                               return (

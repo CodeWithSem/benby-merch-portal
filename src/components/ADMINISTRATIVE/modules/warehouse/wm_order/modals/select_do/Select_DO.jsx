@@ -8,6 +8,11 @@ import Date_Field from "assets/elements/Date_Field";
 import { format_date_1 } from "assets/scripts/format";
 import { api_get_goods_receipt_list_by_date } from "api/firestore_db/inbound/goods_receipt/tbl_goods_receipt_api";
 import Spinner from "assets/elements/Spinner";
+import { item_master_list, sbin_list } from "../../WMO_DATA_MAP";
+import {
+  generate_gr_pallets,
+  generate_wm_orders,
+} from "assets/scripts/functions/palletization";
 
 const Select_DO = ({
   is_open,
@@ -111,12 +116,21 @@ const Select_DO = ({
   const handle_page_change = (page) => set_current_page(page);
 
   const handle_proceed = () => {
-    // set_page("gr_creation");
-    set_selected_gr_data((prev) => ({
-      ...prev,
-      ...selected_gr,
-    }));
+    if (!selected_gr) return;
+
+    const wm_allocations = generate_wm_orders({
+      selected_gr,
+      item_master_list,
+      sbin_list,
+    });
+
+    // set_selected_gr_data((prev) => ({
+    //   ...prev,
+    //   ...selected_gr,
+    //   wm_allocations,
+    // }));
     console.log(selected_gr);
+    console.log(wm_allocations);
     set_selected_gr(null);
     on_close();
   };
