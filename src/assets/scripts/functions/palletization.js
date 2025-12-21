@@ -34,9 +34,12 @@ export function palletize_item({
       lpn_no: String(lpn_counter).padStart(10, "0"), // LPN NO
       item_code,
       item_desc,
-      pallet_type: wm2_pallet_load_1_sutype,
+      sutype: wm2_pallet_load_1_sutype,
       quantity: pallet_quantity, // quantity in cases
-      is_full_pallet: pallet_quantity === cases_per_pallet,
+      quantity_confirmed: 0,
+      wm_order_status: "Pending",
+      transfer_order_status: "Pending",
+      pallet_config: wm2_pallet_config_1, // ✅ include pallet config
     });
 
     remaining_quantity -= pallet_quantity;
@@ -99,31 +102,59 @@ export function generate_gr_pallets({ selected_gr, item_master_list }) {
  * @returns {Array} Array of allocated pallets with bin info
  */
 export function allocate_lpn_to_bins({ pallets, item_master_list, sbin_list }) {
-  // Clone bins to track which ones are assigned
-  const bins = sbin_list.map((b) => ({ ...b }));
+  const bins = sbin_list.map((b) => ({
+    ...b,
+    assigned: false,
+  }));
+
   const allocations = [];
 
   pallets.forEach((pallet) => {
-    // Get destination storage type for this item
-    const dest_stype = item_master_list.find(
-      (i) => i.item_code === pallet.item_code
-    ).wm1_stock_dest_code;
+    const item = item_master_list.find((i) => i.item_code === pallet.item_code);
 
-    // Find the first available bin of this type
-    const bin = bins.find((b) => b.stype_code === dest_stype && !b.assigned);
+    if (!item) {
+      allocations.push({
+        ...pallet,
+        from_stype_code: "GRZ",
+        from_sbin_code: "GRZ-01",
+        to_stype_code: null,
+        to_sbin_code: null,
+        remark: "ITEM NOT FOUND IN MASTER",
+      });
+      return;
+    }
+
+    const dest_stype = item.wm1_stock_dest_code;
+
+    const bin = bins.find(
+      (b) =>
+        b.stype_code === dest_stype &&
+        b.is_available === true &&
+        b.assigned === false
+    );
 
     if (bin) {
       allocations.push({
         ...pallet,
+        // ✅ SOURCE (DEFAULT ORIGIN)
+        from_stype_code: "GRZ",
+        from_sbin_code: "GRZ-01",
+
+        // ✅ DESTINATION
+        to_stype_code: bin.stype_code,
         to_sbin_code: bin.sbin_code,
       });
 
-      // Mark bin as assigned
       bin.assigned = true;
     } else {
-      // No bin available
       allocations.push({
         ...pallet,
+        // ✅ SOURCE
+        from_stype_code: "GRZ",
+        from_sbin_code: "GRZ-01",
+
+        // ❌ DESTINATION
+        to_stype_code: dest_stype,
         to_sbin_code: null,
         remark: "NO AVAILABLE BIN",
       });
@@ -149,11 +180,11 @@ export function generate_wm_orders({
   const pallets = generate_gr_pallets({ selected_gr, item_master_list });
 
   // 2️⃣ Allocate pallets to storage bins (1 LPN = 1 bin)
-  const wm_allocations = allocate_lpn_to_bins({
+  const wm_allocation_list = allocate_lpn_to_bins({
     pallets,
     item_master_list,
     sbin_list,
   });
 
-  return wm_allocations;
+  return wm_allocation_list;
 }

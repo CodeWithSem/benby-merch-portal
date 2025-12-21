@@ -38,17 +38,19 @@ import Button_Action from "assets/elements/Button_Action";
 // import Select_Generic from "assets/elements/modals/Select_Generic";
 import { Get_TBL_INCREMENTAL_ID } from "api/real_time_db/incremental";
 import {
-  api_get_purchase_order_list_by_date,
-  api_set_purchase_order_increment,
-  api_truncate_purchase_order,
-} from "api/firestore_db/inbound/purchase_order/tbl_purchase_order_api";
+  api_get_wm_order_list_by_date,
+  api_set_wm_order_increment,
+  api_truncate_wm_order,
+} from "api/firestore_db/warehouse/wm_order/tbl_wm_order_api";
 import { Use_App } from "context/app_context";
 import Set_Increment_ID from "assets/elements/modals/Set_Increment_ID";
 import { get_description } from "assets/scripts/functions/get_description";
 import Spinner from "assets/elements/Spinner";
 import Select_DO from "./modals/select_do/Select_DO";
+import Create_New_WMO from "./create_new_wmo/Create_New_WMO";
+import Post_View_WMO from "./post_view_wmo/Post_View_WMO";
 // import Edit_PO from "./edit_po/Edit_PO";
-// import Post_View_PO from "./post_view_po/Post_View_PO";
+// import Post_View_PO from "./post_view_wmo/Post_View_PO";
 
 const WM_Order = () => {
   const { active_user } = Use_App();
@@ -82,15 +84,15 @@ const WM_Order = () => {
   // - Variables
 
   const [current_id, set_current_id] = useState(0);
-  const [new_po_data, set_new_po_data] = useState({});
+  const [new_wmo_data, set_new_wmo_data] = useState({});
   const [edit_po_data, set_edit_po_data] = useState({});
-  const [view_po_data, set_view_po_data] = useState({});
+  const [view_wmo_data, set_view_wmo_data] = useState({});
   const [selected_item_list, set_selected_item_list] = useState([]);
   const [selected_approval_list, set_selected_approval_list] = useState([]);
 
   useEffect(() => {
     Get_TBL_INCREMENTAL_ID("TBL_WM_ORDER", (value) => {
-      set_new_po_data((prev) => ({
+      set_new_wmo_data((prev) => ({
         ...prev,
         id: value,
         wmo_number: `WMO-${String(value).padStart(9, "0")}`,
@@ -111,20 +113,11 @@ const WM_Order = () => {
   ];
   // - Columns
 
-  const [wm_order_list, set_wm_order_list] = useState([
-    {
-      id: 1,
-      wmo_number: "WMO-0001",
-      do_number: "GR-0001",
-      po_number: "PO-0001",
-      creation_date: "MM-DD-YYYY",
-      wmo_status: "Pending",
-    },
-  ]);
+  const [wm_order_list, set_wm_order_list] = useState([]);
 
-  const handle_get_purchase_order_list = async () => {
+  const handle_get_wm_order_list = async () => {
     set_loading_list(true);
-    const response = await api_get_purchase_order_list_by_date(
+    const response = await api_get_wm_order_list_by_date(
       start_date,
       end_date,
       show_toast
@@ -139,13 +132,13 @@ const WM_Order = () => {
   };
 
   useEffect(() => {
-    // handle_get_purchase_order_list();
+    handle_get_wm_order_list();
   }, []);
 
   const handle_truncate = async () => {
     set_truncate_loading(true);
-    await api_truncate_purchase_order(show_toast);
-    handle_get_purchase_order_list();
+    await api_truncate_wm_order(show_toast);
+    handle_get_wm_order_list();
     set_truncate_loading(false);
     set_display_modal("");
   };
@@ -268,20 +261,16 @@ const WM_Order = () => {
     alert("Under Maintenance");
   };
 
-  const handle_view_po = (data) => {
+  const handle_view_wmo = (data) => {
     set_for_posting(false);
-    set_view_po_data(data);
-    set_selected_item_list(data.selected_item_list);
-    set_selected_approval_list(data.selected_approval_list);
-    set_page("post_view_po");
+    set_view_wmo_data(data);
+    set_page("post_view_wmo");
   };
 
-  const handle_post_po = (data) => {
+  const handle_post_wmo = (data) => {
     set_for_posting(true);
-    set_view_po_data(data);
-    set_selected_item_list(data.selected_item_list);
-    set_selected_approval_list(data.selected_approval_list);
-    set_page("post_view_po");
+    set_view_wmo_data(data);
+    set_page("post_view_wmo");
   };
 
   const handle_edit_po = (data) => {
@@ -306,7 +295,7 @@ const WM_Order = () => {
   };
 
   const handle_load_data = () => {
-    handle_get_purchase_order_list();
+    handle_get_wm_order_list();
   };
 
   // RETURN ORIGIN
@@ -444,7 +433,7 @@ const WM_Order = () => {
                         variant="white"
                         icon={RefreshCw}
                         icon_position="left"
-                        on_click={handle_get_purchase_order_list}
+                        on_click={handle_get_wm_order_list}
                       ></Button>
                     </div>
                     <div className="w-full mt-4 md:mt-0 md:w-[600px]">
@@ -658,7 +647,7 @@ const WM_Order = () => {
                                       <Button_Action
                                         icon={View}
                                         tooltip="View Record"
-                                        on_click={() => handle_view_po(row)}
+                                        on_click={() => handle_view_wmo(row)}
                                       />
                                     </div>
                                     {row.wmo_status === "Pending" && (
@@ -666,17 +655,7 @@ const WM_Order = () => {
                                         <Button_Action
                                           icon={FileInput}
                                           tooltip="Post Record"
-                                          on_click={() => handle_post_po(row)}
-                                        />
-                                      </div>
-                                    )}
-                                    {(row.wmo_status === "Draft" ||
-                                      row.wmo_status === "Pending") && (
-                                      <div className="relative group flex jusity-center items-center">
-                                        <Button_Action
-                                          icon={Edit}
-                                          tooltip="Edit Record"
-                                          on_click={() => handle_edit_po(row)}
+                                          on_click={() => handle_post_wmo(row)}
                                         />
                                       </div>
                                     )}
@@ -745,20 +724,15 @@ const WM_Order = () => {
         </React.Fragment>
       )}
       {/* + Pages */}
-      {/* {page === "po_creation" && (
-        <Create_New_PO
+      {page === "wmo_creation" && (
+        <Create_New_WMO
           set_page={set_page}
           active_user={active_user}
           show_toast={show_toast}
-          new_po_data={new_po_data}
-          set_new_po_data={set_new_po_data}
-          selected_item_list={selected_item_list}
-          set_selected_item_list={set_selected_item_list}
-          selected_approval_list={selected_approval_list}
-          set_selected_approval_list={set_selected_approval_list}
+          new_wmo_data={new_wmo_data}
           set_wm_order_list={set_wm_order_list}
         />
-      )} */}
+      )}
       {/* {page === "edit_po" && (
         <Edit_PO
           set_page={set_page}
@@ -773,21 +747,15 @@ const WM_Order = () => {
           set_wm_order_list={set_wm_order_list}
         />
       )} */}
-      {/* {page === "post_view_po" && (
-        <Post_View_PO
+      {page === "post_view_wmo" && (
+        <Post_View_WMO
           set_page={set_page}
           active_user={active_user}
           show_toast={show_toast}
-          view_po_data={view_po_data}
-          set_view_po_data={set_view_po_data}
-          selected_item_list={selected_item_list}
-          set_selected_item_list={set_selected_item_list}
-          selected_approval_list={selected_approval_list}
-          set_selected_approval_list={set_selected_approval_list}
-          set_wm_order_list={set_wm_order_list}
+          view_wmo_data={view_wmo_data}
           for_posting={for_posting}
         />
-      )} */}
+      )}
       {/* - Pages */}
       {/* + Modals */}
       {/* {select_modal_configs.map((cfg) => (
@@ -805,7 +773,7 @@ const WM_Order = () => {
           source_desc={cfg.desc}
           lookup_lists={cfg.lookup}
           target_field={cfg.target}
-          set_data={set_new_po_data}
+          set_data={set_new_wmo_data}
           on_after_select={cfg.on_after_select}
         />
       ))} */}
@@ -820,7 +788,7 @@ const WM_Order = () => {
         set_gr_start_date={set_gr_start_date}
         gr_end_date={gr_end_date}
         set_gr_end_date={set_gr_end_date}
-        set_selected_gr_data={set_selected_gr_data}
+        set_new_wmo_data={set_new_wmo_data}
         wm_order_list={wm_order_list}
         set_page={set_page}
       />
@@ -829,13 +797,13 @@ const WM_Order = () => {
         on_close={() => set_display_modal("")}
         width="max-w-[1280px]"
       /> */}
-      {/* <Set_Increment_ID
+      <Set_Increment_ID
         is_open={display_modal === "set_incremental_id"}
         on_close={() => set_display_modal("")}
         show_toast={show_toast}
         current_id={current_id}
-        api_set_increment_id={api_set_purchase_order_increment}
-      /> */}
+        api_set_increment_id={api_set_wm_order_increment}
+      />
       {/* - Modals */}
     </React.Fragment>
   );

@@ -24,7 +24,7 @@ const Select_DO = ({
   set_gr_start_date,
   gr_end_date,
   set_gr_end_date,
-  set_selected_gr_data,
+  set_new_wmo_data,
   wm_order_list,
   set_page,
 }) => {
@@ -72,9 +72,7 @@ const Select_DO = ({
 
   // --- Filter, Sort & Paginate ---
   useEffect(() => {
-    let temp = wm_order_list_data.filter(
-      (gr) => gr.gr_status === "Posted" || gr.gr_status === "Partially Received"
-    );
+    let temp = wm_order_list_data.filter((gr) => gr.gr_status === "Posted");
 
     // SEARCH
     if (debounced_query.trim() !== "") {
@@ -118,20 +116,26 @@ const Select_DO = ({
   const handle_proceed = () => {
     if (!selected_gr) return;
 
-    const wm_allocations = generate_wm_orders({
+    const wm_allocation_list = generate_wm_orders({
       selected_gr,
       item_master_list,
       sbin_list,
     });
 
-    // set_selected_gr_data((prev) => ({
-    //   ...prev,
-    //   ...selected_gr,
-    //   wm_allocations,
-    // }));
+    set_new_wmo_data((prev) => {
+      const { id: gr_id, ...rest_gr } = selected_gr;
+
+      return {
+        ...prev, // keeps WM order id
+        ...rest_gr, // other GR fields
+        gr_id, // explicitly mapped
+        wm_allocation_list,
+      };
+    });
+
     console.log(selected_gr);
-    console.log(wm_allocations);
     set_selected_gr(null);
+    set_page("wmo_creation");
     on_close();
   };
 

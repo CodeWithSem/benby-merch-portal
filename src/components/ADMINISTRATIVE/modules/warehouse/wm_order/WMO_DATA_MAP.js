@@ -31,9 +31,9 @@ export const sbin_list = [
     sbin_code: "GRZ-01",
     sbin_desc: "Goods Receiving Zone A",
     stype_code: "GRZ",
-
     max_bin_capacity: 10000,
     max_bin_capacity_uom: "CS",
+    is_available: true,
     creation_date: "MM-DD-YYYY",
   },
   {
@@ -45,6 +45,7 @@ export const sbin_list = [
     bin_capacity_uom: "CS",
     max_bin_capacity: 48,
     max_bin_capacity_uom: "CS",
+    is_available: true,
     creation_date: "MM-DD-YYYY",
   },
   {
@@ -56,6 +57,7 @@ export const sbin_list = [
     bin_capacity_uom: "CS",
     max_bin_capacity: 48,
     max_bin_capacity_uom: "CS",
+    is_available: true,
     creation_date: "MM-DD-YYYY",
   },
   {
@@ -67,6 +69,7 @@ export const sbin_list = [
     bin_capacity_uom: "CS",
     max_bin_capacity: 48,
     max_bin_capacity_uom: "CS",
+    is_available: true,
     creation_date: "MM-DD-YYYY",
   },
 ];
