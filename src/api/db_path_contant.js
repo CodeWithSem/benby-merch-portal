@@ -11,7 +11,6 @@ export const TABLES = {
   VENDOR_MASTER: "TBL_VENDOR_MASTER",
   // - Inbound Module ==================================
   // + Warhouse Module =================================
-  WM_ORDER: "TBL_WM_ORDER",
   STORAGE_BIN: "TBL_STORAGE_BIN",
   ITEM_MASTER: "TBL_ITEM_MASTER",
   ITEM_EXT_SALES_DATA: "TBL_ITEM_EXT_SALES_DATA",
@@ -146,12 +145,18 @@ export const TABLES = {
   DELIVERY_DOCUMENT_TYPE_HIERARCHY: "TBL_DELIVERY_DOCUMENT_TYPE_HIERARCHY",
   WAREHOUSE_HIERARCHY: "TBL_WAREHOUSE_HIERARCHY",
   APPROVAL_MATRIX_HIERARCHY: "TBL_APPROVAL_MATRIX_HIERARCHY",
-
   // - Maintenance Module ==============================
+  // + Production Module ===============================
+  PRODUCTION_PLAN: "TBL_PRODUCTION_PLAN",
+  // - Production Module ===============================
 };
 
 export const get_firestore_path = (table) => {
   return [DB_ROOT, table, "DATA"];
+};
+
+export const get_realtime_path = (table) => {
+  return `${DB_ROOT}/${table}/DATA`;
 };
 
 export const get_incremental_path = (table) => {
