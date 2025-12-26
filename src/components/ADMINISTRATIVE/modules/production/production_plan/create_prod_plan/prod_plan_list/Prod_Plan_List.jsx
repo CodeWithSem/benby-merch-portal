@@ -8,7 +8,11 @@ import { format_currency, format_date_1 } from "assets/scripts/format";
 import Button from "assets/elements/Button";
 import Button_Action from "assets/elements/Button_Action";
 import Date_Field from "assets/elements/Date_Field";
-import { item_master_list, bom_master_list } from "../../PROD_PLAN_DATA_MAP";
+import {
+  item_master_list,
+  bom_master_list,
+  prod_machine_list,
+} from "../../PROD_PLAN_DATA_MAP";
 import Select_Generic from "assets/elements/modals/Select_Generic";
 import { get_description } from "assets/scripts/functions/get_description";
 import Edit_Item from "./modals/Edit_Item";
@@ -37,6 +41,18 @@ const Prod_Plan_List = ({
       lookup: [item_master_list],
       target: ["item_code"],
     },
+    {
+      key: "select_machine",
+      label: "Machine",
+      width: "max-w-[800px]",
+      list: prod_machine_list,
+      column: ["Machine"],
+      show_creation_date: true,
+      code: ["machine_code"],
+      desc: ["machine_desc"],
+      lookup: [prod_machine_list],
+      target: ["machine_code"],
+    },
   ];
 
   const handle_change_start_date = (value) => {
@@ -49,6 +65,7 @@ const Prod_Plan_List = ({
     // set_show_load_data_button(true);
   };
   const [selected_item_data, set_selected_item_data] = useState({
+    machine_code: "",
     item_code: "",
     item_desc: "",
     quantity: 1,
@@ -83,10 +100,18 @@ const Prod_Plan_List = ({
       "item_desc"
     );
 
+    const machine_desc = get_description(
+      selected_item_data.machine_code,
+      prod_machine_list,
+      "machine_code",
+      "machine_desc"
+    );
+
     set_selected_prod_plan_list((prev) => [
       ...prev,
       {
         ...selected_item_data,
+        machine_desc,
         item_desc, // ✅ SAVE IT
         start_date,
         end_date,
@@ -94,6 +119,7 @@ const Prod_Plan_List = ({
     ]);
 
     set_selected_item_data({
+      machine_code: "",
       item_code: "",
       item_desc: "",
       quantity: 1,
@@ -143,7 +169,6 @@ const Prod_Plan_List = ({
 
   const handle_show_select_item_modal = () => {
     set_display_item_modal("select_item");
-    // selec item function
   };
 
   const handle_edit_item = (item, index) => {
@@ -192,6 +217,9 @@ const Prod_Plan_List = ({
                     No.
                   </th>
                   <th className="px-5 py-4 font-semibold whitespace-nowrap text-gray-700 dark:text-gray-400">
+                    Machine
+                  </th>
+                  <th className="px-5 py-4 font-semibold whitespace-nowrap text-gray-700 dark:text-gray-400">
                     Item
                   </th>
                   <th className="px-5 py-4 font-semibold whitespace-nowrap text-gray-700 dark:text-gray-400">
@@ -228,6 +256,9 @@ const Prod_Plan_List = ({
                     >
                       <td className="px-5 py-4 whitespace-nowrap text-gray-500 dark:text-gray-400">
                         {index + 1}
+                      </td>
+                      <td className="px-5 py-4 font-medium whitespace-nowrap text-gray-800 dark:text-white/90">
+                        {item.machine_desc}
                       </td>
                       <td className="px-5 py-4 font-medium whitespace-nowrap text-gray-800 dark:text-white/90">
                         {item.item_desc}
@@ -270,7 +301,20 @@ const Prod_Plan_List = ({
         {/* - Item List */}
         {/* + Add Item */}
         <div className="mt-5 rounded-lg border border-gray-100 bg-gray-50 p-4 sm:p-6 dark:border-gray-800 dark:bg-gray-900">
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 lg:grid-cols-12">
+          <div className="grid grid-cols-1 gap-4 lg:grid-cols-12">
+            <div className="w-full lg:col-span-12">
+              <Find_Field
+                label="Production Machine / Line"
+                value={get_description(
+                  selected_item_data.machine_code,
+                  prod_machine_list,
+                  "machine_code",
+                  "machine_desc"
+                )}
+                on_click={() => set_display_item_modal("select_machine")}
+                disabled
+              />
+            </div>
             <div className="w-full lg:col-span-3">
               <Text_Field
                 label="Item Code"
@@ -324,6 +368,7 @@ const Prod_Plan_List = ({
                 icon={CirclePlus}
                 on_click={handle_add_item}
                 disabled={
+                  selected_item_data.machine_code === "" ||
                   selected_item_data.item_code === "" ||
                   start_date === "" ||
                   end_date === "" ||

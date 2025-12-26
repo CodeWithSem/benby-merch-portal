@@ -6,6 +6,7 @@ import Button from "assets/elements/Button";
 import Prod_Plan_List from "./prod_plan_list/Prod_Plan_List";
 import { api_create_prod_plan_rtdb } from "api/real_time_db/production/production_plan/tbl_production_plan_api";
 import { handle_text_change_function } from "assets/scripts/functions/input_functions";
+import { validate_required_fields } from "assets/scripts/functions/validate_fields";
 
 const Create_Prod_Plan = ({
   set_page,
@@ -18,6 +19,7 @@ const Create_Prod_Plan = ({
   const [active_tab, set_active_tab] = useState("delivery");
   const [display_modal, set_display_modal] = useState("");
   const [create_loading, set_create_loading] = useState(false);
+  const [is_confirm_modal_open, set_is_confirm_modal_open] = useState(false);
   const [selected_prod_plan_list, set_selected_prod_plan_list] = useState([]);
 
   const tabs = [
@@ -29,50 +31,110 @@ const Create_Prod_Plan = ({
     { key: "approval", title: "Approval" },
   ];
 
-  const handle_preview = () => {
-    alert("Under Maintenance");
-  };
+  const validate_batch_data_fields = () => {
+    const is_valid = validate_required_fields({
+      data: new_prod_plan_data,
+      fields: [{ name: "plan_title", label: "Plan Title" }],
+      show_toast,
+    });
 
-  const handle_save_as_draft = () => {
-    alert("Under Maintenance");
+    return is_valid;
   };
 
   const handle_create = async () => {
-    const new_data = {
-      ...new_prod_plan_data,
-      plan_status: "Pending",
-      selected_prod_plan_list: selected_prod_plan_list.map((data) => ({
-        ...data,
-        prod_start_timestamp: "",
-        prod_end_timestamp: "",
-        prod_status: "Pending",
-      })),
-    };
-    const response = await api_create_prod_plan_rtdb(
-      new_data,
-      active_user?.username,
-      show_toast
-    );
-
-    if (response.success) {
-      set_prod_plan_list((prev) => [...prev, response.data]);
-      set_new_prod_plan_data((prev) => ({
-        id: prev.id,
-        plan_number: prev.plan_number,
-      }));
-      handle_go_back();
-    } else {
-      console.error("Failed to create Production Plan:", response.message);
+    if (!validate_batch_data_fields()) {
+      close_confirm_modal();
+      return;
     }
+    try {
+      const new_data = {
+        ...(({ index, ...rest }) => rest)(new_prod_plan_data),
+        plan_status: "Pending",
+        selected_prod_plan_list: selected_prod_plan_list.map((data) => ({
+          ...data,
+          // prod_start_timestamp: "",
+          // prod_end_timestamp: "",
+          prod_status: "Pending",
+        })),
+      };
+      const response = await api_create_prod_plan_rtdb(
+        new_data,
+        active_user?.username,
+        show_toast
+      );
+      if (response.success) {
+        set_prod_plan_list((prev) => [...prev, response.data]);
+        set_new_prod_plan_data((prev) => ({
+          id: prev.id,
+          plan_number: prev.plan_number,
+        }));
+        handle_go_back();
+      }
+    } catch (error) {
+      console.error("Failed to create a new data:", error);
+    } finally {
+      close_confirm_modal();
+    }
+  };
+
+  const close_confirm_modal = () => {
+    set_is_confirm_modal_open(false);
+    set_create_loading(false);
+  };
+
+  const Confirm_Modal = () => {
+    return (
+      <React.Fragment>
+        <div className="fixed inset-0 flex items-center justify-center z-[100]">
+          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm z-[101]"></div>
+          <div
+            className={`relative bg-white rounded-lg shadow-xl max-w-[500px] w-full p-10 m-5 z-[102]`}
+          >
+            <div className="w-full flex justify-center items-center text-lg md:text-xl font-bold mb-4">
+              Confirm Production Plan Creation
+            </div>
+            <p className="w-full text-center text-sm leading-6 text-gray-500 dark:text-gray-400 pt-4">
+              You are about to create a new Production Plan. Once created, it
+              will be added to the database.
+            </p>
+            <p className="w-full text-center text-sm leading-6 text-gray-500 dark:text-gray-400 pt-4">
+              Please review all the details — before proceeding.
+            </p>
+            <p className="w-full text-center text-sm leading-6 text-gray-500 dark:text-gray-400 py-4">
+              Are you sure you want to continue?
+            </p>
+            <div className="flex justify-center gap-2 mt-4">
+              <Button
+                width="w-[100px]"
+                variant="primary"
+                loading={create_loading}
+                on_click={handle_create}
+              >
+                Yes
+              </Button>
+              <Button
+                width="w-[100px]"
+                variant="white"
+                on_click={() => set_is_confirm_modal_open(false)}
+                disabled={create_loading}
+              >
+                No
+              </Button>
+            </div>
+          </div>
+        </div>
+      </React.Fragment>
+    );
+  };
+
+  const handle_go_back = () => {
+    set_page("main");
   };
 
   const handle_text_change = handle_text_change_function(
     set_new_prod_plan_data
   );
 
-  const handle_go_back = () => {
-    set_page("main");
-  };
   // RETURN ORIGIN
   return (
     <React.Fragment>
@@ -182,8 +244,8 @@ const Create_Prod_Plan = ({
                 width="w-[120px]"
                 icon={CirclePlus}
                 icon_position="left"
-                loading={create_loading}
-                on_click={handle_create}
+                on_click={() => set_is_confirm_modal_open(true)}
+                disabled={selected_prod_plan_list.length === 0}
               >
                 Create
               </Button>
@@ -202,6 +264,7 @@ const Create_Prod_Plan = ({
         </div>
       </div>
       {/* + Modals */}
+      {is_confirm_modal_open && <Confirm_Modal />}
       {/* - Modals */}
     </React.Fragment>
   );

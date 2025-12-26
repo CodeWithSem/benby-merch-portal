@@ -47,6 +47,14 @@ const Remove_Item = ({
                   <div className="grid grid-cols-1 gap-5">
                     <div>
                       <Text_Field
+                        label="Production Machine / Line"
+                        type={"text"}
+                        value={remove_item_data.machine_desc}
+                        disabled
+                      />
+                    </div>
+                    <div>
+                      <Text_Field
                         label="Item Code"
                         type={"text"}
                         value={remove_item_data.item_code}

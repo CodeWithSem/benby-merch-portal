@@ -39,7 +39,7 @@ const Sidebar = ({
       type: "dropdown",
       name: "Production",
       icon: <Pickaxe size={18} />,
-      sub_items: ["Production Plan", "Reports"],
+      sub_items: ["Production Plan", "Progress", "Reports"],
     },
     {
       key: "Warehouse",

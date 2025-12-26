@@ -1,19 +1,6 @@
 import React, { useEffect, useState } from "react";
-import {
-  Search,
-  ChevronDown,
-  ChevronUp,
-  Edit,
-  Trash,
-  View,
-  PlusCircle,
-  RefreshCw,
-  FileUp,
-  Trash2,
-  FileDigit,
-  Database,
-} from "lucide-react";
-import { useToast } from ".././../layout/Toast_Provider";
+import { Search, ChevronDown, ChevronUp, View, RefreshCw } from "lucide-react";
+import { useToast } from ".././../../layout/Toast_Provider";
 import Icon_Field from "assets/elements/Icon_Field";
 import Select_Field from "assets/elements/Select_Field";
 import Button from "assets/elements/Button";
@@ -21,94 +8,53 @@ import Pagination from "assets/elements/Pagination";
 import Button_Action from "assets/elements/Button_Action";
 import { Use_App } from "context/app_context";
 import Spinner from "assets/elements/Spinner";
-import Create_Prod_Plan from "./create_prod_plan/Create_Prod_Plan";
-import { Get_TBL_INCREMENTAL_ID } from "api/real_time_db/incremental";
-import {
-  api_get_prod_plan_by_date_rtdb,
-  api_set_prod_plan_increment,
-  api_truncate_prod_plan,
-} from "api/real_time_db/production/production_plan/tbl_production_plan_api";
-import Set_Increment_ID from "assets/elements/modals/Set_Increment_ID";
-import { format_date_1 } from "assets/scripts/format";
-import Date_Field from "assets/elements/Date_Field";
+import { api_get_posted_prod_plan_rtdb_realtime } from "api/real_time_db/production/production_plan/tbl_production_plan_api";
+import View_Production from "./view_production/View_Production";
 
-const Production_Plan = () => {
+const Progress = () => {
   const { active_user } = Use_App();
   const { show_toast } = useToast();
   const [page, set_page] = useState("main");
-  const [display_modal, set_display_modal] = useState("");
   const [loading_list, set_loading_list] = useState(false);
-  const [truncate_loading, set_truncate_loading] = useState(false);
-  const [show_load_data_button, set_show_load_data_button] = useState(true);
-  const now = new Date();
-  const first_day_of_month = new Date(now.getFullYear(), now.getMonth(), 1);
-  const last_day_of_month = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-  const start = format_date_1(first_day_of_month);
-  const end = format_date_1(last_day_of_month);
-  const [start_date, set_start_date] = useState(start);
-  const [end_date, set_end_date] = useState(end);
 
-  const [current_id, set_current_id] = useState(0);
-  const [new_prod_plan_data, set_new_prod_plan_data] = useState({});
-  const [edit_prod_plan_data, set_edit_prod_plan_data] = useState({});
-  const [delete_prod_plan_data, set_delete_prod_plan_data] = useState({});
-  const [view_prod_plan_data, set_view_prod_plan_data] = useState({});
-
-  useEffect(() => {
-    Get_TBL_INCREMENTAL_ID("TBL_PRODUCTION_PLAN", (value) => {
-      set_new_prod_plan_data((prev) => ({
-        ...prev,
-        id: value,
-        plan_number: `PROD-P-${String(value).padStart(9, "0")}`,
-      }));
-      set_current_id(value);
-    });
-  }, []);
+  const [view_prod_data, set_view_prod_data] = useState({});
 
   const columns = [
-    { key: "index", label: "#", sortable: false },
+    { key: "index", label: "No.", sortable: false },
     { key: "plan_number", label: "Plan Number", sortable: true },
     { key: "plan_title", label: "Plan Title", sortable: true },
-    { key: "creation_date", label: "Creation Date", sortable: true },
+    { key: "posted_date", label: "Posted Date", sortable: true },
     { key: "plan_status", label: "Status", sortable: true },
     { key: "actions", label: "", sortable: false },
   ];
 
   const [prod_plan_list, set_prod_plan_list] = useState([]);
 
-  const handle_get_prod_plan_list = async () => {
+  const handle_get_posted_prod_plan_list = () => {
     set_loading_list(true);
-    const response = await api_get_prod_plan_by_date_rtdb(
-      start_date,
-      end_date,
-      show_toast
+    // Subscribe to real-time updates
+    const unsubscribe = api_get_posted_prod_plan_rtdb_realtime(
+      show_toast,
+      (result) => {
+        if (result.success) {
+          set_prod_plan_list(result.data); // Update your component state
+        } else {
+          set_prod_plan_list([]); // Clear or handle error
+        }
+        set_loading_list(false);
+      }
     );
-    if (response.success) {
-      set_prod_plan_list(response.data);
-    } else {
-      console.error(response.message);
-    }
-    set_loading_list(false);
+
+    // Return unsubscribe function so you can stop listening on unmount
+    return unsubscribe;
   };
 
   useEffect(() => {
-    handle_get_prod_plan_list();
+    const unsubscribe = handle_get_posted_prod_plan_list();
+
+    // Cleanup listener on component unmount
+    return () => unsubscribe();
   }, []);
-
-  const handle_truncate_prod_plan_list = async () => {
-    set_truncate_loading(true);
-    const response = await api_truncate_prod_plan(show_toast);
-    if (response.success) {
-      handle_get_prod_plan_list();
-    } else {
-      console.error(response.message);
-    }
-    set_truncate_loading(false);
-  };
-
-  const handle_set_incremental_id = () => {
-    set_display_modal("set_incremental_id");
-  };
 
   // + Client-Side Filtering
   const [filtered_prod_plan_list, set_filtered_prod_plan_list] = useState([]);
@@ -196,38 +142,9 @@ const Production_Plan = () => {
   const handle_page_change = (page) => set_current_page(page);
   // - Client-Side Filtering
 
-  const handle_change_start_date = (value) => {
-    set_start_date(format_date_1(value));
-    // set_show_load_data_button(true);
-  };
-
-  const handle_change_end_date = (value) => {
-    set_end_date(format_date_1(value));
-    // set_show_load_data_button(true);
-  };
-
-  const handle_create_new_prod_plan = () => set_page("prod_plan_creation");
-
-  const handle_upload_prod_plan = () => alert("Under Maintenance");
-
-  const handle_view_prod_plan = (data) => {
-    console.table(data);
-    set_view_prod_plan_data(data);
-    set_page("view_prod_plan");
-  };
-
-  const handle_edit_prod_plan = (data) => {
-    set_edit_prod_plan_data(data);
-    set_page("edit_prod_plan");
-  };
-
-  const handle_delete_prod_plan = (data) => {
-    set_delete_prod_plan_data(data);
-    set_display_modal("delete_prod_plan");
-  };
-
-  const handle_load_data = () => {
-    handle_get_prod_plan_list();
+  const handle_view_production = (data) => {
+    set_view_prod_data(data);
+    set_page("view_production");
   };
 
   // RETURN ORIGIN
@@ -253,7 +170,7 @@ const Production_Plan = () => {
                 </li>
                 <li className="flex items-center gap-1.5 text-sm text-gray-500">
                   <span>/</span>
-                  <span className="text-gray-800">Production Plan</span>
+                  <span className="text-gray-800">Progress</span>
                 </li>
               </ol>
             </nav>
@@ -262,40 +179,16 @@ const Production_Plan = () => {
           <div className="w-full bg-white rounded-lg border">
             {/* + Header */}
             <div className="flex flex-wrap items-center justify-between gap-3 p-5">
-              <h1 className="text-lg">Production Plan</h1>
+              <h1 className="text-lg">Progress</h1>
               <div className="flex gap-2">
-                {active_user?.category === "DEV" && (
-                  <Button
-                    variant="success"
-                    icon={FileDigit}
-                    icon_position="left"
-                    width="w-[110px]"
-                    on_click={handle_set_incremental_id}
-                  >
-                    Set ID
-                  </Button>
-                )}
-                {active_user?.category === "DEV" && (
-                  <Button
-                    variant="danger"
-                    icon={Trash2}
-                    icon_position="left"
-                    width="w-[110px]"
-                    loading={truncate_loading}
-                    on_click={handle_truncate_prod_plan_list}
-                    disabled={prod_plan_list.length === 0}
-                  >
-                    Truncate
-                  </Button>
-                )}
-                <Button
+                {/* <Button
                   variant="primary"
                   icon={PlusCircle}
                   icon_position="left"
                   on_click={handle_create_new_prod_plan}
                 >
                   Create New Plan
-                </Button>
+                </Button> */}
                 {/* <Button
                   variant="primary"
                   icon={FileUp}
@@ -307,37 +200,6 @@ const Production_Plan = () => {
               </div>
             </div>
             {/* - Header */}
-            {/* + Section 1 */}
-            <div className="p-5 sm:p-6 border-t">
-              {/* + Date Range Filter */}
-              <div className="grid grid-cols-1 gap-5 md:w-[220px]">
-                <Date_Field
-                  label="Start Date"
-                  value={start_date}
-                  on_change={(e) => handle_change_start_date(e.target.value)}
-                  placeholder="Select Date"
-                />
-                <Date_Field
-                  label="End Date"
-                  value={end_date}
-                  on_change={(e) => handle_change_end_date(e.target.value)}
-                  placeholder="Select Date"
-                />
-                {show_load_data_button && (
-                  <Button
-                    variant="primary"
-                    icon={Database}
-                    icon_position="left"
-                    loading={loading_list}
-                    on_click={handle_load_data}
-                  >
-                    Load Data
-                  </Button>
-                )}
-              </div>
-              {/* - Date Range Filter */}
-            </div>
-            {/* - Section 1 */}
             {/* + Section 1 */}
             <div className="p-5 sm:p-6 border-t">
               {/* + prod_plan List */}
@@ -365,7 +227,7 @@ const Production_Plan = () => {
                       variant="white"
                       icon={RefreshCw}
                       icon_position="left"
-                      on_click={handle_get_prod_plan_list}
+                      on_click={handle_get_posted_prod_plan_list}
                     />
                   </div>
                   <div className="w-full mt-4 md:mt-0 md:w-[600px]">
@@ -468,29 +330,9 @@ const Production_Plan = () => {
                                   <div className="relative group flex jusity-center items-center">
                                     <Button_Action
                                       icon={View}
-                                      tooltip="View Record"
+                                      tooltip="View Progress"
                                       on_click={() =>
-                                        handle_view_prod_plan(row)
-                                      }
-                                    />
-                                  </div>
-                                  <div className="relative group flex jusity-center items-center">
-                                    <Button_Action
-                                      icon={Edit}
-                                      tooltip="Edit Record"
-                                      on_click={() =>
-                                        handle_edit_prod_plan(row)
-                                      }
-                                    />
-                                  </div>
-                                  <div className="relative group flex jusity-center items-center">
-                                    <Button_Action
-                                      class_name="mb-[1px]"
-                                      icon={Trash}
-                                      variant="danger"
-                                      tooltip="Delete Record"
-                                      on_click={() =>
-                                        handle_delete_prod_plan(row)
+                                        handle_view_production(row)
                                       }
                                     />
                                   </div>
@@ -541,41 +383,18 @@ const Production_Plan = () => {
         </div>
       )}
       {/* + Pages */}
-      {page === "prod_plan_creation" && (
-        <Create_Prod_Plan
+      {page === "view_production" && (
+        <View_Production
           set_page={set_page}
-          active_user={active_user}
           show_toast={show_toast}
-          new_prod_plan_data={new_prod_plan_data}
-          set_new_prod_plan_data={set_new_prod_plan_data}
-          set_prod_plan_list={set_prod_plan_list}
+          view_prod_data={view_prod_data}
         />
       )}
-      {/* {page === "edit_prod_plan" && (
-        <Edit_prod_plan
-          set_page={set_page}
-          active_user={active_user}
-          show_toast={show_toast}
-          edit_prod_plan_data={edit_prod_plan_data}
-          set_edit_prod_plan_data={set_edit_prod_plan_data}
-          set_prod_plan_list={set_prod_plan_list}
-        />
-      )} */}
-      {/* {page === "view_prod_plan" && (
-        <View_prod_plan set_page={set_page} view_prod_plan_data={view_prod_plan_data} />
-      )} */}
       {/* - Pages */}
       {/* + Modals */}
-      <Set_Increment_ID
-        is_open={display_modal === "set_incremental_id"}
-        on_close={() => set_display_modal("")}
-        show_toast={show_toast}
-        current_id={current_id}
-        api_set_increment_id={api_set_prod_plan_increment}
-      />
       {/* - Modals */}
     </React.Fragment>
   );
 };
 
-export default Production_Plan;
+export default Progress;

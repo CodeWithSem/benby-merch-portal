@@ -15,6 +15,7 @@ const Edit_Item = ({
   set_selected_prod_plan_list,
 }) => {
   const [form, set_form] = useState({
+    machine_code: "",
     item_code: "",
     item_desc: "",
     quantity: 1,
@@ -76,10 +77,16 @@ const Edit_Item = ({
         {/* Body */}
         <div className="rounded-lg border bg-gray-50 p-4">
           <div className="grid grid-cols-12 gap-4">
+            <div className="col-span-12">
+              <Text_Field
+                label="Production Machine / Line"
+                value={form.machine_desc}
+                disabled
+              />
+            </div>
             <div className="col-span-3">
               <Text_Field label="Item Code" value={form.item_code} disabled />
             </div>
-
             <div className="col-span-9">
               <Text_Field
                 label="Item Description"

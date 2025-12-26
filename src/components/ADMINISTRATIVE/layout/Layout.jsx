@@ -39,7 +39,8 @@ import User_Maint from "../modules/maintenance/user/User_Maint";
 import User_Management from "../modules/user_management/User_Management";
 import WM_Order from "../modules/warehouse/wm_order/WM_Order";
 import Storage_Bin from "../modules/warehouse/storage_bin/Storage_Bin";
-import Production_Plan from "../modules/production_plan/Production_Plan";
+import Production_Plan from "../modules/production/production_plan/Production_Plan";
+import Progress from "../modules/production/progress/Progress";
 
 const Layout = () => {
   const [active_item, set_active_item] = useState(() => {
@@ -146,6 +147,8 @@ const Layout = () => {
         return <Data_Assignment />;
       case "Production-Production Plan":
         return <Production_Plan />;
+      case "Production-Progress":
+        return <Progress />;
       case "Templates-Form Elements":
         return <Form_Elements />;
       case "Templates-Tabs":
