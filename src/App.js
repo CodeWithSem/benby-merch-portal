@@ -6,6 +6,7 @@ import Login from "./components/AUTHENTICATION/Login";
 import Sign_Up from "./components/AUTHENTICATION/Sign_Up";
 import { App_Provider, Use_App } from "./context/app_context";
 import { Use_ESC_Clear_Console } from "assets/scripts/functions/clear_console";
+import Production_Layout from "components/PRODUCTION/layout/Production_Layout";
 
 const App_Content = () => {
   const { page, set_page } = Use_App();
@@ -16,6 +17,7 @@ const App_Content = () => {
       {page === "login" && <Login set_page={set_page} />}
       {page === "sign_up" && <Sign_Up set_page={set_page} />}
       {page === "dashboard" && <Layout set_page={set_page} />}
+      {page === "production" && <Production_Layout set_page={set_page} />}
     </Toast_Provider>
   );
 };

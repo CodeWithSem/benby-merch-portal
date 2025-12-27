@@ -27,7 +27,7 @@ const Login = () => {
       set_active_user(user);
 
       // Redirect to Dashboard by updating parent state
-      set_page("dashboard");
+      set_page("production");
 
       show_toast({
         type: "success",
