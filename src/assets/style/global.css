@@ -79,6 +79,22 @@ a {
   background: #e9e9e9 !important;
 }
 
+@keyframes blink {
+  0%,
+  50%,
+  100% {
+    opacity: 1;
+  }
+  25%,
+  75% {
+    opacity: 0;
+  }
+}
+
+.blink-cursor {
+  animation: blink 1.5s step-start infinite;
+}
+
 /* .flatpickr-month {
   height: 50px !important;
   display: flex;

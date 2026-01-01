@@ -27,7 +27,11 @@ const Login = () => {
       set_active_user(user);
 
       // Redirect to Dashboard by updating parent state
-      set_page("production");
+      if (user.category === "PROD") {
+        set_page("production");
+      } else {
+        set_page("dashboard");
+      }
 
       show_toast({
         type: "success",
@@ -76,7 +80,7 @@ const Login = () => {
                     </label>
                     <input
                       type="text"
-                      placeholder="Enter your username"
+                      placeholder="Enter username"
                       value={username}
                       onChange={(e) => set_username(e.target.value)}
                       className="block w-full focus:border-sky-500 focus:ring-sky-500 px-4 py-2.5 bg-white border border-gray-300 rounded-md text-sm shadow-sm placeholder-slate-400 focus:ring-1 focus:outline-none"
@@ -92,7 +96,7 @@ const Login = () => {
                     <div className="relative rounded-md shadow-sm border text-sm border-gray-300 focus-within:ring-1 focus-within:ring-sky-500 focus-within:border-sky-500">
                       <input
                         type={show_password ? "text" : "password"}
-                        placeholder="Enter your password"
+                        placeholder="Enter password"
                         value={password}
                         onChange={(e) => set_password(e.target.value)}
                         className="block w-full pr-10 px-4 py-2.5 bg-transparent border border-transparent focus:outline-none focus:ring-0 focus:border-transparent placeholder-gray-400 disabled:cursor-not-allowed disabled:bg-transparent"

@@ -19,6 +19,7 @@ import { CheckCircle2, CircleX } from "lucide-react";
 import {
   convert_date_to_sort,
   format_date_1,
+  format_date_2,
   format_date_sort,
   get_date_now,
 } from "assets/scripts/format";
@@ -523,3 +524,324 @@ export const api_set_prod_plan_increment = async (new_id) => {
   }
 };
 // - [SET INCREMENT]
+
+// + [UPDATE PRODUCTION STATUS WITH LOG]
+export const api_update_prod_status_rtdb = async (
+  prod_plan_id,
+  prod_index,
+  prod_status,
+  man_power = 0,
+  quantity_complete = 0,
+  quantity_reject = 0,
+  show_toast
+) => {
+  try {
+    if (!prod_plan_id && prod_plan_id !== 0) {
+      throw new Error("Production Plan ID is required.");
+    }
+
+    if (prod_index === undefined || prod_index === null) {
+      throw new Error("Production index is required.");
+    }
+
+    if (!prod_status) {
+      throw new Error("Production status is required.");
+    }
+
+    const record_ref = ref(
+      realtime_db,
+      `${get_realtime_path(
+        TABLES.PRODUCTION_PLAN
+      )}/${prod_plan_id}/selected_prod_plan_list/${prod_index}`
+    );
+
+    const snapshot = await get(record_ref);
+
+    if (!snapshot.exists()) {
+      show_toast?.({
+        type: "danger",
+        title: "Error",
+        message: "Production record does not exist.",
+        icon: <CircleX size={21} className="text-red-500" />,
+      });
+
+      return {
+        success: false,
+        message: "Production record not found",
+        status: "not_found",
+      };
+    }
+
+    const existing_data = snapshot.val();
+
+    const formatted_timestamp = format_date_2(new Date(), "ampm");
+
+    // Create log entry
+    const log_entry = {
+      timestamp: formatted_timestamp,
+      operation: prod_status,
+      man_power,
+      quantity_complete,
+      quantity_reject,
+    };
+
+    const final_data = {
+      ...existing_data,
+      prod_status,
+      prod_log_list: [...(existing_data.prod_log_list || []), log_entry],
+    };
+
+    await set(record_ref, final_data);
+
+    return {
+      success: true,
+      message: "Production status updated successfully",
+      data: final_data,
+    };
+  } catch (error) {
+    console.error("RTDB update production status error:", error);
+
+    show_toast?.({
+      type: "danger",
+      title: "Error",
+      message: error.message || "Failed to update production status.",
+      icon: <CircleX size={21} className="text-red-500" />,
+    });
+
+    return {
+      success: false,
+      message: error.message || "Failed to update production status",
+    };
+  }
+};
+// - [UPDATE PRODUCTION STATUS WITH LOG]
+
+// + [CREATE MAN POWER LOG]
+export const api_create_man_power_log = async ({
+  plan_id,
+  selected_prod_index,
+  operation,
+  name,
+  status,
+}) => {
+  const log_ref = ref(
+    realtime_db,
+    `${get_realtime_path(
+      TABLES.PRODUCTION_PLAN
+    )}/${plan_id}/selected_prod_plan_list/${selected_prod_index}/man_power_log_list`
+  );
+
+  const snapshot = await get(log_ref);
+  const existing_logs = snapshot.exists() ? snapshot.val() : [];
+
+  const new_log = {
+    timestamp: format_date_2(get_date_now(), "ampm"),
+    operation,
+    name,
+    status,
+  };
+
+  await set(log_ref, [...existing_logs, new_log]);
+
+  return true;
+};
+// - [CREATE MAN POWER LOG]
+
+// + [ADD MAN POWER TO PRODUCTION PLAN]
+export const api_add_man_power_to_prod_plan = async ({
+  plan_id,
+  selected_prod_index,
+  payload,
+  show_toast,
+}) => {
+  try {
+    if (!plan_id && plan_id !== 0)
+      throw new Error("Production Plan ID is required.");
+    if (selected_prod_index === undefined || selected_prod_index === null)
+      throw new Error("Production index is required.");
+    if (!payload?.name) throw new Error("Crew name is required.");
+
+    const man_power_ref = ref(
+      realtime_db,
+      `${get_realtime_path(
+        TABLES.PRODUCTION_PLAN
+      )}/${plan_id}/selected_prod_plan_list/${selected_prod_index}/man_power_list`
+    );
+
+    const snapshot = await get(man_power_ref);
+    const existing_list = snapshot.exists() ? snapshot.val() : [];
+
+    const is_duplicate = existing_list.some(
+      (crew) => crew.name?.toLowerCase() === payload.name.toLowerCase()
+    );
+
+    if (is_duplicate) {
+      show_toast?.({
+        type: "danger",
+        title: "Duplicate Crew",
+        message: "This crew already exists.",
+        icon: <CircleX size={21} className="text-red-500" />,
+      });
+      return { success: false, status: "duplicate" };
+    }
+
+    const new_man_power = {
+      name: payload.name,
+      man_power_status: payload.man_power_status || "Active",
+      creation_date: format_date_1(get_date_now()),
+    };
+
+    const updated_list = [...existing_list, new_man_power];
+    await set(man_power_ref, updated_list);
+
+    /* -------- CREATE LOG -------- */
+    await api_create_man_power_log({
+      plan_id,
+      selected_prod_index,
+      operation: "Add",
+      name: payload.name,
+      status: "Active",
+    });
+
+    show_toast?.({
+      type: "success",
+      title: "Crew Added",
+      message: "This crew has been successfully added.",
+      icon: <CheckCircle2 size={21} className="text-green-500" />,
+    });
+
+    return { success: true, data: updated_list };
+  } catch (error) {
+    console.error("RTDB add man power error:", error);
+    show_toast?.({
+      type: "danger",
+      title: "Error",
+      message: error.message || "Something went wrong.",
+      icon: <CircleX size={21} className="text-red-500" />,
+    });
+    return { success: false };
+  }
+};
+// - [ADD MAN POWER TO PRODUCTION PLAN]
+
+// + [UPDATE MAN POWER STATUS]
+export const api_update_man_power_status = async ({
+  plan_id,
+  selected_prod_index,
+  crew_name,
+  new_status,
+  show_toast,
+}) => {
+  try {
+    if (!plan_id && plan_id !== 0)
+      throw new Error("Production Plan ID is required.");
+    if (selected_prod_index === undefined || selected_prod_index === null)
+      throw new Error("Production index is required.");
+    if (!crew_name) throw new Error("Crew name is required.");
+    if (!new_status) throw new Error("New status is required.");
+
+    const man_power_ref = ref(
+      realtime_db,
+      `${get_realtime_path(
+        TABLES.PRODUCTION_PLAN
+      )}/${plan_id}/selected_prod_plan_list/${selected_prod_index}/man_power_list`
+    );
+
+    const snapshot = await get(man_power_ref);
+    const existing_list = snapshot.exists() ? snapshot.val() : [];
+
+    const updated_list = existing_list.map((crew) =>
+      crew.name === crew_name ? { ...crew, man_power_status: new_status } : crew
+    );
+
+    await set(man_power_ref, updated_list);
+
+    /* -------- CREATE LOG -------- */
+    await api_create_man_power_log({
+      plan_id,
+      selected_prod_index,
+      operation: "Update",
+      name: crew_name,
+      status: new_status,
+    });
+
+    show_toast?.({
+      type: "success",
+      title: "Status Updated",
+      message: `Crew status updated to ${new_status}.`,
+      icon: <CheckCircle2 size={21} className="text-green-500" />,
+    });
+
+    return { success: true, data: updated_list };
+  } catch (error) {
+    console.error("RTDB update man power error:", error);
+    show_toast?.({
+      type: "danger",
+      title: "Error",
+      message: error.message || "Something went wrong.",
+      icon: <CircleX size={21} className="text-red-500" />,
+    });
+    return { success: false };
+  }
+};
+// - [UPDATE MAN POWER STATUS]
+
+// + [REMOVE MAN POWER FROM PRODUCTION PLAN]
+export const api_remove_man_power_from_prod_plan = async ({
+  plan_id,
+  selected_prod_index,
+  crew_index,
+  show_toast,
+}) => {
+  try {
+    if (!plan_id && plan_id !== 0)
+      throw new Error("Production Plan ID is required");
+    if (selected_prod_index === undefined || selected_prod_index === null)
+      throw new Error("Production index is required");
+    if (crew_index === undefined || crew_index === null)
+      throw new Error("Crew index is required");
+
+    const man_power_ref = ref(
+      realtime_db,
+      `${get_realtime_path(
+        TABLES.PRODUCTION_PLAN
+      )}/${plan_id}/selected_prod_plan_list/${selected_prod_index}/man_power_list`
+    );
+
+    const snapshot = await get(man_power_ref);
+    const existing_list = snapshot.exists() ? snapshot.val() : [];
+
+    const removed_crew = existing_list[crew_index];
+    const updated_list = existing_list.filter((_, i) => i !== crew_index);
+
+    await set(man_power_ref, updated_list);
+
+    /* -------- CREATE LOG -------- */
+    await api_create_man_power_log({
+      plan_id,
+      selected_prod_index,
+      operation: "Delete",
+      name: removed_crew.name,
+      status: "Removed",
+    });
+
+    show_toast?.({
+      type: "success",
+      title: "Crew Removed",
+      message: "Crew has been successfully removed.",
+      icon: <CheckCircle2 size={21} className="text-green-500" />,
+    });
+
+    return { success: true, data: updated_list };
+  } catch (error) {
+    console.error("RTDB remove man power error:", error);
+    show_toast?.({
+      type: "danger",
+      title: "Error",
+      message: error.message || "Failed to remove crew",
+      icon: <CircleX size={21} className="text-red-500" />,
+    });
+    return { success: false };
+  }
+};
+// - [REMOVE MAN POWER FROM PRODUCTION PLAN]

@@ -1,13 +1,31 @@
 import React, { useEffect, useState } from "react";
 import Chart from "react-apexcharts";
 import Spinner from "assets/elements/Spinner";
-import { api_get_prod_plan_by_id_rtdb_realtime } from "api/real_time_db/production/production_plan/tbl_production_plan_api";
-import { PackageCheck, PackageX, Users } from "lucide-react";
+import {
+  api_get_prod_plan_by_id_rtdb_realtime,
+  api_update_prod_status_rtdb,
+} from "api/real_time_db/production/production_plan/tbl_production_plan_api";
+import {
+  CheckCircle2,
+  ChevronLeft,
+  Info,
+  PackageCheck,
+  PackageX,
+  Users,
+} from "lucide-react";
 import Button from "assets/elements/Button";
+import Pin_Auth from "./modals/Pin_Auth";
+import Input_Monitor from "./modals/Input_Monitor";
 
-const Prod_Operation = ({ plan_id, selected_prod_index }) => {
+const Prod_Operation = ({
+  show_toast,
+  plan_id,
+  selected_prod_index,
+  set_monitor_page,
+}) => {
+  const [display_modal, set_display_modal] = useState("");
+  const [pin_action, set_pin_action] = useState(null);
   const [prod_data, set_prod_data] = useState(null);
-  const [production_status, setProductionStatus] = useState("NotStarted");
 
   useEffect(() => {
     if (!plan_id) return;
@@ -32,6 +50,19 @@ const Prod_Operation = ({ plan_id, selected_prod_index }) => {
   }
 
   const prod = prod_data.selected_prod_plan_list?.[selected_prod_index];
+  const production_status = prod?.prod_status || "NotStarted";
+
+  // + Man Power Count
+  const man_power_list = prod?.man_power_list || [];
+  const assigned_count = man_power_list.length;
+  const active_crew_count = man_power_list.filter(
+    (crew) => crew.man_power_status === "Active"
+  ).length;
+  const idle_crew_count = man_power_list.filter(
+    (crew) => crew.man_power_status === "Idle"
+  ).length;
+
+  // - Man Power Count
 
   const radial_options_global = {
     chart: { type: "radialBar" },
@@ -53,32 +84,132 @@ const Prod_Operation = ({ plan_id, selected_prod_index }) => {
     stroke: { lineCap: "round" },
     labels: ["Progress"],
   };
-  const produced_qty = 0;
+
+  const prod_log_list = prod?.prod_log_list || [];
+
+  // Total quantity produced (complete + reject)
+  const total_quantity_produced = prod_log_list.reduce(
+    (total, log) =>
+      total + (log.quantity_complete || 0) + (log.quantity_reject || 0),
+    0
+  );
+
+  // Total quantity complete
+  const total_quantity_complete = prod_log_list.reduce(
+    (total, log) => total + (log.quantity_complete || 0),
+    0
+  );
+
+  // Total quantity rejected
+  const total_quantity_reject = prod_log_list.reduce(
+    (total, log) => total + (log.quantity_reject || 0),
+    0
+  );
 
   const completion_percent =
     prod.quantity > 0
-      ? Number(((produced_qty / prod.quantity) * 100).toFixed(2))
+      ? Number(((total_quantity_produced / prod.quantity) * 100).toFixed(2))
       : 0;
 
   const series_global = [completion_percent]; // demo percentage
 
-  const handleStart = () => setProductionStatus("Started");
-  const handleHold = () => setProductionStatus("Hold");
-  const handleResume = () => setProductionStatus("Resume");
-  const handleEnd = () => setProductionStatus("End");
+  const handle_start = async () => {
+    const res = await api_update_prod_status_rtdb(
+      plan_id,
+      selected_prod_index,
+      "Start",
+      active_crew_count,
+      0,
+      0,
+      show_toast
+    );
+
+    // ❌ STOP if API failed
+    if (!res?.success) return;
+
+    // ✅ Only runs if API succeeded
+    show_toast({
+      type: "success",
+      title: "Production Started",
+      message: "You have entered correct PIN.",
+      icon: <CheckCircle2 size={21} className="text-green-500" />,
+    });
+  };
+  const handleHold = async () => {
+    const res = await api_update_prod_status_rtdb(
+      plan_id,
+      selected_prod_index,
+      "Hold",
+      active_crew_count,
+      0,
+      0,
+      show_toast
+    );
+
+    if (!res?.success) return;
+
+    show_toast({
+      type: "warning",
+      title: "Production Paused",
+      message: "Production has been placed on hold.",
+      icon: <Info size={21} className="text-yellow-500" />,
+    });
+  };
+  const handleResume = async () => {
+    const res = await api_update_prod_status_rtdb(
+      plan_id,
+      selected_prod_index,
+      "Resume",
+      active_crew_count,
+      0,
+      0,
+      show_toast
+    );
+
+    if (!res?.success) return;
+
+    show_toast({
+      type: "success",
+      title: "Production Resumed",
+      message: "Production has successfully resumed.",
+      icon: <CheckCircle2 size={21} className="text-green-500" />,
+    });
+  };
+
+  const handle_end = async () => {
+    const final_status =
+      total_quantity_produced >= prod.quantity ? "Complete" : "End";
+
+    const res = await api_update_prod_status_rtdb(
+      plan_id,
+      selected_prod_index,
+      final_status,
+      active_crew_count,
+      0,
+      0,
+      show_toast
+    );
+
+    if (!res?.success) return;
+
+    show_toast({
+      type: "success",
+      title: "Production Ended",
+      message: "Production has been successfully ended.",
+      icon: <CheckCircle2 size={21} className="text-green-500" />,
+    });
+  };
 
   const getButtonProps = (button) => {
     switch (button) {
       case "Start":
         return {
-          // Start is active only when production_status is "Started"
-          // Disabled if production is ongoing (Started/Resume/Hold)
-          disabled: ["Started", "Resume", "Hold"].includes(production_status),
-          active: production_status === "Started",
+          disabled: ["Start", "Resume", "Hold"].includes(production_status),
+          active: production_status === "Start",
         };
       case "Hold":
         return {
-          disabled: !["Started", "Resume"].includes(production_status),
+          disabled: !["Start", "Resume"].includes(production_status),
           active: production_status === "Hold",
         };
       case "Resume":
@@ -88,15 +219,16 @@ const Prod_Operation = ({ plan_id, selected_prod_index }) => {
         };
       case "End":
         return {
-          disabled: !["Started", "Resume", "Hold"].includes(production_status),
-          active: production_status === "End",
+          disabled: !["Start", "Resume", "Hold"].includes(production_status),
+          active:
+            production_status === "End" || production_status === "Complete",
         };
       default:
         return {};
     }
   };
 
-  const renderButton = (label, onClick) => {
+  const render_button = (label, onClick) => {
     const { disabled, active } = getButtonProps(label);
 
     const baseClasses =
@@ -107,13 +239,16 @@ const Prod_Operation = ({ plan_id, selected_prod_index }) => {
 
     if (active) {
       if (label === "Start" || label === "Resume")
-        bgClass = "bg-green-500 text-white cursor-not-allowed";
+        bgClass =
+          "bg-green-500 ring-2 ring-green-500 ring-offset-2 text-white cursor-not-allowed outline-none";
       else if (label === "Hold")
-        bgClass = "bg-yellow-500 text-white cursor-not-allowed";
+        bgClass =
+          "bg-yellow-400 ring-2 ring-yellow-400 ring-offset-2 text-white cursor-not-allowed outline-none";
       else if (label === "End")
-        bgClass = "bg-red-500 text-white cursor-not-allowed";
+        bgClass =
+          "bg-red-500 ring-2 ring-red-500 ring-offset-2 text-white cursor-not-allowed outline-none";
     } else if (disabled) {
-      bgClass = "bg-white opacity-40 cursor-not-allowed";
+      bgClass = "bg-white opacity-40 cursor-not-allowed outline-none";
     }
 
     return (
@@ -127,37 +262,67 @@ const Prod_Operation = ({ plan_id, selected_prod_index }) => {
     );
   };
 
+  const handle_start_prod = () => {
+    set_pin_action("START");
+    set_display_modal("pin_auth");
+  };
+  const handle_end_prod = () => {
+    set_pin_action("END");
+    set_display_modal("pin_auth");
+  };
+
+  const handle_go_back = () => {
+    set_monitor_page("prod_selection");
+  };
+
   if (!prod) {
     return <div className="text-center text-red-500">Production not found</div>;
   }
 
+  // RETURN ORIGIN
   return (
     <React.Fragment>
       <div className="flex gap-4">
         {/* + Left Container */}
-        <div className="flex-1">
+        <div className="flex-1 ">
           {/* Compact Operation Panel */}
           <div className="bg-white border rounded-xl px-6 py-4 grid grid-cols-1 gap-4">
             {/* Row 1: Machine + Status */}
             <div className="flex justify-between items-center">
-              <div>
-                <div className="text-xs text-gray-400">
-                  Production Machine / Line
-                </div>
-                <div className="text-lg font-bold text-gray-800">
-                  {prod.machine_desc}
+              {/* LEFT SIDE */}
+              <div className="flex items-center gap-4">
+                <Button
+                  variant="white"
+                  icon={ChevronLeft}
+                  icon_size={18}
+                  icon_position="left"
+                  width="w-[40px] h-[40px]"
+                  on_click={handle_go_back}
+                />
+
+                <div>
+                  <div className="text-xs text-gray-400">
+                    Production Machine / Line
+                  </div>
+                  <div className="text-lg font-bold text-gray-800">
+                    {prod.machine_desc}
+                  </div>
                 </div>
               </div>
+
+              {/* RIGHT SIDE – STATUS */}
               <div>
                 <span
                   className={`px-4 py-1 rounded-full text-sm
-                ${
-                  prod.prod_status === "Pending"
-                    ? "bg-yellow-100 text-yellow-600"
-                    : prod.prod_status === "Complete"
-                    ? "bg-green-100 text-green-600"
-                    : "bg-red-100 text-red-600"
-                }`}
+        ${
+          prod.prod_status === "Pending" || prod.prod_status === "Hold"
+            ? "bg-yellow-100 text-yellow-600"
+            : prod.prod_status === "Complete" ||
+              prod.prod_status === "Start" ||
+              prod.prod_status === "Resume"
+            ? "bg-green-100 text-green-600"
+            : "bg-red-100 text-red-600"
+        }`}
                 >
                   {prod.prod_status}
                 </span>
@@ -182,7 +347,7 @@ const Prod_Operation = ({ plan_id, selected_prod_index }) => {
               <div>
                 <div className="text-xs text-gray-400">Quantity to Produce</div>
                 <div className="text-sm font-medium text-gray-700">
-                  0 / {prod.quantity}
+                  {total_quantity_produced} / {prod.quantity}
                 </div>
               </div>
 
@@ -214,7 +379,7 @@ const Prod_Operation = ({ plan_id, selected_prod_index }) => {
                         Complete Items
                       </span>
                       <h4 className="mt-2 text-2xl font-bold text-gray-600">
-                        876
+                        {total_quantity_complete}
                       </h4>
                     </div>
                     <span className="flex items-center gap-1 rounded-full bg-green-100 py-0.5 pl-2 pr-2.5 text-xs font-medium text-green-500">
@@ -232,7 +397,7 @@ const Prod_Operation = ({ plan_id, selected_prod_index }) => {
                         Rejected Items
                       </span>
                       <h4 className="mt-2 text-2xl font-bold text-gray-600">
-                        201
+                        {total_quantity_reject}
                       </h4>
                     </div>
                     <span className="flex items-center gap-1 rounded-full bg-red-100 py-0.5 pl-2 pr-2.5 text-xs font-medium text-red-500">
@@ -266,32 +431,66 @@ const Prod_Operation = ({ plan_id, selected_prod_index }) => {
                 <div className="mt-8 grid grid-cols-3 gap-3 text-center">
                   <div>
                     <p className="text-xs text-gray-400">Assigned</p>
-                    <p className="text-lg font-bold text-gray-700">6</p>
+                    <p className="text-lg font-bold text-gray-700">
+                      {assigned_count}
+                    </p>
                   </div>
 
                   <div className="border-l border-r">
                     <p className="text-xs text-gray-400">Active</p>
-                    <p className="text-lg font-bold text-green-600">5</p>
+                    <p className="text-lg font-bold text-green-600">
+                      {active_crew_count}
+                    </p>
                   </div>
 
                   <div>
                     <p className="text-xs text-gray-400">Idle</p>
-                    <p className="text-lg font-bold text-yellow-500">1</p>
+                    <p className="text-lg font-bold text-yellow-500">
+                      {idle_crew_count}
+                    </p>
                   </div>
                 </div>
               </div>
-              <div>
-                <Button
-                  variant="primary"
-                  size="lg"
-                  width="w-full"
-                  class_name="h-[124px] text-lg"
-                  // icon={CirclePlus}
-                  // icon_position="left"
-                  // on_click={() => set_is_confirm_modal_open(true)}
-                >
-                  Manage Man Power
-                </Button>
+              <div className="flex gap-4">
+                <div className="flex-1">
+                  <Button
+                    variant="primary"
+                    size="lg"
+                    width="w-full"
+                    class_name="h-[124px] text-base"
+                    // icon={CirclePlus}
+                    // icon_position="left"
+                    on_click={() => set_monitor_page("manage_man_power")}
+                  >
+                    Man Power
+                  </Button>
+                </div>
+                <div className="flex-1">
+                  <Button
+                    variant="primary"
+                    size="lg"
+                    width="w-full"
+                    class_name="h-[124px] text-base"
+                    // icon={CirclePlus}
+                    // icon_position="left"
+                    // on_click={() => set_is_confirm_modal_open(true)}
+                  >
+                    Material Request
+                  </Button>
+                </div>
+                <div className="flex-1">
+                  <Button
+                    variant="primary"
+                    size="lg"
+                    width="w-full"
+                    class_name="h-[124px] text-base"
+                    // icon={CirclePlus}
+                    // icon_position="left"
+                    // on_click={() => set_is_confirm_modal_open(true)}
+                  >
+                    Finish Product
+                  </Button>
+                </div>
               </div>
             </div>
             <div className="col-span-12 xl:col-span-5">
@@ -325,7 +524,7 @@ const Prod_Operation = ({ plan_id, selected_prod_index }) => {
                       Quantity to Produce
                     </div>
                     <div className="text-sm text-gray-600 md:text-base tracking-[0.7]">
-                      {produced_qty} / {prod.quantity}
+                      {total_quantity_produced} / {prod.quantity}
                     </div>
                   </div>
                 </div>
@@ -335,7 +534,7 @@ const Prod_Operation = ({ plan_id, selected_prod_index }) => {
                       Pending
                     </p>
                     <p className="flex items-center justify-center gap-1 font-semibold text-yellow-500 sm:text-lg">
-                      2000
+                      {prod.quantity - total_quantity_produced}
                     </p>
                   </div>
                   <div className="h-7 w-px bg-gray-200"></div>
@@ -344,7 +543,7 @@ const Prod_Operation = ({ plan_id, selected_prod_index }) => {
                       Complete
                     </p>
                     <p className="flex items-center justify-center gap-1 text-base font-semibold text-green-600 sm:text-lg">
-                      12600
+                      {total_quantity_complete}
                     </p>
                   </div>
                   <div className="h-7 w-px bg-gray-200"></div>
@@ -353,7 +552,7 @@ const Prod_Operation = ({ plan_id, selected_prod_index }) => {
                       Rejected
                     </p>
                     <p className="flex items-center justify-center gap-1 font-semibold text-red-600 sm:text-lg">
-                      400
+                      {total_quantity_reject}
                     </p>
                   </div>
                 </div>
@@ -363,12 +562,50 @@ const Prod_Operation = ({ plan_id, selected_prod_index }) => {
         </div>
         {/* - Left Container */}
         <div className="w-[300px] flex flex-col gap-4 justify-between">
-          {renderButton("Start", handleStart)}
-          {renderButton("Hold", handleHold)}
-          {renderButton("Resume", handleResume)}
-          {renderButton("End", handleEnd)}
+          {render_button("Start", handle_start_prod)}
+          {render_button("Hold", handleHold)}
+          {render_button("Resume", handleResume)}
+          {render_button("End", handle_end_prod)}
         </div>
       </div>
+      {/* + Modals */}
+      <Pin_Auth
+        is_open={display_modal === "pin_auth"}
+        on_close={() => {
+          set_display_modal("");
+          set_pin_action("");
+        }}
+        show_toast={show_toast}
+        pin_action={pin_action}
+        on_success={() => {
+          if (pin_action === "START") {
+            handle_start(); // existing logic
+          }
+
+          if (pin_action === "END") {
+            handle_end();
+          }
+        }}
+      />
+      <Input_Monitor
+        is_open={display_modal === "input_monitor"}
+        on_close={() => {
+          set_display_modal("");
+          set_pin_action("");
+        }}
+        show_toast={show_toast}
+        pin_action={pin_action}
+        on_success={() => {
+          if (pin_action === "START") {
+            handle_start(); // existing logic
+          }
+
+          if (pin_action === "END") {
+            handle_end();
+          }
+        }}
+      />
+      {/* - Modals */}
     </React.Fragment>
   );
 };

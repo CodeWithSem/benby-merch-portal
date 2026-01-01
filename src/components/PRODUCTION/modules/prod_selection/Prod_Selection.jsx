@@ -67,7 +67,20 @@ const Prod_Selection = ({
           List of Production
         </h3>
         {prod_data.selected_prod_plan_list?.map((plan, index) => {
-          const completion_percent = Math.round((0 / plan.quantity) * 100);
+          const prod_log_list = plan?.prod_log_list || [];
+
+          const total_quantity_produced = prod_log_list.reduce(
+            (total, log) =>
+              total + (log.quantity_complete || 0) + (log.quantity_reject || 0),
+            0
+          );
+
+          const completion_percent =
+            plan.quantity > 0
+              ? Number(
+                  ((total_quantity_produced / plan.quantity) * 100).toFixed(2)
+                )
+              : 0;
           const radial_series = [completion_percent];
 
           const radial_options = {
@@ -122,7 +135,9 @@ const Prod_Selection = ({
                     <span className="text-xs text-gray-400">
                       Quantity to Produce
                     </span>
-                    <p className="text-sm text-gray-700">0 / {plan.quantity}</p>
+                    <p className="text-sm text-gray-700">
+                      {total_quantity_produced} / {plan.quantity}
+                    </p>
                   </div>
                   <div>
                     <span className="text-xs text-gray-400">Start Date</span>
@@ -135,11 +150,14 @@ const Prod_Selection = ({
                   <div>
                     <p
                       className={`text-center text-xs rounded-full px-3 py-2 max-w-[150px] ${
-                        plan.prod_status === "Pending"
-                          ? "bg-yellow-100 text-yellow-500"
-                          : plan.prod_status === "Complete"
-                          ? "bg-green-100 text-green-500"
-                          : "bg-red-100 text-red-500"
+                        plan.prod_status === "Pending" ||
+                        plan.prod_status === "Hold"
+                          ? "bg-yellow-100 text-yellow-600"
+                          : plan.prod_status === "Complete" ||
+                            plan.prod_status === "Start" ||
+                            plan.prod_status === "Resume"
+                          ? "bg-green-100 text-green-600"
+                          : "bg-red-100 text-red-600"
                       }`}
                     >
                       {plan.prod_status}

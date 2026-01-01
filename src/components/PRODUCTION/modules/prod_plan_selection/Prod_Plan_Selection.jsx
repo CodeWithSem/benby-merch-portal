@@ -41,9 +41,9 @@ const Prod_Plan_Selection = ({
     <React.Fragment>
       {/* + List of Production */}
       {loading ? (
-        <p className="text-gray-500 text-sm text-center py-6">
+        <div className="flex justify-center items-center py-10">
           <Spinner />
-        </p>
+        </div>
       ) : prod_plans.length === 0 ? (
         <p className="text-gray-500 text-sm text-center py-6">
           No production plans found
@@ -51,17 +51,58 @@ const Prod_Plan_Selection = ({
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
           {prod_plans.map((plan, idx) => {
-            const completed_qty = Number(plan.qty_completed || 0);
-            const total_qty = Number(plan.quantity || 1); // avoid divide by zero
-            const completion_percent = Math.round(
-              (completed_qty / total_qty) * 100
-            );
-
             const total_quantity =
               plan.selected_prod_plan_list?.reduce(
                 (acc, item) => acc + item.quantity,
                 0
               ) || 0;
+
+            const {
+              total_quantity_complete,
+              total_quantity_reject,
+              total_quantity_produced,
+            } = (plan.selected_prod_plan_list || []).reduce(
+              (planAcc, plan) => {
+                const logs = plan.prod_log_list || [];
+
+                const planTotals = logs.reduce(
+                  (logAcc, log) => {
+                    const complete = Number(log.quantity_complete) || 0;
+                    const reject = Number(log.quantity_reject) || 0;
+
+                    logAcc.complete += complete;
+                    logAcc.reject += reject;
+                    logAcc.produced += complete + reject;
+
+                    return logAcc;
+                  },
+                  { complete: 0, reject: 0, produced: 0 }
+                );
+
+                planAcc.total_quantity_complete += planTotals.complete;
+                planAcc.total_quantity_reject += planTotals.reject;
+                planAcc.total_quantity_produced += planTotals.produced;
+
+                return planAcc;
+              },
+              {
+                total_quantity_complete: 0,
+                total_quantity_reject: 0,
+                total_quantity_produced: 0,
+              }
+            );
+
+            const total_quantity_pending =
+              total_quantity - total_quantity_produced;
+
+            const completion_percent =
+              total_quantity > 0
+                ? Number(
+                    ((total_quantity_produced / total_quantity) * 100).toFixed(
+                      2
+                    )
+                  )
+                : 0;
 
             return (
               <div

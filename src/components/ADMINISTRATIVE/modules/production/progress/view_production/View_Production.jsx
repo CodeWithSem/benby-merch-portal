@@ -5,7 +5,7 @@ import Text_Field from "assets/elements/Text_Field";
 import { ChevronLeft } from "lucide-react";
 import React, { useState, useEffect } from "react";
 import { api_get_prod_plan_by_id_rtdb_realtime } from "api/real_time_db/production/production_plan/tbl_production_plan_api";
-import View_Prod_Logs from "./View_Prod_Logs";
+import View_Prod_Logs from "./view_prod_logs/View_Prod_Logs";
 
 const View_Production = ({ set_page, show_toast, view_prod_data }) => {
   const [prod_data, set_prod_data] = useState(view_prod_data);
@@ -34,11 +34,65 @@ const View_Production = ({ set_page, show_toast, view_prod_data }) => {
     return () => unsubscribe();
   }, [view_prod_data?.id]);
 
-  const [bar_chart_data_1, set_bar_chart_data_1] = useState({
+  const total_quantity =
+    prod_data.selected_prod_plan_list?.reduce(
+      (acc, item) => acc + item.quantity,
+      0
+    ) || 0;
+
+  const {
+    total_quantity_complete,
+    total_quantity_reject,
+    total_quantity_produced,
+  } = (prod_data.selected_prod_plan_list || []).reduce(
+    (planAcc, plan) => {
+      const logs = plan.prod_log_list || [];
+
+      const planTotals = logs.reduce(
+        (logAcc, log) => {
+          const complete = Number(log.quantity_complete) || 0;
+          const reject = Number(log.quantity_reject) || 0;
+
+          logAcc.complete += complete;
+          logAcc.reject += reject;
+          logAcc.produced += complete + reject;
+
+          return logAcc;
+        },
+        { complete: 0, reject: 0, produced: 0 }
+      );
+
+      planAcc.total_quantity_complete += planTotals.complete;
+      planAcc.total_quantity_reject += planTotals.reject;
+      planAcc.total_quantity_produced += planTotals.produced;
+
+      return planAcc;
+    },
+    {
+      total_quantity_complete: 0,
+      total_quantity_reject: 0,
+      total_quantity_produced: 0,
+    }
+  );
+
+  const total_quantity_pending = total_quantity - total_quantity_produced;
+
+  const completion_percent =
+    total_quantity > 0
+      ? Number(((total_quantity_produced / total_quantity) * 100).toFixed(2))
+      : 0;
+
+  const series_global = [completion_percent];
+
+  const bar_chart_data_1 = {
     series: [
       {
         name: "Count",
-        data: [5271, 2037, 578],
+        data: [
+          total_quantity_pending,
+          total_quantity_complete,
+          total_quantity_reject,
+        ],
       },
     ],
     options: {
@@ -74,7 +128,7 @@ const View_Production = ({ set_page, show_toast, view_prod_data }) => {
         markers: { width: 12, height: 12, radius: 12 },
       },
     },
-  });
+  };
 
   const radial_options_global = {
     chart: { type: "radialBar" },
@@ -96,17 +150,6 @@ const View_Production = ({ set_page, show_toast, view_prod_data }) => {
     stroke: { lineCap: "round" },
     labels: ["Progress"],
   };
-
-  const series_global = [75.12]; // demo percentage
-
-  const total_quantity =
-    prod_data.selected_prod_plan_list?.reduce(
-      (acc, item) => acc + item.quantity,
-      0
-    ) || 0;
-
-  const produced_qty = 0; // replace with actual calculation if available
-
   const handle_go_back = () => set_page("main");
 
   // RETURN ORIGIN
@@ -206,7 +249,7 @@ const View_Production = ({ set_page, show_toast, view_prod_data }) => {
                           Complete Items
                         </span>
                         <h4 className="mt-2 text-2xl font-bold text-gray-600">
-                          876
+                          {total_quantity_complete}
                         </h4>
                       </div>
                       <span className="flex items-center gap-1 rounded-full bg-green-100 py-0.5 pl-2 pr-2.5 text-xs font-medium text-green-500">
@@ -224,7 +267,7 @@ const View_Production = ({ set_page, show_toast, view_prod_data }) => {
                           Rejected Items
                         </span>
                         <h4 className="mt-2 text-2xl font-bold text-gray-600">
-                          201
+                          {total_quantity_reject}
                         </h4>
                       </div>
                       <span className="flex items-center gap-1 rounded-full bg-red-100 py-0.5 pl-2 pr-2.5 text-xs font-medium text-red-500">
@@ -281,7 +324,7 @@ const View_Production = ({ set_page, show_toast, view_prod_data }) => {
                         Quantity to Produce
                       </div>
                       <div className="text-sm text-gray-600 md:text-base tracking-[0.7]">
-                        {produced_qty} / {total_quantity}
+                        {total_quantity_produced} / {total_quantity}
                       </div>
                     </div>
                   </div>
@@ -291,7 +334,7 @@ const View_Production = ({ set_page, show_toast, view_prod_data }) => {
                         Pending
                       </p>
                       <p className="flex items-center justify-center gap-1 font-semibold text-yellow-500 sm:text-lg">
-                        2000
+                        {total_quantity_pending}
                       </p>
                     </div>
                     <div className="h-7 w-px bg-gray-200"></div>
@@ -300,7 +343,7 @@ const View_Production = ({ set_page, show_toast, view_prod_data }) => {
                         Complete
                       </p>
                       <p className="flex items-center justify-center gap-1 text-base font-semibold text-green-600 sm:text-lg">
-                        12600
+                        {total_quantity_complete}
                       </p>
                     </div>
                     <div className="h-7 w-px bg-gray-200"></div>
@@ -309,7 +352,7 @@ const View_Production = ({ set_page, show_toast, view_prod_data }) => {
                         Rejected
                       </p>
                       <p className="flex items-center justify-center gap-1 font-semibold text-red-600 sm:text-lg">
-                        400
+                        {total_quantity_reject}
                       </p>
                     </div>
                   </div>
@@ -320,9 +363,26 @@ const View_Production = ({ set_page, show_toast, view_prod_data }) => {
                   List of Production
                 </h3>
                 {prod_data.selected_prod_plan_list?.map((plan, index) => {
-                  const completion_percent = Math.round(
-                    (0 / plan.quantity) * 100
+                  const prod_log_list = plan?.prod_log_list || [];
+                  // Total quantity produced (complete + reject)
+                  const total_quantity_produced = prod_log_list.reduce(
+                    (total, log) =>
+                      total +
+                      (log.quantity_complete || 0) +
+                      (log.quantity_reject || 0),
+                    0
                   );
+
+                  const completion_percent =
+                    plan.quantity > 0
+                      ? Number(
+                          (
+                            (total_quantity_produced / plan.quantity) *
+                            100
+                          ).toFixed(2)
+                        )
+                      : 0;
+
                   const radial_series = [completion_percent];
 
                   const radial_options = {
@@ -380,7 +440,7 @@ const View_Production = ({ set_page, show_toast, view_prod_data }) => {
                               Quantity to Produce
                             </span>
                             <p className="text-sm text-gray-700">
-                              0 / {plan.quantity}
+                              {total_quantity_produced} / {plan.quantity}
                             </p>
                           </div>
                           <div>
@@ -402,11 +462,14 @@ const View_Production = ({ set_page, show_toast, view_prod_data }) => {
                           <div>
                             <p
                               className={`text-center text-xs rounded-full px-3 py-2 max-w-[150px] ${
-                                plan.prod_status === "Pending"
-                                  ? "bg-yellow-100 text-yellow-500"
-                                  : plan.prod_status === "Complete"
-                                  ? "bg-green-100 text-green-500"
-                                  : "bg-red-100 text-red-500"
+                                plan.prod_status === "Pending" ||
+                                plan.prod_status === "Hold"
+                                  ? "bg-yellow-100 text-yellow-600"
+                                  : plan.prod_status === "Complete" ||
+                                    plan.prod_status === "Start" ||
+                                    plan.prod_status === "Resume"
+                                  ? "bg-green-100 text-green-600"
+                                  : "bg-red-100 text-red-600"
                               }`}
                             >
                               {plan.prod_status}
