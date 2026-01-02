@@ -10,6 +10,7 @@ const Prod_Logs = ({ prod_log_list = [] }) => {
   const columns = [
     { key: "index", label: "No.", sortable: false },
     { key: "timestamp", label: "Timestamp", sortable: true },
+    { key: "user", label: "User", sortable: false },
     { key: "operation", label: "Operation", sortable: false },
     { key: "man_power", label: "Man Power", sortable: false },
     { key: "quantity_complete", label: "Complete Items", sortable: false },

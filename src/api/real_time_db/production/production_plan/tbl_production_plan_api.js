@@ -533,6 +533,7 @@ export const api_update_prod_status_rtdb = async (
   man_power = 0,
   quantity_complete = 0,
   quantity_reject = 0,
+  user,
   show_toast
 ) => {
   try {
@@ -578,6 +579,7 @@ export const api_update_prod_status_rtdb = async (
 
     // Create log entry
     const log_entry = {
+      user: `${user.first_name} ${user.last_name}`,
       timestamp: formatted_timestamp,
       operation: prod_status,
       man_power,
@@ -845,3 +847,78 @@ export const api_remove_man_power_from_prod_plan = async ({
   }
 };
 // - [REMOVE MAN POWER FROM PRODUCTION PLAN]
+
+// + [UPDATE FINISH GOODS LOG BY INDEX]
+export const api_update_fg_log_rtdb = async (
+  prod_plan_id,
+  prod_index,
+  log_index,
+  quantity_complete,
+  quantity_reject,
+  user,
+  show_toast
+) => {
+  try {
+    if (!prod_plan_id && prod_plan_id !== 0)
+      throw new Error("Production Plan ID is required.");
+    if (prod_index === undefined || prod_index === null)
+      throw new Error("Production index is required.");
+    if (log_index === undefined || log_index === null)
+      throw new Error("Log index is required.");
+
+    const log_ref = ref(
+      realtime_db,
+      `${get_realtime_path(
+        TABLES.PRODUCTION_PLAN
+      )}/${prod_plan_id}/selected_prod_plan_list/${prod_index}/prod_log_list/${log_index}`
+    );
+
+    const snapshot = await get(log_ref);
+
+    if (!snapshot.exists()) {
+      show_toast?.({
+        type: "danger",
+        title: "Error",
+        message: "Finish goods log does not exist.",
+        icon: <CircleX size={21} className="text-red-500" />,
+      });
+
+      return { success: false };
+    }
+
+    const existing_log = snapshot.val();
+
+    const updated_log = {
+      ...existing_log,
+      quantity_complete,
+      quantity_reject,
+    };
+
+    await set(log_ref, updated_log);
+
+    show_toast?.({
+      type: "success",
+      title: "Finish Goods Updated",
+      message: "Quantities successfully updated.",
+      icon: <CheckCircle2 size={21} className="text-green-500" />,
+    });
+
+    return {
+      success: true,
+      message: "Finish goods log updated",
+      data: updated_log,
+    };
+  } catch (error) {
+    console.error("RTDB update FG log error:", error);
+
+    show_toast?.({
+      type: "danger",
+      title: "Error",
+      message: error.message || "Failed to update finish goods.",
+      icon: <CircleX size={21} className="text-red-500" />,
+    });
+
+    return { success: false };
+  }
+};
+// - [UPDATE FINISH GOODS LOG BY INDEX]

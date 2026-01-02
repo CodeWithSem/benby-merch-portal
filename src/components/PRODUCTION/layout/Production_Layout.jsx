@@ -6,8 +6,12 @@ import Prod_Selection from "../modules/prod_selection/Prod_Selection";
 import Prod_Operation from "../modules/prod_operation/Prod_Operation";
 import Manage_Man_Power from "../modules/manage_man_power/Manage_Man_Power";
 import Button from "assets/elements/Button";
+import { Use_App } from "context/app_context";
+import Finish_Goods from "../modules/finish_goods/Finish_Goods";
+import Material_Request from "../modules/material_request/Material_Request";
 
 const Production_Layout = ({ set_page }) => {
+  const { active_user } = Use_App();
   const { show_toast } = useToast();
   const [monitor_page, set_monitor_page] = useState("prod_plan_selection");
   const [is_confirm_modal_open, set_is_confirm_modal_open] = useState(false);
@@ -118,6 +122,7 @@ const Production_Layout = ({ set_page }) => {
                 plan_id={selected_plan_id}
                 selected_prod_index={selected_prod_index}
                 set_monitor_page={set_monitor_page}
+                active_user={active_user}
               />
             )}
           {monitor_page === "manage_man_power" && (
@@ -126,6 +131,24 @@ const Production_Layout = ({ set_page }) => {
               selected_prod_index={selected_prod_index}
               show_toast={show_toast}
               set_monitor_page={set_monitor_page}
+            />
+          )}
+          {monitor_page === "material_request" && (
+            <Material_Request
+              plan_id={selected_plan_id}
+              selected_prod_index={selected_prod_index}
+              show_toast={show_toast}
+              set_monitor_page={set_monitor_page}
+              active_user={active_user}
+            />
+          )}
+          {monitor_page === "finish_goods" && (
+            <Finish_Goods
+              plan_id={selected_plan_id}
+              selected_prod_index={selected_prod_index}
+              show_toast={show_toast}
+              set_monitor_page={set_monitor_page}
+              active_user={active_user}
             />
           )}
         </div>

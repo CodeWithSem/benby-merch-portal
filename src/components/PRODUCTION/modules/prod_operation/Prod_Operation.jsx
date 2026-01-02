@@ -16,12 +16,14 @@ import {
 import Button from "assets/elements/Button";
 import Pin_Auth from "./modals/Pin_Auth";
 import Input_Monitor from "./modals/Input_Monitor";
+import End_Production from "../end_production/End_Production";
 
 const Prod_Operation = ({
   show_toast,
   plan_id,
   selected_prod_index,
   set_monitor_page,
+  active_user,
 }) => {
   const [display_modal, set_display_modal] = useState("");
   const [pin_action, set_pin_action] = useState(null);
@@ -121,6 +123,7 @@ const Prod_Operation = ({
       active_crew_count,
       0,
       0,
+      active_user,
       show_toast
     );
 
@@ -143,6 +146,7 @@ const Prod_Operation = ({
       active_crew_count,
       0,
       0,
+      active_user,
       show_toast
     );
 
@@ -163,6 +167,7 @@ const Prod_Operation = ({
       active_crew_count,
       0,
       0,
+      active_user,
       show_toast
     );
 
@@ -176,17 +181,21 @@ const Prod_Operation = ({
     });
   };
 
-  const handle_end = async () => {
+  const handle_end = async ({ quantity_complete, quantity_reject }) => {
     const final_status =
-      total_quantity_produced >= prod.quantity ? "Complete" : "End";
+      total_quantity_produced + quantity_complete + quantity_reject >=
+      prod.quantity
+        ? "Complete"
+        : "End";
 
     const res = await api_update_prod_status_rtdb(
       plan_id,
       selected_prod_index,
       final_status,
       active_crew_count,
-      0,
-      0,
+      quantity_complete || 0,
+      quantity_reject || 0,
+      active_user,
       show_toast
     );
 
@@ -473,7 +482,7 @@ const Prod_Operation = ({
                     class_name="h-[124px] text-base"
                     // icon={CirclePlus}
                     // icon_position="left"
-                    // on_click={() => set_is_confirm_modal_open(true)}
+                    on_click={() => set_monitor_page("material_request")}
                   >
                     Material Request
                   </Button>
@@ -486,9 +495,9 @@ const Prod_Operation = ({
                     class_name="h-[124px] text-base"
                     // icon={CirclePlus}
                     // icon_position="left"
-                    // on_click={() => set_is_confirm_modal_open(true)}
+                    on_click={() => set_monitor_page("finish_goods")}
                   >
-                    Finish Product
+                    Finish Goods
                   </Button>
                 </div>
               </div>
@@ -583,7 +592,8 @@ const Prod_Operation = ({
           }
 
           if (pin_action === "END") {
-            handle_end();
+            // handle_end();
+            set_display_modal("end_production");
           }
         }}
       />
@@ -604,6 +614,16 @@ const Prod_Operation = ({
             handle_end();
           }
         }}
+      />
+      <End_Production
+        is_open={display_modal === "end_production"}
+        on_close={() => {
+          set_display_modal("");
+        }}
+        show_toast={show_toast}
+        total_quantity_produced={total_quantity_produced}
+        quantity_to_produce={prod.quantity}
+        on_proceed={handle_end}
       />
       {/* - Modals */}
     </React.Fragment>

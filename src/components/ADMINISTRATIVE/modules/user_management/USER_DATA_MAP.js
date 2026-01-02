@@ -11,6 +11,12 @@ export const user_category_list = [
     user_category_desc: "User",
     creation_date: "MM-DD-YYYY",
   },
+  {
+    id: 3,
+    user_category_code: "PROD",
+    user_category_desc: "Production",
+    creation_date: "MM-DD-YYYY",
+  },
 ];
 
 export const user_role_list = [
@@ -42,6 +48,12 @@ export const user_role_list = [
     id: 5,
     user_role_code: "WM",
     user_role_desc: "Warehouse Manager",
+    creation_date: "MM-DD-YYYY",
+  },
+  {
+    id: 5,
+    user_role_code: "PRODM",
+    user_role_desc: "Production Manager",
     creation_date: "MM-DD-YYYY",
   },
 ];

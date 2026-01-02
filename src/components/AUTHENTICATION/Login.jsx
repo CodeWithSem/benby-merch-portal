@@ -36,7 +36,7 @@ const Login = () => {
       show_toast({
         type: "success",
         title: "Login Successful",
-        message: `Welcome back ${user.first_name} ${user.last_name}`,
+        message: `Welcome back ${user.first_name}`,
         icon: <CheckCircle2 size={21} className="text-green-500" />,
       });
 

@@ -91,22 +91,33 @@ const View_Prod_Logs = ({
         <div className="flex flex-wrap items-center justify-between gap-3 py-5">
           <h1 className="text-xl">Production</h1>
           <nav>
-            <ol className="flex flex-wrap items-center gap-1.5 text-sm text-gray-500">
+            <ol className="flex flex-wrap items-center gap-1.5">
               <li>
-                <span className="cursor-pointer hover:text-sky-500">Home</span>
+                <a className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-sky-500 cursor-pointer">
+                  Home
+                </a>
               </li>
-              <li>
+              <li className="flex items-center gap-1.5 text-sm text-gray-500">
                 <span>/</span>
-                <span
-                  className="cursor-pointer hover:text-sky-500"
+                <a
+                  className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-sky-500 cursor-pointer"
                   onClick={handle_go_back}
                 >
                   Production
-                </span>
+                </a>
               </li>
-              <li>
+              <li className="flex items-center gap-1.5 text-sm text-gray-500">
                 <span>/</span>
-                <span className="text-gray-800">View</span>
+                <a
+                  className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-sky-500 cursor-pointer"
+                  onClick={handle_go_back}
+                >
+                  Progress
+                </a>
+              </li>
+              <li className="flex items-center gap-1.5 text-sm text-gray-500">
+                <span>/</span>
+                <span className="text-gray-800">Overview</span>
               </li>
             </ol>
           </nav>

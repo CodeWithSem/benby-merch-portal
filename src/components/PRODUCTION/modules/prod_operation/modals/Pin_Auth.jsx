@@ -30,9 +30,9 @@ const Pin_Auth = ({
 
     // 🔐 replace with real validation
     if (pin === "123456") {
-      on_success();
       setPin("");
       on_close();
+      on_success();
     } else {
       // alert("Invalid PIN");
       show_toast({
