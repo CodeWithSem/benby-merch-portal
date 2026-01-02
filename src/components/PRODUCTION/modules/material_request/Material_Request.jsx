@@ -10,6 +10,8 @@ import Button from "assets/elements/Button";
 import { api_get_prod_plan_by_id_rtdb_realtime } from "api/real_time_db/production/production_plan/tbl_production_plan_api";
 import { bom_master_list } from "./bom_master_list";
 import { item_master_list } from "./item_master_list";
+import BOM from "./details/BOM";
+import Mat_Request_List from "./details/Mat_Request_List";
 
 const Material_Request = ({
   plan_id,
@@ -23,12 +25,24 @@ const Material_Request = ({
   const [selected_log, set_selected_log] = useState({});
   const [prod_data, set_prod_data] = useState({});
   const [selected_item_data, set_selected_item_data] = useState({
-    machine_code: "",
     item_code: "",
-    item_desc: "",
-    quantity: 1,
+    quantity: 0,
   });
+  const [material_request_list, set_material_request_list] = useState([
+    {
+      timestamp: "01-03-2025 12:00:00 AM",
+      request_by: "Juan Dela Cruz",
+      quantity_request: 500,
+    },
+  ]);
   const [loading, set_loading] = useState(false);
+
+  const [active_tab, set_active_tab] = useState("bom");
+  const tabs = [
+    { key: "bom", title: "Billing of Material" },
+    { key: "material_request", title: "Material Request" },
+    { key: "receive_material", title: "Receive Material" },
+  ];
 
   useEffect(() => {
     if (!plan_id && plan_id !== 0) return;
@@ -45,9 +59,7 @@ const Material_Request = ({
 
           set_prod_data(selected_prod);
           set_selected_item_data({
-            machine_code: "",
             item_code: selected_prod.item_code,
-            item_desc: "",
             quantity: selected_prod.quantity,
           });
         } else {
@@ -152,75 +164,44 @@ const Material_Request = ({
               </div>
             </div>
           </div>
-          {selected_bom_list.length > 0 && (
-            <div className="overflow-hidden rounded-lg border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]">
-              <div className="px-5 py-4 border-b">
-                <h2 className="font-semibold text-gray-600 text-sm">
-                  Bill of Materials (BOM)
-                </h2>
-              </div>
 
-              <div className="max-w-full overflow-x-auto custom-scrollbar">
-                <table className="min-w-full text-left text-xs text-gray-700">
-                  <thead className="bg-gray-50">
-                    <tr className="border-b">
-                      <th className="px-4 py-3 font-semibold">No.</th>
-                      <th className="px-4 py-3 font-semibold">Material Code</th>
-                      <th className="px-4 py-3 font-semibold">Description</th>
-                      <th className="px-4 py-3 font-semibold">Usage</th>
-                      <th className="px-4 py-3 font-semibold text-right">
-                        Quantity
-                      </th>
-                      <th className="px-4 py-3 font-semibold">UoM</th>
-                    </tr>
-                  </thead>
-
-                  <tbody className="divide-y">
-                    {bom_with_required_qty.map((bom, index) => (
-                      <tr key={bom.id}>
-                        <td className="px-4 py-3">{index + 1}</td>
-                        <td className="px-4 py-3">{bom.mat_code}</td>
-                        <td className="px-4 py-3">{bom.mat_desc}</td>
-                        <td className="px-4 py-3">{bom.usage}</td>
-                        <td className="px-4 py-3 text-right">
-                          {bom.required_quantity}
-                        </td>
-                        <td className="px-4 py-3">{bom.uom}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+          <div className="w-full bg-white rounded-lg border">
+            {/* + Tab Navigation */}
+            <div className="w-full border-b p-2">
+              <nav className="flex overflow-x-auto rounded-lg bg-gray-100 p-1 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-200 [&::-webkit-scrollbar-track]:bg-white [&::-webkit-scrollbar]:h-1.5">
+                {tabs.map((tab) => (
+                  <button
+                    key={tab.key}
+                    onClick={() => set_active_tab(tab.key)}
+                    className={`inline-flex items-center rounded-md px-5 py-2 text-sm font-medium transition-colors duration-200 ease-in-out outline-none whitespace-nowrap ${
+                      active_tab === tab.key
+                        ? "bg-white text-gray-900 shadow-xs"
+                        : "bg-transparent text-gray-500 hover:text-gray-700"
+                    }`}
+                  >
+                    {tab.title}
+                  </button>
+                ))}
+              </nav>
             </div>
-          )}
-          <div className="flex justify-center items-center md:justify-end gap-4">
-            <Button
-              variant="primary"
-              size="lg"
-              icon={ClipboardPlus}
-              icon_position="left"
-              // on_click={() => set_monitor_page("manage_man_power")}
-            >
-              Send Request
-            </Button>
-            <Button
-              variant="primary"
-              size="lg"
-              icon={PackageCheck}
-              icon_position="left"
-              // on_click={() => set_monitor_page("manage_man_power")}
-            >
-              Receive Material
-            </Button>
-            <Button
-              variant="white"
-              size="lg"
-              //   icon={SendHorizonal}
-              //   icon_position="left"
-              on_click={handle_go_back}
-            >
-              Close
-            </Button>
+            {/* - Tab Navigation */}
+            {/* + Tab Content */}
+            <div className="p-6">
+              {active_tab === "bom" && (
+                <BOM
+                  selected_bom_list={selected_bom_list}
+                  bom_with_required_qty={bom_with_required_qty}
+                />
+              )}
+              {active_tab === "material_request" && (
+                <Mat_Request_List
+                  material_request_list={material_request_list}
+                  selected_bom_list={selected_bom_list}
+                  bom_with_required_qty={bom_with_required_qty}
+                />
+              )}
+            </div>
+            {/* - Tab Content */}
           </div>
         </div>
       )}
