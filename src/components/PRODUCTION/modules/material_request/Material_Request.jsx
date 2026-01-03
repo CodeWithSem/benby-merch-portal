@@ -1,10 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {
-  ChevronLeft,
-  ClipboardPlus,
-  PackageCheck,
-  SendHorizonal,
-} from "lucide-react";
+import { ChevronLeft } from "lucide-react";
 import Spinner from "assets/elements/Spinner";
 import Button from "assets/elements/Button";
 import { api_get_prod_plan_by_id_rtdb_realtime } from "api/real_time_db/production/production_plan/tbl_production_plan_api";
@@ -12,6 +7,10 @@ import { bom_master_list } from "./bom_master_list";
 import { item_master_list } from "./item_master_list";
 import BOM from "./details/BOM";
 import Mat_Request_List from "./details/Mat_Request_List";
+import Add_Request from "./modals/Add_Request";
+import Receive_Material from "./modals/Receive_Material";
+import View_Receive_Mat from "./modals/View_Receive_Mat";
+import Receive_Mat_List from "./details/Receive_Mat_List";
 
 const Material_Request = ({
   plan_id,
@@ -20,21 +19,19 @@ const Material_Request = ({
   set_monitor_page,
   active_user,
 }) => {
-  const [quantity_to_produce, set_quantity_to_produce] = useState(0);
   const [display_modal, set_display_modal] = useState("");
-  const [selected_log, set_selected_log] = useState({});
   const [prod_data, set_prod_data] = useState({});
+  const [selected_bom_with_required_qty, set_selected_bom_with_required_qty] =
+    useState([]);
+  const [selected_mat_req_index, set_selected_mat_req_index] = useState(0);
   const [selected_item_data, set_selected_item_data] = useState({
     item_code: "",
     quantity: 0,
   });
-  const [material_request_list, set_material_request_list] = useState([
-    {
-      timestamp: "01-03-2025 12:00:00 AM",
-      request_by: "Juan Dela Cruz",
-      quantity_request: 500,
-    },
-  ]);
+  const [material_request_list, set_material_request_list] = useState([]);
+  const [view_material_request_list, set_view_material_request_list] = useState(
+    []
+  );
   const [loading, set_loading] = useState(false);
 
   const [active_tab, set_active_tab] = useState("bom");
@@ -58,6 +55,7 @@ const Material_Request = ({
             res.data?.selected_prod_plan_list?.[selected_prod_index];
 
           set_prod_data(selected_prod);
+          set_material_request_list(selected_prod.material_request_list);
           set_selected_item_data({
             item_code: selected_prod.item_code,
             quantity: selected_prod.quantity,
@@ -72,6 +70,20 @@ const Material_Request = ({
 
     return () => unsubscribe && unsubscribe();
   }, [plan_id, selected_prod_index, show_toast]);
+
+  useEffect(() => {
+    if (!material_request_list || material_request_list.length === 0) {
+      set_view_material_request_list([]);
+      return;
+    }
+
+    // Map to include DB index and filter only Received
+    const received_requests = material_request_list
+      .map((req, db_index) => ({ ...req, request_index: db_index }))
+      .filter((req) => req.request_status === "Received");
+
+    set_view_material_request_list(received_requests);
+  }, [material_request_list]);
 
   const selected_bom_list = (() => {
     if (!selected_item_data.item_code) return [];
@@ -196,8 +208,21 @@ const Material_Request = ({
               {active_tab === "material_request" && (
                 <Mat_Request_List
                   material_request_list={material_request_list}
-                  selected_bom_list={selected_bom_list}
-                  bom_with_required_qty={bom_with_required_qty}
+                  set_selected_mat_req_index={set_selected_mat_req_index}
+                  set_selected_bom_with_required_qty={
+                    set_selected_bom_with_required_qty
+                  }
+                  set_display_modal={set_display_modal}
+                />
+              )}
+              {active_tab === "receive_material" && (
+                <Receive_Mat_List
+                  material_request_list={view_material_request_list}
+                  set_selected_mat_req_index={set_selected_mat_req_index}
+                  set_selected_bom_with_required_qty={
+                    set_selected_bom_with_required_qty
+                  }
+                  set_display_modal={set_display_modal}
                 />
               )}
             </div>
@@ -206,7 +231,36 @@ const Material_Request = ({
         </div>
       )}
       {/* + Modals */}
-
+      <Add_Request
+        is_open={display_modal === "add_request"}
+        on_close={() => set_display_modal("")}
+        show_toast={show_toast}
+        plan_id={plan_id}
+        selected_prod_index={selected_prod_index}
+        selected_item_data={selected_item_data}
+        active_user={active_user}
+        // on_proceed={handle_update_fg}
+      />
+      <Receive_Material
+        is_open={display_modal === "receive_material"}
+        on_close={() => set_display_modal("")}
+        show_toast={show_toast}
+        active_user={active_user}
+        plan_id={plan_id}
+        selected_prod_index={selected_prod_index}
+        selected_mat_req_index={selected_mat_req_index}
+        selected_bom_with_required_qty={selected_bom_with_required_qty}
+      />
+      <View_Receive_Mat
+        is_open={display_modal === "view_receive_mat"}
+        on_close={() => set_display_modal("")}
+        show_toast={show_toast}
+        active_user={active_user}
+        plan_id={plan_id}
+        selected_prod_index={selected_prod_index}
+        selected_mat_req_index={selected_mat_req_index}
+        selected_bom_with_required_qty={selected_bom_with_required_qty}
+      />
       {/* - Modals */}
     </React.Fragment>
   );

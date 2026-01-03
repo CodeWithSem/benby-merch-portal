@@ -88,6 +88,9 @@ const Production_Layout = ({ set_page }) => {
             <div className="text-xs text-gray-600">
               Powered by QS IT Services
             </div>
+            <div className="mt-[2px] text-xs text-gray-600">
+              User: {`${active_user.first_name} ${active_user.last_name}`}
+            </div>
           </div>
           <div>
             <button

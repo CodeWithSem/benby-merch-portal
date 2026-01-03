@@ -922,3 +922,147 @@ export const api_update_fg_log_rtdb = async (
   }
 };
 // - [UPDATE FINISH GOODS LOG BY INDEX]
+
+// + [CREATE MATERIAL REQUEST]
+export const api_create_material_request_rtdb = async ({
+  plan_id,
+  selected_prod_index,
+  request_data,
+  user,
+  show_toast,
+}) => {
+  try {
+    if (!plan_id && plan_id !== 0)
+      throw new Error("Production Plan ID is required.");
+    if (selected_prod_index === undefined || selected_prod_index === null)
+      throw new Error("Production index is required.");
+    if (!request_data) throw new Error("Request data is required.");
+
+    const request_ref = ref(
+      realtime_db,
+      `${get_realtime_path(
+        TABLES.PRODUCTION_PLAN
+      )}/${plan_id}/selected_prod_plan_list/${selected_prod_index}/material_request_list`
+    );
+
+    // Get existing request list
+    const snapshot = await get(request_ref);
+    const existing_list = snapshot.exists() ? snapshot.val() : [];
+
+    const formatted_timestamp = format_date_2(new Date(), "ampm");
+
+    const new_request = {
+      ...request_data,
+      request_by: `${user?.first_name} ${user?.last_name}`,
+      timestamp: formatted_timestamp,
+      request_status: "Pending",
+    };
+
+    const updated_list = [...existing_list, new_request];
+
+    await set(request_ref, updated_list);
+
+    show_toast?.({
+      type: "success",
+      title: "Material Requested",
+      message: "Material request has been successfully created.",
+      icon: <CheckCircle2 size={21} className="text-green-500" />,
+    });
+
+    return {
+      success: true,
+      data: updated_list,
+    };
+  } catch (error) {
+    console.error("RTDB create material request error:", error);
+
+    show_toast?.({
+      type: "danger",
+      title: "Error",
+      message: error.message || "Failed to create material request.",
+      icon: <CircleX size={21} className="text-red-500" />,
+    });
+
+    return {
+      success: false,
+      message: error.message,
+    };
+  }
+};
+// - [CREATE MATERIAL REQUEST]
+
+// + [UPDATE BOM LIST / RECEIVED QUANTITIES + REQUEST STATUS]
+export const api_update_bom_quantity_rtdb = async ({
+  prod_plan_id,
+  prod_index, // index of selected_prod_plan_list
+  request_index, // index of material_request_list
+  updated_bom_list, // full array of BOM with updated quantity_receive
+  user,
+  show_toast,
+}) => {
+  try {
+    if (!prod_plan_id && prod_plan_id !== 0)
+      throw new Error("Production Plan ID is required.");
+    if (prod_index === undefined || prod_index === null)
+      throw new Error("Production index is required.");
+    if (request_index === undefined || request_index === null)
+      throw new Error("Material request index is required.");
+    if (!Array.isArray(updated_bom_list))
+      throw new Error("Updated BOM list must be an array.");
+
+    const request_ref = ref(
+      realtime_db,
+      `${get_realtime_path(
+        TABLES.PRODUCTION_PLAN
+      )}/${prod_plan_id}/selected_prod_plan_list/${prod_index}/material_request_list/${request_index}`
+    );
+
+    const snapshot = await get(request_ref);
+    if (!snapshot.exists()) throw new Error("Material request not found.");
+
+    const existing_request = snapshot.val();
+
+    // Ensure all BOM entries have quantity_receive
+    const final_bom_list = updated_bom_list.map((bom) => ({
+      ...bom,
+      quantity_receive: bom.quantity_receive || 0,
+    }));
+
+    // Update BOM array and request_status
+    const updated_request = {
+      ...existing_request,
+      bom_with_required_qty: final_bom_list,
+      request_status: "Received",
+      updated_by: user ? `${user.first_name} ${user.last_name}` : "N/A",
+      updated_at: new Date().toISOString(),
+    };
+
+    await set(request_ref, updated_request);
+
+    show_toast?.({
+      type: "success",
+      title: "Material Received",
+      message: "Received quantities have been updated.",
+      icon: <CheckCircle2 size={21} className="text-green-500" />,
+    });
+
+    return {
+      success: true,
+      message: "BOM list and request status updated successfully",
+      data: updated_request,
+      previous_data: existing_request,
+    };
+  } catch (error) {
+    console.error("RTDB update BOM list error:", error);
+
+    show_toast?.({
+      type: "danger",
+      title: "Error",
+      message: error.message || "Failed to receive materials.",
+      icon: <CircleX size={21} className="text-red-500" />,
+    });
+
+    return { success: false, message: error.message };
+  }
+};
+// - [UPDATE BOM LIST / RECEIVED QUANTITIES + REQUEST STATUS]
