@@ -15,7 +15,11 @@ import profile_2 from "../../../assets/images/profile-2.png";
 import { useToast } from "../layout/Toast_Provider";
 import { Use_App } from "../../../context/app_context";
 
-const Header = ({ toggle_sidebar, set_active_item }) => {
+const Header = ({
+  toggle_sidebar,
+  set_active_item,
+  set_is_confirm_logout_open,
+}) => {
   const { active_user, set_active_user, set_page } = Use_App();
   const [mobile_open, set_mobile_open] = useState(false);
   const [profile_open, set_profile_open] = useState(false);
@@ -240,7 +244,7 @@ const Header = ({ toggle_sidebar, set_active_item }) => {
                 </ul>
 
                 <button
-                  onClick={handle_sign_out}
+                  onClick={() => set_is_confirm_logout_open(true)}
                   className="group text-sm mt-3 flex items-center gap-3 rounded-lg px-4 py-2 font-medium text-gray-700 hover:bg-gray-100"
                 >
                   <LogOut size={18} />

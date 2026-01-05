@@ -30,6 +30,8 @@ const Login = () => {
       if (user.category === "PROD") {
         set_page("production");
       } else {
+        // 🔥 FORCE dashboard state
+        localStorage.setItem("active_item", "Dashboard");
         set_page("dashboard");
       }
 
@@ -107,9 +109,9 @@ const Login = () => {
                         onClick={toggle_password_visibility}
                       >
                         {show_password ? (
-                          <EyeOff size={18} />
-                        ) : (
                           <Eye size={18} />
+                        ) : (
+                          <EyeOff size={18} />
                         )}
                       </span>
                     </div>

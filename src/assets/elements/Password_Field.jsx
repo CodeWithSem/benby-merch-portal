@@ -32,7 +32,7 @@ const Password_Field = ({
 
   const input_class = `block w-full pr-10 px-3 py-2 bg-transparent focus:outline-none focus:ring-0 placeholder-gray-400 disabled:cursor-not-allowed disabled:bg-transparent`;
 
-  const icon_class = `absolute right-[14px] top-1/2 transform -translate-y-1/2 cursor-pointer text-gray-500 hover:text-gray-700`;
+  const icon_class = `absolute right-[14px] top-1/2 transform -translate-y-1/2 cursor-pointer text-gray-500 hover:text-gray-700 outline-none`;
 
   return (
     <div className="w-full">
@@ -73,7 +73,7 @@ const Password_Field = ({
             }
           }}
         >
-          {visible ? <EyeOff size={18} /> : <Eye size={18} />}
+          {visible ? <Eye size={18} /> : <EyeOff size={18} />}
         </div>
       </div>
 

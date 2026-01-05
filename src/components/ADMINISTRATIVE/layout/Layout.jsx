@@ -41,11 +41,17 @@ import WM_Order from "../modules/warehouse/wm_order/WM_Order";
 import Storage_Bin from "../modules/warehouse/storage_bin/Storage_Bin";
 import Production_Plan from "../modules/production/production_plan/Production_Plan";
 import Progress from "../modules/production/progress/Progress";
+import { useToast } from "./Toast_Provider";
+import Button from "assets/elements/Button";
+import { Use_App } from "../../../context/app_context";
 
 const Layout = () => {
+  const { set_page } = Use_App();
+  const { show_toast } = useToast();
   const [active_item, set_active_item] = useState(() => {
     return localStorage.getItem("active_item") || "Dashboard";
   });
+  const [is_confirm_logout_open, set_is_confirm_logout_open] = useState(false);
 
   useEffect(() => {
     if (!localStorage.getItem("active_item")) {
@@ -164,6 +170,54 @@ const Layout = () => {
     }
   };
 
+  const handle_sign_out = () => {
+    localStorage.removeItem("active_user");
+    show_toast({
+      type: "success",
+      title: "Signed Out",
+      message: "You have been logged out successfully",
+    });
+    set_page("login"); // redirect to login page
+  };
+
+  const Confirm_Logout = () => {
+    return (
+      <React.Fragment>
+        <div className="fixed inset-0 flex items-center justify-center z-[100]">
+          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm z-[101]"></div>
+          <div
+            className={`relative bg-white rounded-lg shadow-xl max-w-[500px] w-full p-10 m-5 z-[102]`}
+          >
+            <div className="w-full flex justify-center items-center text-lg md:text-xl font-bold mb-4">
+              Confirm Logout
+            </div>
+            <p className="w-full text-center text-sm leading-6 text-gray-500 dark:text-gray-400 py-4">
+              Are you sure you want to logout?
+            </p>
+            <div className="flex justify-center gap-2 mt-4">
+              <Button
+                width="w-[100px]"
+                variant="primary"
+                on_click={handle_sign_out}
+              >
+                Yes
+              </Button>
+              <Button
+                width="w-[100px]"
+                variant="white"
+                on_click={() => {
+                  set_is_confirm_logout_open(false);
+                }}
+              >
+                No
+              </Button>
+            </div>
+          </div>
+        </div>
+      </React.Fragment>
+    );
+  };
+
   // RETURN ORIGIN
   return (
     <React.Fragment>
@@ -176,6 +230,7 @@ const Layout = () => {
             is_collapsed={is_collapsed}
             is_open={is_open}
             toggle_sidebar={toggle_sidebar}
+            set_is_confirm_logout_open={set_is_confirm_logout_open}
           />
         </div>
         <div
@@ -186,12 +241,14 @@ const Layout = () => {
           <Header
             toggle_sidebar={toggle_sidebar}
             set_active_item={set_active_item}
+            set_is_confirm_logout_open={set_is_confirm_logout_open}
           />
           <div className="p-4 mx-auto max-w-screen-2xl md:px-6 pt-2 pb-6">
             {page_renderer(active_item)}
           </div>
         </div>
       </div>
+      {is_confirm_logout_open && <Confirm_Logout />}
     </React.Fragment>
   );
 };
