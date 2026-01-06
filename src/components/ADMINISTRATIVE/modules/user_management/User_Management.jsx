@@ -10,6 +10,8 @@ import {
   RefreshCw,
   FileUp,
   Trash2,
+  Settings,
+  FileCog,
 } from "lucide-react";
 import { useToast } from "../../layout/Toast_Provider";
 import Icon_Field from "assets/elements/Icon_Field";
@@ -26,6 +28,7 @@ import {
 import Create_New_User from "./create_new_user/Create_New_User";
 import Edit_User from "./edit_user/Edit_User";
 import View_User from "./view_user/View_User";
+import Module_Access from "./module_access/Module_Access";
 
 const User_Management = () => {
   const { active_user } = Use_App();
@@ -171,7 +174,10 @@ const User_Management = () => {
 
   const handle_create_new_user = () => set_page("user_creation");
 
-  const handle_upload_batch = () => alert("Under Maintenance");
+  const handle_open_module_access = (data) => {
+    set_view_user_data(data);
+    set_page("module_access");
+  };
 
   const handle_view_user = (data) => {
     set_view_user_data({
@@ -389,6 +395,15 @@ const User_Management = () => {
                                   </div>
                                   <div className="relative group flex jusity-center items-center">
                                     <Button_Action
+                                      icon={FileCog}
+                                      tooltip="Module Access"
+                                      on_click={() =>
+                                        handle_open_module_access(row)
+                                      }
+                                    />
+                                  </div>
+                                  <div className="relative group flex jusity-center items-center">
+                                    <Button_Action
                                       class_name="mb-[1px]"
                                       icon={Trash}
                                       variant="danger"
@@ -461,6 +476,14 @@ const User_Management = () => {
           edit_user_data={edit_user_data}
           set_edit_user_data={set_edit_user_data}
           set_user_list={set_user_list}
+        />
+      )}
+      {page === "module_access" && (
+        <Module_Access
+          set_page={set_page}
+          user_data={view_user_data}
+          active_user={active_user}
+          show_toast={show_toast}
         />
       )}
       {page === "view_user" && (

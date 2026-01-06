@@ -116,19 +116,26 @@ const WM_Order = () => {
   const [wm_order_list, set_wm_order_list] = useState([]);
 
   const handle_get_wm_order_list = async () => {
-    set_loading_list(true);
-    const response = await api_get_wm_order_list_by_date(
-      start_date,
-      end_date,
-      show_toast
-    );
-    if (response.success) {
-      set_wm_order_list(response.data);
-    } else {
-      console.error(response.message);
+    try {
+      set_loading_list(true);
+
+      const response = await api_get_wm_order_list_by_date(
+        start_date,
+        end_date,
+        show_toast
+      );
+
+      if (response?.success) {
+        set_wm_order_list(response.data || []);
+      } else {
+        console.error(response?.message || "Failed to fetch WM order list");
+      }
+    } catch (error) {
+      console.error("Error fetching WM order list:", error);
+    } finally {
+      set_loading_list(false);
+      // set_show_load_data_button(false);
     }
-    set_loading_list(false);
-    // set_show_load_data_button(false);
   };
 
   useEffect(() => {

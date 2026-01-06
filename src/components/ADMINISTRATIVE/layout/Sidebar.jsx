@@ -42,6 +42,13 @@ const Sidebar = ({
       icon: <Home size={18} />,
     },
     {
+      key: "User Management",
+      module_code: "UM",
+      type: "link",
+      name: "User Management",
+      icon: <User size={18} />,
+    },
+    {
       key: "Production",
       module_code: "PR",
       type: "dropdown",
@@ -52,13 +59,6 @@ const Sidebar = ({
         { name: "Progress", sub_module_code: "PR2" },
         { name: "Reports", sub_module_code: "PR3" },
       ],
-    },
-    {
-      key: "User Management",
-      module_code: "UM",
-      type: "link",
-      name: "User Management",
-      icon: <User size={18} />,
     },
     {
       key: "Inbound",

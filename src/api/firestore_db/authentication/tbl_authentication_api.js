@@ -228,6 +228,70 @@ export const api_update_user = async (
   }
 };
 // - [Update]
+
+// + [Update Module Access]
+export const api_update_user_module_access = async (
+  user_id,
+  { module_access, sub_module_access },
+  updated_by,
+  show_toast
+) => {
+  try {
+    if (!user_id) {
+      throw new Error("User ID is required.");
+    }
+
+    if (!module_access || !sub_module_access) {
+      throw new Error("Module access data is required.");
+    }
+
+    const user_doc_ref = doc(
+      firestore_db,
+      "DB1_ERP_SYSTEM",
+      "TBL_AUTHENTICATION",
+      "DATA",
+      user_id
+    );
+
+    const update_payload = {
+      module_access, // e.g. ["INV", "WM"] or "ALL"
+      sub_module_access, // e.g. { INV: ["INV001"], WM: ["WM001"] }
+      updated_by,
+      updated_date: format_date_1(new Date()),
+    };
+
+    await updateDoc(user_doc_ref, update_payload);
+
+    show_toast({
+      type: "success",
+      title: "Access Updated",
+      message: "Module access has been updated successfully.",
+      icon: <CheckCircle2 size={21} className="text-green-500" />,
+    });
+
+    return {
+      success: true,
+      id: user_id,
+      ...update_payload,
+    };
+  } catch (error) {
+    console.error("Error updating module access:", error);
+
+    show_toast({
+      type: "danger",
+      title: "Error",
+      message: error.message || "Failed to update module access.",
+      icon: <CircleX size={21} className="text-red-500" />,
+    });
+
+    return {
+      success: false,
+      message: error.message,
+    };
+  }
+};
+// - [Update Module Access]
+
 // + [Truncate]
 export const api_truncate_user_master = async (show_toast) => {
   try {

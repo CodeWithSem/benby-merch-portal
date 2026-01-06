@@ -31,11 +31,20 @@ export const api_get_wm_order_list_by_date = async (
   show_toast
 ) => {
   try {
+    if (!start_date || !end_date) {
+      return {
+        success: false,
+        data: [],
+        message: "Start date and end date are required",
+      };
+    }
     const tbl_wm_order_ref = collection(
       firestore_db,
       ...get_firestore_path(TABLES.WM_ORDER)
     );
 
+    console.log(start_date);
+    console.log(end_date);
     const start = convert_date_to_sort(start_date);
     const end = convert_date_to_sort(end_date);
 

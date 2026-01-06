@@ -44,7 +44,6 @@ const Password_Field = ({
           {label}
         </label>
       )}
-
       <div className={wrapper_class}>
         <input
           type={visible ? "text" : "password"}
@@ -59,7 +58,6 @@ const Password_Field = ({
           autoComplete="off"
           spellCheck={false}
         />
-
         <div
           onClick={toggle_visibility}
           className={icon_class}
