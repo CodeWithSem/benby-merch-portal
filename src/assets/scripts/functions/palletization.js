@@ -6,6 +6,7 @@
  * @param {number} quantity - Total quantity in cases from GR
  * @param {Array} item_master_list - Master data for items
  * @param {number} lpn_start - Starting LPN number
+ * @param {number} lpn_timestamp - Unix timestamp (same for whole GR)
  * @returns {Array} Array of pallet objects (LPNs)
  */
 export function palletize_item({
@@ -13,6 +14,7 @@ export function palletize_item({
   quantity,
   item_master_list,
   lpn_start = 1,
+  lpn_timestamp,
 }) {
   const item = item_master_list.find((i) => i.item_code === item_code);
   if (!item) return [];
@@ -30,8 +32,11 @@ export function palletize_item({
   while (remaining_quantity > 0) {
     const pallet_quantity = Math.min(cases_per_pallet, remaining_quantity);
 
+    const sequence = String(lpn_counter).padStart(4, "0");
+    const lpn_no = `${lpn_timestamp}${sequence}`;
+
     pallets.push({
-      lpn_no: String(lpn_counter).padStart(10, "0"), // LPN NO
+      lpn_no, // ✅ Unix timestamp + sequence
       item_code,
       item_desc,
       sutype: wm2_pallet_load_1_sutype,
@@ -39,7 +44,7 @@ export function palletize_item({
       quantity_confirmed: 0,
       wm_order_status: "Pending",
       transfer_order_status: "Pending",
-      pallet_config: wm2_pallet_config_1, // ✅ include pallet config
+      pallet_config: wm2_pallet_config_1,
     });
 
     remaining_quantity -= pallet_quantity;
@@ -58,6 +63,7 @@ export function palletize_item({
 export function generate_gr_pallets({ selected_gr, item_master_list }) {
   if (!selected_gr?.received_item_list) return [];
 
+  const unixTimestamp = Date.now(); // ✅ ONE timestamp per GR
   let lpn_counter = 1;
   const pallets = [];
 
@@ -70,6 +76,7 @@ export function generate_gr_pallets({ selected_gr, item_master_list }) {
         quantity: batch.quantity, // quantity in cases
         item_master_list,
         lpn_start: lpn_counter,
+        lpn_timestamp: unixTimestamp, // ✅ pass timestamp
       });
 
       lpn_counter += batch_pallets.length;
@@ -136,11 +143,8 @@ export function allocate_lpn_to_bins({ pallets, item_master_list, sbin_list }) {
     if (bin) {
       allocations.push({
         ...pallet,
-        // ✅ SOURCE (DEFAULT ORIGIN)
         from_stype_code: "GRZ",
         from_sbin_code: "GRZ-01",
-
-        // ✅ DESTINATION
         to_stype_code: bin.stype_code,
         to_sbin_code: bin.sbin_code,
       });
@@ -149,11 +153,8 @@ export function allocate_lpn_to_bins({ pallets, item_master_list, sbin_list }) {
     } else {
       allocations.push({
         ...pallet,
-        // ✅ SOURCE
         from_stype_code: "GRZ",
         from_sbin_code: "GRZ-01",
-
-        // ❌ DESTINATION
         to_stype_code: dest_stype,
         to_sbin_code: null,
         remark: "NO AVAILABLE BIN",

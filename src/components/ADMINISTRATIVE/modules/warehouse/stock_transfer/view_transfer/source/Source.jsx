@@ -1,19 +1,7 @@
-import React, { useEffect, useState } from "react";
-import { useToast } from "../../../../../layout/Toast_Provider";
-import {
-  Search,
-  ChevronDown,
-  ChevronUp,
-  View,
-  RefreshCw,
-  ChevronLeft,
-} from "lucide-react";
+import React from "react";
+import { ChevronLeft } from "lucide-react";
 import Button from "assets/elements/Button";
 import Text_Code_Field from "assets/elements/Text_Code_Field";
-import Icon_Field from "assets/elements/Icon_Field";
-import Select_Field from "assets/elements/Select_Field";
-import Pagination from "assets/elements/Pagination";
-import Checkbox_Field from "assets/elements/Checkbox_Field";
 
 const Source = ({ set_page }) => {
   const handle_go_back = () => {

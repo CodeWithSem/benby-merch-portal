@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useToast } from "../../../../../layout/Toast_Provider";
+import { useToast } from "../../../../../../layout/Toast_Provider";
 import {
   Search,
   ChevronDown,
@@ -18,7 +18,7 @@ import Select_Branch from "./modals/Select_Branch";
 import Select_Plant from "./modals/Select_Plant";
 import Select_SLOC from "./modals/Select_SLOC";
 
-const Source = ({ selected_items, set_selected_items, set_page }) => {
+const Source = ({ selected_items, set_selected_items }) => {
   const { show_toast } = useToast();
   const [display_modal, set_display_modal] = useState("");
 
@@ -152,29 +152,14 @@ const Source = ({ selected_items, set_selected_items, set_page }) => {
     set_display_modal("select_sloc");
   };
 
-  const handle_go_back = () => {
-    set_page("main");
-  };
-
   // RETURN ORIGIN
   return (
     <React.Fragment>
-      <div className="w-full bg-white rounded-lg border">
+      <div className="mt-5 w-full bg-white rounded-lg border">
         {/* + Header */}
         <div className="flex flex-wrap items-center justify-between gap-3 p-5">
           <div className="flex items-center gap-3">
-            <Button
-              variant="white"
-              icon={ChevronLeft}
-              icon_position="left"
-              width="w-[20px]"
-              on_click={handle_go_back}
-            ></Button>
             <h1 className="text-lg">Source</h1>
-          </div>
-
-          <div className="flex gap-2 text-gray-500 text-sm tracking-wider">
-            MM-DD-YYYY
           </div>
         </div>
         {/* - Header */}

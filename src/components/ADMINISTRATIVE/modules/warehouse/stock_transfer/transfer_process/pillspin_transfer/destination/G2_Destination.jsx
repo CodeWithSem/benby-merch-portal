@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useToast } from "../../../../../layout/Toast_Provider";
+import { useToast } from "../../../../../../layout/Toast_Provider";
 import {
   ArrowLeftRight,
   Search,
@@ -14,11 +14,19 @@ import Select_Field from "assets/elements/Select_Field";
 import Text_Field from "assets/elements/Text_Field";
 import Text_Code_Field from "assets/elements/Text_Code_Field";
 import Pagination from "assets/elements/Pagination";
-import Select_Branch from "./modals/Select_Branch";
-import Select_Plant from "./modals/Select_Plant";
-import Select_SLOC from "./modals/Select_SLOC";
+import Select_Branch from "../../../modals/select_hierarchy/Select_Branch";
+import Select_Plant from "../../../modals/select_hierarchy/Select_Plant";
+import Select_SLOC from "../../../modals/select_hierarchy/Select_SLOC";
+import {
+  branch_h_list,
+  branch_list,
+  plant_h_list,
+  plant_list,
+  sloc_list,
+} from "../../../ST_DATA_MAP";
+import { get_description } from "assets/scripts/functions/get_description";
 
-const Destination = ({
+const G2_Destination = ({
   selected_items,
   set_selected_items,
   handle_save_transfer,
@@ -26,6 +34,12 @@ const Destination = ({
 }) => {
   const { show_toast } = useToast();
   const [display_modal, set_display_modal] = useState("");
+
+  const [destination_data, set_destination_data] = useState({
+    branch_code: "BR-001",
+    plant_code: "PL-003",
+    sloc_code: "",
+  });
 
   const columns = [
     { key: "item_code", label: "Item Code", sortable: true },
@@ -155,31 +169,51 @@ const Destination = ({
         {/* + Section 1 */}
         <div className="p-5 sm:p-6 border-t">
           <div className="grid grid-cols-1 gap-5">
+            {/* Branch */}
             <Text_Code_Field
               label="Branch"
               code_width="150px"
-              show_search_button={true}
-              // code_value={}
-              // text_value={}
-              on_click={handle_select_branch}
+              show_search_button={false}
+              code_value={destination_data.branch_code}
+              text_value={get_description(
+                destination_data.branch_code,
+                branch_list,
+                "branch_code",
+                "branch_desc"
+              )}
+              //   on_click={() => set_display_modal("select_branch")}
               disabled
             />
+
+            {/* Plant */}
             <Text_Code_Field
               label="Plant / DC"
               code_width="150px"
-              show_search_button={true}
-              // code_value={}
-              // text_value={}
-              on_click={handle_select_plant}
+              show_search_button={false}
+              code_value={destination_data.plant_code}
+              text_value={get_description(
+                destination_data.plant_code,
+                plant_list,
+                "plant_code",
+                "plant_desc"
+              )}
+              //   on_click={() => set_display_modal("select_plant")}
               disabled
             />
+
+            {/* SLOC */}
             <Text_Code_Field
               label="SLOC"
               code_width="150px"
-              show_search_button={true}
-              // code_value={}
-              // text_value={}
-              on_click={handle_select_sloc}
+              show_search_button={!!destination_data.plant_code}
+              code_value={destination_data.sloc_code}
+              text_value={get_description(
+                destination_data.sloc_code,
+                sloc_list,
+                "sloc_code",
+                "sloc_desc"
+              )}
+              on_click={() => set_display_modal("select_sloc")}
               disabled
             />
           </div>
@@ -423,24 +457,35 @@ const Destination = ({
       <Select_Branch
         is_open={display_modal === "select_branch"}
         on_close={() => set_display_modal("")}
-        width="max-w-[1000px]"
-        height="max-h-[700px]"
+        branch_list={branch_list}
+        set_data={set_destination_data}
+        set_selected_item_list={() => {}}
       />
+
       <Select_Plant
         is_open={display_modal === "select_plant"}
         on_close={() => set_display_modal("")}
-        width="max-w-[1000px]"
-        height="max-h-[700px]"
+        selected_branch_code={destination_data.branch_code}
+        branch_list={branch_list}
+        plant_list={plant_list}
+        branch_h_list={branch_h_list}
+        set_data={set_destination_data}
+        set_selected_item_list={() => {}}
       />
+
       <Select_SLOC
         is_open={display_modal === "select_sloc"}
         on_close={() => set_display_modal("")}
-        width="max-w-[1000px]"
-        height="max-h-[700px]"
+        selected_plant_code={destination_data.plant_code}
+        plant_list={plant_list}
+        sloc_list={sloc_list}
+        plant_h_list={plant_h_list}
+        set_data={set_destination_data}
+        set_selected_item_list={() => {}}
       />
       {/* - Modals */}
     </React.Fragment>
   );
 };
 
-export default Destination;
+export default G2_Destination;

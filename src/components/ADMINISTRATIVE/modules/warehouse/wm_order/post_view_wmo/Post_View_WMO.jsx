@@ -3,6 +3,7 @@ import { ChevronLeft, FileInput } from "lucide-react";
 import Button from "assets/elements/Button";
 import Text_Field from "assets/elements/Text_Field";
 import WM_Items from "./wm_items/WM_Items";
+import { api_post_wm_orders_rtdb } from "../../../../../../api/real_time_db//warehouse/wm_order/tbl_wm_order_api_rtdb";
 
 const Post_View_WMO = ({
   set_page,
@@ -15,7 +16,25 @@ const Post_View_WMO = ({
   const [post_loading, set_post_loading] = useState(false);
 
   const handle_post_wmo = async () => {
-    // post method
+    set_post_loading(true);
+
+    const success = await api_post_wm_orders_rtdb(
+      view_wmo_data.wm_allocation_list,
+      {
+        wmo_number: view_wmo_data.wmo_number,
+        po_number: view_wmo_data.po_number,
+        do_number: view_wmo_data.do_number,
+      },
+      active_user,
+      show_toast
+    );
+
+    if (success) {
+      set_is_confirm_modal_open(false);
+      set_page("main");
+    }
+
+    set_post_loading(false);
   };
 
   const close_confirm_modal = () => {
