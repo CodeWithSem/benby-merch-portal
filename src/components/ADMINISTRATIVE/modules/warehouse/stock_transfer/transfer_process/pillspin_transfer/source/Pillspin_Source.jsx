@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { ChevronLeft, RefreshCw, Search } from "lucide-react";
+import { ChevronUp, ChevronDown, RefreshCw, Search, View } from "lucide-react";
 import Button from "assets/elements/Button";
 import Text_Code_Field from "assets/elements/Text_Code_Field";
 
@@ -19,6 +19,7 @@ import Select_Field from "assets/elements/Select_Field";
 import Icon_Field from "assets/elements/Icon_Field";
 import Pagination from "assets/elements/Pagination";
 import Checkbox_Field from "assets/elements/Checkbox_Field";
+import { item_master_list } from "assets/data/item_master_list";
 
 const Pillspin_Source = ({ selected_items, set_selected_items }) => {
   const [display_modal, set_display_modal] = useState("");
@@ -34,30 +35,35 @@ const Pillspin_Source = ({ selected_items, set_selected_items }) => {
     { key: "item_code", label: "Item Code", sortable: true },
     { key: "item_desc", label: "Item Description", sortable: true },
     { key: "batch_code", label: "Batch", sortable: true },
-    { key: "available_qty", label: "Available Qty", sortable: true },
+    { key: "sbin_code", label: "Storage Bin", sortable: true },
+    { key: "quantity", label: "Available Qty", sortable: true },
+    { key: "uom", label: "UoM", sortable: true },
   ];
 
   const [source_item_list, set_source_item_list] = useState([
     {
-      id: 1,
-      item_code: "ITM-0001",
-      item_desc: "Item Description 1",
-      batch_code: "BATCH-001",
-      available_qty: 50,
+      id: "ITM-00001_ITM-00001_B1_SS-01",
+      item_code: "ITM-00001",
+      batch_code: "ITM-00001_B1",
+      stype_code: "SS",
+      sbin_code: "SS-01",
+      manufacture_date: "12-01-2025",
+      pallet_config: "12x4",
+      sutype: "IP",
+      quantity: 48,
+      uom: "CS",
     },
     {
-      id: 2,
-      item_code: "ITM-0001",
-      item_desc: "Item Description 1",
-      batch_code: "BATCH-002",
-      available_qty: 100,
-    },
-    {
-      id: 3,
-      item_code: "ITM-0002",
-      item_desc: "Item Description 2",
-      batch_code: "BATCH-003",
-      available_qty: 20,
+      id: "ITM-00002_ITM-00002_B1_SS-02",
+      item_code: "ITM-00002",
+      batch_code: "ITM-00002_B1",
+      stype_code: "SS",
+      sbin_code: "SS-02",
+      manufacture_date: "12-01-2025",
+      pallet_config: "12x4",
+      sutype: "IP",
+      quantity: 48,
+      uom: "CS",
     },
   ]);
 
@@ -89,15 +95,39 @@ const Pillspin_Source = ({ selected_items, set_selected_items }) => {
       temp = temp.filter((u) =>
         columns.some((col) => {
           if (col.key === "actions") return false;
-          const val = u[col.key];
+          const val =
+            col.key === "item_desc"
+              ? get_description(
+                  u.item_code,
+                  item_master_list,
+                  "item_code",
+                  "item_desc"
+                )
+              : u[col.key];
           return val?.toString().toLowerCase().includes(q);
         })
       );
     }
 
     temp.sort((a, b) => {
-      const val_a = a[sort_by];
-      const val_b = b[sort_by];
+      const val_a =
+        sort_by === "item_desc"
+          ? get_description(
+              a.item_code,
+              item_master_list,
+              "item_code",
+              "item_desc"
+            )
+          : a[sort_by];
+      const val_b =
+        sort_by === "item_desc"
+          ? get_description(
+              b.item_code,
+              item_master_list,
+              "item_code",
+              "item_desc"
+            )
+          : b[sort_by];
 
       if (val_a == null) return 1;
       if (val_b == null) return -1;
@@ -124,7 +154,15 @@ const Pillspin_Source = ({ selected_items, set_selected_items }) => {
       ? source_item_list.filter((u) =>
           columns.some((col) => {
             if (col.key === "actions") return false;
-            const val = u[col.key];
+            const val =
+              col.key === "item_desc"
+                ? get_description(
+                    u.item_code,
+                    item_master_list,
+                    "item_code",
+                    "item_desc"
+                  )
+                : u[col.key];
             return val
               ?.toString()
               .toLowerCase()
@@ -174,7 +212,6 @@ const Pillspin_Source = ({ selected_items, set_selected_items }) => {
                 "branch_code",
                 "branch_desc"
               )}
-              //   on_click={() => set_display_modal("select_branch")}
               disabled
             />
 
@@ -190,7 +227,6 @@ const Pillspin_Source = ({ selected_items, set_selected_items }) => {
                 "plant_code",
                 "plant_desc"
               )}
-              //   on_click={() => set_display_modal("select_plant")}
               disabled
             />
 
@@ -212,6 +248,7 @@ const Pillspin_Source = ({ selected_items, set_selected_items }) => {
           </div>
         </div>
         {/* - Section */}
+
         {/* + Section 2 */}
         <div className="p-5 sm:p-6 border-t">
           <div className="w-full border rounded-lg">
@@ -234,19 +271,13 @@ const Pillspin_Source = ({ selected_items, set_selected_items }) => {
                   />
                 </div>
                 <div className="mr-2">entries</div>
-                <Button
-                  variant="white"
-                  icon={RefreshCw}
-                  icon_position="left"
-                  //   on_click={() => load_data()}
-                ></Button>
+                <Button variant="white" icon={RefreshCw} icon_position="left" />
               </div>
 
               <div className="w-full mt-4 md:mt-0 md:w-[600px]">
                 <div className="w-full flex items-center gap-2">
                   <div className="w-full">
                     <Icon_Field
-                      //   name="search"
                       placeholder="Search..."
                       icon={Search}
                       icon_position="left"
@@ -314,7 +345,18 @@ const Pillspin_Source = ({ selected_items, set_selected_items }) => {
                   <tbody className="bg-white">
                     {filtered_source_item_list.map((row, idx) => {
                       const render_cell = (col, row) => {
-                        const value = row[col.key];
+                        let value = row[col.key];
+
+                        // + Lookup applied here
+                        if (col.key === "item_desc") {
+                          value = get_description(
+                            row.item_code,
+                            item_master_list,
+                            "item_code",
+                            "item_desc"
+                          );
+                        }
+
                         if (col.key === "checkbox") {
                           return (
                             <div className="w-full flex justify-center items-center">
@@ -337,37 +379,6 @@ const Pillspin_Source = ({ selected_items, set_selected_items }) => {
                                   }
                                 }}
                               />
-                            </div>
-                          );
-                        }
-                        if (col.key === "status") {
-                          return (
-                            <span
-                              className={`inline-flex items-center justify-center gap-1 rounded-full px-3 py-0.5 text-xs font-medium ${
-                                {
-                                  Draft: "bg-yellow-100 text-yellow-600",
-                                  Approved: "bg-green-100 text-green-500",
-                                  "In Transit": "bg-yellow-100 text-yellow-600",
-                                  Received: "bg-green-100 text-green-500",
-                                  Cancelled: "bg-red-100 text-red-500",
-                                }[row.status] || "bg-gray-100 text-gray-500"
-                              }`}
-                            >
-                              {row.status}
-                            </span>
-                          );
-                        }
-                        if (col.key === "actions") {
-                          return (
-                            <div className="flex gap-2">
-                              <div className="relative group flex jusity-center items-center">
-                                <button className="text-gray-500 hover:text-sky-600 text-[12px] outline-none">
-                                  <View size={19} />
-                                </button>
-                                <span className="absolute bottom-full mb-1 left-1/2 transform -translate-x-1/2 px-2 py-1 text-xs text-white bg-sky-600 rounded opacity-0 group-hover:opacity-100 transition-opacity">
-                                  View Record
-                                </span>
-                              </div>
                             </div>
                           );
                         }
@@ -400,7 +411,6 @@ const Pillspin_Source = ({ selected_items, set_selected_items }) => {
             </div>
             {/* + Table */}
 
-            {/* + Pagination */}
             {total_pages > 0 && (
               <Pagination
                 current_page={current_page}
@@ -416,7 +426,6 @@ const Pillspin_Source = ({ selected_items, set_selected_items }) => {
       </div>
 
       {/* ================= MODALS ================= */}
-
       <Select_Branch
         is_open={display_modal === "select_branch"}
         on_close={() => set_display_modal("")}
@@ -446,7 +455,6 @@ const Pillspin_Source = ({ selected_items, set_selected_items }) => {
         set_data={set_source_data}
         set_selected_item_list={() => {}}
       />
-
       {/* ================= END MODALS ================= */}
     </React.Fragment>
   );

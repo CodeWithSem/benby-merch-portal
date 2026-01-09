@@ -31,7 +31,7 @@ const Destination = ({
     { key: "item_code", label: "Item Code", sortable: true },
     { key: "item_desc", label: "Item Description", sortable: true },
     { key: "batch_code", label: "Batch", sortable: true },
-    { key: "available_qty", label: "Available Qty", sortable: true },
+    { key: "quantity", label: "Available Qty", sortable: true },
     {
       key: "transfer_qty",
       label: "Transfert Qty",

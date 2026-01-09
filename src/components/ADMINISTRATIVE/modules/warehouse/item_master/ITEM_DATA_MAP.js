@@ -62,8 +62,8 @@ export const item_status_list = [
 export const uom_list = [
   {
     id: 1,
-    uom_code: "PC",
-    uom_desc: "Piece",
+    uom_code: "CS",
+    uom_desc: "Case",
     creation_date: "MM-DD-YYYY",
   },
   {

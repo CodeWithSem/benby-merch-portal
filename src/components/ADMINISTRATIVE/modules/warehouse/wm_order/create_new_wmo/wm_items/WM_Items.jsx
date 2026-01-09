@@ -1,9 +1,6 @@
 import React, { useState } from "react";
-import { Info, Printer, Search } from "lucide-react";
+import { Info, Search } from "lucide-react";
 import Icon_Field from "assets/elements/Icon_Field";
-import Button from "assets/elements/Button";
-import { generate_lpn_pdf } from "assets/scripts/functions/generate_lpn_pdf";
-import { bulk_generate_lpn_pdf } from "assets/scripts/functions/bulk_generate_lpn_pdf";
 
 const WM_Items = ({ new_wmo_data }) => {
   const [selected_row_id, set_selected_row_id] = useState(null);
@@ -18,18 +15,6 @@ const WM_Items = ({ new_wmo_data }) => {
       item.item_desc?.toLowerCase().includes(keyword)
     );
   });
-
-  const handleGenerateLPN = (pallet) => {
-    // Pass new_wmo_data instead of selected_gr
-    generate_lpn_pdf({ pallet, selected_gr: new_wmo_data });
-  };
-
-  const handleBulkGenerateLPN = () => {
-    bulk_generate_lpn_pdf({
-      pallets: filtered_wm_allocation_list,
-      selected_gr: new_wmo_data,
-    });
-  };
 
   return (
     <div className="flex flex-col gap-5 border-t p-5 sm:p-6">

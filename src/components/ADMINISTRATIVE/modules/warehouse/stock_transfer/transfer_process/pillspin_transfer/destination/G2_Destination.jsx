@@ -25,6 +25,7 @@ import {
   sloc_list,
 } from "../../../ST_DATA_MAP";
 import { get_description } from "assets/scripts/functions/get_description";
+import { item_master_list } from "assets/data/item_master_list";
 
 const G2_Destination = ({
   selected_items,
@@ -42,16 +43,19 @@ const G2_Destination = ({
   });
 
   const columns = [
+    { key: "index", label: "No.", sortable: false },
     { key: "item_code", label: "Item Code", sortable: true },
     { key: "item_desc", label: "Item Description", sortable: true },
     { key: "batch_code", label: "Batch", sortable: true },
-    { key: "available_qty", label: "Available Qty", sortable: true },
+    { key: "sbin_code", label: "Storage Bin", sortable: true },
+    { key: "quantity", label: "Available Qty", sortable: true },
     {
-      key: "transfer_qty",
+      key: "quantity_transfer",
       label: "Transfert Qty",
       sortable: false,
       width: "w-[150px]",
     },
+    { key: "uom", label: "Uom", sortable: true },
   ];
 
   useEffect(() => {
@@ -62,7 +66,7 @@ const G2_Destination = ({
   const [dest_item_list, set_dest_item_list] = useState([]);
   const [filtered_dest_item_list, set_filtered_dest_item_list] = useState([]);
   const [loading, set_loading] = useState(false);
-  const [select_option, set_select_option] = useState(5);
+  const [show_entries, set_show_entries] = useState(5);
   const [current_page, set_current_page] = useState(1);
   const [sort_by, set_sort_by] = useState("timestamp");
   const [sort_order, set_sort_order] = useState("asc");
@@ -85,15 +89,42 @@ const G2_Destination = ({
       temp = temp.filter((u) =>
         columns.some((col) => {
           if (col.key === "actions") return false;
-          const val = u[col.key];
+
+          // + Lookup for item_desc
+          const val =
+            col.key === "item_desc"
+              ? get_description(
+                  u.item_code,
+                  item_master_list,
+                  "item_code",
+                  "item_desc"
+                )
+              : u[col.key];
+
           return val?.toString().toLowerCase().includes(q);
         })
       );
     }
 
     temp.sort((a, b) => {
-      const val_a = a[sort_by];
-      const val_b = b[sort_by];
+      const val_a =
+        sort_by === "item_desc"
+          ? get_description(
+              a.item_code,
+              item_master_list,
+              "item_code",
+              "item_desc"
+            )
+          : a[sort_by];
+      const val_b =
+        sort_by === "item_desc"
+          ? get_description(
+              b.item_code,
+              item_master_list,
+              "item_code",
+              "item_desc"
+            )
+          : b[sort_by];
 
       if (val_a == null) return 1;
       if (val_b == null) return -1;
@@ -103,16 +134,21 @@ const G2_Destination = ({
       return 0;
     });
 
-    const start_idx = (current_page - 1) * select_option;
-    const end_idx = start_idx + select_option;
-    set_filtered_dest_item_list(temp.slice(start_idx, end_idx));
+    const start_idx = (current_page - 1) * show_entries;
+    const end_idx = start_idx + show_entries;
+    const sliced = temp.slice(start_idx, end_idx);
+    const indexed_data = sliced.map((item, i) => ({
+      ...item,
+      index: start_idx + i + 1,
+    }));
+    set_filtered_dest_item_list(indexed_data);
   }, [
     dest_item_list,
     debounced_query,
     sort_by,
     sort_order,
     current_page,
-    select_option,
+    show_entries,
   ]);
 
   const total_pages = Math.ceil(
@@ -120,14 +156,24 @@ const G2_Destination = ({
       ? dest_item_list.filter((u) =>
           columns.some((col) => {
             if (col.key === "actions") return false;
-            const val = u[col.key];
+
+            const val =
+              col.key === "item_desc"
+                ? get_description(
+                    u.item_code,
+                    item_master_list,
+                    "item_code",
+                    "item_desc"
+                  )
+                : u[col.key];
+
             return val
               ?.toString()
               .toLowerCase()
               .includes(debounced_query.toLowerCase());
           })
         ).length
-      : dest_item_list.length) / select_option
+      : dest_item_list.length) / show_entries
   );
 
   const handle_sort = (column) => {
@@ -141,21 +187,11 @@ const G2_Destination = ({
   };
 
   const handle_page_change = (page) => set_current_page(page);
-  // - Client-Side Filtering
 
-  const handle_select_branch = () => {
-    set_display_modal("select_branch");
-  };
-  const handle_select_plant = () => {
-    set_display_modal("select_plant");
-  };
-  const handle_select_sloc = () => {
-    set_display_modal("select_sloc");
-  };
-
-  const handle_go_back = () => {
-    set_page("main");
-  };
+  const handle_select_branch = () => set_display_modal("select_branch");
+  const handle_select_plant = () => set_display_modal("select_plant");
+  const handle_select_sloc = () => set_display_modal("select_sloc");
+  const handle_go_back = () => set_page("main");
 
   // RETURN ORIGIN
   return (
@@ -166,10 +202,10 @@ const G2_Destination = ({
           <h1 className="text-lg">Destination</h1>
         </div>
         {/* - Header */}
+
         {/* + Section 1 */}
         <div className="p-5 sm:p-6 border-t">
           <div className="grid grid-cols-1 gap-5">
-            {/* Branch */}
             <Text_Code_Field
               label="Branch"
               code_width="150px"
@@ -181,11 +217,8 @@ const G2_Destination = ({
                 "branch_code",
                 "branch_desc"
               )}
-              //   on_click={() => set_display_modal("select_branch")}
               disabled
             />
-
-            {/* Plant */}
             <Text_Code_Field
               label="Plant / DC"
               code_width="150px"
@@ -197,11 +230,8 @@ const G2_Destination = ({
                 "plant_code",
                 "plant_desc"
               )}
-              //   on_click={() => set_display_modal("select_plant")}
               disabled
             />
-
-            {/* SLOC */}
             <Text_Code_Field
               label="SLOC"
               code_width="150px"
@@ -213,12 +243,13 @@ const G2_Destination = ({
                 "sloc_code",
                 "sloc_desc"
               )}
-              on_click={() => set_display_modal("select_sloc")}
+              on_click={handle_select_sloc}
               disabled
             />
           </div>
         </div>
         {/* - Section 1 */}
+
         {/* + Section 2 */}
         <div className="p-5 sm:p-6 border-t">
           <div className="w-full border rounded-lg">
@@ -228,9 +259,9 @@ const G2_Destination = ({
                 <div className="w-[90px]">
                   <Select_Field
                     name="option"
-                    value={select_option}
+                    value={show_entries}
                     on_change={(e) => {
-                      set_select_option(Number(e.target.value));
+                      set_show_entries(Number(e.target.value));
                       set_current_page(1);
                     }}
                     options={[
@@ -241,19 +272,13 @@ const G2_Destination = ({
                   />
                 </div>
                 <div className="mr-2">entries</div>
-                <Button
-                  variant="white"
-                  icon={RefreshCw}
-                  icon_position="left"
-                  //   on_click={() => load_data()}
-                ></Button>
+                <Button variant="white" icon={RefreshCw} icon_position="left" />
               </div>
 
               <div className="w-full mt-4 md:mt-0 md:w-[600px]">
                 <div className="w-full flex items-center gap-2">
                   <div className="w-full">
                     <Icon_Field
-                      //   name="search"
                       placeholder="Search..."
                       icon={Search}
                       icon_position="left"
@@ -264,6 +289,7 @@ const G2_Destination = ({
                 </div>
               </div>
             </div>
+
             {/* + Table */}
             <div className="overflow-x-auto">
               {loading ? (
@@ -281,7 +307,6 @@ const G2_Destination = ({
                       {columns.map((col, i) => {
                         const renderHeaderCell = (col) => {
                           const is_sorted = sort_by === col.key;
-
                           return (
                             <div className="flex items-center justify-between w-full">
                               <span>{col.label}</span>
@@ -320,13 +345,25 @@ const G2_Destination = ({
                   <tbody className="bg-white">
                     {filtered_dest_item_list.map((row, idx) => {
                       const render_cell = (col, row) => {
-                        const value = row[col.key];
-                        if (col.key === "transfer_qty") {
+                        if (col.key === "index") {
+                          return <span>{row.index}</span>;
+                        }
+                        // + Lookup applied here
+                        if (col.key === "item_desc") {
+                          return get_description(
+                            row.item_code,
+                            item_master_list,
+                            "item_code",
+                            "item_desc"
+                          );
+                        }
+
+                        if (col.key === "quantity_transfer") {
                           const current_item = selected_items.find(
                             (item) => item.id === row.id
                           );
-                          const current_qty = current_item?.transfer_qty || "";
-
+                          const current_qty =
+                            current_item?.quantity_transfer || "";
                           return (
                             <div className="w-full flex justify-center items-center">
                               <Text_Field
@@ -339,20 +376,19 @@ const G2_Destination = ({
                                     e.target.value === ""
                                       ? ""
                                       : Number(e.target.value);
-
                                   set_selected_items((prev) => {
                                     if (
                                       prev.some((item) => item.id === row.id)
                                     ) {
                                       return prev.map((item) =>
                                         item.id === row.id
-                                          ? { ...item, transfer_qty: val }
+                                          ? { ...item, quantity_transfer: val }
                                           : item
                                       );
                                     } else {
                                       return [
                                         ...prev,
-                                        { id: row.id, transfer_qty: val },
+                                        { id: row.id, quantity_transfer: val },
                                       ];
                                     }
                                   });
@@ -361,39 +397,8 @@ const G2_Destination = ({
                             </div>
                           );
                         }
-                        if (col.key === "status") {
-                          return (
-                            <span
-                              className={`inline-flex items-center justify-center gap-1 rounded-full px-3 py-0.5 text-xs font-medium ${
-                                {
-                                  Draft: "bg-yellow-100 text-yellow-600",
-                                  Approved: "bg-green-100 text-green-500",
-                                  "In Transit": "bg-yellow-100 text-yellow-600",
-                                  Received: "bg-green-100 text-green-500",
-                                  Cancelled: "bg-red-100 text-red-500",
-                                }[row.status] || "bg-gray-100 text-gray-500"
-                              }`}
-                            >
-                              {row.status}
-                            </span>
-                          );
-                        }
-                        if (col.key === "actions") {
-                          return (
-                            <div className="flex gap-2">
-                              <div className="relative group flex jusity-center items-center">
-                                <button className="text-gray-500 hover:text-sky-600 text-[12px] outline-none">
-                                  <View size={19} />
-                                </button>
-                                <span className="absolute bottom-full mb-1 left-1/2 transform -translate-x-1/2 px-2 py-1 text-xs text-white bg-sky-600 rounded opacity-0 group-hover:opacity-100 transition-opacity">
-                                  View Record
-                                </span>
-                              </div>
-                            </div>
-                          );
-                        }
 
-                        return value;
+                        return row[col.key];
                       };
 
                       return (
@@ -420,7 +425,7 @@ const G2_Destination = ({
               )}
             </div>
             {/* - Table */}
-            {/* + Pagination */}
+
             {total_pages > 0 && (
               <Pagination
                 current_page={current_page}
@@ -429,17 +434,16 @@ const G2_Destination = ({
                 variant="compact"
               />
             )}
-            {/* - Pagination */}
           </div>
         </div>
         {/* - Section 2 */}
+
         {/* + Section 3 */}
         <div className="p-4 sm:p-8 border-t">
           <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
             <Button
               variant="primary"
               size="lg"
-              // width="w-[100px]"
               icon={ArrowLeftRight}
               icon_position="left"
               on_click={handle_save_transfer}
@@ -453,6 +457,7 @@ const G2_Destination = ({
         </div>
         {/* - Section 3 */}
       </div>
+
       {/* + Modals */}
       <Select_Branch
         is_open={display_modal === "select_branch"}
@@ -461,7 +466,6 @@ const G2_Destination = ({
         set_data={set_destination_data}
         set_selected_item_list={() => {}}
       />
-
       <Select_Plant
         is_open={display_modal === "select_plant"}
         on_close={() => set_display_modal("")}
@@ -472,7 +476,6 @@ const G2_Destination = ({
         set_data={set_destination_data}
         set_selected_item_list={() => {}}
       />
-
       <Select_SLOC
         is_open={display_modal === "select_sloc"}
         on_close={() => set_display_modal("")}

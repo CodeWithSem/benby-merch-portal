@@ -27,7 +27,7 @@ const Source = ({ selected_items, set_selected_items }) => {
     { key: "item_code", label: "Item Code", sortable: true },
     { key: "item_desc", label: "Item Description", sortable: true },
     { key: "batch_code", label: "Batch", sortable: true },
-    { key: "available_qty", label: "Available Qty", sortable: true },
+    { key: "quantity", label: "Available Qty", sortable: true },
   ];
 
   const [source_item_list, set_source_item_list] = useState([
@@ -36,21 +36,21 @@ const Source = ({ selected_items, set_selected_items }) => {
       item_code: "ITM-0001",
       item_desc: "Item Description 1",
       batch_code: "BATCH-001",
-      available_qty: 50,
+      quantity: 50,
     },
     {
       id: 2,
       item_code: "ITM-0001",
       item_desc: "Item Description 1",
       batch_code: "BATCH-002",
-      available_qty: 100,
+      quantity: 100,
     },
     {
       id: 3,
       item_code: "ITM-0002",
       item_desc: "Item Description 2",
       batch_code: "BATCH-003",
-      available_qty: 20,
+      quantity: 20,
     },
   ]);
 

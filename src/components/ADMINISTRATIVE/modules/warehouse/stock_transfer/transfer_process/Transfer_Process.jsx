@@ -16,6 +16,23 @@ const Transfer_Process = ({ set_page }) => {
   const [transfer_post_data, set_transfer_post_data] = useState([]);
   const [selected_items, set_selected_items] = useState([]);
   const handle_save_transfer = () => {
+    const transfer_data = {
+      batch_code: "ITM-00001_B1",
+      confirm_date: "",
+      from_sbin_code: "GRZ-01",
+      from_stype_code: "GRZ",
+      item_code: "ITM-00001",
+      manufacture_date: "12-01-2025",
+      pallet_config: "12x4",
+      quantity: 48,
+      quantity_confirm: 48,
+      sled_bbd: "12-01-2028",
+      sutype: "IP",
+      to_sbin_code: "SS-01",
+      to_stype_code: "SS",
+      transfer_order_status: "Pending",
+      uom: "CS",
+    };
     console.log(selected_items);
   };
 
@@ -160,6 +177,7 @@ const Transfer_Process = ({ set_page }) => {
               <G2_Destination
                 selected_items={selected_items}
                 set_selected_items={set_selected_items}
+                handle_save_transfer={handle_save_transfer}
                 set_page={set_page}
               />
             </div>

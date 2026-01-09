@@ -36,6 +36,7 @@ import Edit_Item from "./edit_item/Edit_Item";
 import Delete_Item from "./modals/delete_item/Delete_Item";
 import Set_Item_ID from "./modals/set_item_id/Set_Item_ID";
 import Item_Extension from "./item_extension/Item_Extension";
+import { console_log } from "assets/scripts/format";
 
 const HAS_FILTER = true;
 
@@ -223,6 +224,8 @@ const Item_Master = () => {
   };
 
   const handle_view_item = (data) => {
+    // console_log(data);
+    console.table(data);
     set_view_item_data(data);
     set_page("view_item");
   };
