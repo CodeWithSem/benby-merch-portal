@@ -1,11 +1,17 @@
 import React, { useState } from "react";
+
 import { ChevronLeft, CirclePlus, CircleX } from "lucide-react";
+
 import { format_date_1, get_date_now } from "assets/scripts/format";
+
 import Button from "assets/elements/Button";
 import Text_Field from "assets/elements/Text_Field";
+
 import GR_Items from "./gr_items/GR_Items";
+
 import { api_update_po_selected_item_list } from "api/firestore_db/inbound/purchase_order/tbl_purchase_order_api";
 import { api_create_goods_receipt } from "api/firestore_db/inbound/goods_receipt/tbl_goods_receipt_api";
+import Confirm_Modal from "assets/elements/modals/Confirm_Modal";
 
 const Create_New_GR = ({
   set_page,
@@ -76,12 +82,6 @@ const Create_New_GR = ({
 
       if (!response?.success) return;
 
-      console.log("GR DATA", gr_data);
-      console.log("PO DATA", {
-        id: po_id,
-        selected_item_list: cleaned_item_list,
-      });
-
       set_gr_list((prev) => [...prev, response.data]);
       handle_go_back();
     } catch (error) {
@@ -94,51 +94,6 @@ const Create_New_GR = ({
   const close_confirm_modal = () => {
     set_is_confirm_modal_open(false);
     set_create_loading(false);
-  };
-
-  const Confirm_Modal = () => {
-    return (
-      <React.Fragment>
-        <div className="fixed inset-0 flex items-center justify-center z-[100]">
-          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm z-[101]"></div>
-          <div
-            className={`relative bg-white rounded-lg shadow-xl max-w-[500px] w-full p-10 m-5 z-[102]`}
-          >
-            <div className="w-full flex justify-center items-center text-lg md:text-xl font-bold mb-4">
-              Confirm Goods Receipt Creation
-            </div>
-            <p className="w-full text-center text-sm leading-6 text-gray-500 dark:text-gray-400 pt-4">
-              You are about to create a new Goods Receipt. Once created, it will
-              be added to the database.
-            </p>
-            <p className="w-full text-center text-sm leading-6 text-gray-500 dark:text-gray-400 pt-4">
-              Please review all the details — before proceeding.
-            </p>
-            <p className="w-full text-center text-sm leading-6 text-gray-500 dark:text-gray-400 py-4">
-              Are you sure you want to continue?
-            </p>
-            <div className="flex justify-center gap-2 mt-4">
-              <Button
-                width="w-[100px]"
-                variant="primary"
-                loading={create_loading}
-                on_click={handle_create_gr}
-              >
-                Yes
-              </Button>
-              <Button
-                width="w-[100px]"
-                variant="white"
-                on_click={() => set_is_confirm_modal_open(false)}
-                disabled={create_loading}
-              >
-                No
-              </Button>
-            </div>
-          </div>
-        </div>
-      </React.Fragment>
-    );
   };
 
   const handle_go_back = () => {
@@ -279,7 +234,16 @@ const Create_New_GR = ({
           {/* - Section 3 */}
         </div>
       </div>
-      {is_confirm_modal_open && <Confirm_Modal />}
+      <Confirm_Modal
+        is_open={is_confirm_modal_open}
+        title="Confirm Goods Receipt Creation"
+        description_1="You are about to create a new Goods Receipt. Once created, it will be added to the database."
+        description_2="Please review all the details — before proceeding."
+        description_3="Are you sure you want to continue?"
+        on_confirm={handle_create_gr}
+        on_cancel={() => set_is_confirm_modal_open(false)}
+        confirm_loading={create_loading}
+      />
     </React.Fragment>
   );
 };

@@ -4,8 +4,8 @@ import Icon_Field from "assets/elements/Icon_Field";
 import Checkbox_Field from "assets/elements/Checkbox_Field";
 import Button from "assets/elements/Button";
 import Pagination_Modal from "assets/elements/Pagination_Modal";
-import { format_currency } from "assets/scripts/format";
-import { item_ext_pu_list, item_master_list } from "../../PO_DATA_MAP";
+import { item_ext_pu_list } from "assets/data/item_ext_pu_list";
+import { item_master_list } from "assets/data/item_master_list";
 
 const Select_Item = ({
   is_open,
@@ -16,7 +16,7 @@ const Select_Item = ({
   set_selected_item_data,
   selected_item_list = [],
   width = "max-w-[700px]",
-  height = "h-[500px]",
+  height = "max-h-[500px]",
 }) => {
   const [item_list, set_item_list] = useState([]);
   const [filtered_item_list, set_filtered_item_list] = useState([]);
@@ -25,11 +25,7 @@ const Select_Item = ({
   const [search_query, set_search_query] = useState("");
   const [selected_item, set_selected_item] = useState(null);
 
-  // ---------------------------------------------------
-  // LOAD ITEMS from local arrays
-  // ---------------------------------------------------
   useEffect(() => {
-    // Filter item_ext_pu_list by branch, plant, sloc
     const filtered_ext = item_ext_pu_list.filter(
       (item) =>
         item.branch_code === branch_code &&
@@ -38,7 +34,6 @@ const Select_Item = ({
         !selected_item_list.some((s) => s.item_code === item.item_code)
     );
 
-    // Lookup item_desc from item_master_list
     const final_items = filtered_ext.map((item) => {
       const master = item_master_list.find(
         (m) => m.item_code === item.item_code
@@ -48,18 +43,13 @@ const Select_Item = ({
         item_desc: master?.item_desc || "(No Description)",
         unit_price: 0,
         uom: master?.pu_ordering_uom || "",
-        // creation_date: "", // optional, can add if needed
       };
     });
 
     set_item_list(final_items);
     set_current_page(1);
-    // setSelectedItem(null);
   }, [is_open, branch_code, plant_code, sloc_code]);
 
-  // ---------------------------------------------------
-  // SEARCH + PAGINATION
-  // ---------------------------------------------------
   useEffect(() => {
     let data = [...item_list];
 
@@ -90,7 +80,7 @@ const Select_Item = ({
       alert("Please select an item before proceeding.");
       return;
     }
-    // alert(`Selected: ${selected_item.item_desc}`);
+
     set_selected_item_data((prev) => ({
       ...prev,
       id: selected_item.id,
@@ -98,13 +88,11 @@ const Select_Item = ({
       item_desc: selected_item.item_desc,
       uom: selected_item.uom,
     }));
+
     set_selected_item(null);
     on_close();
   };
 
-  // ---------------------------------------------------
-  // RETURN ORIGINAL UI (unchanged)
-  // ---------------------------------------------------
   return is_open ? (
     <React.Fragment>
       <div className="fixed inset-0 flex items-center justify-center z-[97] px-4">
@@ -150,9 +138,6 @@ const Select_Item = ({
                       <th className="px-6 py-3 text-gray-500 text-left">
                         Item
                       </th>
-                      {/* <th className="px-6 py-3 text-gray-500 text-left">
-                        Creation Date
-                      </th> */}
                     </tr>
                   </thead>
 
@@ -195,9 +180,6 @@ const Select_Item = ({
                               </span>
                             </div>
                           </td>
-                          {/* <td className="px-6 py-3 text-gray-700 tracking-wide">
-                            {data.creation_date}
-                          </td> */}
                         </tr>
                       ))
                     )}

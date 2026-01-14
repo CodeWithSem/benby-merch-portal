@@ -1,11 +1,9 @@
 import React from "react";
 import Text_Field from "assets/elements/Text_Field";
 import { get_description } from "assets/scripts/functions/get_description";
-import {
-  company_list,
-  purc_group_list,
-  purc_org_list,
-} from "../../PO_DATA_MAP";
+import { company_list } from "assets/data/company_list";
+import { purc_org_list } from "assets/data/purc_org_list";
+import { purc_group_list } from "assets/data/purc_group_list";
 
 const Org_Data = ({ new_po_data }) => {
   return (

@@ -1,15 +1,20 @@
 import React, { useState } from "react";
-import Text_Field from "assets/elements/Text_Field";
+
 import { CirclePlus, CircleX, Edit, Info, Search, Trash } from "lucide-react";
+
+import { format_currency } from "assets/scripts/format";
+
+import Button from "assets/elements/Button";
+import Button_Action from "assets/elements/Button_Action";
+import Find_Field from "assets/elements/Find_Field";
 import Icon_Field from "assets/elements/Icon_Field";
 import Quantity_Field from "assets/elements/Quantity_Field";
-import Find_Field from "assets/elements/Find_Field";
+import Text_Field from "assets/elements/Text_Field";
+
 import Show_Item_Details from "./modals/Show_Item_Details";
-import { format_currency, format_percentage } from "assets/scripts/format";
-import Button from "assets/elements/Button";
 import Remove_Item from "./modals/Remove_Item";
+
 import Select_Item from "../../modals/item_modals/Select_Item";
-import Button_Action from "assets/elements/Button_Action";
 import Edit_Item from "../../modals/item_modals/Edit_Item";
 
 const PO_Items = ({
@@ -61,7 +66,6 @@ const PO_Items = ({
       return;
     }
 
-    // Optional: Check if the item already exists in the list
     const exists = selected_item_list.some(
       (item) => item.item_code === selected_item_data.item_code
     );
@@ -70,10 +74,8 @@ const PO_Items = ({
       return;
     }
 
-    // Add the item to the list
     set_selected_item_list((prev) => [...prev, selected_item_data]);
 
-    // Reset selected item data if needed
     set_selected_item_data({
       item_code: "",
       item_desc: "",
@@ -88,7 +90,7 @@ const PO_Items = ({
   };
 
   const handle_drag_over = (e) => {
-    e.preventDefault(); // allow drop
+    e.preventDefault();
   };
 
   const handle_drop = (index) => {
@@ -96,8 +98,8 @@ const PO_Items = ({
 
     const items = [...selected_item_list];
     const draggedItem = items[dragged_index];
-    items.splice(dragged_index, 1); // remove dragged item
-    items.splice(index, 0, draggedItem); // insert at new position
+    items.splice(dragged_index, 1);
+    items.splice(index, 0, draggedItem);
     set_selected_item_list(items);
     set_dragged_index(null);
   };
@@ -152,9 +154,11 @@ const PO_Items = ({
   // RETURN ORIGIN
   return (
     <React.Fragment>
+      {/* + Section */}
       <div className="flex flex-col gap-5 border-t p-5 sm:p-6">
-        {/* + Item List */}
+        {/* + Item List Container */}
         <div className="overflow-hidden rounded-lg border border-gray-200 bg-white pt-4 dark:border-gray-800 dark:bg-white/[0.03]">
+          {/* + Header */}
           <div className="flex flex-col gap-5 px-6 md:pl-6 md:pr-3 mb-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <h1 className="font-semibold text-gray-600 whitespace-nowrap">
@@ -174,6 +178,7 @@ const PO_Items = ({
               </div>
             </div>
           </div>
+          {/* - Header */}
           {/* + Table */}
           <div className="max-w-full overflow-x-auto custom-scrollbar">
             <table className="min-w-full text-left text-sm text-gray-700 dark:border-gray-800">
@@ -266,7 +271,7 @@ const PO_Items = ({
           </div>
           {/* - Table */}
         </div>
-        {/* - Item List */}
+        {/* - Item List Container */}
         {/* + Add Item */}
         <div className="mt-5 rounded-lg border border-gray-100 bg-gray-50 p-4 sm:p-6 dark:border-gray-800 dark:bg-gray-900">
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 lg:grid-cols-12">
@@ -387,6 +392,7 @@ const PO_Items = ({
         </div>
         {/* - Order Summary */}
       </div>
+      {/* - Section */}
       {/* + Modals */}
       <Show_Item_Details
         is_open={display_item_modal === "show_details"}

@@ -1,13 +1,17 @@
 import React, { useEffect, useState } from "react";
+
 import { Database, Search, X } from "lucide-react";
-import Icon_Field from "assets/elements/Icon_Field";
-import Checkbox_Field from "assets/elements/Checkbox_Field";
-import Button from "assets/elements/Button";
-import Pagination_Modal from "assets/elements/Pagination_Modal";
-import Date_Field from "assets/elements/Date_Field";
+
 import { format_date_1 } from "assets/scripts/format";
-import { api_get_purchase_order_list_by_date } from "api/firestore_db/inbound/purchase_order/tbl_purchase_order_api";
+
+import Button from "assets/elements/Button";
+import Checkbox_Field from "assets/elements/Checkbox_Field";
+import Date_Field from "assets/elements/Date_Field";
+import Icon_Field from "assets/elements/Icon_Field";
+import Pagination_Modal from "assets/elements/Pagination_Modal";
 import Spinner from "assets/elements/Spinner";
+
+import { api_get_purchase_order_list_by_date } from "api/firestore_db/inbound/purchase_order/tbl_purchase_order_api";
 
 const Select_PO = ({
   is_open,
@@ -53,14 +57,12 @@ const Select_PO = ({
       console.error(response.message);
     }
     set_loading_list(false);
-    // set_show_load_data_button(false);
   };
 
   useEffect(() => {
     handle_get_purchase_order_list();
   }, [gr_list]);
 
-  // --- Debounce Search ---
   useEffect(() => {
     const timer = setTimeout(() => {
       set_debounced_query(search_query);
@@ -69,13 +71,11 @@ const Select_PO = ({
     return () => clearTimeout(timer);
   }, [search_query]);
 
-  // --- Filter, Sort & Paginate ---
   useEffect(() => {
     let temp = po_list.filter(
       (po) => po.po_status === "Posted" || po.po_status === "Partially Received"
     );
 
-    // --- SEARCH ---
     if (debounced_query.trim() !== "") {
       const q = debounced_query.toLowerCase();
 
@@ -95,7 +95,6 @@ const Select_PO = ({
       });
     }
 
-    // --- SORT ---
     temp.sort((a, b) => {
       const val_a = a[sort_by];
       const val_b = b[sort_by];
@@ -106,10 +105,8 @@ const Select_PO = ({
       return 0;
     });
 
-    // --- TOTAL PAGES ---
     set_total_pages(Math.ceil(temp.length / show_entries));
 
-    // --- PAGINATION ---
     const start_idx = (current_page - 1) * show_entries;
     const end_idx = start_idx + show_entries;
     set_filtered_po_list(temp.slice(start_idx, end_idx));
@@ -131,19 +128,16 @@ const Select_PO = ({
       ...prev,
       ...selected_po,
     }));
-    // set_selected_po_data((prev) => ({ ...prev, selected_po })); // this dont...
     set_selected_po(null);
     on_close();
   };
 
   const handle_change_po_start_date = (value) => {
     set_po_start_date(format_date_1(value));
-    // set_show_load_data_button(true);
   };
 
   const handle_change_po_end_date = (value) => {
     set_po_end_date(format_date_1(value));
-    // set_show_load_data_button(true);
   };
 
   const handle_load_data = () => handle_get_purchase_order_list();
@@ -152,10 +146,7 @@ const Select_PO = ({
 
   return (
     <div className="fixed inset-0 flex items-center justify-center z-[97] px-4">
-      {/* + Blur */}
       <div className="absolute inset-0 bg-black/50 backdrop-blur-sm z-[98]"></div>
-
-      {/* + Modal Content */}
       <div
         className={`relative bg-white rounded-lg shadow-xl ${width} w-full py-7 m-5 z-[99]`}
       >
@@ -172,7 +163,6 @@ const Select_PO = ({
 
         <div className={`w-full overflow-y-auto ${height} scrollbar-custom`}>
           <div className="overflow-hidden border border-gray-200 bg-white pt-4">
-            {/* Date Filters */}
             <div className="px-6 mb-5 grid grid-cols-1 gap-5 md:w-[800px] md:grid-cols-3">
               <Date_Field
                 label="Start Date"
@@ -201,8 +191,6 @@ const Select_PO = ({
                 )}
               </div>
             </div>
-
-            {/* Search */}
             <div className="flex flex-col gap-5 px-6 mb-4 sm:flex-row sm:items-center sm:justify-between">
               <div className="w-full">
                 <Icon_Field
@@ -215,8 +203,6 @@ const Select_PO = ({
                 />
               </div>
             </div>
-
-            {/* Table */}
             <div className="max-w-full overflow-x-auto custom-scrollbar">
               <table className="min-w-full whitespace-nowrap">
                 <thead className="border-gray-100 border-y bg-gray-50">
@@ -305,11 +291,8 @@ const Select_PO = ({
                 </tbody>
               </table>
             </div>
-            {/* - Table */}
           </div>
         </div>
-
-        {/* Footer */}
         <div className="flex flex-col items-center sm:flex-row sm:justify-between gap-3 mt-5 px-7">
           <div>
             {total_pages > 0 && (

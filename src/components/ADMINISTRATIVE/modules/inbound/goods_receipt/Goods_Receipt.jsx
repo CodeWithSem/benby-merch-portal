@@ -1,43 +1,51 @@
 import React, { useEffect, useState } from "react";
-import { useToast } from "../../../layout/Toast_Provider";
-import { format_date_1 } from "assets/scripts/format";
-import { company_list, po_type_list } from "./GR_DATA_MAP";
+
 import {
-  Search,
   ChevronDown,
   ChevronUp,
-  View,
-  PlusCircle,
-  RefreshCw,
-  SlidersHorizontal,
-  FileUp,
-  FileInput,
   Database,
   FileDigit,
-  Trash2,
+  FileInput,
+  FileUp,
   FileX,
+  PlusCircle,
+  RefreshCw,
+  Search,
+  SlidersHorizontal,
+  Trash2,
+  View,
 } from "lucide-react";
-import Select_Field from "assets/elements/Select_Field";
-import Icon_Field from "assets/elements/Icon_Field";
+
+import { useToast } from "../../../layout/Toast_Provider";
+import { Use_App } from "context/app_context";
+
+import { format_date_1 } from "assets/scripts/format";
+
 import Button from "assets/elements/Button";
-import Date_Field from "assets/elements/Date_Field";
-import Checkbox_Field from "assets/elements/Checkbox_Field";
-import Pagination from "assets/elements/Pagination";
-import Create_New_GR from "./create_new_gr/Create_New_GR";
-import Select_PO from "./modals/select_po/Select_PO";
-import Delete_GR from "./modals/delete_gr/Delete_GR";
 import Button_Action from "assets/elements/Button_Action";
+import Checkbox_Field from "assets/elements/Checkbox_Field";
+import Date_Field from "assets/elements/Date_Field";
+import Icon_Field from "assets/elements/Icon_Field";
+import Pagination from "assets/elements/Pagination";
+import Select_Field from "assets/elements/Select_Field";
+
+import Set_Increment_ID from "assets/elements/modals/Set_Increment_ID";
+import Create_New_GR from "./create_new_gr/Create_New_GR";
+import Delete_GR from "./modals/delete_gr/Delete_GR";
+import Post_View_GR from "./post_view_gr/Post_View_GR";
+import Reverse_GR from "./reverse_gr/Reverse_GR";
+import Select_PO from "./modals/select_po/Select_PO";
+
+import { company_list } from "assets/data/company_list";
+import { po_type_list } from "assets/data/po_type_list";
+
+import { Get_TBL_INCREMENTAL_ID } from "api/real_time_db/incremental";
 import { api_get_batch_master_list } from "api/firestore_db/inbound/batch/tbl_batch_master_api";
 import {
   api_get_goods_receipt_list_by_date,
   api_set_goods_receipt_increment,
   api_truncate_goods_receipt,
 } from "api/firestore_db/inbound/goods_receipt/tbl_goods_receipt_api";
-import { Use_App } from "context/app_context";
-import { Get_TBL_INCREMENTAL_ID } from "api/real_time_db/incremental";
-import Set_Increment_ID from "assets/elements/modals/Set_Increment_ID";
-import Post_View_GR from "./post_view_gr/Post_View_GR";
-import Reverse_GR from "./reverse_gr/Reverse_GR";
 
 const Goods_Receipt = () => {
   const { active_user } = Use_App();
@@ -57,8 +65,6 @@ const Goods_Receipt = () => {
   const [gr_end_date, set_gr_end_date] = useState(end);
   const [po_start_date, set_po_start_date] = useState(start);
   const [po_end_date, set_po_end_date] = useState(end);
-  const [show_load_data_button, set_show_load_data_button] = useState(true);
-
   const [selected_po_data, set_selected_po_data] = useState({});
   const [new_gr_data, set_new_gr_data] = useState({});
   const [view_gr_data, set_view_gr_data] = useState({});
@@ -100,7 +106,6 @@ const Goods_Receipt = () => {
       console.error(response.message);
     }
     set_loading_list(false);
-    // set_show_load_data_button(false);
   };
 
   useEffect(() => {
@@ -135,18 +140,6 @@ const Goods_Receipt = () => {
     }, 300);
     return () => clearTimeout(timer);
   }, [search_query]);
-
-  // --- Load all users once ---
-  //   const load_data = async () => {
-  //     set_loading(true);
-  //     const data = await fetch_gr_list();
-  //     set_gr_list(data);
-  //     set_loading(false);
-  //   };
-
-  //   useEffect(() => {
-  //     load_data();
-  //   }, []);
 
   useEffect(() => {
     let temp = [...gr_list];
@@ -249,10 +242,6 @@ const Goods_Receipt = () => {
     set_page("post_view_gr");
   };
 
-  const handle_edit_gr = async (gr_data) => {
-    // Edit function here.
-  };
-
   const handle_reverse_gr = (data) => {
     set_reverse_gr_data(data);
     set_page("reverse_gr");
@@ -260,17 +249,14 @@ const Goods_Receipt = () => {
 
   const handle_change_gr_start_date = (value) => {
     set_gr_start_date(format_date_1(value));
-    // set_show_load_data_button(true);
   };
 
   const handle_change_gr_end_date = (value) => {
     set_gr_end_date(format_date_1(value));
-    // set_show_load_data_button(true);
   };
 
   const handle_load_data = () => {
     handle_get_goods_receipt_list();
-    // set_show_load_data_button(false);
   };
 
   // RETURN ORIGIN
@@ -279,6 +265,7 @@ const Goods_Receipt = () => {
       {page === "main" && (
         <React.Fragment>
           <div className="w-full">
+            {/* + Title */}
             <div className="flex flex-wrap items-center justify-between gap-3 py-5">
               <h1 className="text-xl">Inbound</h1>
               {/* + Breadcrumbs */}
@@ -303,6 +290,8 @@ const Goods_Receipt = () => {
               </nav>
               {/* - Breadcrumbs */}
             </div>
+            {/* - Title */}
+            {/* + Main Container */}
             <div className="w-full bg-white rounded-lg border">
               {/* + Header */}
               <div className="flex flex-wrap items-center justify-between gap-3 p-5">
@@ -367,18 +356,15 @@ const Goods_Receipt = () => {
                     on_change={(e) => handle_change_gr_end_date(e.target.value)}
                     placeholder="Select Date"
                   />
-                  {show_load_data_button && (
-                    <Button
-                      variant="primary"
-                      icon={Database}
-                      // width="w-[150px]"
-                      icon_position="left"
-                      loading={loading_list}
-                      on_click={handle_load_data}
-                    >
-                      Load Data
-                    </Button>
-                  )}
+                  <Button
+                    variant="primary"
+                    icon={Database}
+                    icon_position="left"
+                    loading={loading_list}
+                    on_click={handle_load_data}
+                  >
+                    Load Data
+                  </Button>
                 </div>
               </div>
               {/* - Section 1 */}
@@ -677,6 +663,7 @@ const Goods_Receipt = () => {
               </div>
               {/* - Section 2 */}
             </div>
+            {/* - Main Container */}
           </div>
         </React.Fragment>
       )}

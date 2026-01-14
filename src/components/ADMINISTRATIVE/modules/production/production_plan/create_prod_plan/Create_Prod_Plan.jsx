@@ -7,6 +7,7 @@ import Prod_Plan_List from "./prod_plan_list/Prod_Plan_List";
 import { api_create_prod_plan_rtdb } from "api/real_time_db/production/production_plan/tbl_production_plan_api";
 import { handle_text_change_function } from "assets/scripts/functions/input_functions";
 import { validate_required_fields } from "assets/scripts/functions/validate_fields";
+import Capacity_Calculator from "./capacity_calculator/Capacity_Calculator";
 
 const Create_Prod_Plan = ({
   set_page,
@@ -16,20 +17,9 @@ const Create_Prod_Plan = ({
   set_new_prod_plan_data,
   set_prod_plan_list,
 }) => {
-  const [active_tab, set_active_tab] = useState("delivery");
-  const [display_modal, set_display_modal] = useState("");
   const [create_loading, set_create_loading] = useState(false);
   const [is_confirm_modal_open, set_is_confirm_modal_open] = useState(false);
   const [selected_prod_plan_list, set_selected_prod_plan_list] = useState([]);
-
-  const tabs = [
-    { key: "delivery", title: "Delivery" },
-    { key: "address", title: "Address" },
-    { key: "org_data", title: "Org Data" },
-    { key: "po_status", title: "PO Status" },
-    { key: "shipment", title: "Shipment" },
-    { key: "approval", title: "Approval" },
-  ];
 
   const validate_batch_data_fields = () => {
     const is_valid = validate_required_fields({
@@ -230,6 +220,7 @@ const Create_Prod_Plan = ({
           </div>
           {/* - Section 1 */}
           {/* + Section 3 */}
+          <Capacity_Calculator />
           <Prod_Plan_List
             selected_prod_plan_list={selected_prod_plan_list}
             set_selected_prod_plan_list={set_selected_prod_plan_list}

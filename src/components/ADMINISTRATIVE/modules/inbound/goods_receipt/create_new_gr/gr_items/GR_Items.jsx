@@ -1,9 +1,10 @@
 import React, { useState } from "react";
 import { Info, PackagePlus, Search } from "lucide-react";
-import Text_Field from "assets/elements/Text_Field";
+
 import Icon_Field from "assets/elements/Icon_Field";
-import Select_Batch from "../../modals/Select_Batch";
 import Button from "assets/elements/Button";
+
+import Select_Batch from "../../modals/Select_Batch";
 
 const GR_Items = ({
   show_toast,
@@ -20,14 +21,12 @@ const GR_Items = ({
     set_display_item_modal("select_batch");
   };
 
-  // Callback from Select_Batch
   const handle_batches_proceed = ({ selected_batches, quantity_received }) => {
-    // Update the selected item in selected_po_data
     const updated_items = selected_po_data.selected_item_list.map((item) =>
       item.id === selected_receive_item.id
         ? {
             ...item,
-            batch_list: selected_batches, // <-- store the selected batches per item
+            batch_list: selected_batches,
             quantity_received: quantity_received,
             quantity_left: item.quantity_open - quantity_received,
             batch:
@@ -49,7 +48,6 @@ const GR_Items = ({
   return (
     <React.Fragment>
       <div className="flex flex-col gap-5 border-t p-5 sm:p-6">
-        {/* Item List */}
         <div className="overflow-hidden rounded-lg border border-gray-200 bg-white pt-4">
           <div className="flex flex-col gap-5 px-6 mb-4 sm:flex-row sm:items-center sm:justify-between">
             <h1 className="font-semibold text-gray-600 whitespace-nowrap">
@@ -150,7 +148,7 @@ const GR_Items = ({
         </div>
       </div>
 
-      {/* Modal */}
+      {/* + Modals */}
       <Select_Batch
         is_open={display_item_modal === "select_batch"}
         on_close={() => set_display_item_modal("")}
@@ -159,11 +157,10 @@ const GR_Items = ({
         show_toast={show_toast}
         batch_list={batch_list}
         selected_receive_item={selected_receive_item}
-        selected_batches_param={
-          selected_receive_item?.batch_list || [] // <-- pre-fill batches for the item
-        }
-        on_proceed={handle_batches_proceed} // <-- update parent data directly
+        selected_batches_param={selected_receive_item?.batch_list || []}
+        on_proceed={handle_batches_proceed}
       />
+      {/* - Modals */}
     </React.Fragment>
   );
 };

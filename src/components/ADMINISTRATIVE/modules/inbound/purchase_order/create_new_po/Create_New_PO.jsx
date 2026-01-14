@@ -1,9 +1,14 @@
 import React, { useState } from "react";
-import { get_date_now, format_date_1 } from "assets/scripts/format";
+
 import { ChevronLeft, CirclePlus, Eye, Save } from "lucide-react";
-import Text_Field from "assets/elements/Text_Field";
+
+import { get_date_now, format_date_1 } from "assets/scripts/format";
+import { get_description } from "assets/scripts/functions/get_description";
+
 import Button from "assets/elements/Button";
+import Text_Field from "assets/elements/Text_Field";
 import Text_Code_Field from "assets/elements/Text_Code_Field";
+
 import Delivery from "./po_details/Delivery";
 import Address from "./po_details/Address";
 import Org_Data from "./po_details/Org_Data";
@@ -11,27 +16,28 @@ import PO_Status from "./po_details/PO_Status";
 import Shipment from "./po_details/Shipment";
 import Approval from "./po_details/Approval";
 import PO_Items from "./po_items/PO_Items";
+
 import Select_Generic from "assets/elements/modals/Select_Generic";
-import {
-  branch_h_list,
-  branch_list,
-  plant_h_list,
-  plant_list,
-  po_type_list,
-  sloc_list,
-  vendor_master_list,
-  payment_term_list,
-  incoterms_list,
-  city_list,
-  country_list,
-  district_list,
-  language_list,
-  region_list,
-} from "../PO_DATA_MAP";
-import { get_description } from "assets/scripts/functions/get_description";
 import Select_Branch from "../modals/select_hierarchy/Select_Branch";
 import Select_Plant from "../modals/select_hierarchy/Select_Plant";
 import Select_SLOC from "../modals/select_hierarchy/Select_SLOC";
+import Confirm_Modal from "assets/elements/modals/Confirm_Modal";
+
+import { po_type_list } from "assets/data/po_type_list";
+import { vendor_master_list } from "assets/data/vendor_master_list";
+import { branch_list } from "assets/data/branch_list";
+import { branch_h_list } from "assets/data/branch_h_list";
+import { plant_list } from "assets/data/plant_list";
+import { plant_h_list } from "assets/data/plant_h_list";
+import { sloc_list } from "assets/data/sloc_list";
+import { payment_term_list } from "assets/data/payment_term_list";
+import { incoterms_list } from "assets/data/incoterms_list";
+import { city_list } from "assets/data/city_list";
+import { country_list } from "assets/data/country_list";
+import { district_list } from "assets/data/district_list";
+import { language_list } from "assets/data/language_list";
+import { region_list } from "assets/data/region_list";
+
 import { api_create_purchase_order } from "api/firestore_db/inbound/purchase_order/tbl_purchase_order_api";
 
 const Create_New_PO = ({
@@ -48,6 +54,7 @@ const Create_New_PO = ({
 }) => {
   const [active_tab, set_active_tab] = useState("delivery");
   const [display_modal, set_display_modal] = useState("");
+  const [is_confirm_modal_open, set_is_confirm_modal_open] = useState(false);
   const [create_loading, set_create_loading] = useState(false);
 
   const tabs = [
@@ -128,17 +135,8 @@ const Create_New_PO = ({
         ...role,
         approval_status: "Pending",
       })),
-      // selected_approval_list: selected_approval_list
-      //   .filter((role) => role.is_included)
-      //   .map((role) => ({
-      //     ...role,
-      //     approval_status: "Pending",
-      //   })),
       po_status: "Pending",
     };
-
-    // console.log(final_po_data);
-    // console.table(final_po_data);
 
     try {
       set_create_loading(true);
@@ -165,10 +163,12 @@ const Create_New_PO = ({
     set_selected_approval_list([]);
     set_page("main");
   };
+
   // RETURN ORIGIN
   return (
     <React.Fragment>
       <div className="w-full">
+        {/* + Title */}
         <div className="flex flex-wrap items-center justify-between gap-3 py-5">
           <h1 className="text-xl">Inbound</h1>
           {/* + Breadcrumbs */}
@@ -205,6 +205,8 @@ const Create_New_PO = ({
           </nav>
           {/* - Breadcrumbs */}
         </div>
+        {/* - Title */}
+        {/* + Main Container */}
         <div className="w-full bg-white rounded-lg border">
           {/* + Header */}
           <div className="flex flex-wrap items-center justify-between gap-3 p-5">
@@ -425,7 +427,8 @@ const Create_New_PO = ({
                 icon={CirclePlus}
                 icon_position="left"
                 loading={create_loading}
-                on_click={handle_create}
+                disabled={selected_item_list.length === 0}
+                on_click={() => set_is_confirm_modal_open(true)}
               >
                 Create
               </Button>
@@ -442,6 +445,7 @@ const Create_New_PO = ({
           </div>
           {/* - Section 4 */}
         </div>
+        {/* - Main Container */}
       </div>
       {/* + Modals */}
       {select_modal_configs.map((cfg) => (
@@ -495,6 +499,16 @@ const Create_New_PO = ({
         plant_h_list={plant_h_list}
         set_data={set_new_po_data}
         set_selected_item_list={set_selected_item_list}
+      />
+      <Confirm_Modal
+        is_open={is_confirm_modal_open}
+        title="Confirm Purchase Order Creation"
+        description_1="You are about to create a new Purchase Order. Once created, it will be added to the database."
+        description_2="Please review all the details before proceeding."
+        description_3="Are you sure you want to continue?"
+        on_confirm={handle_create}
+        on_cancel={() => set_is_confirm_modal_open(false)}
+        confirm_loading={create_loading}
       />
       {/* - Modals */}
     </React.Fragment>

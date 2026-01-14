@@ -1,0 +1,58 @@
+export const po_type_h_list = [
+  {
+    id: 1,
+    po_type_code: "SPO",
+    company_code: "COM-001",
+    purc_org_code: "P-ORG-001",
+    purc_group_code: "P-GRP-001",
+  },
+  {
+    id: 2,
+    po_type_code: "FPO",
+    company_code: "COM-001",
+    purc_org_code: "P-ORG-001",
+    purc_group_code: "P-GRP-001",
+  },
+  {
+    id: 3,
+    po_type_code: "LPO",
+    company_code: "COM-001",
+    purc_org_code: "P-ORG-001",
+    purc_group_code: "P-GRP-001",
+  },
+  {
+    id: 4,
+    po_type_code: "BND",
+    company_code: "COM-001",
+    purc_org_code: "P-ORG-001",
+    purc_group_code: "P-GRP-001",
+  },
+  {
+    id: 5,
+    po_type_code: "SVC",
+    company_code: "COM-001",
+    purc_org_code: "P-ORG-001",
+    purc_group_code: "P-GRP-001",
+  },
+  {
+    id: 6,
+    po_type_code: "CPO",
+    company_code: "COM-001",
+    purc_org_code: "P-ORG-001",
+    purc_group_code: "P-GRP-001",
+  },
+  {
+    id: 7,
+    po_type_code: "RTV",
+    company_code: "COM-001",
+    purc_org_code: "P-ORG-001",
+    purc_group_code: "P-GRP-001",
+  },
+  {
+    id: 8,
+    po_type_code: "LOP",
+    company_code: "COM-001",
+    purc_org_code: "P-ORG-001",
+    purc_group_code: "P-GRP-001",
+  },
+];

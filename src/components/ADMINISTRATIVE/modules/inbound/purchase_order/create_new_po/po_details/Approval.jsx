@@ -1,12 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import Checkbox_Field from "assets/elements/Checkbox_Field";
 import Text_Field from "assets/elements/Text_Field";
 import Find_Field from "assets/elements/Find_Field";
-import {
-  app_matrix_h_list,
-  app_matrix_list,
-  user_role_list,
-} from "../../PO_DATA_MAP";
+import { app_matrix_h_list } from "assets/data/app_matrix_h_list";
+import { app_matrix_list } from "assets/data/app_matrix_list";
+import { user_role_list } from "assets/data/user_role_list";
 import Select_Generic from "assets/elements/modals/Select_Generic";
 import { get_description } from "assets/scripts/functions/get_description";
 
@@ -40,19 +38,16 @@ const Approval = ({
       return;
     }
 
-    // Filter roles based on selected matrix
     const filtered = app_matrix_h_list.filter(
       (item) => item.app_matrix_code === matrix_code
     );
 
     set_selected_approval_list((prevRoles) => {
-      // Map new roles, preserve is_included if already exists
       return filtered.map((item) => {
         const role_info = user_role_list.find(
           (r) => r.user_role_code === item.user_role_code
         );
 
-        // Check if this role already exists in previous state
         const existing = prevRoles.find(
           (r) => r.user_role_code === item.user_role_code
         );

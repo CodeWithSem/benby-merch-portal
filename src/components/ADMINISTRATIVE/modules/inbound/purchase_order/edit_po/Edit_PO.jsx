@@ -1,15 +1,14 @@
 import React, { useState } from "react";
+
+import { ChevronLeft, Eye, RefreshCcwDot } from "lucide-react";
+
 import { get_date_now, format_date_1 } from "assets/scripts/format";
-import {
-  ChevronLeft,
-  CirclePlus,
-  Eye,
-  RefreshCcwDot,
-  Save,
-} from "lucide-react";
-import Text_Field from "assets/elements/Text_Field";
+import { get_description } from "assets/scripts/functions/get_description";
+
 import Button from "assets/elements/Button";
+import Text_Field from "assets/elements/Text_Field";
 import Text_Code_Field from "assets/elements/Text_Code_Field";
+
 import Delivery from "./po_details/Delivery";
 import Address from "./po_details/Address";
 import Org_Data from "./po_details/Org_Data";
@@ -17,28 +16,29 @@ import PO_Status from "./po_details/PO_Status";
 import Shipment from "./po_details/Shipment";
 import Approval from "./po_details/Approval";
 import PO_Items from "./po_items/PO_Items";
+
 import Select_Generic from "assets/elements/modals/Select_Generic";
-import {
-  branch_h_list,
-  branch_list,
-  plant_h_list,
-  plant_list,
-  po_type_list,
-  sloc_list,
-  vendor_master_list,
-  payment_term_list,
-  incoterms_list,
-  city_list,
-  country_list,
-  district_list,
-  language_list,
-  region_list,
-} from "../PO_DATA_MAP";
-import { get_description } from "assets/scripts/functions/get_description";
 import Select_Branch from "../modals/select_hierarchy/Select_Branch";
 import Select_Plant from "../modals/select_hierarchy/Select_Plant";
 import Select_SLOC from "../modals/select_hierarchy/Select_SLOC";
+
+import { po_type_list } from "assets/data/po_type_list";
+import { vendor_master_list } from "assets/data/vendor_master_list";
+import { branch_list } from "assets/data/branch_list";
+import { branch_h_list } from "assets/data/branch_h_list";
+import { plant_list } from "assets/data/plant_list";
+import { plant_h_list } from "assets/data/plant_h_list";
+import { sloc_list } from "assets/data/sloc_list";
+import { payment_term_list } from "assets/data/payment_term_list";
+import { incoterms_list } from "assets/data/incoterms_list";
+import { city_list } from "assets/data/city_list";
+import { country_list } from "assets/data/country_list";
+import { district_list } from "assets/data/district_list";
+import { language_list } from "assets/data/language_list";
+import { region_list } from "assets/data/region_list";
+
 import { api_update_purchase_order } from "api/firestore_db/inbound/purchase_order/tbl_purchase_order_api";
+import Confirm_Modal from "assets/elements/modals/Confirm_Modal";
 
 const Edit_PO = ({
   set_page,
@@ -54,6 +54,7 @@ const Edit_PO = ({
 }) => {
   const [active_tab, set_active_tab] = useState("delivery");
   const [display_modal, set_display_modal] = useState("");
+  const [is_confirm_modal_open, set_is_confirm_modal_open] = useState(false);
   const [update_loading, set_update_loading] = useState(false);
 
   const tabs = [
@@ -109,7 +110,6 @@ const Edit_PO = ({
         "ad_mobile",
         "ad_email",
       ],
-      // on_after_select: () => set_page("po_creation"),
     },
   ];
 
@@ -124,8 +124,8 @@ const Edit_PO = ({
   const handle_edit = async () => {
     const items_with_tracking = selected_item_list.map((item) => ({
       ...item,
-      quantity_open: item.quantity, // same as original quantity
-      quantity_left: item.quantity, // same as original quantity
+      quantity_open: item.quantity,
+      quantity_left: item.quantity,
     }));
 
     const final_po_data = {
@@ -137,9 +137,6 @@ const Edit_PO = ({
       })),
       po_status: "Pending",
     };
-
-    // console.log(final_po_data);
-    // console.table(final_po_data);
 
     try {
       set_update_loading(true);
@@ -166,10 +163,12 @@ const Edit_PO = ({
     set_selected_approval_list([]);
     set_page("main");
   };
+
   // RETURN ORIGIN
   return (
     <React.Fragment>
       <div className="w-full">
+        {/* + Title */}
         <div className="flex flex-wrap items-center justify-between gap-3 py-5">
           <h1 className="text-xl">Inbound</h1>
           {/* + Breadcrumbs */}
@@ -206,6 +205,8 @@ const Edit_PO = ({
           </nav>
           {/* - Breadcrumbs */}
         </div>
+        {/* - Title */}
+        {/* + Main Container */}
         <div className="w-full bg-white rounded-lg border">
           {/* + Header */}
           <div className="flex flex-wrap items-center justify-between gap-3 p-5">
@@ -416,8 +417,8 @@ const Edit_PO = ({
                 width="w-[120px]"
                 icon={RefreshCcwDot}
                 icon_position="left"
-                loading={update_loading}
-                on_click={handle_edit}
+                disabled={selected_item_list.length === 0}
+                on_click={() => set_is_confirm_modal_open(true)}
               >
                 Update
               </Button>
@@ -434,6 +435,7 @@ const Edit_PO = ({
           </div>
           {/* - Section 4 */}
         </div>
+        {/* - Main Container */}
       </div>
       {/* + Modals */}
       {select_modal_configs.map((cfg) => (
@@ -487,6 +489,16 @@ const Edit_PO = ({
         plant_h_list={plant_h_list}
         set_data={set_edit_po_data}
         set_selected_item_list={set_selected_item_list}
+      />
+      <Confirm_Modal
+        is_open={is_confirm_modal_open}
+        title="Confirm Purchase Order Update"
+        description_1="You are about to edit this Branch. Once edited, it will be updated to the database."
+        description_2="Please review all the details — before proceeding."
+        description_3="Are you sure you want to continue?"
+        on_confirm={handle_edit}
+        on_cancel={() => set_is_confirm_modal_open(false)}
+        confirm_loading={update_loading}
       />
       {/* - Modals */}
     </React.Fragment>

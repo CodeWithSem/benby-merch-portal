@@ -1,4 +1,5 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
+
 import {
   Search,
   ChevronDown,
@@ -15,43 +16,43 @@ import {
   Trash2,
   FileDigit,
 } from "lucide-react";
+
 import { useToast } from "../../../layout/Toast_Provider";
+import { Use_App } from "context/app_context";
+
 import { format_date_1 } from "assets/scripts/format";
+import { get_description } from "assets/scripts/functions/get_description";
+
+import Button from "assets/elements/Button";
+import Button_Action from "assets/elements/Button_Action";
 import Icon_Field from "assets/elements/Icon_Field";
 import Select_Field from "assets/elements/Select_Field";
-import Pagination from "assets/elements/Pagination";
-import Button from "assets/elements/Button";
 import Checkbox_Field from "assets/elements/Checkbox_Field";
 import Date_Field from "assets/elements/Date_Field";
-import Create_New_PO from "./create_new_po/Create_New_PO";
-import Select_PO_Type from "./modals/select_po_type/Select_PO_Type";
-import Delete_PO from "./modals/delete_po/Delete_PO";
-import Button_Action from "assets/elements/Button_Action";
-import {
-  company_list,
-  purc_org_list,
-  purc_group_list,
-  po_type_list,
-  purchase_order_list,
-  branch_list,
-  plant_list,
-  sloc_list,
-  po_type_h_list,
-  vendor_master_list,
-} from "./PO_DATA_MAP";
+import Pagination from "assets/elements/Pagination";
+import Spinner from "assets/elements/Spinner";
+
 import Select_Generic from "assets/elements/modals/Select_Generic";
+import Set_Increment_ID from "assets/elements/modals/Set_Increment_ID";
+
+import Create_New_PO from "./create_new_po/Create_New_PO";
+import Edit_PO from "./edit_po/Edit_PO";
+import Post_View_PO from "./post_view_po/Post_View_PO";
+import Delete_PO from "./modals/delete_po/Delete_PO";
+
+import { company_list } from "assets/data/company_list";
+import { purc_org_list } from "assets/data/purc_org_list";
+import { purc_group_list } from "assets/data/purc_group_list";
+import { po_type_list } from "assets/data/po_type_list";
+import { po_type_h_list } from "assets/data/po_type_h_list";
+import { vendor_master_list } from "assets/data/vendor_master_list";
+
 import { Get_TBL_INCREMENTAL_ID } from "api/real_time_db/incremental";
 import {
   api_get_purchase_order_list_by_date,
   api_set_purchase_order_increment,
   api_truncate_purchase_order,
 } from "api/firestore_db/inbound/purchase_order/tbl_purchase_order_api";
-import { Use_App } from "context/app_context";
-import Set_Increment_ID from "assets/elements/modals/Set_Increment_ID";
-import { get_description } from "assets/scripts/functions/get_description";
-import Spinner from "assets/elements/Spinner";
-import Edit_PO from "./edit_po/Edit_PO";
-import Post_View_PO from "./post_view_po/Post_View_PO";
 
 const Purchase_Order = () => {
   const { active_user } = Use_App();
@@ -85,6 +86,7 @@ const Purchase_Order = () => {
   const [new_po_data, set_new_po_data] = useState({});
   const [edit_po_data, set_edit_po_data] = useState({});
   const [view_po_data, set_view_po_data] = useState({});
+  const [delete_po_data, set_delete_po_data] = useState({});
   const [selected_item_list, set_selected_item_list] = useState([]);
   const [selected_approval_list, set_selected_approval_list] = useState([]);
 
@@ -280,7 +282,7 @@ const Purchase_Order = () => {
   const select_modal_configs = [
     {
       key: "select_po_type_h",
-      label: "PO Type Hierarchy",
+      label: "PO Type",
       show_creation_date: false,
       width: "max-w-[1200px]",
       list: po_type_h_list,
@@ -351,7 +353,8 @@ const Purchase_Order = () => {
     set_page("edit_po");
   };
 
-  const handle_delete_po = () => {
+  const handle_delete_po = (data) => {
+    set_delete_po_data(data);
     set_display_modal("delete_po");
   };
 
@@ -740,17 +743,17 @@ const Purchase_Order = () => {
                                         />
                                       </div>
                                     )}
-                                    <div className="relative group flex jusity-center items-center">
-                                      <Button_Action
-                                        class_name="mb-[1px]"
-                                        icon={Trash}
-                                        variant="danger"
-                                        tooltip="Delete Record"
-                                        on_click={() =>
-                                          handle_delete_po(row.id)
-                                        }
-                                      />
-                                    </div>
+                                    {active_user.category === "DEV" && (
+                                      <div className="relative group flex jusity-center items-center">
+                                        <Button_Action
+                                          class_name="mb-[1px]"
+                                          icon={Trash}
+                                          variant="danger"
+                                          tooltip="Delete Record"
+                                          on_click={() => handle_delete_po(row)}
+                                        />
+                                      </div>
+                                    )}
                                   </div>
                                 );
                               }
@@ -870,21 +873,11 @@ const Purchase_Order = () => {
         />
       ))}
       {/* - Modals */}
-      <Select_PO_Type
-        is_open={display_modal === "select_po_type"}
-        on_close={() => set_display_modal("")}
-        width="max-w-[1280px]"
-        height="max-h-[700px]"
-        set_page={set_page}
-        company_list={company_list}
-        purc_org_list={purc_org_list}
-        purc_group_list={purc_group_list}
-        po_type_list={po_type_list}
-      />
       <Delete_PO
         is_open={display_modal === "delete_po"}
         on_close={() => set_display_modal("")}
         width="max-w-[1280px]"
+        delete_po_data={delete_po_data}
       />
       <Set_Increment_ID
         is_open={display_modal === "set_incremental_id"}

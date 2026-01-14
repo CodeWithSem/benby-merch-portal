@@ -60,7 +60,7 @@ export const item_master_list = [
     sdp_inv_acc_center_code: "IAC-001",
 
     pu_purc_group_code: "",
-    pu_ordering_uom: "",
+    pu_ordering_uom: "CS",
     pu_valid_from: "01-01-2026",
     pu_valid_to: "01-01-2027",
     pu_plant_status_code: "PL-S-01",
@@ -175,7 +175,7 @@ export const item_master_list = [
     sdp_inv_acc_center_code: "IAC-001",
 
     pu_purc_group_code: "",
-    pu_ordering_uom: "",
+    pu_ordering_uom: "CS",
     pu_valid_from: "01-01-2026",
     pu_valid_to: "01-01-2027",
     pu_plant_status_code: "PL-S-01",
@@ -290,7 +290,7 @@ export const item_master_list = [
     sdp_inv_acc_center_code: "IAC-001",
 
     pu_purc_group_code: "",
-    pu_ordering_uom: "",
+    pu_ordering_uom: "CS",
     pu_valid_from: "01-01-2026",
     pu_valid_to: "01-01-2027",
     pu_plant_status_code: "PL-S-01",
@@ -405,7 +405,7 @@ export const item_master_list = [
     sdp_inv_acc_center_code: "IAC-001",
 
     pu_purc_group_code: "",
-    pu_ordering_uom: "",
+    pu_ordering_uom: "CS",
     pu_valid_from: "01-01-2026",
     pu_valid_to: "01-01-2027",
     pu_plant_status_code: "PL-S-01",
@@ -520,7 +520,7 @@ export const item_master_list = [
     sdp_inv_acc_center_code: "IAC-001",
 
     pu_purc_group_code: "",
-    pu_ordering_uom: "",
+    pu_ordering_uom: "CS",
     pu_valid_from: "01-01-2026",
     pu_valid_to: "01-01-2027",
     pu_plant_status_code: "PL-S-01",

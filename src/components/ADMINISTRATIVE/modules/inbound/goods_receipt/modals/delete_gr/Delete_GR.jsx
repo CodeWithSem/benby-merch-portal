@@ -15,14 +15,10 @@ const Delete_GR = ({ is_open, on_close, width = "max-w-[700px]" }) => {
     return (
       <React.Fragment>
         <div className="fixed inset-0 flex items-center justify-center z-[100]">
-          {/* + Blur */}
           <div className="absolute inset-0 bg-black/50 backdrop-blur-sm z-[101]"></div>
-          {/* - Blur */}
-          {/* + Modal Content */}
           <div
             className={`relative bg-white rounded-lg shadow-xl max-w-[500px] w-full p-10 m-5 z-[102]`}
           >
-            {/* Modal Body */}
             <div className="w-full flex justify-center items-center text-lg md:text-xl font-bold mb-4">
               Delete Goods Receipt
             </div>
@@ -54,7 +50,6 @@ const Delete_GR = ({ is_open, on_close, width = "max-w-[700px]" }) => {
               </Button>
             </div>
           </div>
-          {/* - Modal Content */}
         </div>
       </React.Fragment>
     );
@@ -64,10 +59,7 @@ const Delete_GR = ({ is_open, on_close, width = "max-w-[700px]" }) => {
   return is_open ? (
     <React.Fragment>
       <div className="fixed inset-0 flex items-center justify-center z-[97] px-4">
-        {/* + Blur */}
         <div className="absolute inset-0 bg-black/50 backdrop-blur-sm z-[98]"></div>
-        {/* - Blur */}
-        {/* + Modal Content */}
         <div
           className={`relative bg-white rounded-lg shadow-xl ${width} w-full p-10 m-5 z-[99]`}
         >
@@ -77,12 +69,9 @@ const Delete_GR = ({ is_open, on_close, width = "max-w-[700px]" }) => {
           >
             <X size={20} />
           </button>
-          {/* + Modal Label */}
           <div className="text-lg md:text-xl font-bold mb-5">
             Delete Goods Receipt
           </div>
-          {/* - Modal Label */}
-          {/* + Modal Body */}
           <div className="w-full pl-1 p-4 overflow-y-auto max-h-[500px] scrollbar-custom">
             <div className="w-full">
               <div className="w-full bg-white rounded-lg border">
@@ -141,8 +130,6 @@ const Delete_GR = ({ is_open, on_close, width = "max-w-[700px]" }) => {
               </div>
             </div>
           </div>
-          {/* - Modal Body */}
-          {/* + Modal Footer */}
           <div className="flex justify-end gap-2 mt-5">
             <Button
               width="w-[100px]"
@@ -155,10 +142,7 @@ const Delete_GR = ({ is_open, on_close, width = "max-w-[700px]" }) => {
               Close
             </Button>
           </div>
-          {/* - Modal Footer */}
         </div>
-
-        {/* - Modal Content */}
       </div>
       {is_confirm_modal_open && <Confirm_Modal />}
     </React.Fragment>

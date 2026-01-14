@@ -185,7 +185,7 @@ const Prod_Plan_List = ({
     <React.Fragment>
       <div className="flex flex-col gap-5 border-t p-5 sm:p-6">
         {/* + Item List */}
-        <div className="overflow-hidden rounded-lg border border-gray-200 bg-white pt-4 dark:border-gray-800 dark:bg-white/[0.03]">
+        <div className="overflow-hidden rounded-lg border border-gray-200 bg-white pt-4">
           <div className="flex flex-col gap-5 px-6 md:pl-6 md:pr-3 mb-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <h1
