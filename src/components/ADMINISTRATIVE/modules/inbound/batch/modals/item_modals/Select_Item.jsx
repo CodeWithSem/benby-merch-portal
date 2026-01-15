@@ -1,10 +1,14 @@
 import React, { useEffect, useState } from "react";
+
 import { Search, X } from "lucide-react";
-import Icon_Field from "assets/elements/Icon_Field";
-import Checkbox_Field from "assets/elements/Checkbox_Field";
+
+import { item_master_list } from "assets/data/item_master_list";
+import { item_ext_pu_list } from "assets/data/item_ext_pu_list";
+
 import Button from "assets/elements/Button";
+import Checkbox_Field from "assets/elements/Checkbox_Field";
+import Icon_Field from "assets/elements/Icon_Field";
 import Pagination_Modal from "assets/elements/Pagination_Modal";
-import { item_ext_pu_list, item_master_list } from "../../BATCH_DATA_MAP";
 
 const Select_Item = ({
   is_open,
@@ -14,7 +18,7 @@ const Select_Item = ({
   sloc_code,
   set_data,
   width = "max-w-[700px]",
-  height = "h-[500px]",
+  height = "max-h-[500px]",
 }) => {
   const [item_list, set_item_list] = useState([]);
   const [filtered_item_list, set_filtered_item_list] = useState([]);

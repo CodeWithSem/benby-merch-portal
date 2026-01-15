@@ -1,9 +1,5 @@
 import React from "react";
-import Text_Field from "assets/elements/Text_Field";
-import Select_Field from "assets/elements/Select_Field";
-import Checkbox_Field from "assets/elements/Checkbox_Field";
-import Textarea_Field from "assets/elements/Textarea_Field";
-import Date_Field from "assets/elements/Date_Field";
+
 import {
   handle_checkbox_change_function,
   handle_date_change_function,
@@ -11,10 +7,17 @@ import {
   handle_text_change_function,
   make_options,
 } from "assets/scripts/functions/input_functions";
-import { batch_type_list, period_ind_list } from "../../BATCH_DATA_MAP";
 import { get_description } from "assets/scripts/functions/get_description";
-import Select_Generic from "assets/elements/modals/Select_Generic";
+
+import { batch_type_list } from "assets/data/batch_type_list";
+import { period_ind_list } from "assets/data/period_ind_list";
+
+import Checkbox_Field from "assets/elements/Checkbox_Field";
+import Date_Field from "assets/elements/Date_Field";
 import Find_Field from "assets/elements/Find_Field";
+import Select_Field from "assets/elements/Select_Field";
+import Select_Generic from "assets/elements/modals/Select_Generic";
+import Textarea_Field from "assets/elements/Textarea_Field";
 
 const Batch_Details = ({
   display_modal,

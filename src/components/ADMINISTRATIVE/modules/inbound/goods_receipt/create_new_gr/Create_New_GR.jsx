@@ -215,7 +215,12 @@ const Create_New_GR = ({
                 width="w-[120px]"
                 icon={CirclePlus}
                 icon_position="left"
-                disabled={create_loading}
+                loading={create_loading}
+                disabled={
+                  selected_po_data.selected_item_list.filter(
+                    ({ quantity_received }) => quantity_received > 0
+                  ).length === 0
+                }
                 on_click={() => set_is_confirm_modal_open(true)}
               >
                 Create

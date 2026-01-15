@@ -497,8 +497,19 @@ const Prod_Operation = ({
                     // icon_position="left"
                     on_click={() => set_monitor_page("finish_goods")}
                   >
-                    Finish Goods
+                    Production Report
                   </Button>
+                  {/* <Button
+                    variant="primary"
+                    size="lg"
+                    width="w-full"
+                    class_name="h-[124px] text-base"
+                    // icon={CirclePlus}
+                    // icon_position="left"
+                    on_click={() => set_monitor_page("finish_goods")}
+                  >
+                    Finish Goods
+                  </Button> */}
                 </div>
               </div>
             </div>

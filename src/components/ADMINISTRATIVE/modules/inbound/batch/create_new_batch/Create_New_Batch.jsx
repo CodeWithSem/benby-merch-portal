@@ -1,28 +1,31 @@
 import React, { useState } from "react";
+
 import { ChevronLeft, CirclePlus } from "lucide-react";
+
+import { api_create_batch_master } from "api/firestore_db/inbound/batch/tbl_batch_master_api";
+
 import { format_date_1, get_date_now } from "assets/scripts/format";
-import { useToast } from "../../../../layout/Toast_Provider";
+import { get_description } from "assets/scripts/functions/get_description";
+import { handle_text_change_function } from "assets/scripts/functions/input_functions";
+import { validate_required_fields } from "assets/scripts/functions/validate_fields";
+
+import { item_master_list } from "assets/data/item_master_list";
+import { branch_h_list } from "assets/data/branch_h_list";
+import { branch_list } from "assets/data/branch_list";
+import { plant_h_list } from "assets/data/plant_h_list";
+import { plant_list } from "assets/data/plant_list";
+import { sloc_list } from "assets/data/sloc_list";
+
 import Button from "assets/elements/Button";
 import Text_Code_Field from "assets/elements/Text_Code_Field";
 import Text_Field from "assets/elements/Text_Field";
-import Verify_Field from "assets/elements/Verify_Field";
+
 import Batch_Details from "./batch_details/Batch_Details";
-import { get_description } from "assets/scripts/functions/get_description";
+
 import Select_Branch from "../modals/select_hierarchy/Select_Branch";
 import Select_Plant from "../modals/select_hierarchy/Select_Plant";
 import Select_SLOC from "../modals/select_hierarchy/Select_SLOC";
-import {
-  branch_h_list,
-  branch_list,
-  item_master_list,
-  plant_h_list,
-  plant_list,
-  sloc_list,
-} from "../BATCH_DATA_MAP";
 import Select_Item from "../modals/item_modals/Select_Item";
-import { handle_text_change_function } from "assets/scripts/functions/input_functions";
-import { api_create_batch_master } from "api/firestore_db/inbound/batch/tbl_batch_master_api";
-import { validate_required_fields } from "assets/scripts/functions/validate_fields";
 
 const Create_New_Batch = ({
   set_page,
@@ -349,7 +352,6 @@ const Create_New_Batch = ({
         height="max-h-[700px]"
         branch_list={branch_list}
         set_data={set_new_batch_data}
-        // set_selected_item_list={set_selected_item_list}
       />
       <Select_Plant
         is_open={display_modal === "select_plant"}

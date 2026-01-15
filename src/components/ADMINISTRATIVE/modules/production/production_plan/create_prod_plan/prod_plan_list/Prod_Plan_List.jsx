@@ -1,22 +1,26 @@
 import React, { useState } from "react";
-import Text_Field from "assets/elements/Text_Field";
-import { CirclePlus, CircleX, Edit, Info, Search, Trash } from "lucide-react";
-import Icon_Field from "assets/elements/Icon_Field";
-import Quantity_Field from "assets/elements/Quantity_Field";
-import Find_Field from "assets/elements/Find_Field";
-import { format_currency, format_date_1 } from "assets/scripts/format";
+
+import { CirclePlus, Edit, Info, Search, Trash } from "lucide-react";
+
+import { format_date_1 } from "assets/scripts/format";
+import { get_description } from "assets/scripts/functions/get_description";
+
+import { item_master_list } from "assets/data/item_master_list";
+import { bom_master_list } from "assets/data/bom_master_list";
+import { prod_machine_list } from "assets/data/prod_machine_list";
+
 import Button from "assets/elements/Button";
 import Button_Action from "assets/elements/Button_Action";
 import Date_Field from "assets/elements/Date_Field";
-import {
-  item_master_list,
-  bom_master_list,
-  prod_machine_list,
-} from "../../PROD_PLAN_DATA_MAP";
+import Find_Field from "assets/elements/Find_Field";
+import Icon_Field from "assets/elements/Icon_Field";
+import Quantity_Field from "assets/elements/Quantity_Field";
 import Select_Generic from "assets/elements/modals/Select_Generic";
-import { get_description } from "assets/scripts/functions/get_description";
+import Text_Field from "assets/elements/Text_Field";
+
 import Edit_Item from "./modals/Edit_Item";
 import Remove_Item from "./modals/Remove_Item";
+import Select_Field from "assets/elements/Select_Field";
 
 const Prod_Plan_List = ({
   selected_prod_plan_list,
@@ -68,8 +72,13 @@ const Prod_Plan_List = ({
     machine_code: "",
     item_code: "",
     item_desc: "",
+    shift: "",
     quantity: 1,
   });
+  const shift_options = [
+    { value: "DAY", label: "Day Shift" },
+    { value: "NIGHT", label: "Night Shift" },
+  ];
   const [edit_item_data, set_edit_item_data] = useState({});
   const [remove_item_data, set_remove_item_data] = useState({});
 
@@ -143,10 +152,25 @@ const Prod_Plan_List = ({
     return bom_master_list.filter((bom) => bom.pad_code === item.pad_code);
   })();
 
+  const selected_item = item_master_list.find(
+    (i) => i.item_code === selected_item_data.item_code
+  );
+
+  const pc_per_cs = selected_item?.cc1_ac_pc_cs ?? 1;
+
   const bom_with_required_qty = selected_bom_list.map((bom) => ({
     ...bom,
-    required_quantity: bom.quantity * selected_item_data.quantity,
+    required_quantity: (
+      bom.quantity *
+      selected_item_data.quantity *
+      pc_per_cs
+    ).toFixed(2),
   }));
+
+  // const bom_with_required_qty = selected_bom_list.map((bom) => ({
+  //   ...bom,
+  //   required_quantity: bom.quantity * selected_item_data.quantity,
+  // }));
 
   const handle_drag_start = (index) => {
     set_dragged_index(index);
@@ -353,6 +377,20 @@ const Prod_Plan_List = ({
               />
             </div>
             <div className="w-full lg:col-span-3">
+              <Select_Field
+                label="Shift"
+                value={selected_item_data.shift}
+                placeholder="Select shift"
+                options={shift_options}
+                on_change={(e) =>
+                  set_selected_item_data((prev) => ({
+                    ...prev,
+                    shift: e.target.value,
+                  }))
+                }
+              />
+            </div>
+            <div className="w-full lg:col-span-3">
               <Quantity_Field
                 label="Quantity to Produce"
                 placeholder="0"
@@ -361,7 +399,8 @@ const Prod_Plan_List = ({
                 min={1}
               />
             </div>
-            <div className="flex w-full items-end lg:col-span-3">
+            <div className="flex w-full items-end lg:col-span-9"></div>
+            <div className="flex w-full items-end lg:col-span-3 lg:mt-2">
               <Button
                 variant="primary"
                 width="w-full"

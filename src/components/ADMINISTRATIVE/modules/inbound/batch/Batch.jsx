@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+
 import {
   Search,
   ChevronDown,
@@ -11,27 +12,35 @@ import {
   FileUp,
   Trash2,
 } from "lucide-react";
-import { useToast } from "../../../layout/Toast_Provider";
-import { branch_list, plant_list, sloc_list } from "./BATCH_DATA_MAP";
-import Icon_Field from "assets/elements/Icon_Field";
-import Select_Field from "assets/elements/Select_Field";
-import Button from "assets/elements/Button";
-import Pagination from "assets/elements/Pagination";
-import Create_New_Batch from "./create_new_batch/Create_New_Batch";
-import Edit_Batch from "./edit_batch/Edit_Batch";
-import Select_Branch from "./modals/Select_Branch";
-import Select_Plant from "./modals/Select_Plant";
-import Select_SLOC from "./modals/Select_SLOC";
-import Select_Item from "./modals/Select_Item";
-import View_Batch from "./view_batch/View_Batch";
-import Delete_Batch from "./modals/delete_batch/Delete_Batch";
-import Button_Action from "assets/elements/Button_Action";
+
 import { Use_App } from "context/app_context";
+import { useToast } from "../../../layout/Toast_Provider";
+
 import {
   api_get_batch_master_list,
   api_truncate_batch_master,
 } from "api/firestore_db/inbound/batch/tbl_batch_master_api";
+
+import { branch_list } from "assets/data/branch_list";
+import { plant_list } from "assets/data/plant_list";
+import { sloc_list } from "assets/data/sloc_list";
+
+import Button from "assets/elements/Button";
+import Button_Action from "assets/elements/Button_Action";
+import Icon_Field from "assets/elements/Icon_Field";
+import Select_Field from "assets/elements/Select_Field";
+import Pagination from "assets/elements/Pagination";
 import Spinner from "assets/elements/Spinner";
+
+import Create_New_Batch from "./create_new_batch/Create_New_Batch";
+import Edit_Batch from "./edit_batch/Edit_Batch";
+import View_Batch from "./view_batch/View_Batch";
+
+import Select_Branch from "./modals/Select_Branch";
+import Select_Plant from "./modals/Select_Plant";
+import Select_SLOC from "./modals/Select_SLOC";
+import Select_Item from "./modals/Select_Item";
+import Delete_Batch from "./modals/delete_batch/Delete_Batch";
 
 const Batch = () => {
   const { active_user } = Use_App();
@@ -53,7 +62,6 @@ const Batch = () => {
     { key: "item_code", label: "Item Code", sortable: true },
     { key: "manufacture_date", label: "Manufacturing Date", sortable: true },
     { key: "sled_bbd", label: "SLED / BBD", sortable: true },
-    // { key: "creation_date", label: "Creation Date", sortable: true },
     { key: "actions", label: "", sortable: false },
   ];
 
@@ -176,7 +184,6 @@ const Batch = () => {
   const handle_upload_batch = () => alert("Under Maintenance");
 
   const handle_view_batch = (data) => {
-    console.table(data);
     set_view_batch_data(data);
     set_page("view_batch");
   };
@@ -196,6 +203,7 @@ const Batch = () => {
     <React.Fragment>
       {page === "main" && (
         <div className="w-full">
+          {/* + Title */}
           <div className="flex flex-wrap items-center justify-between gap-3 py-5">
             <h1 className="text-xl">Inbound</h1>
             {/* + Breadcrumbs */}
@@ -220,6 +228,8 @@ const Batch = () => {
             </nav>
             {/* - Breadcrumbs */}
           </div>
+          {/* - Title */}
+          {/* + Main Container */}
           <div className="w-full bg-white rounded-lg border">
             {/* + Header */}
             <div className="flex flex-wrap items-center justify-between gap-3 p-5">
@@ -428,6 +438,7 @@ const Batch = () => {
             </div>
             {/* - Section 1 */}
           </div>
+          {/* - Main Container */}
         </div>
       )}
       {/* + Pages */}
