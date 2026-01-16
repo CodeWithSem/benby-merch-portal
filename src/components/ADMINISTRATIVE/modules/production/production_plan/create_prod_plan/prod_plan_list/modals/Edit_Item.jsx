@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import Text_Field from "assets/elements/Text_Field";
 import Quantity_Field from "assets/elements/Quantity_Field";
 import Date_Field from "assets/elements/Date_Field";
+import Select_Field from "assets/elements/Select_Field"; // ✅ import Select_Field
 import Button from "assets/elements/Button";
 import { Info, X } from "lucide-react";
 import { format_date_1 } from "assets/scripts/format";
@@ -14,6 +15,11 @@ const Edit_Item = ({
   set_edit_item_data,
   set_selected_prod_plan_list,
 }) => {
+  const shift_options = [
+    { value: "DAY", label: "DAY" },
+    { value: "NIGHT", label: "NIGHT" },
+  ];
+
   const [form, set_form] = useState({
     machine_code: "",
     item_code: "",
@@ -21,6 +27,7 @@ const Edit_Item = ({
     quantity: 1,
     start_date: "",
     end_date: "",
+    shift: "", // ✅ add shift
   });
 
   // Load selected item into form
@@ -34,6 +41,7 @@ const Edit_Item = ({
         end_date: edit_item_data.end_date
           ? format_date_1(edit_item_data.end_date)
           : "",
+        shift: edit_item_data.shift || "", // ✅ load existing shift
       });
     }
   }, [edit_item_data]);
@@ -49,6 +57,7 @@ const Edit_Item = ({
               start_date: form.start_date,
               end_date: form.end_date,
               quantity: form.quantity,
+              shift: form.shift, // ✅ save updated shift
             }
           : item
       )
@@ -95,7 +104,7 @@ const Edit_Item = ({
               />
             </div>
 
-            <div className="col-span-4">
+            <div className="col-span-3">
               <Date_Field
                 label="Start Date"
                 value={form.start_date}
@@ -108,7 +117,7 @@ const Edit_Item = ({
               />
             </div>
 
-            <div className="col-span-4">
+            <div className="col-span-3">
               <Date_Field
                 label="End Date"
                 value={form.end_date}
@@ -120,8 +129,16 @@ const Edit_Item = ({
                 }
               />
             </div>
-
-            <div className="col-span-4">
+            <div className="col-span-3">
+              <Select_Field
+                label="Shift"
+                value={form.shift}
+                placeholder="Select shift"
+                options={shift_options}
+                on_change={(e) => set_form({ ...form, shift: e.target.value })}
+              />
+            </div>
+            <div className="col-span-3">
               <Quantity_Field
                 label="Quantity to Produce"
                 value={form.quantity}

@@ -149,6 +149,10 @@ const Capacity_Calculator = () => {
     });
   };
 
+  const handle_remove_item = (id) => {
+    set_calculation_list((prev) => prev.filter((item) => item.id !== id));
+  };
+
   const handle_show_select_item_modal = () =>
     set_display_item_modal("select_item");
 
@@ -264,6 +268,7 @@ const Capacity_Calculator = () => {
                             tooltip="Remove Item"
                             variant="danger"
                             size={20}
+                            on_click={() => handle_remove_item(item.id)}
                           />
                         </div>
                       </td>

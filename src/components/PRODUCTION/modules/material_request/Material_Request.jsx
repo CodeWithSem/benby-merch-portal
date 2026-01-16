@@ -3,8 +3,8 @@ import { ChevronLeft } from "lucide-react";
 import Spinner from "assets/elements/Spinner";
 import Button from "assets/elements/Button";
 import { api_get_prod_plan_by_id_rtdb_realtime } from "api/real_time_db/production/production_plan/tbl_production_plan_api";
-import { bom_master_list } from "./bom_master_list";
-import { item_master_list } from "./item_master_list";
+import { bom_master_list } from "assets/data/bom_master_list";
+import { item_master_list } from "assets/data/item_master_list";
 import BOM from "./details/BOM";
 import Mat_Request_List from "./details/Mat_Request_List";
 import Add_Request from "./modals/Add_Request";
@@ -97,9 +97,19 @@ const Material_Request = ({
     return bom_master_list.filter((bom) => bom.pad_code === item.pad_code);
   })();
 
+  const selected_item = item_master_list.find(
+    (i) => i.item_code === selected_item_data.item_code
+  );
+
+  const pc_per_cs = selected_item?.cc1_ac_pc_cs ?? 1;
+
   const bom_with_required_qty = selected_bom_list.map((bom) => ({
     ...bom,
-    required_quantity: bom.quantity * selected_item_data.quantity,
+    required_quantity: (
+      bom.quantity *
+      selected_item_data.quantity *
+      pc_per_cs
+    ).toFixed(2),
   }));
 
   const handle_go_back = () => set_monitor_page("prod_operation");
@@ -153,7 +163,7 @@ const Material_Request = ({
             <div className="h-px bg-gray-200" />
 
             {/* Row 3: Quantity + Dates */}
-            <div className="grid grid-cols-3 gap-4 items-center">
+            <div className="grid grid-cols-4 gap-4 items-center">
               <div>
                 <div className="text-xs text-gray-400">Quantity to Produce</div>
                 <div className="text-sm font-medium text-gray-700">
@@ -172,6 +182,13 @@ const Material_Request = ({
                 <div className="text-xs text-gray-400">End Date</div>
                 <div className="text-sm font-medium text-gray-700">
                   {prod_data.end_date}
+                </div>
+              </div>
+
+              <div>
+                <div className="text-xs text-gray-400">Shift</div>
+                <div className="text-sm font-medium text-gray-700">
+                  {prod_data.shift}
                 </div>
               </div>
             </div>

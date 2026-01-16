@@ -29,4 +29,10 @@ export const prod_machine_list = [
     machine_desc: "Production Machine 5",
     creation_date: "MM-DD-YYYY",
   },
+  {
+    id: 6,
+    machine_code: "MAC-06",
+    machine_desc: "Production Machine 6",
+    creation_date: "MM-DD-YYYY",
+  },
 ];

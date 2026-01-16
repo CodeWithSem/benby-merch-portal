@@ -76,8 +76,8 @@ const Prod_Plan_List = ({
     quantity: 1,
   });
   const shift_options = [
-    { value: "DAY", label: "Day Shift" },
-    { value: "NIGHT", label: "Night Shift" },
+    { value: "DAY", label: "DAY" },
+    { value: "NIGHT", label: "NIGHT" },
   ];
   const [edit_item_data, set_edit_item_data] = useState({});
   const [remove_item_data, set_remove_item_data] = useState({});
@@ -255,6 +255,9 @@ const Prod_Plan_List = ({
                   <th className="px-5 py-4 font-semibold whitespace-nowrap text-gray-700 dark:text-gray-400">
                     End Date
                   </th>
+                  <th className="px-5 py-4 font-semibold whitespace-nowrap text-gray-700 dark:text-gray-400">
+                    Shift
+                  </th>
                   <th className="px-5 py-4 whitespace-nowrap text-gray-700 dark:text-gray-400"></th>
                 </tr>
               </thead>
@@ -295,6 +298,9 @@ const Prod_Plan_List = ({
                       </td>
                       <td className="px-5 py-4 whitespace-nowrap text-gray-500 dark:text-gray-400">
                         {item.end_date}
+                      </td>
+                      <td className="px-5 py-4 whitespace-nowrap text-gray-500 dark:text-gray-400">
+                        {item.shift}
                       </td>
 
                       <td className="px-5 py-4 whitespace-nowrap text-gray-500 dark:text-gray-400">
@@ -411,6 +417,7 @@ const Prod_Plan_List = ({
                   selected_item_data.item_code === "" ||
                   start_date === "" ||
                   end_date === "" ||
+                  selected_item_data.shift === "" ||
                   selected_item_data.quantity === ""
                 }
               >

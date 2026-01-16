@@ -1,11 +1,9 @@
-import React, { useEffect, useState } from "react";
-import { CircleX, X } from "lucide-react";
+import React, { useState } from "react";
+import { X } from "lucide-react";
 import Button from "assets/elements/Button";
-import { item_master_list } from "../item_master_list";
-import { bom_master_list } from "../bom_master_list";
+import { item_master_list } from "assets/data/item_master_list";
+import { bom_master_list } from "assets/data/bom_master_list";
 import Input_Req_Quantity from "./Input_Req_Quantity";
-import { Timestamp } from "firebase/firestore";
-import { format_date_2, get_date_now } from "assets/scripts/format";
 import { api_create_material_request_rtdb } from "api/real_time_db/production/production_plan/tbl_production_plan_api";
 
 const Add_Request = ({
@@ -56,9 +54,15 @@ const Add_Request = ({
     return bom_master_list.filter((bom) => bom.pad_code === item.pad_code);
   })();
 
+  const selected_item = item_master_list.find(
+    (i) => i.item_code === selected_item_data.item_code
+  );
+
+  const pc_per_cs = selected_item?.cc1_ac_pc_cs ?? 1;
+
   const bom_with_required_qty = selected_bom_list.map((bom) => ({
     ...bom,
-    required_quantity: bom.quantity * request_quantity,
+    required_quantity: (bom.quantity * request_quantity * pc_per_cs).toFixed(2),
   }));
 
   const handle_close = () => {

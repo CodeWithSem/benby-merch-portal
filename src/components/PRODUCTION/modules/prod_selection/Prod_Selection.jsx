@@ -148,23 +148,11 @@ const Prod_Selection = ({
                     <p className="text-sm text-gray-700">{plan.end_date}</p>
                   </div>
                   <div>
-                    <p
-                      className={`text-center text-xs rounded-full px-3 py-2 max-w-[150px] ${
-                        plan.prod_status === "Pending" ||
-                        plan.prod_status === "Hold"
-                          ? "bg-yellow-100 text-yellow-600"
-                          : plan.prod_status === "Complete" ||
-                            plan.prod_status === "Start" ||
-                            plan.prod_status === "Resume"
-                          ? "bg-green-100 text-green-600"
-                          : "bg-red-100 text-red-600"
-                      }`}
-                    >
-                      {plan.prod_status}
-                    </p>
+                    <span className="text-xs text-gray-400">Shift</span>
+                    <p className="text-sm text-gray-700">{plan.shift}</p>
                   </div>
                 </div>
-                <div className="flex items-center justify-center lg:border-l lg:pl-5">
+                <div className="flex flex-col items-center justify-center lg:border-l lg:pl-5">
                   <Chart
                     options={radial_options}
                     series={radial_series}
@@ -172,6 +160,20 @@ const Prod_Selection = ({
                     height={120}
                     width={120}
                   />
+                  <p
+                    className={`text-center text-xs rounded-full px-3 py-2 w-full ${
+                      plan.prod_status === "Pending" ||
+                      plan.prod_status === "Hold"
+                        ? "bg-yellow-100 text-yellow-600"
+                        : plan.prod_status === "Complete" ||
+                          plan.prod_status === "Start" ||
+                          plan.prod_status === "Resume"
+                        ? "bg-green-100 text-green-600"
+                        : "bg-red-100 text-red-600"
+                    }`}
+                  >
+                    {plan.prod_status}
+                  </p>
                 </div>
               </div>
             </div>

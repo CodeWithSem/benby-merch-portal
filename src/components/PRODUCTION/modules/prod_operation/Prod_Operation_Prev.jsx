@@ -29,23 +29,20 @@ const Prod_Operation = ({
   const [display_modal, set_display_modal] = useState("");
   const [pin_action, set_pin_action] = useState(null);
   const [prod_data, set_prod_data] = useState(null);
-  const [crewCount, setCrewCount] = useState(0);
 
   useEffect(() => {
     if (!plan_id) return;
+
     const unsubscribe = api_get_prod_plan_by_id_rtdb_realtime(
       plan_id,
       null,
       ({ success, data }) => {
-        if (success) {
-          set_prod_data(data);
-          const prod = data.selected_prod_plan_list?.[selected_prod_index];
-          setCrewCount(prod?.man_power || 0);
-        }
+        if (success) set_prod_data(data);
       }
     );
+
     return () => unsubscribe();
-  }, [plan_id, selected_prod_index]);
+  }, [plan_id]);
 
   if (!prod_data) {
     return (
@@ -56,32 +53,19 @@ const Prod_Operation = ({
   }
 
   const prod = prod_data.selected_prod_plan_list?.[selected_prod_index];
-  if (!prod)
-    return <div className="text-center text-red-500">Production not found</div>;
-
   const production_status = prod?.prod_status || "NotStarted";
 
-  const prod_log_list = prod?.prod_log_list || [];
-  // const total_quantity_produced = prod_log_list.reduce(
-  //   (total, log) =>
-  //     total + (log.quantity_complete || 0) + (log.quantity_reject || 0),
-  //   0
-  // );
-  // const total_quantity_complete = prod_log_list.reduce(
-  //   (total, log) => total + (log.quantity_complete || 0),
-  //   0
-  // );
-  // const total_quantity_reject = prod_log_list.reduce(
-  //   (total, log) => total + (log.quantity_reject || 0),
-  //   0
-  // );
-  const total_quantity_produced = prod?.prod_report?.quantity_complete || 0;
-  const total_quantity_complete = prod?.prod_report?.quantity_complete || 0;
-  const total_quantity_reject = 0;
-  const completion_percent =
-    prod.quantity > 0
-      ? Number(((total_quantity_produced / prod.quantity) * 100).toFixed(2))
-      : 0;
+  // + Man Power Count
+  const man_power_list = prod?.man_power_list || [];
+  const assigned_count = man_power_list.length;
+  const active_crew_count = man_power_list.filter(
+    (crew) => crew.man_power_status === "Active"
+  ).length;
+  const idle_crew_count = man_power_list.filter(
+    (crew) => crew.man_power_status === "Idle"
+  ).length;
+
+  // - Man Power Count
 
   const radial_options_global = {
     chart: { type: "radialBar" },
@@ -104,20 +88,50 @@ const Prod_Operation = ({
     labels: ["Progress"],
   };
 
-  const series_global = [completion_percent];
+  const prod_log_list = prod?.prod_log_list || [];
+
+  // Total quantity produced (complete + reject)
+  const total_quantity_produced = prod_log_list.reduce(
+    (total, log) =>
+      total + (log.quantity_complete || 0) + (log.quantity_reject || 0),
+    0
+  );
+
+  // Total quantity complete
+  const total_quantity_complete = prod_log_list.reduce(
+    (total, log) => total + (log.quantity_complete || 0),
+    0
+  );
+
+  // Total quantity rejected
+  const total_quantity_reject = prod_log_list.reduce(
+    (total, log) => total + (log.quantity_reject || 0),
+    0
+  );
+
+  const completion_percent =
+    prod.quantity > 0
+      ? Number(((total_quantity_produced / prod.quantity) * 100).toFixed(2))
+      : 0;
+
+  const series_global = [completion_percent]; // demo percentage
 
   const handle_start = async () => {
     const res = await api_update_prod_status_rtdb(
       plan_id,
       selected_prod_index,
       "Start",
-      crewCount,
+      active_crew_count,
       0,
       0,
       active_user,
       show_toast
     );
+
+    // ❌ STOP if API failed
     if (!res?.success) return;
+
+    // ✅ Only runs if API succeeded
     show_toast({
       type: "success",
       title: "Production Started",
@@ -125,19 +139,20 @@ const Prod_Operation = ({
       icon: <CheckCircle2 size={21} className="text-green-500" />,
     });
   };
-
   const handleHold = async () => {
     const res = await api_update_prod_status_rtdb(
       plan_id,
       selected_prod_index,
       "Hold",
-      crewCount,
+      active_crew_count,
       0,
       0,
       active_user,
       show_toast
     );
+
     if (!res?.success) return;
+
     show_toast({
       type: "warning",
       title: "Production Paused",
@@ -145,19 +160,20 @@ const Prod_Operation = ({
       icon: <Info size={21} className="text-yellow-500" />,
     });
   };
-
   const handleResume = async () => {
     const res = await api_update_prod_status_rtdb(
       plan_id,
       selected_prod_index,
       "Resume",
-      crewCount,
+      active_crew_count,
       0,
       0,
       active_user,
       show_toast
     );
+
     if (!res?.success) return;
+
     show_toast({
       type: "success",
       title: "Production Resumed",
@@ -166,18 +182,48 @@ const Prod_Operation = ({
     });
   };
 
+  // const handle_end = async ({ quantity_complete, quantity_reject }) => {
+  //   const final_status =
+  //     total_quantity_produced + quantity_complete + quantity_reject >=
+  //     prod.quantity
+  //       ? "Complete"
+  //       : "End";
+
+  //   const res = await api_update_prod_status_rtdb(
+  //     plan_id,
+  //     selected_prod_index,
+  //     final_status,
+  //     active_crew_count,
+  //     quantity_complete || 0,
+  //     quantity_reject || 0,
+  //     active_user,
+  //     show_toast
+  //   );
+
+  //   if (!res?.success) return;
+
+  //   show_toast({
+  //     type: "success",
+  //     title: "Production Ended",
+  //     message: "Production has been successfully ended.",
+  //     icon: <CheckCircle2 size={21} className="text-green-500" />,
+  //   });
+  // };
+
   const handle_end = async () => {
     const res = await api_update_prod_status_rtdb(
       plan_id,
       selected_prod_index,
       "End",
-      crewCount,
+      active_crew_count,
       0,
       0,
       active_user,
       show_toast
     );
+
     if (!res?.success) return;
+
     show_toast({
       type: "success",
       title: "Production Ended",
@@ -185,7 +231,6 @@ const Prod_Operation = ({
       icon: <CheckCircle2 size={21} className="text-green-500" />,
     });
   };
-
   const getButtonProps = (button) => {
     switch (button) {
       case "Start":
@@ -216,7 +261,13 @@ const Prod_Operation = ({
 
   const render_button = (label, onClick) => {
     const { disabled, active } = getButtonProps(label);
-    let bgClass = "bg-white hover:bg-gray-100 cursor-pointer";
+
+    const baseClasses =
+      "flex-1 py-3 px-4 rounded-lg font-semibold text-gray-700 transition-colors border";
+
+    // Apply bg color based on button type and status
+    let bgClass = "bg-white hover:bg-gray-100 cursor-pointer"; // default
+
     if (active) {
       if (label === "Start" || label === "Resume")
         bgClass =
@@ -230,10 +281,11 @@ const Prod_Operation = ({
     } else if (disabled) {
       bgClass = "bg-white opacity-40 cursor-not-allowed outline-none";
     }
+
     return (
       <button
         key={label}
-        className={`flex-1 py-3 px-4 rounded-lg font-semibold text-gray-700 transition-colors border ${bgClass}`}
+        className={`${baseClasses} ${bgClass}`}
         onClick={disabled || active ? undefined : onClick}
       >
         {label.toUpperCase()}
@@ -242,31 +294,33 @@ const Prod_Operation = ({
   };
 
   const handle_start_prod = () => {
-    if (crewCount === 0) {
-      show_toast({
-        type: "warning",
-        title: "Invalid Man Power",
-        message: "Please assign man power before starting.",
-        icon: <Info size={21} className="text-yellow-500" />,
-      });
-      return;
-    }
     set_pin_action("START");
     set_display_modal("pin_auth");
   };
-
   const handle_end_prod = () => {
     set_pin_action("END");
     set_display_modal("pin_auth");
   };
-  const handle_go_back = () => set_monitor_page("prod_selection");
 
+  const handle_go_back = () => {
+    set_monitor_page("prod_selection");
+  };
+
+  if (!prod) {
+    return <div className="text-center text-red-500">Production not found</div>;
+  }
+
+  // RETURN ORIGIN
   return (
     <React.Fragment>
       <div className="flex gap-4">
-        <div className="flex-1">
+        {/* + Left Container */}
+        <div className="flex-1 ">
+          {/* Compact Operation Panel */}
           <div className="bg-white border rounded-xl px-6 py-4 grid grid-cols-1 gap-4">
+            {/* Row 1: Machine + Status */}
             <div className="flex justify-between items-center">
+              {/* LEFT SIDE */}
               <div className="flex items-center gap-4">
                 <Button
                   variant="white"
@@ -276,6 +330,7 @@ const Prod_Operation = ({
                   width="w-[40px] h-[40px]"
                   on_click={handle_go_back}
                 />
+
                 <div>
                   <div className="text-xs text-gray-400">
                     Production Machine / Line
@@ -285,31 +340,40 @@ const Prod_Operation = ({
                   </div>
                 </div>
               </div>
+
+              {/* RIGHT SIDE – STATUS */}
               <div>
                 <span
-                  className={`px-4 py-1 rounded-full text-sm ${
-                    prod.prod_status === "Pending" ||
-                    prod.prod_status === "Hold"
-                      ? "bg-yellow-100 text-yellow-600"
-                      : prod.prod_status === "Complete" ||
-                        prod.prod_status === "Start" ||
-                        prod.prod_status === "Resume"
-                      ? "bg-green-100 text-green-600"
-                      : "bg-red-100 text-red-600"
-                  }`}
+                  className={`px-4 py-1 rounded-full text-sm
+        ${
+          prod.prod_status === "Pending" || prod.prod_status === "Hold"
+            ? "bg-yellow-100 text-yellow-600"
+            : prod.prod_status === "Complete" ||
+              prod.prod_status === "Start" ||
+              prod.prod_status === "Resume"
+            ? "bg-green-100 text-green-600"
+            : "bg-red-100 text-red-600"
+        }`}
                 >
                   {prod.prod_status}
                 </span>
               </div>
             </div>
+
+            {/* Divider */}
             <div className="h-px bg-gray-200" />
+            {/* Row 2: Item */}
             <div>
               <div className="text-xs text-gray-400">Item</div>
               <div className="text-md font-medium text-gray-700 leading-tight">
                 {prod.item_desc}
               </div>
             </div>
+
+            {/* Divider */}
             <div className="h-px bg-gray-200" />
+
+            {/* Row 3: Quantity + Dates */}
             <div className="grid grid-cols-3 gap-4 items-center">
               <div>
                 <div className="text-xs text-gray-400">Quantity to Produce</div>
@@ -317,12 +381,14 @@ const Prod_Operation = ({
                   {total_quantity_produced} / {prod.quantity}
                 </div>
               </div>
+
               <div>
                 <div className="text-xs text-gray-400">Start Date</div>
                 <div className="text-sm font-medium text-gray-700">
                   {prod.start_date}
                 </div>
               </div>
+
               <div>
                 <div className="text-xs text-gray-400">End Date</div>
                 <div className="text-sm font-medium text-gray-700">
@@ -371,58 +437,73 @@ const Prod_Operation = ({
                   </div>
                 </div>
               </div>
-
-              <div className="h-[132px] rounded-lg border border-gray-200 bg-white p-6 flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gray-100">
-                    <Users size={18} />
+              <div className="rounded-lg border border-gray-200 bg-white p-4">
+                <div className="flex items-center justify-between">
+                  {/* Left */}
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gray-100">
+                      <Users size={18} />
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-400">Man Power</p>
+                      <p className="text-lg font-semibold text-gray-700">
+                        Crew Overview
+                      </p>
+                    </div>
                   </div>
-                  <div className="flex flex-col">
-                    <p className="text-xs text-gray-400">Man Power</p>
-                    <p className="text-lg font-semibold text-gray-700">
-                      Crew Count
+
+                  {/* Status */}
+                  <span className="rounded-full bg-green-100 px-3 py-1 text-xs font-medium text-green-600">
+                    Active
+                  </span>
+                </div>
+
+                {/* Numbers */}
+                <div className="mt-8 grid grid-cols-3 gap-3 text-center">
+                  <div>
+                    <p className="text-xs text-gray-400">Assigned</p>
+                    <p className="text-lg font-bold text-gray-700">
+                      {assigned_count}
+                    </p>
+                  </div>
+
+                  <div className="border-l border-r">
+                    <p className="text-xs text-gray-400">Active</p>
+                    <p className="text-lg font-bold text-green-600">
+                      {active_crew_count}
+                    </p>
+                  </div>
+
+                  <div>
+                    <p className="text-xs text-gray-400">Idle</p>
+                    <p className="text-lg font-bold text-yellow-500">
+                      {idle_crew_count}
                     </p>
                   </div>
                 </div>
-                <div className="flex items-center gap-3">
-                  <button
-                    onClick={() =>
-                      setCrewCount((prev) => Math.max(prev - 1, 0))
-                    }
-                    className="outline-none flex h-10 w-12 items-center justify-center rounded-lg bg-red-100 text-red-500 text-lg font-bold hover:bg-red-200 transition"
-                  >
-                    -
-                  </button>
-                  <span className="text-2xl mx-4 font-bold text-gray-700">
-                    {crewCount}
-                  </span>
-                  <button
-                    onClick={() => setCrewCount((prev) => prev + 1)}
-                    className="outline-none flex h-10 w-12 items-center justify-center rounded-lg bg-green-100 text-green-500 text-lg font-bold hover:bg-green-200 transition"
-                  >
-                    +
-                  </button>
-                </div>
               </div>
-
               <div className="flex gap-4">
-                {/* <div className="flex-1">
-                  <Button
-                    variant="primary"
-                    size="lg"
-                    width="w-full"
-                    class_name="h-[150px] text-base"
-                    on_click={() => set_monitor_page("manage_man_power")}
-                  >
-                    Man Power
-                  </Button>
-                </div> */}
                 <div className="flex-1">
                   <Button
                     variant="primary"
                     size="lg"
                     width="w-full"
-                    class_name="h-[150px] text-base"
+                    class_name="h-[124px] text-base"
+                    // icon={CirclePlus}
+                    // icon_position="left"
+                    on_click={() => set_monitor_page("manage_man_power")}
+                  >
+                    Man Power
+                  </Button>
+                </div>
+                <div className="flex-1">
+                  <Button
+                    variant="primary"
+                    size="lg"
+                    width="w-full"
+                    class_name="h-[124px] text-base"
+                    // icon={CirclePlus}
+                    // icon_position="left"
                     on_click={() => set_monitor_page("material_request")}
                   >
                     Material Request
@@ -433,15 +514,27 @@ const Prod_Operation = ({
                     variant="primary"
                     size="lg"
                     width="w-full"
-                    class_name="h-[150px] text-base"
+                    class_name="h-[124px] text-base"
+                    // icon={CirclePlus}
+                    // icon_position="left"
                     on_click={() => set_display_modal("prod_report")}
                   >
                     Production Report
                   </Button>
+                  {/* <Button
+                    variant="primary"
+                    size="lg"
+                    width="w-full"
+                    class_name="h-[124px] text-base"
+                    // icon={CirclePlus}
+                    // icon_position="left"
+                    on_click={() => set_monitor_page("finish_goods")}
+                  >
+                    Finish Goods
+                  </Button> */}
                 </div>
               </div>
             </div>
-
             <div className="col-span-12 xl:col-span-5">
               <div className="rounded-lg border border-gray-200 bg-gray-100">
                 <div className="shadow-default rounded-lg bg-white px-5 pb-11 pt-5 sm:px-6 sm:pt-6">
@@ -509,7 +602,7 @@ const Prod_Operation = ({
             </div>
           </div>
         </div>
-
+        {/* - Left Container */}
         <div className="w-[300px] flex flex-col gap-4 justify-between">
           {render_button("Start", handle_start_prod)}
           {render_button("Hold", handleHold)}
@@ -517,7 +610,7 @@ const Prod_Operation = ({
           {render_button("End", handle_end_prod)}
         </div>
       </div>
-
+      {/* + Modals */}
       <Pin_Auth
         is_open={display_modal === "pin_auth"}
         on_close={() => {
@@ -527,8 +620,14 @@ const Prod_Operation = ({
         show_toast={show_toast}
         pin_action={pin_action}
         on_success={() => {
-          if (pin_action === "START") handle_start();
-          if (pin_action === "END") handle_end();
+          if (pin_action === "START") {
+            handle_start(); // existing logic
+          }
+
+          if (pin_action === "END") {
+            handle_end();
+            // set_display_modal("end_production");
+          }
         }}
       />
       <Input_Monitor
@@ -540,13 +639,20 @@ const Prod_Operation = ({
         show_toast={show_toast}
         pin_action={pin_action}
         on_success={() => {
-          if (pin_action === "START") handle_start();
-          if (pin_action === "END") handle_end();
+          if (pin_action === "START") {
+            handle_start(); // existing logic
+          }
+
+          if (pin_action === "END") {
+            handle_end();
+          }
         }}
       />
       <End_Production
         is_open={display_modal === "end_production"}
-        on_close={() => set_display_modal("")}
+        on_close={() => {
+          set_display_modal("");
+        }}
         show_toast={show_toast}
         total_quantity_produced={total_quantity_produced}
         quantity_to_produce={prod.quantity}
@@ -554,13 +660,13 @@ const Prod_Operation = ({
       />
       <Prod_Report
         is_open={display_modal === "prod_report"}
-        on_close={() => set_display_modal("")}
+        on_close={() => {
+          set_display_modal("");
+        }}
         show_toast={show_toast}
-        prod_report={prod?.prod_report}
-        active_user={active_user}
-        prod_plan_id={plan_id}
-        prod_index={selected_prod_index}
+        // on_proceed={handle_end}
       />
+      {/* - Modals */}
     </React.Fragment>
   );
 };

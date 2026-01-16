@@ -590,6 +590,7 @@ export const api_update_prod_status_rtdb = async (
     const final_data = {
       ...existing_data,
       prod_status,
+      man_power,
       prod_log_list: [...(existing_data.prod_log_list || []), log_entry],
     };
 
@@ -1066,3 +1067,68 @@ export const api_update_bom_quantity_rtdb = async ({
   }
 };
 // - [UPDATE BOM LIST / RECEIVED QUANTITIES + REQUEST STATUS]
+
+// + [SAVE PRODUCTION REPORT PER PROD ITEM]
+export const api_save_prod_report_rtdb = async (
+  prod_plan_id,
+  prod_index,
+  prod_report_data,
+  user,
+  show_toast
+) => {
+  try {
+    if (!prod_plan_id && prod_plan_id !== 0) {
+      throw new Error("Production Plan ID is required.");
+    }
+
+    if (prod_index === undefined || prod_index === null) {
+      throw new Error("Production index is required.");
+    }
+
+    if (!prod_report_data) {
+      throw new Error("Production report data is required.");
+    }
+
+    const prod_report_ref = ref(
+      realtime_db,
+      `${get_realtime_path(
+        TABLES.PRODUCTION_PLAN
+      )}/${prod_plan_id}/selected_prod_plan_list/${prod_index}/prod_report`
+    );
+
+    const final_prod_report = {
+      ...prod_report_data,
+      creation_date: format_date_1(get_date_now()),
+      created_by: user ? `${user.first_name} ${user.last_name}` : "N/A",
+    };
+
+    await set(prod_report_ref, final_prod_report);
+
+    show_toast?.({
+      type: "success",
+      title: "Saved Successfully",
+      message: "Production report has been saved.",
+      icon: <CheckCircle2 size={21} className="text-green-500" />,
+    });
+
+    return {
+      success: true,
+      data: final_prod_report,
+    };
+  } catch (error) {
+    console.error("RTDB save production report error:", error);
+
+    show_toast?.({
+      type: "danger",
+      title: "Error",
+      message: error.message || "Failed to save production report.",
+      icon: <CircleX size={21} className="text-red-500" />,
+    });
+
+    return {
+      success: false,
+      message: error.message,
+    };
+  }
+};
+// - [SAVE PRODUCTION REPORT PER PROD ITEM]

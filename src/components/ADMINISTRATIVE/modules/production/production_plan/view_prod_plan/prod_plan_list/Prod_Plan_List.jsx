@@ -56,6 +56,9 @@ const Prod_Plan_List = ({ selected_prod_plan_list }) => {
                   <th className="px-5 py-4 font-semibold whitespace-nowrap text-gray-700 dark:text-gray-400">
                     End Date
                   </th>
+                  <th className="px-5 py-4 font-semibold whitespace-nowrap text-gray-700 dark:text-gray-400">
+                    Shift
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100 bg-white dark:divide-gray-800 dark:bg-white/[0.03]">
@@ -88,6 +91,9 @@ const Prod_Plan_List = ({ selected_prod_plan_list }) => {
                       </td>
                       <td className="px-5 py-4 whitespace-nowrap text-gray-500 dark:text-gray-400">
                         {item.end_date}
+                      </td>
+                      <td className="px-5 py-4 whitespace-nowrap text-gray-500 dark:text-gray-400">
+                        {item.shift}
                       </td>
                     </tr>
                   ))

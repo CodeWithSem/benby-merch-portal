@@ -14,6 +14,7 @@ import Icon_Field from "assets/elements/Icon_Field";
 import Pagination from "assets/elements/Pagination";
 import Prod_Logs from "./details/Prod_Logs";
 import Man_Power_Logs from "./details/Man_Power_Logs";
+import Prod_Report from "./details/Prod_Report";
 
 const HAS_FILTER = true;
 
@@ -190,6 +191,22 @@ const View_Prod_Logs = ({
                     </div>
 
                     <div>
+                      <span className="text-xs text-gray-400">Shift</span>
+                      <p className="text-sm text-gray-700">
+                        {selected_prod_plan.shift}
+                      </p>
+                    </div>
+                  </div>
+                  {/* 🔵 CHART — SAME CONTAINER, NO UI CHANGE */}
+                  <div className="flex flex-col items-center justify-center lg:border-l lg:pl-5">
+                    <Chart
+                      options={radial_options}
+                      series={radial_series}
+                      type="radialBar"
+                      height={120}
+                      width={120}
+                    />
+                    <div className="w-full">
                       <p
                         className={`text-center text-xs rounded-full px-3 py-2 max-w-[150px] ${
                           selected_prod_plan.prod_status === "Pending" ||
@@ -205,16 +222,6 @@ const View_Prod_Logs = ({
                         {selected_prod_plan.prod_status}
                       </p>
                     </div>
-                  </div>
-                  {/* 🔵 CHART — SAME CONTAINER, NO UI CHANGE */}
-                  <div className="flex items-center justify-center lg:border-l lg:pl-5">
-                    <Chart
-                      options={radial_options}
-                      series={radial_series}
-                      type="radialBar"
-                      height={120}
-                      width={120}
-                    />
                   </div>
                 </div>
               </>
@@ -240,6 +247,16 @@ const View_Prod_Logs = ({
                     Production Logs
                   </button>
                   <button
+                    onClick={() => set_active_tab("prod_report")}
+                    className={`inline-flex items-center rounded-md px-5 py-2 text-sm font-medium transition-colors outline-none whitespace-nowrap ${
+                      active_tab === "prod_report"
+                        ? "bg-white text-gray-900 shadow-xs"
+                        : "bg-transparent text-gray-500 hover:text-gray-700"
+                    }`}
+                  >
+                    Production Report
+                  </button>
+                  {/* <button
                     onClick={() => set_active_tab("man_power_logs")}
                     className={`inline-flex items-center rounded-md px-5 py-2 text-sm font-medium transition-colors outline-none whitespace-nowrap ${
                       active_tab === "man_power_logs"
@@ -248,7 +265,7 @@ const View_Prod_Logs = ({
                     }`}
                   >
                     Man Power Logs
-                  </button>
+                  </button> */}
                 </nav>
               </div>
 
@@ -256,6 +273,9 @@ const View_Prod_Logs = ({
               <div>
                 {active_tab === "prod_logs" && (
                   <Prod_Logs prod_log_list={prod_log_list} />
+                )}
+                {active_tab === "prod_report" && (
+                  <Prod_Report report={selected_prod_plan?.prod_report} />
                 )}
                 {active_tab === "man_power_logs" && (
                   <Man_Power_Logs man_power_log_list={man_power_log_list} />
