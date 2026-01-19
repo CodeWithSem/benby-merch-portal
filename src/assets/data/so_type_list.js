@@ -1,0 +1,86 @@
+export const so_type_list = [
+  {
+    id: 1,
+    so_type_code: "OR",
+    so_type_desc: "Standard Sales Order",
+    creation_date: "MM-DD-YYYY",
+  },
+  {
+    id: 2,
+    so_type_code: "SO",
+    so_type_desc: "Rush Order",
+    creation_date: "MM-DD-YYYY",
+  },
+  {
+    id: 3,
+    so_type_code: "CS",
+    so_type_desc: "Cash Sales",
+    creation_date: "MM-DD-YYYY",
+  },
+  {
+    id: 4,
+    so_type_code: "RE",
+    so_type_desc: "Return Sales Order",
+    creation_date: "MM-DD-YYYY",
+  },
+  {
+    id: 5,
+    so_type_code: "CR",
+    so_type_desc: "Credit Memo Request",
+    creation_date: "MM-DD-YYYY",
+  },
+  {
+    id: 6,
+    so_type_code: "DR",
+    so_type_desc: "Debit Memo Request",
+    creation_date: "MM-DD-YYYY",
+  },
+  {
+    id: 7,
+    so_type_code: "FD",
+    so_type_desc: "Free of Charge Delivery",
+    creation_date: "MM-DD-YYYY",
+  },
+  {
+    id: 8,
+    so_type_code: "BV",
+    so_type_desc: "Consignment Fill-Up",
+    creation_date: "MM-DD-YYYY",
+  },
+  {
+    id: 9,
+    so_type_code: "KB",
+    so_type_desc: "Consignment Issue",
+    creation_date: "MM-DD-YYYY",
+  },
+  {
+    id: 10,
+    so_type_code: "KE",
+    so_type_desc: "Consignment Pick-Up",
+    creation_date: "MM-DD-YYYY",
+  },
+  {
+    id: 11,
+    so_type_code: "KR",
+    so_type_desc: "Consignment Return",
+    creation_date: "MM-DD-YYYY",
+  },
+  {
+    id: 12,
+    so_type_code: "TA",
+    so_type_desc: "Telephone Order",
+    creation_date: "MM-DD-YYYY",
+  },
+  {
+    id: 13,
+    so_type_code: "QT",
+    so_type_desc: "Sales Quotation",
+    creation_date: "MM-DD-YYYY",
+  },
+  {
+    id: 14,
+    so_type_code: "IN",
+    so_type_desc: "Sales Inquiry",
+    creation_date: "MM-DD-YYYY",
+  },
+];

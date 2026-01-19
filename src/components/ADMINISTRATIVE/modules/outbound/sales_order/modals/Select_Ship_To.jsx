@@ -9,54 +9,127 @@ const Select_Ship_To = ({
   is_open,
   on_close,
   width = "max-w-[700px]",
-  height = "h-[500px]",
+  height = "max-h-[500px]",
+  selected_customer_code,
+  customer_master_list,
   customer_sh_list,
+  ship_to_h_list,
+  set_data,
 }) => {
   // + Client-Side Filtering
-  const [filtered_customer_sh_list, set_filtered_customer_sh_list] = useState(
-    []
-  );
+  const [filtered_ship_to_h_list, set_filtered_ship_to_h_list] = useState([]);
   const [current_page, set_current_page] = useState(1);
   const [rows_per_page, set_rows_per_page] = useState(5);
   const [search_query, set_search_query] = useState("");
-  const [selected_customer_sh, set_selected_customer_sh] = useState(null);
+  const [selected_ship_to_h, set_selected_ship_to_h] = useState(null);
+
+  const lookup_columns = [
+    {
+      code_key: "customer_code",
+      list: customer_master_list,
+      desc_key: "customer_desc",
+    },
+    {
+      code_key: "customer_sh_code",
+      list: customer_sh_list,
+      desc_key: "customer_sh_desc",
+    },
+  ];
+
+  const apply_lookups = (data, lookup_columns) => {
+    return data.map((row) => {
+      const updated = { ...row };
+
+      lookup_columns.forEach(({ code_key, list, desc_key }) => {
+        const code_value = row[code_key];
+        const match = list.find((item) => item[code_key] === code_value);
+
+        updated[desc_key] = match ? match[desc_key] : "";
+      });
+
+      return updated;
+    });
+  };
+
+  const get_searchable_fields = (lookup_columns) => {
+    const fields = [];
+
+    lookup_columns.forEach(({ code_key, desc_key }) => {
+      fields.push(code_key);
+      fields.push(desc_key);
+    });
+
+    return fields;
+  };
 
   useEffect(() => {
-    let data = [...customer_sh_list];
+    // 1. Start with ship_to_h_list
+    let data = apply_lookups(ship_to_h_list, lookup_columns);
 
+    // 2. Filter by selected_customer_code
+    if (selected_customer_code) {
+      data = data.filter((row) => row.customer_code === selected_customer_code);
+    }
+
+    // 3. Searchable fields
+    const search_fields = get_searchable_fields(lookup_columns);
+
+    // 4. Perform search
     if (search_query.trim() !== "") {
       const q = search_query.toLowerCase();
-      data = data.filter(
-        (customer) =>
-          customer.customer_sh_code.toLowerCase().includes(q) ||
-          customer.customer_sh_desc.toLowerCase().includes(q)
+
+      data = data.filter((row) =>
+        search_fields.some((field) =>
+          row[field]?.toString().toLowerCase().includes(q)
+        )
       );
     }
 
+    // 4. Pagination
     const start_idx = (current_page - 1) * rows_per_page;
     const end_idx = start_idx + rows_per_page;
-    set_filtered_customer_sh_list(data.slice(start_idx, end_idx));
-  }, [customer_sh_list, search_query, current_page, rows_per_page]);
 
-  const total_pages = Math.ceil(
-    customer_sh_list.filter(
-      (data) =>
-        data.customer_sh_code
-          .toLowerCase()
-          .includes(search_query.toLowerCase()) ||
-        data.customer_sh_desc.toLowerCase().includes(search_query.toLowerCase())
-    ).length / rows_per_page
-  );
+    set_filtered_ship_to_h_list(data.slice(start_idx, end_idx));
+  }, [
+    ship_to_h_list,
+    selected_customer_code,
+    search_query,
+    current_page,
+    rows_per_page,
+  ]);
+
+  // 1. Apply lookup to ship_to_h_list
+  const lookup_applied_list = apply_lookups(ship_to_h_list, lookup_columns);
+
+  // 2. Generate searchable fields
+  const search_fields = get_searchable_fields(lookup_columns);
+
+  // 3. Filter count based on search
+  const filtered_count = lookup_applied_list.filter((row) => {
+    const q = search_query.toLowerCase();
+
+    return search_fields.some((field) =>
+      row[field]?.toString().toLowerCase().includes(q)
+    );
+  }).length;
+
+  // 4. Calculate total pages
+  const total_pages = Math.ceil(filtered_count / rows_per_page);
 
   const handle_page_change = (page) => set_current_page(page);
   // - Client-Side Filtering
 
-  const handle_select_sold_to = () => {
-    if (!selected_customer_sh) {
-      alert("Please select a branch before proceeding.");
+  const handle_select_branch = () => {
+    if (!selected_ship_to_h) {
+      alert("Please select a data before proceeding.");
       return;
     }
-    alert(`Selected: ${selected_customer_sh.customer_sh_desc}`);
+    set_data((prev) => ({
+      ...prev,
+      customer_sh_code: selected_ship_to_h.customer_sh_code,
+    }));
+    set_selected_ship_to_h(null);
+    on_close();
   };
 
   // RETURN ORIGIN
@@ -66,6 +139,7 @@ const Select_Ship_To = ({
         {/* + Blur */}
         <div className="absolute inset-0 bg-black/50 backdrop-blur-sm z-[98]"></div>
         {/* - Blur */}
+
         {/* + Modal Content */}
         <div
           className={`relative bg-white rounded-lg shadow-xl ${width} w-full py-7 m-5 z-[99]`}
@@ -76,9 +150,11 @@ const Select_Ship_To = ({
           >
             <X size={20} />
           </button>
+          {/* + Modal Label */}
           <div className="text-lg md:text-xl font-bold mb-5 px-7">
-            Customer Selection
+            Ship to Address Selection
           </div>
+          {/* - Modal Label */}
           {/* + Modal Body */}
           <div className={`w-full overflow-y-auto ${height} scrollbar-custom`}>
             <div className="overflow-hidden border border-gray-200 bg-white pt-4">
@@ -104,15 +180,16 @@ const Select_Ship_To = ({
                     <tr className="font-semibold text-xs">
                       <th className="px-6 py-3 w-[80px]"></th>
                       <th className="px-6 py-3 text-gray-500 text-left">
-                        Customer
+                        Plant
                       </th>
                       <th className="px-6 py-3 text-gray-500 text-left">
                         Creation Date
                       </th>
                     </tr>
                   </thead>
+
                   <tbody className="divide-y divide-gray-100">
-                    {filtered_customer_sh_list.length === 0 ? (
+                    {filtered_ship_to_h_list.length === 0 ? (
                       <tr>
                         <td
                           colSpan={3}
@@ -122,15 +199,15 @@ const Select_Ship_To = ({
                         </td>
                       </tr>
                     ) : (
-                      filtered_customer_sh_list.map((data) => (
+                      filtered_ship_to_h_list.map((data) => (
                         <tr
                           key={data.id}
                           className={`hover:bg-sky-50/50 cursor-pointer text-[12px] ${
-                            selected_customer_sh?.id === data.id
+                            selected_ship_to_h?.id === data.id
                               ? "bg-sky-50"
                               : ""
                           }`}
-                          onClick={() => set_selected_customer_sh(data)}
+                          onClick={() => set_selected_ship_to_h(data)}
                         >
                           <td className="px-5 py-4 sm:px-6 text-center">
                             <div className="flex justify-center items-center">
@@ -138,17 +215,17 @@ const Select_Ship_To = ({
                                 name="check"
                                 box_size={18}
                                 icon_size={12}
-                                checked={selected_customer_sh?.id === data.id}
-                                on_change={() => set_selected_customer_sh(data)}
+                                checked={selected_ship_to_h?.id === data.id}
+                                on_change={() => set_selected_ship_to_h(data)}
                               />
                             </div>
                           </td>
                           <td className="px-5 py-4 sm:px-6">
                             <div className="block font-medium text-gray-800">
-                              <span className="block text-gray-500 text-[12px]">
+                              <span className="block text-gray-500 text-[10px]">
                                 {data.customer_sh_code}
                               </span>
-                              <span className="block text-gray-800 text-sm">
+                              <span className="block text-gray-800 text-[13px]">
                                 {data.customer_sh_desc}
                               </span>
                             </div>
@@ -183,9 +260,9 @@ const Select_Ship_To = ({
             <div className="flex justify-center sm:justify-end gap-2 w-full">
               <Button
                 variant="primary"
-                on_click={handle_select_sold_to}
+                on_click={handle_select_branch}
                 class_name="w-full md:w-[100px]"
-                disabled={!selected_customer_sh}
+                disabled={!selected_ship_to_h}
               >
                 Proceed
               </Button>

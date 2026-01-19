@@ -5,39 +5,41 @@ import Checkbox_Field from "assets/elements/Checkbox_Field";
 import Button from "assets/elements/Button";
 import Pagination_Modal from "assets/elements/Pagination_Modal";
 
-const Select_Sold_To = ({
+const Select_Branch = ({
   is_open,
   on_close,
   width = "max-w-[700px]",
-  height = "h-[500px]",
-  customer_list,
+  height = "max-h-[500px]",
+  customer_master_list,
+  set_data,
 }) => {
   // + Client-Side Filtering
-  const [filtered_customer_list, set_filtered_customer_list] = useState([]);
+  const [filtered_customer_master_list, set_filtered_customer_master_list] =
+    useState([]);
   const [current_page, set_current_page] = useState(1);
   const [rows_per_page, set_rows_per_page] = useState(5);
   const [search_query, set_search_query] = useState("");
   const [selected_customer, set_selected_customer] = useState(null);
 
   useEffect(() => {
-    let data = [...customer_list];
+    let data = [...customer_master_list];
 
     if (search_query.trim() !== "") {
       const q = search_query.toLowerCase();
       data = data.filter(
-        (customer) =>
-          customer.customer_code.toLowerCase().includes(q) ||
-          customer.customer_desc.toLowerCase().includes(q)
+        (data) =>
+          data.customer_code.toLowerCase().includes(q) ||
+          data.customer_desc.toLowerCase().includes(q)
       );
     }
 
     const start_idx = (current_page - 1) * rows_per_page;
     const end_idx = start_idx + rows_per_page;
-    set_filtered_customer_list(data.slice(start_idx, end_idx));
-  }, [customer_list, search_query, current_page, rows_per_page]);
+    set_filtered_customer_master_list(data.slice(start_idx, end_idx));
+  }, [customer_master_list, search_query, current_page, rows_per_page]);
 
   const total_pages = Math.ceil(
-    customer_list.filter(
+    customer_master_list.filter(
       (data) =>
         data.customer_code.toLowerCase().includes(search_query.toLowerCase()) ||
         data.customer_desc.toLowerCase().includes(search_query.toLowerCase())
@@ -47,14 +49,21 @@ const Select_Sold_To = ({
   const handle_page_change = (page) => set_current_page(page);
   // - Client-Side Filtering
 
-  const handle_select_sold_to = () => {
+  const handle_select_branch = () => {
     if (!selected_customer) {
       alert("Please select a branch before proceeding.");
       return;
     }
-    alert(`Selected: ${selected_customer.customer_desc}`);
+    set_data((prev) => ({
+      ...prev,
+      customer_code: selected_customer.customer_code,
+      customer_sh_code: "",
+    }));
+    set_selected_customer(null);
+    on_close();
   };
 
+  // RETURN ORIGIN
   return is_open ? (
     <React.Fragment>
       <div className="fixed inset-0 flex items-center justify-center z-[97] px-4">
@@ -72,9 +81,11 @@ const Select_Sold_To = ({
           >
             <X size={20} />
           </button>
+          {/* + Modal Label */}
           <div className="text-lg md:text-xl font-bold mb-5 px-7">
-            Customer Selection
+            Sold to Customer Selection
           </div>
+          {/* - Modal Label */}
           {/* + Modal Body */}
           <div className={`w-full overflow-y-auto ${height} scrollbar-custom`}>
             <div className="overflow-hidden border border-gray-200 bg-white pt-4">
@@ -100,7 +111,7 @@ const Select_Sold_To = ({
                     <tr className="font-semibold text-xs">
                       <th className="px-6 py-3 w-[80px]"></th>
                       <th className="px-6 py-3 text-gray-500 text-left">
-                        Customer
+                        Branch
                       </th>
                       <th className="px-6 py-3 text-gray-500 text-left">
                         Creation Date
@@ -109,7 +120,7 @@ const Select_Sold_To = ({
                   </thead>
 
                   <tbody className="divide-y divide-gray-100">
-                    {filtered_customer_list.length === 0 ? (
+                    {filtered_customer_master_list.length === 0 ? (
                       <tr>
                         <td
                           colSpan={3}
@@ -119,7 +130,7 @@ const Select_Sold_To = ({
                         </td>
                       </tr>
                     ) : (
-                      filtered_customer_list.map((data) => (
+                      filtered_customer_master_list.map((data) => (
                         <tr
                           key={data.id}
                           className={`hover:bg-sky-50/50 cursor-pointer text-[12px] ${
@@ -140,10 +151,10 @@ const Select_Sold_To = ({
                           </td>
                           <td className="px-5 py-4 sm:px-6">
                             <div className="block font-medium text-gray-800">
-                              <span className="block text-gray-500 text-[12px]">
+                              <span className="block text-gray-500 text-[10px]">
                                 {data.customer_code}
                               </span>
-                              <span className="block text-gray-800 text-sm">
+                              <span className="block text-gray-800 text-[13px]">
                                 {data.customer_desc}
                               </span>
                             </div>
@@ -178,7 +189,7 @@ const Select_Sold_To = ({
             <div className="flex justify-center sm:justify-end gap-2 w-full">
               <Button
                 variant="primary"
-                on_click={handle_select_sold_to}
+                on_click={handle_select_branch}
                 class_name="w-full md:w-[100px]"
                 disabled={!selected_customer}
               >
@@ -201,4 +212,4 @@ const Select_Sold_To = ({
   ) : null;
 };
 
-export default Select_Sold_To;
+export default Select_Branch;

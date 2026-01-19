@@ -9,7 +9,7 @@ const Select_Branch = ({
   is_open,
   on_close,
   width = "max-w-[700px]",
-  height = "h-[500px]",
+  height = "max-h-[500px]",
   branch_list,
   set_data,
   set_selected_item_list,

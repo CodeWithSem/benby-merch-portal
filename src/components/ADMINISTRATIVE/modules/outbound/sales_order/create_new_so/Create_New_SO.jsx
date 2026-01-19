@@ -17,16 +17,39 @@ import Select_Ship_To from "../modals/Select_Ship_To";
 import Select_Plant from "../modals/Select_Plant";
 import Select_SLOC from "../modals/Select_SLOC";
 import Select_Item from "../modals/Select_Item";
+import { get_description } from "assets/scripts/functions/get_description";
+import Select_Generic from "assets/elements/modals/Select_Generic";
 
-const Create_New_SO = ({
-  set_page,
-  customer_list,
-  customer_sh_list,
-  plant_list,
-  sloc_list,
-}) => {
+const Create_New_SO = ({ set_page, so_data }) => {
+  const {
+    so_type_list,
+    sales_org_list,
+    customer_master_list,
+    customer_sh_list,
+    ship_to_h_list,
+    order_reason_list,
+    plant_list,
+    sloc_list,
+    new_so_data,
+    set_new_so_data,
+  } = so_data;
   const [active_tab, set_active_tab] = useState("sales");
   const [display_modal, set_display_modal] = useState("");
+
+  const select_modal_configs = [
+    // {
+    //   key: "select_sold_to",
+    //   label: "Customer",
+    //   show_creation_date: true,
+    //   width: "max-w-[1200px]",
+    //   list: customer_master_list,
+    //   column: ["Customer"],
+    //   code: ["customer_code"],
+    //   desc: ["customer_desc"],
+    //   lookup: [customer_master_list],
+    //   target: ["customer_code"],
+    // },
+  ];
 
   const tabs = [
     { key: "sales", title: "Sales" },
@@ -169,42 +192,60 @@ const Create_New_SO = ({
                   <div className="col-span-full">
                     <Text_Code_Field
                       label="SO Type"
-                      // code_value={search_value}
-                      // text_value={search_value}
                       code_width="150px"
                       show_search_button={false}
+                      code_value={new_so_data.so_type_code}
+                      text_value={get_description(
+                        new_so_data.so_type_code,
+                        so_type_list,
+                        "so_type_code",
+                        "so_type_desc"
+                      )}
                       disabled
                     />
                   </div>
                   <div className="col-span-full">
                     <Text_Code_Field
                       label="Sales Organization"
-                      // code_value={search_value}
-                      // text_value={search_value}
                       code_width="150px"
                       show_search_button={false}
-                      on_click={() => set_display_modal("select_sales_org")}
+                      code_value={new_so_data.sales_org_code}
+                      text_value={get_description(
+                        new_so_data.sales_org_code,
+                        sales_org_list,
+                        "sales_org_code",
+                        "sales_org_desc"
+                      )}
                       disabled
                     />
                   </div>
                   <div className="col-span-full">
                     <Text_Code_Field
                       label="Sold to Party / Address"
-                      // code_value={search_value}
-                      // text_value={search_value}
                       code_width="150px"
-                      show_search_button={true}
+                      code_value={new_so_data.customer_code}
+                      text_value={get_description(
+                        new_so_data.customer_code,
+                        customer_master_list,
+                        "customer_code",
+                        "customer_desc"
+                      )}
                       on_click={() => set_display_modal("select_sold_to")}
                       disabled
                     />
                   </div>
                   <div className="col-span-full">
                     <Text_Code_Field
-                      label="Ship to Party / Address"
-                      // code_value={search_value}
-                      // text_value={search_value}
+                      label="Sold to Party / Address"
                       code_width="150px"
-                      show_search_button={true}
+                      show_search_button={!!new_so_data.customer_code}
+                      code_value={new_so_data.customer_sh_code}
+                      text_value={get_description(
+                        new_so_data.customer_sh_code,
+                        customer_sh_list,
+                        "customer_sh_code",
+                        "customer_sh_desc"
+                      )}
                       on_click={() => set_display_modal("select_ship_to")}
                       disabled
                     />
@@ -238,7 +279,15 @@ const Create_New_SO = ({
               {/* - Tab Navigation */}
               {/* + Tab Content */}
               <div className="p-6">
-                {active_tab === "sales" && <Sales />}
+                {active_tab === "sales" && (
+                  <Sales
+                    so_data={{
+                      order_reason_list,
+                      new_so_data,
+                      set_new_so_data,
+                    }}
+                  />
+                )}
                 {active_tab === "shipping" && (
                   <Shipping
                     handle_open_plant_modal={handle_open_plant_modal}
@@ -294,20 +343,59 @@ const Create_New_SO = ({
           {/* - Section 4 */}
         </div>
       </div>
+      {select_modal_configs.map((cfg) => (
+        <Select_Generic
+          key={cfg.key}
+          is_open={display_modal === cfg.key}
+          on_close={() => set_display_modal("")}
+          width={cfg.width}
+          height="max-h-[700px]"
+          modal_label={cfg.label}
+          show_creation_date={cfg.show_creation_date}
+          column_names={cfg.column}
+          source_list={cfg.list}
+          source_code={cfg.code}
+          source_desc={cfg.desc}
+          lookup_lists={cfg.lookup}
+          target_field={cfg.target}
+          set_data={set_new_so_data}
+          on_after_select={cfg.on_after_select}
+        />
+      ))}
+
       <Select_Sold_To
         is_open={display_modal === "select_sold_to"}
         on_close={() => set_display_modal("")}
         width="max-w-[1000px]"
         height="max-h-[700px]"
-        customer_list={customer_list}
+        customer_master_list={customer_master_list}
+        set_data={set_new_so_data}
       />
+      {/* <Select_Sold_To
+        is_open={display_modal === "select_sold_to"}
+        on_close={() => set_display_modal("")}
+        width="max-w-[1000px]"
+        height="max-h-[700px]"
+        customer_master_list={customer_master_list}
+      /> */}
       <Select_Ship_To
         is_open={display_modal === "select_ship_to"}
         on_close={() => set_display_modal("")}
         width="max-w-[1000px]"
         height="max-h-[700px]"
+        selected_customer_code={new_so_data.customer_code}
+        customer_master_list={customer_master_list}
         customer_sh_list={customer_sh_list}
+        ship_to_h_list={ship_to_h_list}
+        set_data={set_new_so_data}
       />
+      {/* <Select_Ship_To
+        is_open={display_modal === "select_ship_to"}
+        on_close={() => set_display_modal("")}
+        width="max-w-[1000px]"
+        height="max-h-[700px]"
+        customer_sh_list={customer_sh_list}
+      /> */}
       <Select_Plant
         is_open={display_modal === "select_plant"}
         on_close={() => set_display_modal("")}

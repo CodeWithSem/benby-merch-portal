@@ -15,15 +15,7 @@ import {
   Database,
 } from "lucide-react";
 import { format_date_1 } from "assets/scripts/format";
-import {
-  customer_list,
-  customer_sh_list,
-  dist_channel_list,
-  plant_list,
-  sales_org_list,
-  sloc_list,
-  so_type_list,
-} from "./SO_DATA_MAP";
+
 import Icon_Field from "assets/elements/Icon_Field";
 import Select_Field from "assets/elements/Select_Field";
 import Button from "assets/elements/Button";
@@ -36,6 +28,16 @@ import Edit_SO from "./edit_so/Edit_SO";
 import Post_View_SO from "./post_view_so/Post_View_SO";
 import Select_SO_Type from "./modals/select_so_type/Select_SO_Type";
 import Delete_SO from "./modals/delete_so/Delete_SO";
+import { plant_list, sloc_list } from "./SO_DATA_MAP";
+import { so_type_h_list } from "assets/data/so_type_h_list";
+import { so_type_list } from "assets/data/so_type_list";
+import { sales_org_list } from "assets/data/sales_org_list";
+import { dist_channel_list } from "assets/data/dist_channel_list";
+import { customer_master_list } from "assets/data/customer_master_list";
+import { customer_sh_list } from "assets/data/customer_sh_list";
+import { ship_to_h_list } from "assets/data/ship_to_h_list";
+import { order_reason_list } from "assets/data/order_reason_list";
+import Select_Generic from "assets/elements/modals/Select_Generic";
 
 const Sales_Order = () => {
   const { show_toast } = useToast();
@@ -47,6 +49,8 @@ const Sales_Order = () => {
   const [start_date, set_start_date] = useState(today);
   const [end_date, set_end_date] = useState(today);
   const [show_load_data_button, set_show_load_data_button] = useState(false);
+
+  const [new_so_data, set_new_so_data] = useState({});
 
   const columns = [
     { key: "so_number", label: "SO Number", sortable: true },
@@ -86,18 +90,6 @@ const Sales_Order = () => {
     return () => clearTimeout(timer);
   }, [search_query]);
 
-  // --- Load all users once ---
-  //   const load_data = async () => {
-  //     set_loading(true);
-  //     const data = await fetch_so_list();
-  //     set_so_list(data);
-  //     set_loading(false);
-  //   };
-
-  //   useEffect(() => {
-  //     load_data();
-  //   }, []);
-
   useEffect(() => {
     let temp = [...so_list];
 
@@ -136,7 +128,6 @@ const Sales_Order = () => {
     current_page,
     select_option,
   ]);
-  // - Client-side Filtering
 
   const total_pages = Math.ceil(
     (debounced_query
@@ -166,8 +157,24 @@ const Sales_Order = () => {
   const handle_page_change = (page) => set_current_page(page);
   // - Client-Side Filtering
 
+  const select_modal_configs = [
+    {
+      key: "select_so_type_h",
+      label: "SO Type",
+      show_creation_date: false,
+      width: "max-w-[1200px]",
+      list: so_type_h_list,
+      column: ["SO Type", "Sales Organization", "Distribution Channel"],
+      code: ["so_type_code", "sales_org_code", "dist_channel_code"],
+      desc: ["so_type_desc", "sales_org_desc", "dist_channel_desc"],
+      lookup: [so_type_list, sales_org_list, dist_channel_list],
+      target: ["so_type_code", "sales_org_code", "dist_channel_code"],
+      on_after_select: () => set_page("so_creation"),
+    },
+  ];
+
   const handle_create_new_so = () => {
-    set_display_modal("select_so_type");
+    set_display_modal("select_so_type_h");
   };
 
   const handle_upload_so = () => {
@@ -550,16 +557,24 @@ const Sales_Order = () => {
       {page === "so_creation" && (
         <Create_New_SO
           set_page={set_page}
-          customer_list={customer_list}
-          customer_sh_list={customer_sh_list}
-          plant_list={plant_list}
-          sloc_list={sloc_list}
+          so_data={{
+            so_type_list,
+            sales_org_list,
+            customer_master_list,
+            customer_sh_list,
+            ship_to_h_list,
+            order_reason_list,
+            plant_list,
+            sloc_list,
+            new_so_data,
+            set_new_so_data,
+          }}
         />
       )}
       {page === "edit_so" && (
         <Edit_SO
           set_page={set_page}
-          customer_list={customer_list}
+          customer_master_list={customer_master_list}
           customer_sh_list={customer_sh_list}
           plant_list={plant_list}
           sloc_list={sloc_list}
@@ -570,16 +585,25 @@ const Sales_Order = () => {
       )}
       {/* - Pages */}
       {/* + Modals */}
-      <Select_SO_Type
-        is_open={display_modal === "select_so_type"}
-        on_close={() => set_display_modal("")}
-        width="max-w-[1280px]"
-        height="max-h-[700px]"
-        set_page={set_page}
-        sales_org_list={sales_org_list}
-        dist_channel_list={dist_channel_list}
-        so_type_list={so_type_list}
-      />
+      {select_modal_configs.map((cfg) => (
+        <Select_Generic
+          key={cfg.key}
+          is_open={display_modal === cfg.key}
+          on_close={() => set_display_modal("")}
+          width={cfg.width}
+          height="max-h-[1280px]"
+          modal_label={cfg.label}
+          show_creation_date={cfg.show_creation_date}
+          column_names={cfg.column}
+          source_list={cfg.list}
+          source_code={cfg.code}
+          source_desc={cfg.desc}
+          lookup_lists={cfg.lookup}
+          target_field={cfg.target}
+          set_data={set_new_so_data}
+          on_after_select={cfg.on_after_select}
+        />
+      ))}
 
       <Delete_SO
         is_open={display_modal === "delete_so"}
