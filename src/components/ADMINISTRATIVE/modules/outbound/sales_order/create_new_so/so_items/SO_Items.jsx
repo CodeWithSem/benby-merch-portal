@@ -1,11 +1,14 @@
 import React, { useEffect, useRef, useState } from "react";
 import {
   CirclePlus,
+  CircleX,
+  Edit,
   FileText,
   Info,
   Search,
   SlidersHorizontal,
   SquarePen,
+  Trash,
   Trash2,
 } from "lucide-react";
 import { format_currency, format_percentage } from "assets/scripts/format";
@@ -18,78 +21,37 @@ import Checkbox_Field from "assets/elements/Checkbox_Field";
 import Show_Item_Details from "./modals/Show_Item_Details";
 import Edit_Item from "./modals/Edit_Item";
 import Button_Action from "assets/elements/Button_Action";
+import Select_Item from "../../modals/Select_Item";
 
-const SO_Items = ({ handle_open_item_modal }) => {
+const SO_Items = ({ so_data }) => {
+  const {
+    show_toast,
+    new_so_data,
+    selected_item_list,
+    set_selected_item_list,
+  } = so_data;
+
   const [display_item_modal, set_display_item_modal] = useState("");
-  const [selected_row, set_selected_row] = useState(null);
   const [show_filter, set_show_filter] = useState(false);
-  const [quantity, set_quantity] = useState(1);
+  const [search_query, set_search_query] = useState("");
+  const [dragged_index, set_dragged_index] = useState(null);
+  const [selected_item_data, set_selected_item_data] = useState({
+    item_code: "",
+    item_desc: "",
+    unit_price: "",
+    quantity: 1,
+    total: "",
+  });
 
-  const [item_list, set_item_list] = useState([
-    {
-      id: 1,
-      item_code: "ITM-0001",
-      item_desc: "Item Description 1",
-      qty: "10",
-      unit: "PCS",
-      price: "8000",
-      discount_type: "PERCENT",
-      discount: "5",
-      net_price: "7600",
-      total_gross: "80000",
-      total_net: "76000",
-      currency: "PHP",
-      pricing_date: "2025-11-08",
-      on_hand: "150",
-      committed: "20",
-      is_approved: 0,
-      remarks: "For office equipment",
-    },
-    {
-      id: 2,
-      item_code: "ITM-0002",
-      item_desc: "Item Description 2",
-      qty: "5",
-      unit: "BOX",
-      price: "1200",
-      discount_type: "AMOUNT",
-      discount: "100",
-      net_price: "1100",
-      total_gross: "6000",
-      total_net: "5500",
-      currency: "PHP",
-      pricing_date: "2025-11-07",
-      on_hand: "80",
-      committed: "10",
-      is_approved: 1,
-      remarks: "Printer ink pack",
-    },
-    {
-      id: 3,
-      item_code: "ITM-0003",
-      item_desc: "Item Description 3",
-      qty: "20",
-      unit: "SET",
-      price: "2500",
-      discount_type: "PERCENT",
-      discount: "10",
-      net_price: "2250",
-      total_gross: "50000",
-      total_net: "45000",
-      currency: "USD",
-      pricing_date: "2025-10-30",
-      on_hand: "300",
-      committed: "50",
-      is_approved: 1,
-      remarks: "Computer accessories bundle",
-    },
-  ]);
+  const filtered_item_list = selected_item_list.filter((item) =>
+    item.item_desc.toLowerCase().includes(search_query.toLowerCase()),
+  );
 
   const columns = [
     { key: "no", label: "No.", visible: true },
     { key: "item_desc", label: "Item", visible: true },
-    { key: "qty", label: "Qty", visible: true },
-    { key: "unit", label: "Unit", visible: true },
+    { key: "quantity", label: "Qty", visible: true },
+    { key: "uom", label: "Unit", visible: true },
     { key: "price", label: "Price", visible: true },
     { key: "discount_type", label: "Discount Type", visible: false },
     { key: "discount", label: "Discount", visible: false },
@@ -106,28 +68,98 @@ const SO_Items = ({ handle_open_item_modal }) => {
   ];
 
   const [visible_columns, set_visible_columns] = useState(
-    columns.filter((col) => col.visible).map((col) => col.key)
+    columns.filter((col) => col.visible).map((col) => col.key),
   );
 
   const toggle_column = (key, checked) => {
     set_visible_columns((prev) =>
-      checked ? [...prev, key] : prev.filter((c) => c !== key)
+      checked ? [...prev, key] : prev.filter((c) => c !== key),
     );
   };
 
-  const handle_row_click = (item_id) => {
-    set_selected_row(item_id);
+  const handle_drag_start = (index) => {
+    set_dragged_index(index);
   };
 
-  const handle_add_item = () => {
-    alert("Under Maintenance");
+  const handle_drag_over = (e) => {
+    e.preventDefault();
   };
+
+  const handle_drop = (index) => {
+    if (dragged_index === null) return;
+
+    const items = [...selected_item_list];
+    const draggedItem = items[dragged_index];
+    items.splice(dragged_index, 1);
+    items.splice(index, 0, draggedItem);
+    set_selected_item_list(items);
+    set_dragged_index(null);
+  };
+
+  const handle_show_select_item_modal = () => {
+    if (!new_so_data.customer_code) {
+      show_toast({
+        type: "danger",
+        title: "Invalid",
+        message: "Please select a customer.",
+        icon: <CircleX size={21} className="text-red-500" />,
+      });
+      return;
+    } else if (!new_so_data.customer_sh_code) {
+      show_toast({
+        type: "danger",
+        title: "Invalid",
+        message: "Please select an address.",
+        icon: <CircleX size={21} className="text-red-500" />,
+      });
+      return;
+    }
+    set_display_item_modal("select_item");
+  };
+
   const handle_show_details = () => {
     set_display_item_modal("show_details");
   };
   const handle_edit_item = () => {
     set_display_item_modal("edit_item");
   };
+
+  const handle_quantity_change = (value) => {
+    set_selected_item_data((prev) => {
+      const updated_quantity = value === "" ? "" : Number(value);
+      return {
+        ...prev,
+        quantity: updated_quantity,
+        total: updated_quantity * prev.unit_price,
+      };
+    });
+  };
+
+  const handle_add_item = () => {
+    if (!selected_item_data || !selected_item_data.item_code) {
+      alert("Please select an item first.");
+      return;
+    }
+
+    const exists = selected_item_list.some(
+      (item) => item.item_code === selected_item_data.item_code,
+    );
+    if (exists) {
+      alert("This item is already added.");
+      return;
+    }
+
+    set_selected_item_list((prev) => [...prev, selected_item_data]);
+
+    set_selected_item_data({
+      item_code: "",
+      item_desc: "",
+      quantity: 1,
+      unit_price: "",
+      total: 0,
+    });
+  };
+
   // RETURN ORIGIN
   return (
     <React.Fragment>
@@ -144,10 +176,12 @@ const SO_Items = ({ handle_open_item_modal }) => {
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center md:w-[500px]">
               <div className="w-full">
                 <Icon_Field
-                  name="search"
+                  item_desc="search"
                   placeholder="Search..."
                   icon={Search}
                   icon_position="left"
+                  value={search_query}
+                  on_change={(e) => set_search_query(e.target.value)}
                 />
               </div>
               {/* + Dropdown Filter */}
@@ -219,174 +253,185 @@ const SO_Items = ({ handle_open_item_modal }) => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
-                {item_list.map((item, index) => {
-                  const is_active = selected_row === item.id;
-
-                  return (
-                    <tr
-                      key={item.id}
-                      className={`text-xs whitespace-nowrap ${
-                        is_active ? "bg-sky-50" : "hover:bg-gray-50"
-                      }`}
-                      onClick={() => handle_row_click(item.id)}
+                {filtered_item_list.length === 0 ? (
+                  <tr>
+                    <td
+                      colSpan={7}
+                      className="text-center py-4 text-gray-500 dark:text-gray-400"
                     >
-                      {columns
-                        .filter((col) => visible_columns.includes(col.key))
-                        .map((col) => {
-                          switch (col.key) {
-                            case "no":
-                              return (
-                                <td
-                                  key={col.key}
-                                  className="px-5 py-4 text-gray-500"
-                                >
-                                  {index + 1}
-                                </td>
-                              );
-                            case "price":
-                            case "net_price":
-                            case "total_gross":
-                            case "total_net":
-                              return (
-                                <td
-                                  key={col.key}
-                                  className="px-5 py-4 text-gray-500"
-                                >
-                                  {format_currency(item[col.key], 2, true)}
-                                </td>
-                              );
-                            case "discount":
-                              return (
-                                <td
-                                  key={col.key}
-                                  className="px-5 py-4 text-gray-500"
-                                >
-                                  {format_percentage(item[col.key], 0)}
-                                </td>
-                              );
-                            case "is_approved":
-                              return (
-                                <td
-                                  key={col.key}
-                                  className="px-5 py-4 text-gray-500"
-                                >
-                                  <Checkbox_Field
-                                    box_size={18}
-                                    icon_size={12}
-                                    checked={item.is_approved === 1}
-                                    disabled
-                                  />
-                                </td>
-                              );
-                            case "actions":
-                              return (
-                                <td key={col.key} className="px-5 py-4">
-                                  <div className="flex gap-2">
-                                    <div className="relative group flex jusity-center items-center">
+                      No record found.
+                    </td>
+                  </tr>
+                ) : (
+                  filtered_item_list.map((item, index) => {
+                    return (
+                      <tr
+                        key={item.item_code}
+                        draggable
+                        onDragStart={() => handle_drag_start(index)}
+                        onDragOver={handle_drag_over}
+                        onDrop={() => handle_drop(index)}
+                        className="text-xs hover:bg-gray-50/50"
+                      >
+                        {columns
+                          .filter((col) => visible_columns.includes(col.key))
+                          .map((col) => {
+                            switch (col.key) {
+                              case "no":
+                                return (
+                                  <td
+                                    key={col.key}
+                                    className="px-5 py-4 text-gray-500"
+                                  >
+                                    {index + 1}
+                                  </td>
+                                );
+                              case "price":
+                              case "net_price":
+                              case "total_gross":
+                              case "total_net":
+                                return (
+                                  <td
+                                    key={col.key}
+                                    className="px-5 py-4 text-gray-500"
+                                  >
+                                    {format_currency(item[col.key], 2, true)}
+                                  </td>
+                                );
+                              case "discount":
+                                return (
+                                  <td
+                                    key={col.key}
+                                    className="px-5 py-4 text-gray-500"
+                                  >
+                                    {format_percentage(item[col.key], 0)}
+                                  </td>
+                                );
+                              case "is_approved":
+                                return (
+                                  <td
+                                    key={col.key}
+                                    className="px-5 py-4 text-gray-500"
+                                  >
+                                    <Checkbox_Field
+                                      box_size={18}
+                                      icon_size={12}
+                                      checked={item.is_approved === 1}
+                                      disabled
+                                    />
+                                  </td>
+                                );
+                              case "actions":
+                                return (
+                                  <td key={col.key} className="px-5 py-4">
+                                    <div className="flex gap-2">
                                       <Button_Action
-                                        icon={FileText}
-                                        size={18}
-                                        tooltip="Show Details"
-                                        on_click={() =>
-                                          handle_show_details(item)
-                                        }
-                                      />
-                                    </div>
-                                    <div className="relative group flex jusity-center items-center">
-                                      <Button_Action
-                                        icon={SquarePen}
-                                        size={18}
+                                        icon={Edit}
                                         tooltip="Edit Item"
-                                        on_click={() => handle_edit_item(item)}
-                                      />
-                                    </div>
-                                    <div className="relative group flex jusity-center items-center">
-                                      <Button_Action
-                                        icon={Trash2}
-                                        size={18}
-                                        tooltip="Delete Item"
-                                        variant="danger"
+                                        size={20}
                                         // on_click={() => handle_edit_item(item)}
                                       />
+                                      <Button_Action
+                                        icon={Trash}
+                                        variant="danger"
+                                        tooltip="Remove Item"
+                                        size={20}
+                                        // on_click={() =>
+                                        //   handle_remove_item(item)
+                                        // }
+                                      />
                                     </div>
-                                  </div>
-                                </td>
-                              );
-                            default:
-                              return (
-                                <td
-                                  key={col.key}
-                                  className="px-5 py-4 text-gray-500"
-                                >
-                                  {item[col.key] ?? "-"}
-                                </td>
-                              );
-                          }
-                        })}
-                    </tr>
-                  );
-                })}
+                                  </td>
+                                );
+                              default:
+                                return (
+                                  <td
+                                    key={col.key}
+                                    className="px-5 py-4 text-gray-500"
+                                  >
+                                    {item[col.key] ?? "-"}
+                                  </td>
+                                );
+                            }
+                          })}
+                      </tr>
+                    );
+                  })
+                )}
               </tbody>
             </table>
           </div>
           {/* - Table */}
         </div>
         {/* - Section 1 */}
-        {/* + Section 2 */}
+        {/* + Add Item */}
         <div className="mt-5 rounded-lg border border-gray-100 bg-gray-50 p-4 sm:p-6 dark:border-gray-800 dark:bg-gray-900">
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 lg:grid-cols-12">
             <div className="w-full lg:col-span-3">
               <Text_Field
                 label="Item Code"
-                type={"number"}
-                // value={text}
+                type={"text"}
+                value={selected_item_data.item_code}
                 disabled
               />
             </div>
             <div className="w-full lg:col-span-9">
               <Find_Field
                 label="Item Description"
-                // value={search_value}
-                on_click={handle_open_item_modal}
+                value={selected_item_data.item_desc}
+                on_click={handle_show_select_item_modal}
                 disabled
               />
             </div>
-            <div className="w-full lg:col-span-4">
+            <div className="w-full lg:col-span-3">
               <Text_Field
                 label="Unit Price"
                 type={"text"}
-                // value={text}
-                disabled
-              />
-            </div>
-            <div className="w-full lg:col-span-2">
-              <Text_Field
-                label="Unit"
-                type={"text"}
-                // value={text}
+                // value={selected_item_data.unit_price}
+                // on_change={(e) => handle_unit_price_change(e.target.value)}
                 disabled
               />
             </div>
             <div className="w-full lg:col-span-2">
               <Quantity_Field
                 label="Quantity"
-                value={quantity}
-                on_change={set_quantity}
                 placeholder="0"
+                value={selected_item_data.quantity}
+                on_change={handle_quantity_change}
                 min={1}
               />
             </div>
-            <div className="flex w-full items-end lg:col-span-2">
+            <div className="w-full lg:col-span-2">
+              <Text_Field
+                label="Unit"
+                type={"text"}
+                value={selected_item_data.uom}
+                disabled
+              />
+            </div>
+            <div className="w-full lg:col-span-3">
+              <Text_Field
+                label="Total"
+                type={"text"}
+                value={format_currency(selected_item_data.total || 0, 2, false)}
+                disabled
+              />
+            </div>
+            {/* <div className="flex w-full items-end lg:col-span-2">
               <Button variant="white" width="w-full">
                 Discount
               </Button>
-            </div>
+            </div> */}
             <div className="flex w-full items-end lg:col-span-2">
               <Button
                 variant="primary"
                 width="w-full"
                 icon={CirclePlus}
-                onClick={handle_add_item}
+                on_click={handle_add_item}
+                disabled={
+                  selected_item_data.item_code === "" ||
+                  selected_item_data.quantity === ""
+                }
               >
                 Add Item
               </Button>
@@ -400,7 +445,7 @@ const SO_Items = ({ handle_open_item_modal }) => {
             </p>
           </div>
         </div>
-        {/* - Section 2 */}
+        {/* - Add Item */}
         {/* + Section 3 */}
         <div className="flex flex-wrap justify-between sm:justify-end">
           <div className="mt-6 w-full space-y-1 text-right sm:w-[270px]">
@@ -447,6 +492,14 @@ const SO_Items = ({ handle_open_item_modal }) => {
         is_open={display_item_modal === "edit_item"}
         on_close={() => set_display_item_modal("")}
         width="max-w-[1280px]"
+      />
+      <Select_Item
+        is_open={display_item_modal === "select_item"}
+        on_close={() => set_display_item_modal("")}
+        sales_org_code={new_so_data.sales_org_code}
+        dist_channel_code={new_so_data.dist_channel_code}
+        set_selected_item_data={set_selected_item_data}
+        selected_item_list={selected_item_list}
       />
       {/* - Modals */}
     </React.Fragment>

@@ -37,7 +37,7 @@ const PO_Items = ({
   const [remove_item_data, set_remove_item_data] = useState({});
 
   const filtered_item_list = selected_item_list.filter((item) =>
-    item.item_desc.toLowerCase().includes(search_query.toLowerCase())
+    item.item_desc.toLowerCase().includes(search_query.toLowerCase()),
   );
 
   const handle_quantity_change = (value) => {
@@ -67,7 +67,7 @@ const PO_Items = ({
     }
 
     const exists = selected_item_list.some(
-      (item) => item.item_code === selected_item_data.item_code
+      (item) => item.item_code === selected_item_data.item_code,
     );
     if (exists) {
       alert("This item is already added.");
@@ -135,7 +135,7 @@ const PO_Items = ({
 
   const gross_total = selected_item_list.reduce(
     (sum, item) => sum + (item.total || 0),
-    0
+    0,
   );
 
   const handle_show_details = () => {

@@ -5,63 +5,132 @@ import Checkbox_Field from "assets/elements/Checkbox_Field";
 import Button from "assets/elements/Button";
 import Pagination_Modal from "assets/elements/Pagination_Modal";
 
-const Select_Branch = ({
+const Select_SLOC = ({
   is_open,
   on_close,
   width = "max-w-[700px]",
-  height = "max-h-[500px]",
-  customer_master_list,
+  height = "h-[500px]",
+  selected_plant_code,
+  plant_list,
+  sloc_list,
+  plant_h_list,
   set_data,
   set_selected_item_list,
 }) => {
   // + Client-Side Filtering
-  const [filtered_customer_master_list, set_filtered_customer_master_list] =
-    useState([]);
+  const [filtered_plant_h_list, set_filtered_plant_h_list] = useState([]);
   const [current_page, set_current_page] = useState(1);
   const [rows_per_page, set_rows_per_page] = useState(5);
   const [search_query, set_search_query] = useState("");
-  const [selected_customer, set_selected_customer] = useState(null);
+  const [selected_plant_h, set_selected_plant_h] = useState(null);
+
+  const lookup_columns = [
+    {
+      code_key: "plant_code",
+      list: plant_list,
+      desc_key: "plant_desc",
+    },
+    {
+      code_key: "sloc_code",
+      list: sloc_list,
+      desc_key: "sloc_desc",
+    },
+  ];
+
+  const apply_lookups = (data, lookup_columns) => {
+    return data.map((row) => {
+      const updated = { ...row };
+
+      lookup_columns.forEach(({ code_key, list, desc_key }) => {
+        const code_value = row[code_key];
+        const match = list.find((item) => item[code_key] === code_value);
+
+        updated[desc_key] = match ? match[desc_key] : "";
+      });
+
+      return updated;
+    });
+  };
+
+  const get_searchable_fields = (lookup_columns) => {
+    const fields = [];
+
+    lookup_columns.forEach(({ code_key, desc_key }) => {
+      fields.push(code_key);
+      fields.push(desc_key);
+    });
+
+    return fields;
+  };
 
   useEffect(() => {
-    let data = [...customer_master_list];
+    // 1. Start with plant_h_list
+    let data = apply_lookups(plant_h_list, lookup_columns);
 
+    // 2. Filter by selected_plant_code
+    if (selected_plant_code) {
+      data = data.filter((row) => row.plant_code === selected_plant_code);
+    }
+
+    // 3. Searchable fields
+    const search_fields = get_searchable_fields(lookup_columns);
+
+    // 4. Perform search
     if (search_query.trim() !== "") {
       const q = search_query.toLowerCase();
-      data = data.filter(
-        (data) =>
-          data.customer_code.toLowerCase().includes(q) ||
-          data.customer_desc.toLowerCase().includes(q),
+
+      data = data.filter((row) =>
+        search_fields.some((field) =>
+          row[field]?.toString().toLowerCase().includes(q)
+        )
       );
     }
 
+    // 4. Pagination
     const start_idx = (current_page - 1) * rows_per_page;
     const end_idx = start_idx + rows_per_page;
-    set_filtered_customer_master_list(data.slice(start_idx, end_idx));
-  }, [customer_master_list, search_query, current_page, rows_per_page]);
 
-  const total_pages = Math.ceil(
-    customer_master_list.filter(
-      (data) =>
-        data.customer_code.toLowerCase().includes(search_query.toLowerCase()) ||
-        data.customer_desc.toLowerCase().includes(search_query.toLowerCase()),
-    ).length / rows_per_page,
-  );
+    set_filtered_plant_h_list(data.slice(start_idx, end_idx));
+  }, [
+    plant_h_list,
+    selected_plant_code,
+    search_query,
+    current_page,
+    rows_per_page,
+  ]);
+
+  // 1. Apply lookup to plant_h_list
+  const lookup_applied_list = apply_lookups(plant_h_list, lookup_columns);
+
+  // 2. Generate searchable fields
+  const search_fields = get_searchable_fields(lookup_columns);
+
+  // 3. Filter count based on search
+  const filtered_count = lookup_applied_list.filter((row) => {
+    const q = search_query.toLowerCase();
+
+    return search_fields.some((field) =>
+      row[field]?.toString().toLowerCase().includes(q)
+    );
+  }).length;
+
+  // 4. Calculate total pages
+  const total_pages = Math.ceil(filtered_count / rows_per_page);
 
   const handle_page_change = (page) => set_current_page(page);
   // - Client-Side Filtering
 
-  const handle_select_branch = () => {
-    if (!selected_customer) {
-      alert("Please select a branch before proceeding.");
+  const handle_select_plant = () => {
+    if (!selected_plant_h) {
+      alert("Please select a data before proceeding.");
       return;
     }
     set_data((prev) => ({
       ...prev,
-      customer_code: selected_customer.customer_code,
-      customer_sh_code: "",
+      sloc_code: selected_plant_h.sloc_code,
     }));
     set_selected_item_list([]);
-    set_selected_customer(null);
+    set_selected_plant_h(null);
     on_close();
   };
 
@@ -85,7 +154,7 @@ const Select_Branch = ({
           </button>
           {/* + Modal Label */}
           <div className="text-lg md:text-xl font-bold mb-5 px-7">
-            Sold to Customer Selection
+            Storage Location Selection
           </div>
           {/* - Modal Label */}
           {/* + Modal Body */}
@@ -113,7 +182,7 @@ const Select_Branch = ({
                     <tr className="font-semibold text-xs">
                       <th className="px-6 py-3 w-[80px]"></th>
                       <th className="px-6 py-3 text-gray-500 text-left">
-                        Branch
+                        Storage Location
                       </th>
                       <th className="px-6 py-3 text-gray-500 text-left">
                         Creation Date
@@ -122,7 +191,7 @@ const Select_Branch = ({
                   </thead>
 
                   <tbody className="divide-y divide-gray-100">
-                    {filtered_customer_master_list.length === 0 ? (
+                    {filtered_plant_h_list.length === 0 ? (
                       <tr>
                         <td
                           colSpan={3}
@@ -132,13 +201,13 @@ const Select_Branch = ({
                         </td>
                       </tr>
                     ) : (
-                      filtered_customer_master_list.map((data) => (
+                      filtered_plant_h_list.map((data) => (
                         <tr
                           key={data.id}
                           className={`hover:bg-sky-50/50 cursor-pointer text-[12px] ${
-                            selected_customer?.id === data.id ? "bg-sky-50" : ""
+                            selected_plant_h?.id === data.id ? "bg-sky-50" : ""
                           }`}
-                          onClick={() => set_selected_customer(data)}
+                          onClick={() => set_selected_plant_h(data)}
                         >
                           <td className="px-5 py-4 sm:px-6 text-center">
                             <div className="flex justify-center items-center">
@@ -146,18 +215,18 @@ const Select_Branch = ({
                                 name="check"
                                 box_size={18}
                                 icon_size={12}
-                                checked={selected_customer?.id === data.id}
-                                on_change={() => set_selected_customer(data)}
+                                checked={selected_plant_h?.id === data.id}
+                                on_change={() => set_selected_plant_h(data)}
                               />
                             </div>
                           </td>
                           <td className="px-5 py-4 sm:px-6">
                             <div className="block font-medium text-gray-800">
                               <span className="block text-gray-500 text-[10px]">
-                                {data.customer_code}
+                                {data.sloc_code}
                               </span>
                               <span className="block text-gray-800 text-[13px]">
-                                {data.customer_desc}
+                                {data.sloc_desc}
                               </span>
                             </div>
                           </td>
@@ -191,9 +260,9 @@ const Select_Branch = ({
             <div className="flex justify-center sm:justify-end gap-2 w-full">
               <Button
                 variant="primary"
-                on_click={handle_select_branch}
+                on_click={handle_select_plant}
                 class_name="w-full md:w-[100px]"
-                disabled={!selected_customer}
+                disabled={!selected_plant_h}
               >
                 Proceed
               </Button>
@@ -214,4 +283,4 @@ const Select_Branch = ({
   ) : null;
 };
 
-export default Select_Branch;
+export default Select_SLOC;

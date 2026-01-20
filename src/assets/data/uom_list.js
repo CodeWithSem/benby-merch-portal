@@ -7,6 +7,12 @@ export const uom_list = [
   },
   {
     id: 2,
+    uom_code: "PC",
+    uom_desc: "Piece",
+    creation_date: "MM-DD-YYYY",
+  },
+  {
+    id: 3,
     uom_code: "KG",
     uom_desc: "Kilogram",
     creation_date: "MM-DD-YYYY",

@@ -28,7 +28,6 @@ import Edit_SO from "./edit_so/Edit_SO";
 import Post_View_SO from "./post_view_so/Post_View_SO";
 import Select_SO_Type from "./modals/select_so_type/Select_SO_Type";
 import Delete_SO from "./modals/delete_so/Delete_SO";
-import { plant_list, sloc_list } from "./SO_DATA_MAP";
 import { so_type_h_list } from "assets/data/so_type_h_list";
 import { so_type_list } from "assets/data/so_type_list";
 import { sales_org_list } from "assets/data/sales_org_list";
@@ -37,6 +36,8 @@ import { customer_master_list } from "assets/data/customer_master_list";
 import { customer_sh_list } from "assets/data/customer_sh_list";
 import { ship_to_h_list } from "assets/data/ship_to_h_list";
 import { order_reason_list } from "assets/data/order_reason_list";
+import { plant_list } from "assets/data/plant_list";
+import { sloc_list } from "assets/data/sloc_list";
 import Select_Generic from "assets/elements/modals/Select_Generic";
 
 const Sales_Order = () => {
@@ -49,6 +50,7 @@ const Sales_Order = () => {
   const [start_date, set_start_date] = useState(today);
   const [end_date, set_end_date] = useState(today);
   const [show_load_data_button, set_show_load_data_button] = useState(false);
+  const [selected_item_list, set_selected_item_list] = useState([]);
 
   const [new_so_data, set_new_so_data] = useState({});
 
@@ -101,7 +103,7 @@ const Sales_Order = () => {
           if (col.key === "actions") return false;
           const val = u[col.key];
           return val?.toString().toLowerCase().includes(q);
-        })
+        }),
       );
     }
 
@@ -139,9 +141,9 @@ const Sales_Order = () => {
               ?.toString()
               .toLowerCase()
               .includes(debounced_query.toLowerCase());
-          })
+          }),
         ).length
-      : so_list.length) / select_option
+      : so_list.length) / select_option,
   );
 
   const handle_sort = (column) => {
@@ -558,14 +560,18 @@ const Sales_Order = () => {
         <Create_New_SO
           set_page={set_page}
           so_data={{
+            show_toast,
             so_type_list,
             sales_org_list,
+            dist_channel_list,
             customer_master_list,
             customer_sh_list,
             ship_to_h_list,
             order_reason_list,
             plant_list,
             sloc_list,
+            selected_item_list,
+            set_selected_item_list,
             new_so_data,
             set_new_so_data,
           }}

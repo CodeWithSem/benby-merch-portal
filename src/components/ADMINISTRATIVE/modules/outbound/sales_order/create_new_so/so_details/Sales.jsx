@@ -84,7 +84,7 @@ const Sales = ({ so_data }) => {
                 new_so_data.sa_order_reason_code,
                 order_reason_list,
                 "order_reason_code",
-                "order_reason_desc"
+                "order_reason_desc",
               )}
               on_click={() => set_display_modal("select_order_reason")}
               disabled

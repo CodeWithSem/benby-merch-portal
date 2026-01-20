@@ -73,7 +73,7 @@ const Create_New_Batch = ({
       const response = await api_create_batch_master(
         new_batch_data,
         active_user?.username,
-        show_toast
+        show_toast,
       );
       if (response.success) {
         set_batch_list((prev) => [...prev, response.data]);
@@ -215,7 +215,7 @@ const Create_New_Batch = ({
                     new_batch_data.branch_code,
                     branch_list,
                     "branch_code",
-                    "branch_desc"
+                    "branch_desc",
                   )}
                   on_click={() => set_display_modal("select_branch")}
                   disabled
@@ -231,7 +231,7 @@ const Create_New_Batch = ({
                     new_batch_data.plant_code,
                     plant_list,
                     "plant_code",
-                    "plant_desc"
+                    "plant_desc",
                   )}
                   on_click={() => set_display_modal("select_plant")}
                   disabled
@@ -247,7 +247,7 @@ const Create_New_Batch = ({
                     new_batch_data.sloc_code,
                     sloc_list,
                     "sloc_code",
-                    "sloc_desc"
+                    "sloc_desc",
                   )}
                   on_click={() => set_display_modal("select_sloc")}
                   disabled
@@ -262,7 +262,7 @@ const Create_New_Batch = ({
                   new_batch_data.item_code,
                   item_master_list,
                   "item_code",
-                  "item_desc"
+                  "item_desc",
                 )}
                 on_click={() => set_display_modal("select_item")}
                 disabled

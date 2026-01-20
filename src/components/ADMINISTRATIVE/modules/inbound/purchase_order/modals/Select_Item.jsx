@@ -12,15 +12,7 @@ const Select_Item = ({
   width = "max-w-[700px]",
   height = "h-[500px]",
 }) => {
-  const [item_list, set_item_list] = useState([
-    {
-      id: 1,
-      item_code: "ITM-00000001",
-      item_desc: "Item Description",
-      unit_price: 0,
-      creation_date: "06-05-2025",
-    },
-  ]);
+  const [item_list, set_item_list] = useState([]);
 
   // + Client-Side Filtering
   const [filtered_item_list, set_filtered_item_list] = useState([]);
@@ -37,7 +29,7 @@ const Select_Item = ({
       data = data.filter(
         (data) =>
           data.item_code.toLowerCase().includes(q) ||
-          data.item_desc.toLowerCase().includes(q)
+          data.item_desc.toLowerCase().includes(q),
       );
     }
 
@@ -50,8 +42,8 @@ const Select_Item = ({
     item_list.filter(
       (data) =>
         data.item_code.toLowerCase().includes(search_query.toLowerCase()) ||
-        data.item_desc.toLowerCase().includes(search_query.toLowerCase())
-    ).length / rows_per_page
+        data.item_desc.toLowerCase().includes(search_query.toLowerCase()),
+    ).length / rows_per_page,
   );
 
   const handle_page_change = (page) => set_current_page(page);

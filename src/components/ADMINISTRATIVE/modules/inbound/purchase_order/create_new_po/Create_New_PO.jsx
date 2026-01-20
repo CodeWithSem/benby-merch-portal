@@ -143,7 +143,7 @@ const Create_New_PO = ({
       const response = await api_create_purchase_order(
         final_po_data,
         active_user?.username,
-        show_toast
+        show_toast,
       );
       if (response.success) {
         set_po_list((prev) => [...prev, response.data]);
@@ -249,7 +249,7 @@ const Create_New_PO = ({
                       new_po_data.po_type_code,
                       po_type_list,
                       "po_type_code",
-                      "po_type_desc"
+                      "po_type_desc",
                     )}
                     disabled
                   />
@@ -264,7 +264,7 @@ const Create_New_PO = ({
                       new_po_data.vendor_code,
                       vendor_master_list,
                       "vendor_code",
-                      "vendor_desc"
+                      "vendor_desc",
                     )}
                     on_click={() => set_display_modal("select_vendor")}
                     disabled
@@ -280,7 +280,7 @@ const Create_New_PO = ({
                       new_po_data.branch_code,
                       branch_list,
                       "branch_code",
-                      "branch_desc"
+                      "branch_desc",
                     )}
                     on_click={() => set_display_modal("select_branch")}
                     disabled
@@ -296,7 +296,7 @@ const Create_New_PO = ({
                       new_po_data.plant_code,
                       plant_list,
                       "plant_code",
-                      "plant_desc"
+                      "plant_desc",
                     )}
                     on_click={() => set_display_modal("select_plant")}
                     disabled
@@ -312,7 +312,7 @@ const Create_New_PO = ({
                       new_po_data.sloc_code,
                       sloc_list,
                       "sloc_code",
-                      "sloc_desc"
+                      "sloc_desc",
                     )}
                     on_click={() => set_display_modal("select_sloc")}
                     disabled

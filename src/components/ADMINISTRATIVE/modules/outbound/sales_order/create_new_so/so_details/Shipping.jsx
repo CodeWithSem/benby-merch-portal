@@ -1,10 +1,26 @@
-import React from "react";
+import React, { useState } from "react";
 import Date_Field from "assets/elements/Date_Field";
 import Text_Code_Field from "assets/elements/Text_Code_Field";
 import Text_Field from "assets/elements/Text_Field";
 import Textarea_Field from "assets/elements/Textarea_Field";
+import Select_Branch from "../../modals/select_hierarchy/Select_Branch";
+import Select_Plant from "../../modals/select_hierarchy/Select_Plant";
+import Select_SLOC from "../../modals/select_hierarchy/Select_SLOC";
+import { get_description } from "assets/scripts/functions/get_description";
 
-const Shipping = ({ handle_open_plant_modal, handle_open_sloc_modal }) => {
+const Shipping = ({ so_data }) => {
+  const {
+    branch_list,
+    branch_h_list,
+    plant_list,
+    plant_h_list,
+    sloc_list,
+    set_selected_item_list,
+    new_so_data,
+    set_new_so_data,
+  } = so_data;
+
+  const [display_modal, set_display_modal] = useState("");
   // RETURN ORIGIN
   return (
     <React.Fragment>
@@ -13,23 +29,49 @@ const Shipping = ({ handle_open_plant_modal, handle_open_sloc_modal }) => {
         <div className="grid grid-cols-1 gap-5">
           <div>
             <Text_Code_Field
-              label="Plant / DC"
-              // code_value={code_data}
-              // text_value={text_data}
+              label="Branch"
               code_width="150px"
               show_search_button={true}
-              on_click={handle_open_plant_modal}
+              code_value={new_so_data.branch_code}
+              text_value={get_description(
+                new_so_data.branch_code,
+                branch_list,
+                "branch_code",
+                "branch_desc",
+              )}
+              on_click={() => set_display_modal("select_branch")}
+              disabled
+            />
+          </div>
+          <div>
+            <Text_Code_Field
+              label="Plant"
+              code_width="150px"
+              show_search_button={true}
+              code_value={new_so_data.plant_code}
+              text_value={get_description(
+                new_so_data.plant_code,
+                plant_list,
+                "plant_code",
+                "plant_desc",
+              )}
+              on_click={() => set_display_modal("select_plant")}
               disabled
             />
           </div>
           <div>
             <Text_Code_Field
               label="SLOC"
-              // code_value={code_data}
-              // text_value={text_data}
               code_width="150px"
               show_search_button={true}
-              on_click={handle_open_sloc_modal}
+              code_value={new_so_data.sloc_code}
+              text_value={get_description(
+                new_so_data.sloc_code,
+                sloc_list,
+                "sloc_code",
+                "sloc_desc",
+              )}
+              on_click={() => set_display_modal("select_sloc")}
               disabled
             />
           </div>
@@ -83,6 +125,41 @@ const Shipping = ({ handle_open_plant_modal, handle_open_sloc_modal }) => {
         </div>
       </div>
       {/* - Section 3 */}
+      {/* + Modals */}
+      <Select_Branch
+        is_open={display_modal === "select_branch"}
+        on_close={() => set_display_modal("")}
+        width="max-w-[1000px]"
+        height="max-h-[700px]"
+        branch_list={branch_list}
+        set_data={set_new_so_data}
+        set_selected_item_list={set_selected_item_list}
+      />
+      <Select_Plant
+        is_open={display_modal === "select_plant"}
+        on_close={() => set_display_modal("")}
+        width="max-w-[1000px]"
+        height="max-h-[700px]"
+        selected_branch_code={new_so_data.branch_code}
+        branch_list={branch_list}
+        plant_list={plant_list}
+        branch_h_list={branch_h_list}
+        set_data={set_new_so_data}
+        set_selected_item_list={set_selected_item_list}
+      />
+      <Select_SLOC
+        is_open={display_modal === "select_sloc"}
+        on_close={() => set_display_modal("")}
+        width="max-w-[1000px]"
+        height="max-h-[700px]"
+        selected_plant_code={new_so_data.plant_code}
+        plant_list={plant_list}
+        sloc_list={sloc_list}
+        plant_h_list={plant_h_list}
+        set_data={set_new_so_data}
+        set_selected_item_list={set_selected_item_list}
+      />
+      {/* - Modals */}
     </React.Fragment>
   );
 };

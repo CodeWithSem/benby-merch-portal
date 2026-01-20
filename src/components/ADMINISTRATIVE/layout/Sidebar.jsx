@@ -9,6 +9,7 @@ import {
   PackagePlus,
   PackageMinus,
   Settings,
+  Calculator,
 } from "lucide-react";
 import delphys_logo from "../../../assets/images/delphys-sidebar-logo.png";
 import { useToast } from "./Toast_Provider";
@@ -99,6 +100,17 @@ const Sidebar = ({
         { name: "Stock Transfer", sub_module_code: "WH3" },
         { name: "Inventory Master", sub_module_code: "WH4" },
         { name: "Item Master", sub_module_code: "WH5" },
+      ],
+    },
+    {
+      key: "Financial",
+      module_code: "FN",
+      type: "dropdown",
+      name: "Financial",
+      icon: <Calculator size={18} />,
+      sub_items: [
+        { name: "Pricing Procedure", sub_module_code: "FN1" },
+        { name: "Discount Procedure", sub_module_code: "FN2" },
       ],
     },
     {
@@ -298,13 +310,13 @@ const Sidebar = ({
             const filtered_sub_items = show_all_modules
               ? item.sub_items
               : item.sub_items?.filter((sub) =>
-                  allowed_sub_modules.includes(sub.sub_module_code)
+                  allowed_sub_modules.includes(sub.sub_module_code),
                 ) || [];
 
             if (!filtered_sub_items.length) return null;
 
             const is_parent_active = filtered_sub_items.some(
-              (sub) => active_item === `${item.key}-${sub.name}`
+              (sub) => active_item === `${item.key}-${sub.name}`,
             );
 
             return (

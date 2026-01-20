@@ -19,17 +19,24 @@ import Select_SLOC from "../modals/Select_SLOC";
 import Select_Item from "../modals/Select_Item";
 import { get_description } from "assets/scripts/functions/get_description";
 import Select_Generic from "assets/elements/modals/Select_Generic";
+import { plant_h_list } from "assets/data/plant_h_list";
+import { branch_list } from "assets/data/branch_list";
+import { branch_h_list } from "assets/data/branch_h_list";
 
 const Create_New_SO = ({ set_page, so_data }) => {
   const {
+    show_toast,
     so_type_list,
     sales_org_list,
+    dist_channel_list,
     customer_master_list,
     customer_sh_list,
     ship_to_h_list,
     order_reason_list,
     plant_list,
     sloc_list,
+    selected_item_list,
+    set_selected_item_list,
     new_so_data,
     set_new_so_data,
   } = so_data;
@@ -199,7 +206,7 @@ const Create_New_SO = ({ set_page, so_data }) => {
                         new_so_data.so_type_code,
                         so_type_list,
                         "so_type_code",
-                        "so_type_desc"
+                        "so_type_desc",
                       )}
                       disabled
                     />
@@ -214,7 +221,22 @@ const Create_New_SO = ({ set_page, so_data }) => {
                         new_so_data.sales_org_code,
                         sales_org_list,
                         "sales_org_code",
-                        "sales_org_desc"
+                        "sales_org_desc",
+                      )}
+                      disabled
+                    />
+                  </div>
+                  <div className="col-span-full">
+                    <Text_Code_Field
+                      label="Distribution Channel"
+                      code_width="150px"
+                      show_search_button={false}
+                      code_value={new_so_data.dist_channel_code}
+                      text_value={get_description(
+                        new_so_data.dist_channel_code,
+                        dist_channel_list,
+                        "dist_channel_code",
+                        "dist_channel_desc",
                       )}
                       disabled
                     />
@@ -228,7 +250,7 @@ const Create_New_SO = ({ set_page, so_data }) => {
                         new_so_data.customer_code,
                         customer_master_list,
                         "customer_code",
-                        "customer_desc"
+                        "customer_desc",
                       )}
                       on_click={() => set_display_modal("select_sold_to")}
                       disabled
@@ -236,7 +258,7 @@ const Create_New_SO = ({ set_page, so_data }) => {
                   </div>
                   <div className="col-span-full">
                     <Text_Code_Field
-                      label="Sold to Party / Address"
+                      label="Ship to Party / Address"
                       code_width="150px"
                       show_search_button={!!new_so_data.customer_code}
                       code_value={new_so_data.customer_sh_code}
@@ -244,7 +266,7 @@ const Create_New_SO = ({ set_page, so_data }) => {
                         new_so_data.customer_sh_code,
                         customer_sh_list,
                         "customer_sh_code",
-                        "customer_sh_desc"
+                        "customer_sh_desc",
                       )}
                       on_click={() => set_display_modal("select_ship_to")}
                       disabled
@@ -290,8 +312,16 @@ const Create_New_SO = ({ set_page, so_data }) => {
                 )}
                 {active_tab === "shipping" && (
                   <Shipping
-                    handle_open_plant_modal={handle_open_plant_modal}
-                    handle_open_sloc_modal={handle_open_sloc_modal}
+                    so_data={{
+                      branch_list,
+                      branch_h_list,
+                      plant_list,
+                      plant_h_list,
+                      sloc_list,
+                      set_selected_item_list,
+                      new_so_data,
+                      set_new_so_data,
+                    }}
                   />
                 )}
                 {active_tab === "instructions" && <Instructions />}
@@ -303,7 +333,14 @@ const Create_New_SO = ({ set_page, so_data }) => {
           </div>
           {/* - Section 2 */}
           {/* + Section 3 */}
-          <SO_Items handle_open_item_modal={handle_open_item_modal} />
+          <SO_Items
+            so_data={{
+              show_toast,
+              new_so_data,
+              selected_item_list,
+              set_selected_item_list,
+            }}
+          />
           {/* - Section 3 */}
           {/* + Section 4 */}
           <div className="p-4 sm:p-8 border-t">
@@ -370,6 +407,7 @@ const Create_New_SO = ({ set_page, so_data }) => {
         height="max-h-[700px]"
         customer_master_list={customer_master_list}
         set_data={set_new_so_data}
+        set_selected_item_list={set_selected_item_list}
       />
       {/* <Select_Sold_To
         is_open={display_modal === "select_sold_to"}
@@ -396,7 +434,7 @@ const Create_New_SO = ({ set_page, so_data }) => {
         height="max-h-[700px]"
         customer_sh_list={customer_sh_list}
       /> */}
-      <Select_Plant
+      {/* <Select_Plant
         is_open={display_modal === "select_plant"}
         on_close={() => set_display_modal("")}
         width="max-w-[1000px]"
@@ -415,7 +453,7 @@ const Create_New_SO = ({ set_page, so_data }) => {
         on_close={() => set_display_modal("")}
         width="max-w-[1000px]"
         height="max-h-[700px]"
-      />
+      /> */}
     </React.Fragment>
   );
 };
