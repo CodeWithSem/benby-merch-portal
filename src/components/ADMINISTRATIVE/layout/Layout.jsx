@@ -44,8 +44,9 @@ import Progress from "../modules/production/progress/Progress";
 import { useToast } from "./Toast_Provider";
 import Button from "assets/elements/Button";
 import { Use_App } from "../../../context/app_context";
+import Pricing_Condition from "../modules/financial/pricing_condition/Pricing_Condition";
+import Discount_Condition from "../modules/financial/discount_condition/Discount_Condition";
 import Pricing_Procedure from "../modules/financial/pricing_procedure/Pricing_Procedure";
-import Discount_Procedure from "../modules/financial/discount_procedure/Discount_Procedure";
 
 const Layout = () => {
   const { set_page } = Use_App();
@@ -121,10 +122,12 @@ const Layout = () => {
         return <Inventory_Master />;
       case "Warehouse-Item Master":
         return <Item_Master />;
+      case "Financial-Pricing Condition":
+        return <Pricing_Condition />;
+      case "Financial-Discount Condition":
+        return <Discount_Condition />;
       case "Financial-Pricing Procedure":
         return <Pricing_Procedure />;
-      case "Financial-Discount Procedure":
-        return <Discount_Procedure />;
       case "Maintenance-General Structure":
         return <General_Structure />;
       case "Maintenance-Financial":

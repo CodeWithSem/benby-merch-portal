@@ -83,7 +83,7 @@ const Prod_Plan_List = ({
   const [remove_item_data, set_remove_item_data] = useState({});
 
   const filtered_item_list = selected_prod_plan_list.filter((item) =>
-    item.item_desc.toLowerCase().includes(search_query.toLowerCase())
+    item.item_desc.toLowerCase().includes(search_query.toLowerCase()),
   );
 
   const handle_quantity_change = (value) => {
@@ -106,14 +106,14 @@ const Prod_Plan_List = ({
       selected_item_data.item_code,
       item_master_list,
       "item_code",
-      "item_desc"
+      "item_desc",
     );
 
     const machine_desc = get_description(
       selected_item_data.machine_code,
       prod_machine_list,
       "machine_code",
-      "machine_desc"
+      "machine_desc",
     );
 
     set_selected_prod_plan_list((prev) => [
@@ -144,7 +144,7 @@ const Prod_Plan_List = ({
     if (!selected_item_data.item_code) return [];
 
     const item = item_master_list.find(
-      (i) => i.item_code === selected_item_data.item_code
+      (i) => i.item_code === selected_item_data.item_code,
     );
 
     if (!item?.pad_code) return [];
@@ -153,7 +153,7 @@ const Prod_Plan_List = ({
   })();
 
   const selected_item = item_master_list.find(
-    (i) => i.item_code === selected_item_data.item_code
+    (i) => i.item_code === selected_item_data.item_code,
   );
 
   const pc_per_cs = selected_item?.cc1_ac_pc_cs ?? 1;
@@ -339,7 +339,7 @@ const Prod_Plan_List = ({
                   selected_item_data.machine_code,
                   prod_machine_list,
                   "machine_code",
-                  "machine_desc"
+                  "machine_desc",
                 )}
                 on_click={() => set_display_item_modal("select_machine")}
                 disabled
@@ -360,7 +360,7 @@ const Prod_Plan_List = ({
                   selected_item_data.item_code,
                   item_master_list,
                   "item_code",
-                  "item_desc"
+                  "item_desc",
                 )}
                 on_click={handle_show_select_item_modal}
                 disabled

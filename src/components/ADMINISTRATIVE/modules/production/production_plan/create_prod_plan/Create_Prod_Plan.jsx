@@ -50,7 +50,7 @@ const Create_Prod_Plan = ({
       const response = await api_create_prod_plan_rtdb(
         new_data,
         active_user?.username,
-        show_toast
+        show_toast,
       );
       if (response.success) {
         set_prod_plan_list((prev) => [...prev, response.data]);
@@ -122,7 +122,7 @@ const Create_Prod_Plan = ({
   };
 
   const handle_text_change = handle_text_change_function(
-    set_new_prod_plan_data
+    set_new_prod_plan_data,
   );
 
   // RETURN ORIGIN

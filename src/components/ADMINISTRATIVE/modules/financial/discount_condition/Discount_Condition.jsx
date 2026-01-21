@@ -21,91 +21,68 @@ import Select_Field from "assets/elements/Select_Field";
 import Pagination from "assets/elements/Pagination";
 import Spinner from "assets/elements/Spinner";
 import { format_currency } from "assets/scripts/format";
-import Create_Price_Proc from "./create/Create_Price_Proc";
-// import Create_Pricing_Con from "./create/Create_Pricing_Con";
+import Create_Discount_Con from "./create/Create_Discount_Con";
 
 /* MOCK API */
-const api_get_price_proc_list = async () => ({
+const api_get_discount_conedure_list = async () => ({
   success: true,
   data: [
     {
       id: 1,
-      price_proc_code: "GEN-8802",
-      proc_category_code: "GEN",
-      item_code: "8802",
-      item_group_code: "",
-      item_group_1_code: "",
-      item_group_2_code: "",
-      item_group_3_code: "",
-      item_group_4_code: "",
-      item_group_5_code: "",
-      customer_code: "",
-      customer_group_code: "",
-      base_price: 120,
-      discount_category_code: "",
-      discount_price: 120,
-      discount_proc_list: [],
-      currency: "PHP",
-      uom: "CS",
-      tax_rate: 12,
-      valid_from: "01-01-2026",
-      valid_to: "01-01-2027",
+      discount_con_code: "DGEN-8802",
+      discount_type: "Percent",
+      discount_value: 5,
+      min_qty: 0,
+      status: "Active",
+    },
+    {
+      id: 2,
+      discount_con_code: "DC01-CS0001-8802",
+      discount_type: "Amount",
+      discount_value: 10,
+      min_qty: 0,
       status: "Active",
     },
   ],
 });
 
-const Pricing_Procedure = () => {
+const Discount_Condition = () => {
   const { active_user } = Use_App();
   const { show_toast } = useToast();
 
   const [page, set_page] = useState("main");
-  const [display_modal, set_display_modal] = useState("");
   const [loading_list, set_loading_list] = useState(false);
-
-  const [price_proc_list, set_price_proc_list] = useState([]);
-  const [edit_data, set_edit_data] = useState({});
-  const [new_price_proc_data, set_new_price_proc_data] = useState({});
-  const [view_data, set_view_data] = useState({});
-  const [delete_data, set_delete_data] = useState({});
+  const [discount_list, set_discount_list] = useState([]);
+  const [new_discount_con_data, set_new_discount_con_data] = useState({});
 
   const columns = [
     { key: "index", label: "#", sortable: false },
-    { key: "price_proc_code", label: "Pricing Proc. Code", sortable: true },
     {
-      key: "proc_category_code",
-      label: "Category",
+      key: "discount_con_code",
+      label: "Discount Con. Code",
       sortable: true,
     },
-    { key: "item_code", label: "Item Code", sortable: true },
-    { key: "base_price", label: "Base Price", sortable: true },
-    {
-      key: "discount_category_code",
-      label: "Discount Category",
-      sortable: true,
-    },
-    { key: "discount_price", label: "Discount Price", sortable: true },
-    { key: "currency", label: "Currency", sortable: true },
-    { key: "uom", label: "UoM", sortable: true },
-    // { key: "tax_rate", label: "Tax %", sortable: true },
-    { key: "valid_from", label: "Valid From", sortable: true },
-    { key: "valid_to", label: "Valid To", sortable: true },
+    { key: "discount_type", label: "Type", sortable: true },
+    { key: "discount_value", label: "Discount", sortable: true },
+    { key: "min_qty", label: "Min Qty", sortable: true },
+    // { key: "valid_from", label: "Valid From", sortable: true },
+    // { key: "valid_to", label: "Valid To", sortable: true },
     { key: "status", label: "Status", sortable: true },
     { key: "actions", label: "", sortable: false },
   ];
 
-  const handle_get_price_proc_list = async () => {
+  const handle_get_discount_list = async () => {
     set_loading_list(true);
-    const response = await api_get_price_proc_list();
-    if (response.success) set_price_proc_list(response.data);
+    const response = await api_get_discount_conedure_list();
+    if (response.success) set_discount_list(response.data);
     set_loading_list(false);
   };
 
   useEffect(() => {
-    handle_get_price_proc_list();
+    handle_get_discount_list();
   }, []);
 
-  /* + Client-Side Filtering (COPIED FROM BATCH.JSX) */
+  /* + Client-Side Filtering (COPIED FROM Pricing_Procedure) */
   const [filtered_list, set_filtered_list] = useState([]);
   const [show_entries, set_show_entries] = useState(5);
   const [current_page, set_current_page] = useState(1);
@@ -123,7 +100,7 @@ const Pricing_Procedure = () => {
   }, [search_query]);
 
   useEffect(() => {
-    let temp = [...price_proc_list];
+    let temp = [...discount_list];
 
     if (debounced_query.trim() !== "") {
       const q = debounced_query.toLowerCase();
@@ -139,8 +116,8 @@ const Pricing_Procedure = () => {
     temp.sort((a, b) => {
       const val_a = a[sort_by];
       const val_b = b[sort_by];
-      if (val_a == null) return 1;
-      if (val_b == null) return -1;
+      if (val_a == "") return 1;
+      if (val_b == "") return -1;
       if (val_a < val_b) return sort_order === "asc" ? -1 : 1;
       if (val_a > val_b) return sort_order === "asc" ? 1 : -1;
       return 0;
@@ -157,7 +134,7 @@ const Pricing_Procedure = () => {
 
     set_filtered_list(indexed_data);
   }, [
-    price_proc_list,
+    discount_list,
     debounced_query,
     sort_by,
     sort_order,
@@ -167,7 +144,7 @@ const Pricing_Procedure = () => {
 
   const total_pages = Math.ceil(
     (debounced_query
-      ? price_proc_list.filter((u) =>
+      ? discount_list.filter((u) =>
           columns.some((col) => {
             if (col.key === "actions") return false;
             const val = u[col.key];
@@ -177,7 +154,7 @@ const Pricing_Procedure = () => {
               .includes(debounced_query.toLowerCase());
           }),
         ).length
-      : price_proc_list.length) / show_entries,
+      : discount_list.length) / show_entries,
   );
 
   const handle_sort = (column) => {
@@ -191,12 +168,12 @@ const Pricing_Procedure = () => {
   };
 
   const handle_page_change = (page) => set_current_page(page);
-  /* - Client-Side Filtering */
 
+  // RETURN ORIGIN
   return (
     <React.Fragment>
       {page === "main" && (
-        <div className="w-full">
+        <div>
           {/* + Title */}
           <div className="flex flex-wrap items-center justify-between gap-3 py-5">
             <h1 className="text-xl">Financial</h1>
@@ -216,35 +193,34 @@ const Pricing_Procedure = () => {
                 </li>
                 <li className="flex items-center gap-1.5 text-sm text-gray-500">
                   <span>/</span>
-                  <span className="text-gray-800">Pricing Procedure</span>
+                  <span className="text-gray-800">Discount Condition</span>
                 </li>
               </ol>
             </nav>
             {/* - Breadcrumbs */}
           </div>
           {/* - Title */}
+
           <div className="w-full bg-white rounded-lg border">
             <div className="flex justify-between items-center p-5">
-              <h1 className="text-lg">Pricing Procedure</h1>
+              <h1 className="text-lg">Discount Condition</h1>
               <Button
                 variant="primary"
                 icon={PlusCircle}
                 icon_position="left"
                 on_click={() => set_page("create")}
               >
-                Create Pricing Procedure
+                Create Discount Condition
               </Button>
             </div>
 
             <div className="p-5 sm:p-6 border-t">
-              {/* + Pricing Procedure List */}
               <div className="w-full border rounded-lg">
                 <div className="w-full md:flex md:justify-between p-4 gap-4">
                   <div className="flex items-center text-sm gap-2">
                     <div>Show</div>
                     <div className="w-[90px]">
                       <Select_Field
-                        name="option"
                         value={show_entries}
                         on_change={(e) => {
                           set_show_entries(Number(e.target.value));
@@ -262,21 +238,18 @@ const Pricing_Procedure = () => {
                       variant="white"
                       icon={RefreshCw}
                       icon_position="left"
-                      on_click={handle_get_price_proc_list}
+                      on_click={handle_get_discount_list}
                     />
                   </div>
+
                   <div className="w-full mt-4 md:mt-0 md:w-[600px]">
-                    <div className="w-full flex items-center gap-2">
-                      <div className="w-full">
-                        <Icon_Field
-                          placeholder="Search..."
-                          icon={Search}
-                          icon_position="left"
-                          value={search_query}
-                          on_change={(e) => set_search_query(e.target.value)}
-                        />
-                      </div>
-                    </div>
+                    <Icon_Field
+                      placeholder="Search..."
+                      icon={Search}
+                      icon_position="left"
+                      value={search_query}
+                      on_change={(e) => set_search_query(e.target.value)}
+                    />
                   </div>
                 </div>
 
@@ -333,63 +306,35 @@ const Pricing_Procedure = () => {
 
                       <tbody className="bg-white">
                         {filtered_list.map((row, idx) => {
-                          const render_cell = (col, row) => {
-                            const value = row[col.key];
+                          const render_cell = (col) => {
                             if (col.key === "index")
                               return <span>{row.index}</span>;
-                            if (col.key === "base_price")
-                              return (
-                                <span>
-                                  {format_currency(row.base_price, 2, "")}
-                                </span>
-                              );
-                            if (col.key === "discount_category_code")
-                              return (
-                                <span>
-                                  {row.discount_category_code === ""
-                                    ? "-"
-                                    : row.discount_category_code}
-                                </span>
-                              );
-                            if (col.key === "discount_price")
-                              return (
-                                <span>
-                                  {row.discount_category_code === ""
-                                    ? "-"
-                                    : format_currency(row.base_price, 2, "")}
-                                </span>
-                              );
+
+                            if (col.key === "discount_value")
+                              return row.discount_type === "Percent"
+                                ? `${row.discount_value}%`
+                                : format_currency(row.discount_value, 2, "");
+
                             if (col.key === "actions")
                               return (
                                 <div className="flex gap-2">
-                                  <div className="relative group flex jusity-center items-center">
-                                    <Button_Action
-                                      icon={View}
-                                      tooltip="View Record"
-                                      on_click={() => handle_view_pricing(row)}
-                                    />
-                                  </div>
-                                  <div className="relative group flex jusity-center items-center">
-                                    <Button_Action
-                                      icon={Edit}
-                                      tooltip="Edit Record"
-                                      on_click={() => handle_edit_pricing(row)}
-                                    />
-                                  </div>
-                                  <div className="relative group flex jusity-center items-center">
-                                    <Button_Action
-                                      class_name="mb-[1px]"
-                                      icon={Trash}
-                                      variant="danger"
-                                      tooltip="Delete Record"
-                                      on_click={() =>
-                                        handle_delete_pricing(row)
-                                      }
-                                    />
-                                  </div>
+                                  <Button_Action
+                                    tooltip="View Record"
+                                    icon={View}
+                                  />
+                                  <Button_Action
+                                    tooltip="Edit Record"
+                                    icon={Edit}
+                                  />
+                                  <Button_Action
+                                    tooltip="Delete Record"
+                                    icon={Trash}
+                                    variant="danger"
+                                  />
                                 </div>
                               );
-                            return value;
+
+                            return row[col.key] ?? "-";
                           };
 
                           return (
@@ -402,9 +347,11 @@ const Pricing_Procedure = () => {
                                   key={i}
                                   className={`border px-4 py-4 text-[12px] text-gray-600 ${
                                     i === 0 ? "border-l-0" : ""
-                                  } ${i === columns.length - 1 ? "border-r-0" : ""}`}
+                                  } ${
+                                    i === columns.length - 1 ? "border-r-0" : ""
+                                  }`}
                                 >
-                                  {render_cell(col, row)}
+                                  {render_cell(col)}
                                 </td>
                               ))}
                             </tr>
@@ -415,7 +362,6 @@ const Pricing_Procedure = () => {
                   )}
                 </div>
 
-                {/* + Pagination */}
                 {total_pages > 0 && (
                   <Pagination
                     current_page={current_page}
@@ -424,23 +370,20 @@ const Pricing_Procedure = () => {
                     variant="compact"
                   />
                 )}
-                {/* - Pagination */}
               </div>
-              {/* - Pricing Procedure List */}
             </div>
           </div>
         </div>
       )}
-
       {page === "create" && (
-        <Create_Price_Proc
+        <Create_Discount_Con
           set_page={set_page}
-          new_price_proc_data={new_price_proc_data}
-          set_new_price_proc_data={set_new_price_proc_data}
+          new_discount_con_data={new_discount_con_data}
+          set_new_discount_con_data={set_new_discount_con_data}
         />
       )}
     </React.Fragment>
   );
 };
 
-export default Pricing_Procedure;
+export default Discount_Condition;

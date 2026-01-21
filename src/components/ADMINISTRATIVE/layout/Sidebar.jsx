@@ -109,8 +109,9 @@ const Sidebar = ({
       name: "Financial",
       icon: <Calculator size={18} />,
       sub_items: [
-        { name: "Pricing Procedure", sub_module_code: "FN1" },
-        { name: "Discount Procedure", sub_module_code: "FN2" },
+        { name: "Pricing Condition", sub_module_code: "FN1" },
+        { name: "Discount Condition", sub_module_code: "FN2" },
+        { name: "Pricing Procedure", sub_module_code: "FN3" },
       ],
     },
     {

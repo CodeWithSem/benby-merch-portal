@@ -11,15 +11,15 @@ import Pricing_Details from "./details/Pricing_Details";
 import { item_master_list } from "assets/data/item_master_list";
 import Select_Generic from "assets/elements/modals/Select_Generic";
 import { customer_master_list } from "assets/data/customer_master_list";
-import { price_con_list } from "assets/data/price_con_list";
+import { customer_group_list } from "assets/data/customer_group_code";
 
-const Create_Pricing_Proc = ({
+const Create_Pricing_Con = ({
   set_page,
   active_user,
   show_toast,
-  new_price_proc_data,
-  set_new_price_proc_data,
-  set_price_proc_list,
+  new_price_con_data,
+  set_new_price_con_data,
+  set_price_con_list,
 }) => {
   const [active_tab, set_active_tab] = useState("pricing_details");
   const [is_confirm_modal_open, set_is_confirm_modal_open] = useState(false);
@@ -27,25 +27,6 @@ const Create_Pricing_Proc = ({
   const [display_modal, set_display_modal] = useState("");
 
   const select_modal_configs = [
-    {
-      key: "select_price_con",
-      label: "Pricing Condition",
-      show_creation_date: true,
-      width: "max-w-[1000px]",
-      list: price_con_list,
-      column: ["Pricing Condition"],
-      code: ["price_con_code"],
-      desc: ["price_con_desc"],
-      lookup: [price_con_list],
-      target: ["price_con_code"],
-      on_after_select: () => {
-        set_new_price_proc_data((prev) => ({
-          ...prev,
-          item_code: "",
-          customer_code: "",
-        }));
-      },
-    },
     {
       key: "select_item",
       label: "Item",
@@ -57,6 +38,14 @@ const Create_Pricing_Proc = ({
       desc: ["item_desc"],
       lookup: [item_master_list],
       target: ["item_code"],
+      on_after_select: (row) => {
+        set_new_price_con_data((prev) => ({
+          ...prev,
+          item_code: row.item_code,
+          price_con_code: `GEN-${row.item_code}`,
+          price_con_desc: `GEN-${row.item_desc}`,
+        }));
+      },
     },
     {
       key: "select_customer",
@@ -70,19 +59,28 @@ const Create_Pricing_Proc = ({
       lookup: [customer_master_list],
       target: ["customer_code"],
     },
+    {
+      key: "select_customer_group",
+      label: "Customer Group",
+      show_creation_date: true,
+      width: "max-w-[1000px]",
+      list: customer_group_list,
+      column: ["Customer Group"],
+      code: ["customer_group_code"],
+      desc: ["customer_group_desc"],
+      lookup: [customer_group_list],
+      target: ["customer_group_code"],
+    },
   ];
 
   const handle_text_change = handle_text_change_function(
-    set_new_price_proc_data,
+    set_new_price_con_data,
   );
 
-  const validate_price_proc_data_fields = () => {
+  const validate_price_con_data_fields = () => {
     const is_valid = validate_required_fields({
       data: new_batch_data,
-      fields: [
-        { name: "price_proc_code", label: "Pricing Procedure Code" },
-        { name: "item_code", label: "Item" },
-      ],
+      fields: [{ name: "item_code", label: "Item" }],
       show_toast,
     });
 
@@ -90,7 +88,7 @@ const Create_Pricing_Proc = ({
   };
 
   const handle_create = async () => {
-    if (!validate_price_proc_data_fields()) {
+    if (!validate_price_con_data_fields()) {
       close_confirm_modal();
       return;
     }
@@ -151,7 +149,7 @@ const Create_Pricing_Proc = ({
               >
                 <span>/</span>
                 <a className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-sky-500 cursor-pointer">
-                  Pricing Procedure
+                  Pricing Condition
                 </a>
               </li>
               <li className="flex items-center gap-1.5 text-sm text-gray-500">
@@ -173,7 +171,7 @@ const Create_Pricing_Proc = ({
                 width="w-[20px]"
                 on_click={handle_go_back}
               ></Button>
-              <h1 className="text-lg">Pricing Procedure Creation</h1>
+              <h1 className="text-lg">Pricing Condition Creation</h1>
             </div>
 
             <div className="flex gap-2">
@@ -188,28 +186,12 @@ const Create_Pricing_Proc = ({
             <div className="grid grid-cols-1 gap-5">
               <div>
                 <Text_Code_Field
-                  label="Pricing Condition"
-                  code_width="150px"
-                  show_search_button={true}
-                  code_value={new_price_proc_data.price_con_code}
-                  text_value={get_description(
-                    new_price_proc_data.price_con_code,
-                    price_con_list,
-                    "price_con_code",
-                    "price_con_desc",
-                  )}
-                  on_click={() => set_display_modal("select_price_con")}
-                  disabled
-                />
-              </div>
-              <div>
-                <Text_Code_Field
                   label="Item"
                   code_width="150px"
                   show_search_button={true}
-                  code_value={new_price_proc_data.item_code}
+                  code_value={new_price_con_data?.item_code}
                   text_value={get_description(
-                    new_price_proc_data.item_code,
+                    new_price_con_data.item_code,
                     item_master_list,
                     "item_code",
                     "item_desc",
@@ -218,32 +200,22 @@ const Create_Pricing_Proc = ({
                   disabled
                 />
               </div>
-              {new_price_proc_data.price_con_code === "PC01" && (
-                <div>
-                  <Text_Code_Field
-                    label="Customer"
-                    code_width="150px"
-                    show_search_button={true}
-                    code_value={new_price_proc_data.customer_code}
-                    text_value={get_description(
-                      new_price_proc_data.customer_code,
-                      customer_master_list,
-                      "customer_code",
-                      "customer_desc",
-                    )}
-                    on_click={() => set_display_modal("select_customer")}
-                    disabled
-                  />
-                </div>
-              )}
-
               <div>
                 <Text_Field
-                  label="Pricing Procedure Code"
+                  label="Pricing Condition Code"
                   type={"text"}
                   placeholder={"Enter code"}
-                  value={new_price_proc_data?.price_proc_code}
-                  on_change={handle_text_change("price_proc_code")}
+                  value={new_price_con_data?.price_con_code}
+                  on_change={handle_text_change("price_con_code")}
+                />
+              </div>
+              <div>
+                <Text_Field
+                  label="Pricing Condition Description"
+                  type={"text"}
+                  placeholder={"Enter description"}
+                  value={new_price_con_data?.price_con_desc}
+                  on_change={handle_text_change("price_con_desc")}
                 />
               </div>
             </div>
@@ -274,8 +246,8 @@ const Create_Pricing_Proc = ({
                   <Pricing_Details
                     display_modal={display_modal}
                     set_display_modal={set_display_modal}
-                    new_price_proc_data={new_price_proc_data}
-                    set_new_price_proc_data={set_new_price_proc_data}
+                    new_price_con_data={new_price_con_data}
+                    set_new_price_con_data={set_new_price_con_data}
                   />
                 )}
               </div>
@@ -311,8 +283,8 @@ const Create_Pricing_Proc = ({
       </div>
       <Confirm_Modal
         is_open={is_confirm_modal_open}
-        title="Confirm Pricing Procedure Creation"
-        description_1="You are about to create a new Pricing Procedure. Once created, it will be added to the database."
+        title="Confirm Pricing Condition Creation"
+        description_1="You are about to create a new Pricing Condition. Once created, it will be added to the database."
         description_2="Please review all the details — before proceeding."
         description_3="Are you sure you want to continue?"
         on_confirm={handle_create}
@@ -334,7 +306,7 @@ const Create_Pricing_Proc = ({
           source_desc={cfg.desc}
           lookup_lists={cfg.lookup}
           target_field={cfg.target}
-          set_data={set_new_price_proc_data}
+          set_data={set_new_price_con_data}
           on_after_select={cfg.on_after_select}
         />
       ))}
@@ -342,4 +314,4 @@ const Create_Pricing_Proc = ({
   );
 };
 
-export default Create_Pricing_Proc;
+export default Create_Pricing_Con;
