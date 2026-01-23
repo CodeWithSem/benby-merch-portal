@@ -8,12 +8,22 @@ import Pagination_Modal from "assets/elements/Pagination_Modal";
 // 🔹 SD DATA SOURCE
 import { item_ext_sd_list } from "assets/data/item_ext_sd_list";
 import { item_master_list } from "assets/data/item_master_list";
+import { resolve_unit_price } from "assets/scripts/functions/resolve_unit_price";
+
+// 🔹 PRICING RESOLVER
 
 const Select_Item = ({
   is_open,
   on_close,
   sales_org_code,
   dist_channel_code,
+
+  // 🔹 pricing context
+  customer_code,
+  customer_group_code,
+  item_group_code,
+  price_proc_list = [],
+
   set_selected_item_data,
   selected_item_list = [],
   width = "max-w-[700px]",
@@ -48,6 +58,7 @@ const Select_Item = ({
         ...item,
         item_desc: master?.item_desc || "(No Description)",
         uom: master?.pu_ordering_uom || master?.base_uom || "",
+        item_group_code: master?.item_group_code || null,
       };
     });
 
@@ -94,12 +105,24 @@ const Select_Item = ({
       return;
     }
 
+    const unit_price = resolve_unit_price({
+      item_code: selected_item.item_code,
+      customer_code,
+      customer_group_code,
+      item_group_code: selected_item.item_group_code || item_group_code,
+      price_proc_list,
+    });
+
     set_selected_item_data((prev) => ({
       ...prev,
       id: selected_item.id,
       item_code: selected_item.item_code,
       item_desc: selected_item.item_desc,
       uom: selected_item.uom,
+      unit_price,
+      total: unit_price * prev.quantity,
+      // base_price: unit_price,
+      // current_price: unit_price,
     }));
 
     set_selected_item(null);

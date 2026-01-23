@@ -7,10 +7,15 @@ import Text_Field from "assets/elements/Text_Field";
 import { format_date_1, get_date_now } from "assets/scripts/format";
 import { get_description } from "assets/scripts/functions/get_description";
 import { handle_text_change_function } from "assets/scripts/functions/input_functions";
-import { ChevronLeft } from "lucide-react";
+import { ChevronLeft, CirclePlus } from "lucide-react";
 import React, { useState } from "react";
 import Pricing_Details from "./details/Pricing_Details";
 import Pricing_Elements from "./pricing_elements/Pricing_Elements";
+import { discount_category_list } from "assets/data/discount_category_list";
+import { price_proc_category_list } from "assets/data/price_proc_category_list";
+import { customer_master_list } from "assets/data/customer_master_list";
+import { customer_group_list } from "assets/data/customer_group_code";
+import { item_group_list } from "assets/data/item_group_list";
 
 const Create_Price_Proc = ({
   set_page,
@@ -21,6 +26,26 @@ const Create_Price_Proc = ({
   const [active_tab, set_active_tab] = useState("pricing_details");
   const [price_element_list, set_price_element_list] = useState([]);
   const select_modal_configs = [
+    {
+      key: "select_price_proc_category",
+      label: "Pricing Procedure Category",
+      show_creation_date: true,
+      width: "max-w-[1000px]",
+      list: price_proc_category_list,
+      column: ["Category"],
+      code: ["price_proc_category_code"],
+      desc: ["price_proc_category_desc"],
+      lookup: [price_proc_category_list],
+      target: ["price_proc_category_code"],
+      on_after_select: () => {
+        set_new_price_proc_data((prev) => ({
+          ...prev,
+          customer_code: null,
+          customer_group_code: null,
+          item_group_code: null,
+        }));
+      },
+    },
     {
       key: "select_price_con",
       label: "Pricing Condition",
@@ -33,7 +58,7 @@ const Create_Price_Proc = ({
       lookup: [price_con_list],
       target: ["price_con_code"],
       on_after_select: (row) => {
-        // FIRST & ONLY ROW (Pricing Condition)
+        console.log(row);
         const pricing_condition_element = {
           id: row.price_con_code,
           code: row.price_con_code,
@@ -44,21 +69,98 @@ const Create_Price_Proc = ({
 
         set_new_price_proc_data((prev) => ({
           ...prev,
+          id: row.id,
+          item_code: row.item_code,
           base_price: row.base_price,
           uom: row.uom,
           currency: row.currency,
           tax_rate: row.tax_rate,
           status: row.status,
+          discount_category_code: "",
         }));
-
-        // ✅ Replace table content (always 1 row)
         set_price_element_list([pricing_condition_element]);
       },
+    },
+    {
+      key: "select_discount_category",
+      label: "Discount Category",
+      show_creation_date: true,
+      width: "max-w-[1000px]",
+      list: discount_category_list,
+      column: ["Discount Category"],
+      code: ["discount_category_code"],
+      desc: ["discount_category_desc"],
+      lookup: [discount_category_list],
+      target: ["discount_category_code"],
+      on_after_select: (row) => {
+        set_price_element_list((prev) => (prev.length > 0 ? [prev[0]] : []));
+      },
+    },
+    {
+      key: "select_customer",
+      label: "Customer",
+      show_creation_date: true,
+      width: "max-w-[1000px]",
+      list: customer_master_list,
+      column: ["Customer"],
+      code: ["customer_code"],
+      desc: ["customer_desc"],
+      lookup: [customer_master_list],
+      target: ["customer_code"],
+    },
+    {
+      key: "select_customer_group",
+      label: "Customer Group",
+      show_creation_date: true,
+      width: "max-w-[1000px]",
+      list: customer_group_list,
+      column: ["Customer Group"],
+      code: ["customer_group_code"],
+      desc: ["customer_group_desc"],
+      lookup: [customer_group_list],
+      target: ["customer_group_code"],
+    },
+    {
+      key: "select_item_group",
+      label: "Item Group",
+      show_creation_date: true,
+      width: "max-w-[1000px]",
+      list: item_group_list,
+      column: ["Item Group"],
+      code: ["item_group_code"],
+      desc: ["item_group_desc"],
+      lookup: [item_group_list],
+      target: ["item_group_code"],
     },
   ];
   const handle_text_change = handle_text_change_function(
     set_new_price_proc_data,
   );
+
+  const handle_create = () => {
+    if (!price_element_list || price_element_list.length === 0) {
+      console.warn("No pricing elements added yet!");
+      return;
+    }
+
+    // Find the last result row (if exists)
+    const last_result_row = [...price_element_list]
+      .reverse()
+      .find((row) => row.is_result);
+
+    // If no discounts are added, last_result_row will be undefined, use base price
+    const current_price = last_result_row
+      ? last_result_row.amount
+      : price_element_list[0].amount; // base_price row
+
+    const final_data = {
+      ...new_price_proc_data,
+      price_element_list: price_element_list,
+      current_price,
+    };
+
+    console.log("Pricing Procedure Create Data:", final_data);
+  };
 
   const handle_go_back = () => {
     set_page("main");
@@ -68,7 +170,7 @@ const Create_Price_Proc = ({
     <React.Fragment>
       <div className="w-full">
         <div className="flex flex-wrap items-center justify-between gap-3 py-5">
-          <h1 className="text-xl">Production</h1>
+          <h1 className="text-xl">Financial</h1>
           {/* + Breadcrumbs */}
           <nav>
             <ol className="flex flex-wrap items-center gap-1.5">
@@ -83,7 +185,7 @@ const Create_Price_Proc = ({
                   className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-sky-500 cursor-pointer"
                   onClick={handle_go_back}
                 >
-                  Production
+                  Financial
                 </a>
               </li>
               <li className="flex items-center gap-1.5 text-sm text-gray-500">
@@ -92,7 +194,7 @@ const Create_Price_Proc = ({
                   className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-sky-500 cursor-pointer"
                   onClick={handle_go_back}
                 >
-                  Production Plan
+                  Pricing Procedure
                 </a>
               </li>
               <li className="flex items-center gap-1.5 text-sm text-gray-500">
@@ -114,7 +216,7 @@ const Create_Price_Proc = ({
                 width="w-[20px]"
                 on_click={handle_go_back}
               ></Button>
-              <h1 className="text-lg">Production Plan Creation</h1>
+              <h1 className="text-lg">Pricing Procedure Creation</h1>
             </div>
             <div className="flex gap-2">
               <div className="text-gray-500 text-sm tracking-wider">
@@ -132,8 +234,26 @@ const Create_Price_Proc = ({
                     label="Pricing Procedure Code"
                     type={"text"}
                     placeholder={"Enter code"}
-                    value={new_price_proc_data.price_proc_code}
+                    value={new_price_proc_data?.price_proc_code}
                     on_change={handle_text_change("price_proc_code")}
+                  />
+                </div>
+                <div>
+                  <Text_Code_Field
+                    label="Pricing Procedure Category"
+                    code_width="150px"
+                    show_search_button={true}
+                    code_value={new_price_proc_data?.price_proc_category_code}
+                    text_value={get_description(
+                      new_price_proc_data.price_proc_category_code,
+                      price_proc_category_list,
+                      "price_proc_category_code",
+                      "price_proc_category_desc",
+                    )}
+                    on_click={() =>
+                      set_display_modal("select_price_proc_category")
+                    }
+                    disabled
                   />
                 </div>
                 <div>
@@ -152,6 +272,62 @@ const Create_Price_Proc = ({
                     disabled
                   />
                 </div>
+                {new_price_proc_data?.price_proc_category_code === "PPC01" && (
+                  <div>
+                    <Text_Code_Field
+                      label="Customer"
+                      code_width="150px"
+                      show_search_button={true}
+                      code_value={new_price_proc_data?.customer_code}
+                      text_value={get_description(
+                        new_price_proc_data.customer_code,
+                        customer_master_list,
+                        "customer_code",
+                        "customer_desc",
+                      )}
+                      on_click={() => set_display_modal("select_customer")}
+                      disabled
+                    />
+                  </div>
+                )}
+                {new_price_proc_data?.price_proc_category_code === "PPC02" && (
+                  <div>
+                    <Text_Code_Field
+                      label="Customer Group"
+                      code_width="150px"
+                      show_search_button={true}
+                      code_value={new_price_proc_data?.customer_group_code}
+                      text_value={get_description(
+                        new_price_proc_data.customer_group_code,
+                        customer_group_list,
+                        "customer_group_code",
+                        "customer_group_desc",
+                      )}
+                      on_click={() =>
+                        set_display_modal("select_customer_group")
+                      }
+                      disabled
+                    />
+                  </div>
+                )}
+                {new_price_proc_data?.price_proc_category_code === "PPC03" && (
+                  <div>
+                    <Text_Code_Field
+                      label="Item Group"
+                      code_width="150px"
+                      show_search_button={true}
+                      code_value={new_price_proc_data?.item_group_code}
+                      text_value={get_description(
+                        new_price_proc_data.item_group_code,
+                        item_group_list,
+                        "item_group_code",
+                        "item_group_desc",
+                      )}
+                      on_click={() => set_display_modal("select_item_group")}
+                      disabled
+                    />
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -185,10 +361,59 @@ const Create_Price_Proc = ({
             </div>
           </div>
           {/* - Section 2 */}
+          <div className="p-5 sm:p-6 border-t">
+            <div className="w-full">
+              <div className="grid grid-cols-1 gap-5">
+                <div>
+                  <Text_Code_Field
+                    label="Discount Category"
+                    code_width="150px"
+                    show_search_button={true}
+                    code_value={new_price_proc_data?.discount_category_code}
+                    text_value={get_description(
+                      new_price_proc_data.discount_category_code,
+                      discount_category_list,
+                      "discount_category_code",
+                      "discount_category_desc",
+                    )}
+                    on_click={() =>
+                      set_display_modal("select_discount_category")
+                    }
+                    disabled
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
           <Pricing_Elements
             price_element_list={price_element_list}
             set_price_element_list={set_price_element_list}
+            base_price={new_price_proc_data?.base_price || 0}
+            discount_category_code={new_price_proc_data?.discount_category_code}
           />
+          <div className="p-4 sm:p-8 border-t">
+            <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
+              <Button
+                variant="primary"
+                size="lg"
+                width="w-[120px]"
+                icon={CirclePlus}
+                icon_position="left"
+                on_click={handle_create}
+                // on_click={() => set_is_confirm_modal_open(true)}
+              >
+                Create
+              </Button>
+              <Button
+                variant="white"
+                size="lg"
+                width="w-[120px]"
+                on_click={handle_go_back}
+              >
+                Cancel
+              </Button>
+            </div>
+          </div>
         </div>
       </div>
       {select_modal_configs.map((cfg) => (

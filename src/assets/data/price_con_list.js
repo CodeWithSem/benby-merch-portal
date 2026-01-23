@@ -1,7 +1,7 @@
 export const price_con_list = [
   {
     id: 1,
-    price_con_code: "GEN-8802",
+    price_con_code: "BP01-8802",
     price_con_desc: "SISTERS SF BUDGET PACK DAY-USE 4'S X 36",
     item_code: "8802",
     base_price: 120,
@@ -13,7 +13,7 @@ export const price_con_list = [
   },
   {
     id: 2,
-    price_con_code: "GEN-8826",
+    price_con_code: "BP02-8826",
     price_con_desc: "SISTERS SF BUDGET PACK NIGHT-USE 4'S X 36",
     item_code: "8826",
     base_price: 150,

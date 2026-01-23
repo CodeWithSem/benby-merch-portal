@@ -1,20 +1,14 @@
 export const discount_category_list = [
   {
     id: 1,
-    discount_category_code: "DGEN",
-    discount_category_desc: "General Discount",
+    discount_category_code: "RD",
+    discount_category_desc: "Running Discount",
     creation_date: "MM-DD-YYYY",
   },
   {
     id: 2,
-    discount_category_code: "DC01",
-    discount_category_desc: "Item / Customer",
-    creation_date: "MM-DD-YYYY",
-  },
-  {
-    id: 3,
-    discount_category_code: "DC02",
-    discount_category_desc: "Item / Customer Group",
+    discount_category_code: "BD",
+    discount_category_desc: "Base Price Discount",
     creation_date: "MM-DD-YYYY",
   },
 ];

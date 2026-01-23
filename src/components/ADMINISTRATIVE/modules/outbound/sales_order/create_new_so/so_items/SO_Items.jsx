@@ -22,6 +22,7 @@ import Show_Item_Details from "./modals/Show_Item_Details";
 import Edit_Item from "./modals/Edit_Item";
 import Button_Action from "assets/elements/Button_Action";
 import Select_Item from "../../modals/Select_Item";
+import { price_proc_list } from "assets/data/price_proc_list";
 
 const SO_Items = ({ so_data }) => {
   const {
@@ -52,18 +53,19 @@ const SO_Items = ({ so_data }) => {
     { key: "item_desc", label: "Item", visible: true },
     { key: "quantity", label: "Qty", visible: true },
     { key: "uom", label: "Unit", visible: true },
-    { key: "price", label: "Price", visible: true },
-    { key: "discount_type", label: "Discount Type", visible: false },
-    { key: "discount", label: "Discount", visible: false },
-    { key: "net_price", label: "Net Price", visible: true },
-    { key: "total_gross", label: "Total Gross", visible: false },
-    { key: "total_net", label: "Total Net", visible: false },
-    { key: "currency", label: "Currency", visible: false },
-    { key: "pricing_date", label: "Pricing Date", visible: false },
-    { key: "on_hand", label: "On Hand", visible: false },
-    { key: "committed", label: "Committed", visible: false },
-    { key: "is_approved", label: "Is Approved", visible: false },
-    { key: "remarks", label: "Remarks", visible: false },
+    { key: "unit_price", label: "Unit Price", visible: true },
+    { key: "total", label: "Total", visible: true },
+    // { key: "discount_type", label: "Discount Type", visible: false },
+    // { key: "discount", label: "Discount", visible: false },
+    // { key: "net_price", label: "Net Price", visible: true },
+    // { key: "total_gross", label: "Total Gross", visible: false },
+    // { key: "total_net", label: "Total Net", visible: false },
+    // { key: "currency", label: "Currency", visible: true },
+    // { key: "pricing_date", label: "Pricing Date", visible: false },
+    // { key: "on_hand", label: "On Hand", visible: false },
+    // { key: "committed", label: "Committed", visible: false },
+    // { key: "is_approved", label: "Is Approved", visible: false },
+    // { key: "remarks", label: "Remarks", visible: false },
     { key: "actions", label: "", visible: true },
   ];
 
@@ -159,6 +161,11 @@ const SO_Items = ({ so_data }) => {
       total: 0,
     });
   };
+
+  const gross_total = selected_item_list.reduce(
+    (sum, item) => sum + (item.total || 0),
+    0,
+  );
 
   // RETURN ORIGIN
   return (
@@ -286,7 +293,8 @@ const SO_Items = ({ so_data }) => {
                                     {index + 1}
                                   </td>
                                 );
-                              case "price":
+                              case "unit_price":
+                              case "total":
                               case "net_price":
                               case "total_gross":
                               case "total_net":
@@ -295,7 +303,7 @@ const SO_Items = ({ so_data }) => {
                                     key={col.key}
                                     className="px-5 py-4 text-gray-500"
                                   >
-                                    {format_currency(item[col.key], 2, true)}
+                                    {format_currency(item[col.key], 2, false)}
                                   </td>
                                 );
                               case "discount":
@@ -387,8 +395,11 @@ const SO_Items = ({ so_data }) => {
               <Text_Field
                 label="Unit Price"
                 type={"text"}
-                // value={selected_item_data.unit_price}
-                // on_change={(e) => handle_unit_price_change(e.target.value)}
+                value={format_currency(
+                  selected_item_data.unit_price || 0,
+                  2,
+                  false,
+                )}
                 disabled
               />
             </div>
@@ -473,8 +484,9 @@ const SO_Items = ({ so_data }) => {
                 <span className="font-medium text-gray-700 dark:text-gray-400">
                   Total
                 </span>
+                {/* Sum up all the total in selected_item_list */}
                 <span className="text-lg font-semibold text-gray-800 dark:text-white/90">
-                  {format_currency(0, 2, true)}
+                  {format_currency(gross_total, 2, true)}
                 </span>
               </li>
             </ul>
@@ -498,6 +510,10 @@ const SO_Items = ({ so_data }) => {
         on_close={() => set_display_item_modal("")}
         sales_org_code={new_so_data.sales_org_code}
         dist_channel_code={new_so_data.dist_channel_code}
+        customer_code={new_so_data.customer_code}
+        customer_group_code={""}
+        item_group_code={""}
+        price_proc_list={price_proc_list}
         set_selected_item_data={set_selected_item_data}
         selected_item_list={selected_item_list}
       />

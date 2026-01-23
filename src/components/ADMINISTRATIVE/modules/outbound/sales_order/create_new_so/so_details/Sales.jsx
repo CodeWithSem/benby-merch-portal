@@ -94,7 +94,7 @@ const Sales = ({ so_data }) => {
       </div>
       {/* - Section 1 */}
       {/* + Section 2 */}
-      <div className="mt-5 rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6 dark:border-gray-800 dark:bg-gray-900 whitespace-nowrap">
+      {/* <div className="mt-5 rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6 dark:border-gray-800 dark:bg-gray-900 whitespace-nowrap">
         <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
           <div>
             <Text_Field label="Pricing Procedure" type={"text"} disabled />
@@ -124,7 +124,7 @@ const Sales = ({ so_data }) => {
             <Text_Field label="Total After Discount" type={"text"} disabled />
           </div>
         </div>
-      </div>
+      </div> */}
       {/* - Section 2 */}
       {/* + Modals */}
       {select_modal_configs.map((cfg) => (
