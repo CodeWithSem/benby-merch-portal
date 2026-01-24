@@ -1,37 +1,106 @@
-import React, { useState } from "react";
-import { handle_text_change_function } from "assets/scripts/functions/input_functions";
-import Confirm_Modal from "assets/elements/modals/Confirm_Modal";
-import { ChevronLeft, CirclePlus, CircleX } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { ChevronLeft, CircleX, RefreshCcwDot } from "lucide-react";
 import Button from "assets/elements/Button";
 import Text_Field from "assets/elements/Text_Field";
-import { get_description } from "assets/scripts/functions/get_description";
-import { format_date_1, get_date_now } from "assets/scripts/format";
 import Text_Code_Field from "assets/elements/Text_Code_Field";
-import Pricing_Details from "./details/Pricing_Details";
-import { item_master_list } from "assets/data/item_master_list";
+import Confirm_Modal from "assets/elements/modals/Confirm_Modal";
 import Select_Generic from "assets/elements/modals/Select_Generic";
-import { customer_master_list } from "assets/data/customer_master_list";
-import { customer_group_list } from "assets/data/customer_group_code";
+import Pricing_Details from "./details/Pricing_Details";
+import { get_description } from "assets/scripts/functions/get_description";
+import { item_master_list } from "assets/data/item_master_list";
+import { format_date_1, get_date_now } from "assets/scripts/format";
+import { api_update_price_con } from "api/firestore_db/financial/price_condition/tbl_price_con_api";
 
-import { api_create_price_con } from "api/firestore_db/financial/price_condition/tbl_price_con_api";
-
-const Create_Pricing_Con = ({
+const Edit_Pricing_Con = ({
+  edit_price_con_data,
+  set_price_con_list,
   set_page,
   active_user,
   show_toast,
-  new_price_con_data,
-  set_new_price_con_data,
-  set_price_con_list,
-  reset_new_data,
 }) => {
+  const [form_data, set_form_data] = useState({ ...edit_price_con_data });
   const [active_tab, set_active_tab] = useState("pricing_details");
-  const [is_confirm_modal_open, set_is_confirm_modal_open] = useState(false);
-  const [create_loading, set_create_loading] = useState(false);
   const [display_modal, set_display_modal] = useState("");
+  const [is_confirm_modal_open, set_is_confirm_modal_open] = useState(false);
+  const [update_loading, set_update_loading] = useState(false);
 
-  /* ======================================================
-     Select Modal Config
-     ====================================================== */
+  // Handle text changes
+  const handle_text_change = (field) => (e) => {
+    set_form_data((prev) => ({ ...prev, [field]: e.target.value }));
+  };
+
+  const handle_go_back = () => set_page("main");
+
+  // Validate before update
+  const validate_fields = () => {
+    if (!form_data.item_code?.trim()) {
+      show_toast({
+        type: "danger",
+        title: "Invalid",
+        message: "Item is required",
+        icon: <CircleX size={21} className="text-red-500" />,
+      });
+      return false;
+    }
+    if (!form_data.price_con_code?.trim()) {
+      show_toast({
+        type: "danger",
+        title: "Invalid",
+        message: "Pricing Condition Code is required",
+        icon: <CircleX size={21} className="text-red-500" />,
+      });
+      return false;
+    }
+    if (!form_data.price_con_desc?.trim()) {
+      show_toast({
+        type: "danger",
+        title: "Invalid",
+        message: "Description is required",
+        icon: <CircleX size={21} className="text-red-500" />,
+      });
+      return false;
+    }
+    return true;
+  };
+
+  const handle_update = async () => {
+    if (!validate_fields()) {
+      close_confirm_modal();
+      return;
+    }
+
+    try {
+      set_update_loading(true);
+
+      const response = await api_update_price_con(
+        {
+          ...form_data,
+          change_date: get_date_now(),
+          change_by: active_user?.username,
+        },
+        active_user?.username,
+        show_toast,
+      );
+
+      if (response.success) {
+        set_price_con_list((prev) =>
+          prev.map((item) => (item.id === form_data.id ? response.data : item)),
+        );
+        set_page("main");
+      }
+    } catch (error) {
+      console.error("Failed to update pricing condition:", error);
+    } finally {
+      close_confirm_modal();
+    }
+  };
+
+  const close_confirm_modal = () => {
+    set_is_confirm_modal_open(false);
+    set_update_loading(false);
+  };
+
+  // Modal configs for select fields
   const select_modal_configs = [
     {
       key: "select_item",
@@ -45,7 +114,7 @@ const Create_Pricing_Con = ({
       lookup: [item_master_list],
       target: ["item_code"],
       on_after_select: (row) => {
-        set_new_price_con_data((prev) => ({
+        set_form_data((prev) => ({
           ...prev,
           item_code: row.item_code,
           price_con_code: row.item_code,
@@ -53,122 +122,12 @@ const Create_Pricing_Con = ({
         }));
       },
     },
-    {
-      key: "select_customer",
-      label: "Customer",
-      show_creation_date: true,
-      width: "max-w-[1000px]",
-      list: customer_master_list,
-      column: ["Customer"],
-      code: ["customer_code"],
-      desc: ["customer_desc"],
-      lookup: [customer_master_list],
-      target: ["customer_code"],
-    },
-    {
-      key: "select_customer_group",
-      label: "Customer Group",
-      show_creation_date: true,
-      width: "max-w-[1000px]",
-      list: customer_group_list,
-      column: ["Customer Group"],
-      code: ["customer_group_code"],
-      desc: ["customer_group_desc"],
-      lookup: [customer_group_list],
-      target: ["customer_group_code"],
-    },
   ];
 
-  const handle_text_change = handle_text_change_function(
-    set_new_price_con_data,
-  );
-
-  /* ======================================================
-     Validation (Branch-style)
-     ====================================================== */
-  const validate_price_con_data_fields = () => {
-    if (!new_price_con_data.item_code?.trim()) {
-      show_toast({
-        type: "danger",
-        title: "Invalid",
-        message: "Item is required",
-        icon: <CircleX size={21} className="text-red-500" />,
-      });
-      return false;
-    }
-
-    if (!new_price_con_data.price_con_code?.trim()) {
-      show_toast({
-        type: "danger",
-        title: "Invalid",
-        message: "Pricing Condition Code is required",
-        icon: <CircleX size={21} className="text-red-500" />,
-      });
-      return false;
-    }
-
-    if (!new_price_con_data.price_con_desc?.trim()) {
-      show_toast({
-        type: "danger",
-        title: "Invalid",
-        message: "Description is required",
-        icon: <CircleX size={21} className="text-red-500" />,
-      });
-      return false;
-    }
-
-    return true;
-  };
-
-  /* ======================================================
-     Create API (Copied from Branch logic)
-     ====================================================== */
-  const handle_create = async () => {
-    if (!validate_price_con_data_fields()) {
-      close_confirm_modal();
-      return;
-    }
-
-    try {
-      set_create_loading(true);
-
-      const response = await api_create_price_con(
-        {
-          ...new_price_con_data,
-          creation_date: get_date_now(),
-          created_by: active_user?.username,
-        },
-        active_user?.username,
-        show_toast,
-      );
-
-      if (response.success) {
-        set_price_con_list((prev) => [...prev, response.data]);
-        reset_new_data();
-        set_page("main");
-      }
-    } catch (error) {
-      console.error("Failed to create pricing condition:", error);
-    } finally {
-      close_confirm_modal();
-    }
-  };
-
-  const close_confirm_modal = () => {
-    set_is_confirm_modal_open(false);
-    set_create_loading(false);
-  };
-
-  const handle_go_back = () => {
-    set_page("main");
-  };
-
-  /* ======================================================
-     RETURN (UI UNCHANGED)
-     ====================================================== */
   return (
     <React.Fragment>
       <div className="w-full">
+        {/* Header */}
         <div className="flex flex-wrap items-center justify-between gap-3 py-5">
           <h1 className="text-xl">Financial</h1>
           {/* Breadcrumbs */}
@@ -197,14 +156,14 @@ const Create_Pricing_Con = ({
               </li>
               <li className="flex items-center gap-1.5 text-sm text-gray-500">
                 <span>/</span>
-                <span className="text-gray-800">Create</span>
+                <span className="text-gray-800">Edit</span>
               </li>
             </ol>
           </nav>
         </div>
 
         <div className="w-full bg-white rounded-lg border">
-          {/* Header */}
+          {/* Navigation + Back */}
           <div className="flex flex-wrap items-center justify-between gap-3 p-5">
             <div className="flex items-center gap-3">
               <Button
@@ -214,46 +173,45 @@ const Create_Pricing_Con = ({
                 width="w-[20px]"
                 on_click={handle_go_back}
               />
-              <h1 className="text-lg">Pricing Condition Creation</h1>
+              <h1 className="text-lg">Edit Pricing Condition</h1>
             </div>
             <div className="text-gray-500 text-sm tracking-wider">
               {format_date_1(get_date_now())}
             </div>
           </div>
 
-          {/* Section 1 */}
+          {/* Section 1 - Basic Info */}
           <div className="p-5 sm:p-6 border-t">
             <div className="grid grid-cols-1 gap-5">
               <Text_Code_Field
                 label="Item"
                 code_width="150px"
-                show_search_button
-                code_value={new_price_con_data?.item_code}
+                show_search_button={false}
+                code_value={form_data?.item_code}
                 text_value={get_description(
-                  new_price_con_data.item_code,
+                  form_data.item_code,
                   item_master_list,
                   "item_code",
                   "item_desc",
                 )}
-                on_click={() => set_display_modal("select_item")}
+                bg_dis_color="bg-slate-50"
+                text_dis_color="text-slate-500"
                 disabled
               />
-
               <Text_Field
                 label="Pricing Condition Code"
-                value={new_price_con_data?.price_con_code}
+                value={form_data?.price_con_code}
                 on_change={handle_text_change("price_con_code")}
               />
-
               <Text_Field
                 label="Pricing Condition Description"
-                value={new_price_con_data?.price_con_desc}
+                value={form_data?.price_con_desc}
                 on_change={handle_text_change("price_con_desc")}
               />
             </div>
           </div>
 
-          {/* Section 2 */}
+          {/* Section 2 - Tabs (Pricing Details) */}
           <div className="p-5 sm:p-6 border-t">
             <div className="w-full bg-white rounded-lg border">
               <div className="w-full border-b p-2">
@@ -276,26 +234,26 @@ const Create_Pricing_Con = ({
                   <Pricing_Details
                     display_modal={display_modal}
                     set_display_modal={set_display_modal}
-                    new_price_con_data={new_price_con_data}
-                    set_new_price_con_data={set_new_price_con_data}
+                    new_price_con_data={form_data}
+                    set_new_price_con_data={set_form_data}
                   />
                 )}
               </div>
             </div>
           </div>
 
-          {/* Section 3 */}
+          {/* Section 3 - Actions */}
           <div className="p-4 sm:p-8 border-t">
             <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
               <Button
                 variant="primary"
                 size="lg"
                 width="w-[120px]"
-                icon={CirclePlus}
+                icon={RefreshCcwDot}
                 icon_position="left"
                 on_click={() => set_is_confirm_modal_open(true)}
               >
-                Create
+                Update
               </Button>
               <Button
                 variant="white"
@@ -310,17 +268,19 @@ const Create_Pricing_Con = ({
         </div>
       </div>
 
+      {/* Confirm Modal */}
       <Confirm_Modal
         is_open={is_confirm_modal_open}
-        title="Confirm Pricing Condition Creation"
-        description_1="You are about to create a new Pricing Condition. Once created, it will be added to the database."
-        description_2="Please review all the details — before proceeding."
+        title="Confirm Pricing Condition Update"
+        description_1="You are about to update this Pricing Condition."
+        description_2="Please review all the details before proceeding."
         description_3="Are you sure you want to continue?"
-        on_confirm={handle_create}
+        on_confirm={handle_update}
         on_cancel={() => set_is_confirm_modal_open(false)}
-        confirm_loading={create_loading}
+        confirm_loading={update_loading}
       />
 
+      {/* Select Modals */}
       {select_modal_configs.map((cfg) => (
         <Select_Generic
           key={cfg.key}
@@ -336,7 +296,7 @@ const Create_Pricing_Con = ({
           source_desc={cfg.desc}
           lookup_lists={cfg.lookup}
           target_field={cfg.target}
-          set_data={set_new_price_con_data}
+          set_data={set_form_data}
           on_after_select={cfg.on_after_select}
         />
       ))}
@@ -344,4 +304,4 @@ const Create_Pricing_Con = ({
   );
 };
 
-export default Create_Pricing_Con;
+export default Edit_Pricing_Con;

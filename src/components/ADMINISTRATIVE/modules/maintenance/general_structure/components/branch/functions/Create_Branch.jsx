@@ -62,7 +62,7 @@ const Create_Branch = ({
       const response = await api_create_branch(
         new_data,
         active_user?.username,
-        show_toast
+        show_toast,
       );
       if (response.success) {
         console_log(response.data);

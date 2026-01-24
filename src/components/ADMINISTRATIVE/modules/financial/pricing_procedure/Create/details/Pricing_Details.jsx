@@ -1,8 +1,13 @@
 import React from "react";
 import Text_Field from "assets/elements/Text_Field";
 import { format_currency } from "assets/scripts/format";
+import Date_Field from "assets/elements/Date_Field";
+import { handle_date_change_function } from "assets/scripts/functions/input_functions";
 
-const Pricing_Details = ({ new_price_proc_data }) => {
+const Pricing_Details = ({ new_price_proc_data, set_new_price_proc_data }) => {
+  const handle_date_change = handle_date_change_function(
+    set_new_price_proc_data,
+  );
   // RETURN ORIGIN
   return (
     <React.Fragment>
@@ -36,14 +41,6 @@ const Pricing_Details = ({ new_price_proc_data }) => {
               disabled
             />
           </div>
-          {/* <div>
-            <Text_Field
-              label="Tax Rate"
-              type={"text"}
-              value={new_price_proc_data?.tax_rate}
-              disabled
-            />
-          </div> */}
           <div>
             <Text_Field
               label="Status"
@@ -52,6 +49,23 @@ const Pricing_Details = ({ new_price_proc_data }) => {
               disabled
             />
           </div>
+          <div>
+            <Date_Field
+              label="Valid From"
+              placeholder="MM-DD-YYYY"
+              value={new_price_proc_data.valid_from}
+              on_change={handle_date_change("valid_from")}
+            />
+          </div>
+          <div>
+            <Date_Field
+              label="Valid To"
+              placeholder="MM-DD-YYYY"
+              value={new_price_proc_data.valid_to}
+              on_change={handle_date_change("valid_to")}
+            />
+          </div>
+          <div></div>
         </div>
       </div>
     </React.Fragment>

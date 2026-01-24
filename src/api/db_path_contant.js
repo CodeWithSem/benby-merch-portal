@@ -10,7 +10,7 @@ export const TABLES = {
   BATCH_MASTER: "TBL_BATCH_MASTER",
   VENDOR_MASTER: "TBL_VENDOR_MASTER",
   // - Inbound Module ==================================
-  // + Warehouse Module =================================
+  // + Warehouse Module ================================
   STORAGE_BIN: "TBL_STORAGE_BIN",
   ITEM_MASTER: "TBL_ITEM_MASTER",
   ITEM_EXT_SALES_DATA: "TBL_ITEM_EXT_SALES_DATA",
@@ -19,7 +19,12 @@ export const TABLES = {
   ITEM_EXT_PLANT_DATA: "TBL_ITEM_EXT_PLANT_DATA",
   ITEM_EXT_WM_DATA_1: "TBL_ITEM_EXT_WM_DATA_1",
   ITEM_EXT_WM_DATA_2: "TBL_ITEM_EXT_WM_DATA_2",
-  // - Warehouse Module =================================
+  // - Warehouse Module ================================
+  // + Financial Module ================================
+  PRICE_CONDITION: "TBL_PRICE_CONDITION",
+  DISCOUNT_CONDITION: "TBL_DISCOUNT_CONDITION",
+  PRICE_PROCEDURE: "TBL_PRICE_PROCEDURE",
+  // - Financial Module ================================
   // + Maintenance Module ==============================
   // General Structure
   COMPANY: "TBL_COMPANY",

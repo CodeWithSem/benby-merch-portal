@@ -120,7 +120,7 @@ const Batch = () => {
           if (col.key === "actions") return false;
           const val = u[col.key];
           return val?.toString().toLowerCase().includes(q);
-        })
+        }),
       );
     }
 
@@ -161,9 +161,9 @@ const Batch = () => {
               ?.toString()
               .toLowerCase()
               .includes(debounced_query.toLowerCase());
-          })
+          }),
         ).length
-      : batch_list.length) / show_entries
+      : batch_list.length) / show_entries,
   );
 
   const handle_sort = (column) => {

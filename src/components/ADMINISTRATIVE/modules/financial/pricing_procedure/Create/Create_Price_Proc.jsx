@@ -1,6 +1,5 @@
 import { price_con_list } from "assets/data/price_con_list";
 import Button from "assets/elements/Button";
-import Find_Field from "assets/elements/Find_Field";
 import Select_Generic from "assets/elements/modals/Select_Generic";
 import Text_Code_Field from "assets/elements/Text_Code_Field";
 import Text_Field from "assets/elements/Text_Field";
@@ -16,13 +15,19 @@ import { price_proc_category_list } from "assets/data/price_proc_category_list";
 import { customer_master_list } from "assets/data/customer_master_list";
 import { customer_group_list } from "assets/data/customer_group_code";
 import { item_group_list } from "assets/data/item_group_list";
+import { api_create_price_proc } from "api/firestore_db/financial/price_procedure/tbl_price_proc_api";
+import Confirm_Modal from "assets/elements/modals/Confirm_Modal";
 
 const Create_Price_Proc = ({
   set_page,
   new_price_proc_data,
   set_new_price_proc_data,
+  set_price_proc_list,
+  reset_new_data,
 }) => {
   const [display_modal, set_display_modal] = useState("");
+  const [is_confirm_modal_open, set_is_confirm_modal_open] = useState(false);
+  const [create_loading, set_create_loading] = useState(false);
   const [active_tab, set_active_tab] = useState("pricing_details");
   const [price_element_list, set_price_element_list] = useState([]);
   const select_modal_configs = [
@@ -137,7 +142,27 @@ const Create_Price_Proc = ({
     set_new_price_proc_data,
   );
 
-  const handle_create = () => {
+  const validate_field = () => {
+    const is_valid = validate_required_fields({
+      data: new_price_proc_data,
+      fields: [
+        {
+          name: "price_proc_category_code",
+          label: "Pricing Procedure Category",
+        },
+      ],
+      show_toast,
+    });
+
+    return is_valid;
+  };
+
+  const handle_create = async () => {
+    if (!validate_field()) {
+      close_confirm_modal();
+      return;
+    }
+
     if (!price_element_list || price_element_list.length === 0) {
       console.warn("No pricing elements added yet!");
       return;
@@ -159,7 +184,34 @@ const Create_Price_Proc = ({
       current_price,
     };
 
-    console.log("Pricing Procedure Create Data:", final_data);
+    try {
+      set_create_loading(true);
+
+      const response = await api_create_price_proc(
+        {
+          ...final_data,
+          creation_date: get_date_now(),
+          created_by: active_user?.username,
+        },
+        active_user?.username,
+        show_toast,
+      );
+
+      if (response.success) {
+        set_price_proc_list((prev) => [...prev, response.data]);
+        reset_new_data();
+        set_page("main");
+      }
+    } catch (error) {
+      console.error("Failed to create pricing condition:", error);
+    } finally {
+      close_confirm_modal();
+    }
+  };
+
+  const close_confirm_modal = () => {
+    set_is_confirm_modal_open(false);
+    set_create_loading(false);
   };
 
   const handle_go_back = () => {
@@ -399,8 +451,7 @@ const Create_Price_Proc = ({
                 width="w-[120px]"
                 icon={CirclePlus}
                 icon_position="left"
-                on_click={handle_create}
-                // on_click={() => set_is_confirm_modal_open(true)}
+                on_click={() => set_is_confirm_modal_open(true)}
               >
                 Create
               </Button>
@@ -416,6 +467,16 @@ const Create_Price_Proc = ({
           </div>
         </div>
       </div>
+      <Confirm_Modal
+        is_open={is_confirm_modal_open}
+        title="Confirm Pricing Procedure Creation"
+        description_1="You are about to create a new Pricing Procedure. Once created, it will be added to the database."
+        description_2="Please review all the details — before proceeding."
+        description_3="Are you sure you want to continue?"
+        on_confirm={handle_create}
+        on_cancel={() => set_is_confirm_modal_open(false)}
+        confirm_loading={create_loading}
+      />
       {select_modal_configs.map((cfg) => (
         <Select_Generic
           key={cfg.key}

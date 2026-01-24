@@ -174,7 +174,7 @@ const Branch = ({ set_page }) => {
           if (col.key === "actions") return false;
           const val = u[col.key];
           return val?.toString().toLowerCase().includes(q);
-        })
+        }),
       );
     }
 
@@ -218,9 +218,9 @@ const Branch = ({ set_page }) => {
               ?.toString()
               .toLowerCase()
               .includes(debounced_query.toLowerCase());
-          })
+          }),
         ).length
-      : branch_list.length) / select_option
+      : branch_list.length) / select_option,
   );
 
   const handle_sort = (column) => {

@@ -1,65 +1,33 @@
 import React, { useState } from "react";
 import { handle_text_change_function } from "assets/scripts/functions/input_functions";
 import Confirm_Modal from "assets/elements/modals/Confirm_Modal";
-import { ChevronLeft, CirclePlus } from "lucide-react";
+import { ChevronLeft, Edit2, RefreshCcwDot } from "lucide-react";
 import Button from "assets/elements/Button";
 import Text_Field from "assets/elements/Text_Field";
 import { format_date_1, get_date_now } from "assets/scripts/format";
-import Text_Code_Field from "assets/elements/Text_Code_Field";
 import Discount_Details from "./details/Discount_Details";
-import { item_master_list } from "assets/data/item_master_list";
 import Select_Generic from "assets/elements/modals/Select_Generic";
-import { customer_master_list } from "assets/data/customer_master_list";
-import { discount_category_list } from "assets/data/discount_category_list";
-import { get_description } from "assets/scripts/functions/get_description";
-import { customer_group_list } from "assets/data/customer_group_code";
-import { api_create_discount_con } from "api/firestore_db/financial/discount_condition/tbl_discount_con_api";
+import { item_master_list } from "assets/data/item_master_list";
+import { api_update_discount_con } from "api/firestore_db/financial/discount_condition/tbl_discount_con_api";
 
-const Create_Discount_Con = ({
+const Edit_Discount_Con = ({
   set_page,
   active_user,
   show_toast,
-  new_discount_con_data,
-  set_new_discount_con_data,
+  edit_discount_con_data,
+  set_edit_discount_con_data,
   set_discount_con_list,
-  reset_new_data,
 }) => {
   const [active_tab, set_active_tab] = useState("discount_details");
   const [is_confirm_modal_open, set_is_confirm_modal_open] = useState(false);
-  const [create_loading, set_create_loading] = useState(false);
+  const [edit_loading, set_edit_loading] = useState(false);
   const [display_modal, set_display_modal] = useState("");
 
   const handle_text_change = handle_text_change_function(
-    set_new_discount_con_data,
+    set_edit_discount_con_data,
   );
 
   const select_modal_configs = [
-    {
-      key: "select_discount_category",
-      label: "Discount Category",
-      show_creation_date: true,
-      width: "max-w-[1000px]",
-      list: discount_category_list,
-      column: ["Discount Category"],
-      code: ["discount_category_code"],
-      desc: ["discount_category_desc"],
-      lookup: [discount_category_list],
-      target: ["discount_category_code"],
-      on_after_select: () => {
-        set_new_discount_con_data((prev) => ({
-          ...prev,
-          item_code: "",
-          customer_code: "",
-          customer_group_code: "",
-          item_group_code: "",
-          item_group_1_code: "",
-          item_group_2_code: "",
-          item_group_3_code: "",
-          item_group_4_code: "",
-          item_group_5_code: "",
-        }));
-      },
-    },
     {
       key: "select_item",
       label: "Item",
@@ -72,60 +40,33 @@ const Create_Discount_Con = ({
       lookup: [item_master_list],
       target: ["item_code"],
     },
-    {
-      key: "select_customer",
-      label: "Customer",
-      show_creation_date: true,
-      width: "max-w-[1000px]",
-      list: customer_master_list,
-      column: ["Customer"],
-      code: ["customer_code"],
-      desc: ["customer_desc"],
-      lookup: [customer_master_list],
-      target: ["customer_code"],
-    },
-    {
-      key: "select_customer_group",
-      label: "Customer Group",
-      show_creation_date: true,
-      width: "max-w-[1000px]",
-      list: customer_group_list,
-      column: ["Customer Group"],
-      code: ["customer_group_code"],
-      desc: ["customer_group_desc"],
-      lookup: [customer_group_list],
-      target: ["customer_group_code"],
-    },
   ];
 
-  const handle_create = async () => {
-    try {
-      set_create_loading(true);
+  const handle_go_back = () => set_page("main");
 
-      const res = await api_create_discount_con(
-        new_discount_con_data,
+  const handle_update = async () => {
+    try {
+      set_edit_loading(true);
+
+      const res = await api_update_discount_con(
+        edit_discount_con_data,
         active_user,
         show_toast,
       );
 
       if (res.success) {
-        set_discount_con_list((prev) => [...prev, res.data]);
-        reset_new_data();
+        set_discount_con_list((prev) =>
+          prev.map((item) => (item.id === res.id ? res.data : item)),
+        );
+        set_is_confirm_modal_open(false);
         set_page("main");
       }
     } catch (err) {
-      console.error("Create discount condition error:", err);
+      console.error("Error updating discount condition:", err);
     } finally {
-      close_confirm_modal();
+      set_edit_loading(false);
     }
   };
-
-  const close_confirm_modal = () => {
-    set_is_confirm_modal_open(false);
-    set_create_loading(false);
-  };
-
-  const handle_go_back = () => set_page("main");
 
   return (
     <React.Fragment>
@@ -133,7 +74,6 @@ const Create_Discount_Con = ({
         {/* HEADER */}
         <div className="flex flex-wrap items-center justify-between gap-3 py-5">
           <h1 className="text-xl">Financial</h1>
-          {/* + Breadcrumbs */}
           <nav>
             <ol className="flex flex-wrap items-center gap-1.5">
               <li>
@@ -161,11 +101,10 @@ const Create_Discount_Con = ({
               </li>
               <li className="flex items-center gap-1.5 text-sm text-gray-500">
                 <span>/</span>
-                <span className="text-gray-800">Create</span>
+                <span className="text-gray-800">Edit</span>
               </li>
             </ol>
           </nav>
-          {/* - Breadcrumbs */}
         </div>
 
         <div className="w-full bg-white rounded-lg border">
@@ -179,7 +118,7 @@ const Create_Discount_Con = ({
                 width="w-[20px]"
                 on_click={handle_go_back}
               ></Button>
-              <h1 className="text-lg">Discount Condition Creation</h1>
+              <h1 className="text-lg">Edit Discount Condition</h1>
             </div>
             <div className="text-sm text-gray-500">
               {format_date_1(get_date_now())}
@@ -192,15 +131,16 @@ const Create_Discount_Con = ({
               <Text_Field
                 label="Discount Condition Code"
                 placeholder={"Enter code"}
-                value={new_discount_con_data.discount_con_code}
-                on_change={handle_text_change("discount_con_code")}
+                value={edit_discount_con_data.discount_con_code}
+                // on_change={handle_text_change("discount_con_code")}
+                disabled
               />
             </div>
             <div>
               <Text_Field
                 label="Discount Condition Description"
                 placeholder={"Enter description"}
-                value={new_discount_con_data.discount_con_desc}
+                value={edit_discount_con_data.discount_con_desc}
                 on_change={handle_text_change("discount_con_desc")}
               />
             </div>
@@ -229,8 +169,8 @@ const Create_Discount_Con = ({
                   <Discount_Details
                     display_modal={display_modal}
                     set_display_modal={set_display_modal}
-                    new_discount_con_data={new_discount_con_data}
-                    set_new_discount_con_data={set_new_discount_con_data}
+                    edit_discount_con_data={edit_discount_con_data}
+                    set_edit_discount_con_data={set_edit_discount_con_data}
                   />
                 )}
               </div>
@@ -242,10 +182,10 @@ const Create_Discount_Con = ({
             <Button
               variant="primary"
               size="lg"
-              icon={CirclePlus}
+              icon={RefreshCcwDot}
               on_click={() => set_is_confirm_modal_open(true)}
             >
-              Create
+              Update
             </Button>
             <Button variant="white" size="lg" on_click={handle_go_back}>
               Cancel
@@ -254,17 +194,19 @@ const Create_Discount_Con = ({
         </div>
       </div>
 
+      {/* CONFIRM MODAL */}
       <Confirm_Modal
         is_open={is_confirm_modal_open}
-        title="Confirm Discount Condition Creation"
-        description_1="You are about to create a new Discount Condition."
+        title="Confirm Discount Condition Update"
+        description_1="You are about to update this Discount Condition."
         description_2="Please review all details before proceeding."
         description_3="Are you sure you want to continue?"
-        on_confirm={handle_create}
+        on_confirm={handle_update}
         on_cancel={() => set_is_confirm_modal_open(false)}
-        confirm_loading={create_loading}
+        confirm_loading={edit_loading}
       />
 
+      {/* SELECT MODALS */}
       {select_modal_configs.map((cfg) => (
         <Select_Generic
           key={cfg.key}
@@ -279,7 +221,7 @@ const Create_Discount_Con = ({
           source_desc={cfg.desc}
           lookup_lists={cfg.lookup}
           target_field={cfg.target}
-          set_data={set_new_discount_con_data}
+          set_data={set_edit_discount_con_data}
           on_after_select={cfg.on_after_select}
         />
       ))}
@@ -287,4 +229,4 @@ const Create_Discount_Con = ({
   );
 };
 
-export default Create_Discount_Con;
+export default Edit_Discount_Con;

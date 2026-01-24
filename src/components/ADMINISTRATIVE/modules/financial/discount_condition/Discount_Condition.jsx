@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-
 import {
   Search,
   ChevronDown,
@@ -9,6 +8,8 @@ import {
   View,
   PlusCircle,
   RefreshCw,
+  FileDigit,
+  Trash2,
 } from "lucide-react";
 
 import { Use_App } from "context/app_context";
@@ -20,69 +21,88 @@ import Icon_Field from "assets/elements/Icon_Field";
 import Select_Field from "assets/elements/Select_Field";
 import Pagination from "assets/elements/Pagination";
 import Spinner from "assets/elements/Spinner";
+import Set_Increment_ID from "assets/elements/modals/Set_Increment_ID";
 import { format_currency } from "assets/scripts/format";
-import Create_Discount_Con from "./create/Create_Discount_Con";
 
-/* MOCK API */
-const api_get_discount_conedure_list = async () => ({
-  success: true,
-  data: [
-    {
-      id: 1,
-      discount_con_code: "DGEN-8802",
-      discount_type: "Percent",
-      discount_value: 5,
-      min_qty: 0,
-      status: "Active",
-    },
-    {
-      id: 2,
-      discount_con_code: "DC01-CS0001-8802",
-      discount_type: "Amount",
-      discount_value: 10,
-      min_qty: 0,
-      status: "Active",
-    },
-  ],
-});
+import Create_Discount_Con from "./create/Create_Discount_Con";
+import Edit_Discount_Con from "./edit/Edit_Discount_Con";
+import View_Discount_Con from "./view/View_Discount_Con";
+import Delete_Discount_Con from "./delete/Delete_Discount_Con";
+
+import {
+  api_get_discount_con_list,
+  api_truncate_discount_con,
+  api_set_discount_con_increment,
+} from "api/firestore_db/financial/discount_condition/tbl_discount_con_api";
+
+import { Get_TBL_INCREMENTAL_ID } from "api/real_time_db/incremental";
 
 const Discount_Condition = () => {
   const { active_user } = Use_App();
   const { show_toast } = useToast();
 
   const [page, set_page] = useState("main");
+  const [display_modal, set_display_modal] = useState("");
   const [loading_list, set_loading_list] = useState(false);
-  const [discount_list, set_discount_list] = useState([]);
-  const [new_discount_con_data, set_new_discount_con_data] = useState({});
+  const [truncate_loading, set_truncate_loading] = useState(false);
+
+  const def_discount_con_data = {
+    id: null,
+    discount_con_code: "",
+    discount_con_desc: "",
+    discount_type: "Percent",
+    discount_value: null,
+    status: "Active",
+    creation_date: "",
+    created_by: "",
+    change_date: "",
+    change_by: "",
+  };
+
+  const [current_id, set_current_id] = useState(0);
+  const [new_discount_con_data, set_new_discount_con_data] = useState({
+    ...def_discount_con_data,
+  });
+
+  useEffect(() => {
+    Get_TBL_INCREMENTAL_ID("TBL_DISCOUNT_CONDITION", (value) => {
+      set_new_discount_con_data((prev) => ({ ...prev, id: value }));
+      set_current_id(value);
+    });
+  }, []);
+
+  const [discount_con_list, set_discount_con_list] = useState([]);
+  const [edit_data, set_edit_data] = useState({});
+  const [view_data, set_view_data] = useState({});
+  const [delete_data, set_delete_data] = useState({});
 
   const columns = [
     { key: "index", label: "#", sortable: false },
-    {
-      key: "discount_con_code",
-      label: "Discount Con. Code",
-      sortable: true,
-    },
+    { key: "discount_con_code", label: "Discount Code", sortable: true },
+    { key: "discount_con_desc", label: "Description", sortable: true },
     { key: "discount_type", label: "Type", sortable: true },
     { key: "discount_value", label: "Discount", sortable: true },
-    { key: "min_qty", label: "Min Qty", sortable: true },
-    // { key: "valid_from", label: "Valid From", sortable: true },
-    // { key: "valid_to", label: "Valid To", sortable: true },
     { key: "status", label: "Status", sortable: true },
     { key: "actions", label: "", sortable: false },
   ];
 
-  const handle_get_discount_list = async () => {
+  /* ======================================================
+     Get Discount List
+  ====================================================== */
+  const handle_get_discount_con_list = async () => {
     set_loading_list(true);
-    const response = await api_get_discount_conedure_list();
-    if (response.success) set_discount_list(response.data);
+    const response = await api_get_discount_con_list();
+    if (response.success) set_discount_con_list(response.data);
     set_loading_list(false);
   };
 
   useEffect(() => {
-    handle_get_discount_list();
+    handle_get_discount_con_list();
   }, []);
 
-  /* + Client-Side Filtering (COPIED FROM Pricing_Procedure) */
+  /* ======================================================
+     Client-Side Filtering, Sorting, Pagination
+  ====================================================== */
   const [filtered_list, set_filtered_list] = useState([]);
   const [show_entries, set_show_entries] = useState(5);
   const [current_page, set_current_page] = useState(1);
@@ -100,7 +120,7 @@ const Discount_Condition = () => {
   }, [search_query]);
 
   useEffect(() => {
-    let temp = [...discount_list];
+    let temp = [...discount_con_list];
 
     if (debounced_query.trim() !== "") {
       const q = debounced_query.toLowerCase();
@@ -116,8 +136,8 @@ const Discount_Condition = () => {
     temp.sort((a, b) => {
       const val_a = a[sort_by];
       const val_b = b[sort_by];
-      if (val_a == "") return 1;
-      if (val_b == "") return -1;
+      if (val_a == null) return 1;
+      if (val_b == null) return -1;
       if (val_a < val_b) return sort_order === "asc" ? -1 : 1;
       if (val_a > val_b) return sort_order === "asc" ? 1 : -1;
       return 0;
@@ -125,16 +145,15 @@ const Discount_Condition = () => {
 
     const start_idx = (current_page - 1) * show_entries;
     const end_idx = start_idx + show_entries;
-    const sliced = temp.slice(start_idx, end_idx);
 
-    const indexed_data = sliced.map((item, i) => ({
+    const indexed = temp.slice(start_idx, end_idx).map((item, i) => ({
       ...item,
       index: start_idx + i + 1,
     }));
 
-    set_filtered_list(indexed_data);
+    set_filtered_list(indexed);
   }, [
-    discount_list,
+    discount_con_list,
     debounced_query,
     sort_by,
     sort_order,
@@ -143,18 +162,8 @@ const Discount_Condition = () => {
   ]);
 
   const total_pages = Math.ceil(
-    (debounced_query
-      ? discount_list.filter((u) =>
-          columns.some((col) => {
-            if (col.key === "actions") return false;
-            const val = u[col.key];
-            return val
-              ?.toString()
-              .toLowerCase()
-              .includes(debounced_query.toLowerCase());
-          }),
-        ).length
-      : discount_list.length) / show_entries,
+    (debounced_query ? filtered_list.length : discount_con_list.length) /
+      show_entries,
   );
 
   const handle_sort = (column) => {
@@ -167,17 +176,48 @@ const Discount_Condition = () => {
     set_current_page(1);
   };
 
-  const handle_page_change = (page) => set_current_page(page);
+  /* ======================================================
+     Truncate Function
+  ====================================================== */
+  const handle_truncate_discount_con_list = async () => {
+    set_truncate_loading(true);
+    const response = await api_truncate_discount_con(show_toast);
+    if (response.success) handle_get_discount_con_list();
+    set_truncate_loading(false);
+  };
 
-  // RETURN ORIGIN
+  const handle_edit = (row) => {
+    set_edit_data(row);
+    set_page("edit");
+  };
+
+  const handle_view = (row) => {
+    set_view_data(row);
+    set_page("view");
+  };
+
+  const handle_delete = (row) => {
+    set_delete_data(row);
+    set_display_modal("delete");
+  };
+
+  const reset_new_data = () => {
+    set_new_discount_con_data((prev) => ({
+      ...def_discount_con_data,
+      id: prev.id,
+    }));
+  };
+
+  /* ======================================================
+     Render
+  ====================================================== */
   return (
     <React.Fragment>
       {page === "main" && (
-        <div>
-          {/* + Title */}
+        <div className="w-full">
+          {/* Title */}
           <div className="flex flex-wrap items-center justify-between gap-3 py-5">
             <h1 className="text-xl">Financial</h1>
-            {/* + Breadcrumbs */}
             <nav>
               <ol className="flex flex-wrap items-center gap-1.5">
                 <li>
@@ -197,25 +237,49 @@ const Discount_Condition = () => {
                 </li>
               </ol>
             </nav>
-            {/* - Breadcrumbs */}
           </div>
-          {/* - Title */}
 
           <div className="w-full bg-white rounded-lg border">
             <div className="flex justify-between items-center p-5">
               <h1 className="text-lg">Discount Condition</h1>
-              <Button
-                variant="primary"
-                icon={PlusCircle}
-                icon_position="left"
-                on_click={() => set_page("create")}
-              >
-                Create Discount Condition
-              </Button>
+              <div className="flex gap-2">
+                {active_user?.category === "DEV" && (
+                  <Button
+                    variant="success"
+                    icon={FileDigit}
+                    icon_position="left"
+                    width="w-[110px]"
+                    on_click={() => set_display_modal("set_incremental_id")}
+                  >
+                    Set ID
+                  </Button>
+                )}
+                {active_user?.category === "DEV" && (
+                  <Button
+                    variant="danger"
+                    icon={Trash2}
+                    icon_position="left"
+                    width="w-[110px]"
+                    loading={truncate_loading}
+                    on_click={handle_truncate_discount_con_list}
+                  >
+                    Truncate
+                  </Button>
+                )}
+                <Button
+                  variant="primary"
+                  icon={PlusCircle}
+                  icon_position="left"
+                  on_click={() => set_page("create")}
+                >
+                  Create Discount Condition
+                </Button>
+              </div>
             </div>
 
             <div className="p-5 sm:p-6 border-t">
               <div className="w-full border rounded-lg">
+                {/* Show entries & search */}
                 <div className="w-full md:flex md:justify-between p-4 gap-4">
                   <div className="flex items-center text-sm gap-2">
                     <div>Show</div>
@@ -233,12 +297,11 @@ const Discount_Condition = () => {
                         ]}
                       />
                     </div>
-                    <div className="mr-2">entries</div>
+                    <div>entries</div>
                     <Button
                       variant="white"
                       icon={RefreshCw}
-                      icon_position="left"
-                      on_click={handle_get_discount_list}
+                      on_click={handle_get_discount_con_list}
                     />
                   </div>
 
@@ -253,9 +316,10 @@ const Discount_Condition = () => {
                   </div>
                 </div>
 
+                {/* Table */}
                 <div className="overflow-x-auto">
                   {loading_list ? (
-                    <div className="p-6 flex justify-center items-center text-gray-500 text-sm">
+                    <div className="p-6 flex justify-center">
                       <Spinner />
                     </div>
                   ) : filtered_list.length === 0 ? (
@@ -315,21 +379,41 @@ const Discount_Condition = () => {
                                 ? `${row.discount_value}%`
                                 : format_currency(row.discount_value, 2, "");
 
+                            if (col.key === "status") {
+                              const status_class = {
+                                Active: "bg-green-100 text-green-500",
+                                Inactive: "bg-red-100 text-red-500",
+                              };
+                              return (
+                                <span
+                                  className={`inline-flex items-center justify-center gap-1 rounded-full px-3 py-0.5 text-xs font-medium ${
+                                    status_class[row.status] ||
+                                    "bg-gray-100 text-gray-500"
+                                  }`}
+                                >
+                                  {row.status}
+                                </span>
+                              );
+                            }
+
                             if (col.key === "actions")
                               return (
                                 <div className="flex gap-2">
                                   <Button_Action
                                     tooltip="View Record"
                                     icon={View}
+                                    on_click={() => handle_view(row)}
                                   />
                                   <Button_Action
                                     tooltip="Edit Record"
                                     icon={Edit}
+                                    on_click={() => handle_edit(row)}
                                   />
                                   <Button_Action
                                     tooltip="Delete Record"
                                     icon={Trash}
                                     variant="danger"
+                                    on_click={() => handle_delete(row)}
                                   />
                                 </div>
                               );
@@ -347,9 +431,7 @@ const Discount_Condition = () => {
                                   key={i}
                                   className={`border px-4 py-4 text-[12px] text-gray-600 ${
                                     i === 0 ? "border-l-0" : ""
-                                  } ${
-                                    i === columns.length - 1 ? "border-r-0" : ""
-                                  }`}
+                                  } ${i === columns.length - 1 ? "border-r-0" : ""}`}
                                 >
                                   {render_cell(col)}
                                 </td>
@@ -366,7 +448,7 @@ const Discount_Condition = () => {
                   <Pagination
                     current_page={current_page}
                     total_pages={total_pages}
-                    on_page_change={handle_page_change}
+                    on_page_change={set_current_page}
                     variant="compact"
                   />
                 )}
@@ -375,13 +457,52 @@ const Discount_Condition = () => {
           </div>
         </div>
       )}
+
       {page === "create" && (
         <Create_Discount_Con
           set_page={set_page}
+          active_user={active_user}
+          show_toast={show_toast}
           new_discount_con_data={new_discount_con_data}
           set_new_discount_con_data={set_new_discount_con_data}
+          set_discount_con_list={set_discount_con_list}
+          reset_new_data={reset_new_data}
         />
       )}
+
+      {page === "edit" && (
+        <Edit_Discount_Con
+          set_page={set_page}
+          active_user={active_user}
+          show_toast={show_toast}
+          edit_discount_con_data={edit_data}
+          set_edit_discount_con_data={set_edit_data}
+          set_discount_con_list={set_discount_con_list}
+        />
+      )}
+
+      {page === "view" && (
+        <View_Discount_Con
+          set_page={set_page}
+          view_discount_con_data={view_data}
+        />
+      )}
+
+      <Delete_Discount_Con
+        is_open={display_modal === "delete"}
+        on_close={() => set_display_modal("")}
+        show_toast={show_toast}
+        delete_data={delete_data}
+        set_discount_con_list={set_discount_con_list}
+      />
+
+      <Set_Increment_ID
+        is_open={display_modal === "set_incremental_id"}
+        on_close={() => set_display_modal("")}
+        show_toast={show_toast}
+        current_id={current_id}
+        api_set_increment_id={api_set_discount_con_increment}
+      />
     </React.Fragment>
   );
 };

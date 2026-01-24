@@ -9,6 +9,8 @@ import {
   View,
   PlusCircle,
   RefreshCw,
+  FileDigit,
+  Trash2,
 } from "lucide-react";
 
 import { Use_App } from "context/app_context";
@@ -22,41 +24,48 @@ import Pagination from "assets/elements/Pagination";
 import Spinner from "assets/elements/Spinner";
 import { format_currency } from "assets/scripts/format";
 import Create_Price_Proc from "./create/Create_Price_Proc";
+import {
+  api_get_price_proc_list,
+  api_set_price_proc_increment,
+  api_truncate_price_proc,
+} from "api/firestore_db/financial/price_procedure/tbl_price_proc_api";
+import { Get_TBL_INCREMENTAL_ID } from "api/real_time_db/incremental";
+import Set_Increment_ID from "assets/elements/modals/Set_Increment_ID";
 // import Create_Pricing_Con from "./create/Create_Pricing_Con";
 
-/* MOCK API */
-const api_get_price_proc_list = async () => ({
-  success: true,
-  data: [
-    {
-      id: 1,
-      price_proc_code: "8802-PPC01",
-      item_code: "8802",
-      price_con_code: "BP01-8802",
-      price_proc_category_code: "GEN",
-      customer_code: null,
-      customer_group_code: null,
-      item_group_code: null,
-      base_price: 120,
-      currency: "PHP",
-      status: "Active",
-      tax_rate: 12,
-      uom: "CS",
-      discount_category_code: "",
-      price_element_list: [
-        {
-          id: "BP01-8802",
-          code: "BP01-8802",
-          description: "SISTERS SF BUDGET PACK DAY-USE 4'S X 36",
-          amount: 120,
-          currency: "PHP",
-        },
-      ],
+// /* MOCK API */
+// const api_get_price_proc_list = async () => ({
+//   success: true,
+//   data: [
+//     {
+//       id: 1,
+//       price_proc_code: "8802-PPC01",
+//       item_code: "8802",
+//       price_proc_code: "BP01-8802",
+//       price_proc_category_code: "GEN",
+//       customer_code: null,
+//       customer_group_code: null,
+//       item_group_code: null,
+//       base_price: 120,
+//       currency: "PHP",
+//       status: "Active",
+//       tax_rate: 12,
+//       uom: "CS",
+//       discount_category_code: "",
+//       price_element_list: [
+//         {
+//           id: "BP01-8802",
+//           code: "BP01-8802",
+//           description: "SISTERS SF BUDGET PACK DAY-USE 4'S X 36",
+//           amount: 120,
+//           currency: "PHP",
+//         },
+//       ],
 
-      current_price: 120,
-    },
-  ],
-});
+//       current_price: 120,
+//     },
+//   ],
+// });
 
 const Pricing_Procedure = () => {
   const { active_user } = Use_App();
@@ -64,11 +73,45 @@ const Pricing_Procedure = () => {
 
   const [page, set_page] = useState("main");
   const [display_modal, set_display_modal] = useState("");
+  const [truncate_loading, set_truncate_loading] = useState(false);
   const [loading_list, set_loading_list] = useState(false);
+
+  const def_price_proc_data = {
+    id: null,
+    price_proc_code: "",
+    item_code: "",
+    price_proc_code: "",
+    price_proc_category_code: "",
+    customer_code: null,
+    customer_group_code: null,
+    item_group_code: null,
+    base_price: null,
+    currency: "PHP",
+    status: "Active",
+    tax_rate: 12,
+    uom: "CS",
+    discount_category_code: "RD",
+    price_element_list: [],
+    current_price: null,
+  };
+
+  const [current_id, set_current_id] = useState(0);
+  const [new_price_proc_data, set_new_price_proc_data] = useState({
+    ...def_price_proc_data,
+  });
+
+  useEffect(() => {
+    Get_TBL_INCREMENTAL_ID("TBL_PRICE_PROCEDURE", (value) => {
+      set_new_price_proc_data((prev) => ({
+        ...prev,
+        id: value,
+      }));
+      set_current_id(value);
+    });
+  }, []);
 
   const [price_proc_list, set_price_proc_list] = useState([]);
   const [edit_data, set_edit_data] = useState({});
-  const [new_price_proc_data, set_new_price_proc_data] = useState({});
   const [view_data, set_view_data] = useState({});
   const [delete_data, set_delete_data] = useState({});
 
@@ -90,7 +133,6 @@ const Pricing_Procedure = () => {
     { key: "discount_price", label: "Discount Price", sortable: true },
     { key: "currency", label: "Currency", sortable: true },
     { key: "uom", label: "UoM", sortable: true },
-    // { key: "tax_rate", label: "Tax %", sortable: true },
     { key: "valid_from", label: "Valid From", sortable: true },
     { key: "valid_to", label: "Valid To", sortable: true },
     { key: "status", label: "Status", sortable: true },
@@ -100,7 +142,11 @@ const Pricing_Procedure = () => {
   const handle_get_price_proc_list = async () => {
     set_loading_list(true);
     const response = await api_get_price_proc_list();
-    if (response.success) set_price_proc_list(response.data);
+    if (response.success) {
+      set_price_proc_list(response.data);
+    } else {
+      console.error(response.message);
+    }
     set_loading_list(false);
   };
 
@@ -196,6 +242,37 @@ const Pricing_Procedure = () => {
   const handle_page_change = (page) => set_current_page(page);
   /* - Client-Side Filtering */
 
+  const handle_truncate_price_proc_list = async () => {
+    set_truncate_loading(true);
+    const response = await api_truncate_price_proc(show_toast);
+    if (response.success) {
+      handle_get_price_proc_list();
+    }
+    set_truncate_loading(false);
+  };
+
+  const handle_edit = (row) => {
+    set_edit_data(row);
+    set_page("edit");
+  };
+
+  const handle_view = (row) => {
+    set_view_data(row);
+    set_page("view");
+  };
+  const handle_delete = (row) => {
+    set_delete_data(row);
+    set_display_modal("delete");
+  };
+
+  const reset_new_data = () => {
+    set_new_price_proc_data((prev) => ({
+      ...def_price_proc_data,
+      id: prev.id,
+    }));
+  };
+
+  // RETURN ORIGIN
   return (
     <React.Fragment>
       {page === "main" && (
@@ -229,14 +306,39 @@ const Pricing_Procedure = () => {
           <div className="w-full bg-white rounded-lg border">
             <div className="flex justify-between items-center p-5">
               <h1 className="text-lg">Pricing Procedure</h1>
-              <Button
-                variant="primary"
-                icon={PlusCircle}
-                icon_position="left"
-                on_click={() => set_page("create")}
-              >
-                Create Pricing Procedure
-              </Button>
+              <div className="flex gap-2">
+                {active_user?.category === "DEV" && (
+                  <Button
+                    variant="success"
+                    icon={FileDigit}
+                    icon_position="left"
+                    width="w-[110px]"
+                    on_click={() => set_display_modal("set_incremental_id")}
+                  >
+                    Set ID
+                  </Button>
+                )}
+                {active_user?.category === "DEV" && (
+                  <Button
+                    variant="danger"
+                    icon={Trash2}
+                    icon_position="left"
+                    width="w-[110px]"
+                    loading={truncate_loading}
+                    on_click={handle_truncate_price_proc_list}
+                  >
+                    Truncate
+                  </Button>
+                )}
+                <Button
+                  variant="primary"
+                  icon={PlusCircle}
+                  icon_position="left"
+                  on_click={() => set_page("create")}
+                >
+                  Create Pricing Procedure
+                </Button>
+              </div>
             </div>
 
             <div className="p-5 sm:p-6 border-t">
@@ -442,6 +544,14 @@ const Pricing_Procedure = () => {
           set_new_price_proc_data={set_new_price_proc_data}
         />
       )}
+
+      <Set_Increment_ID
+        is_open={display_modal === "set_incremental_id"}
+        on_close={() => set_display_modal("")}
+        show_toast={show_toast}
+        current_id={current_id}
+        api_set_increment_id={api_set_price_proc_increment}
+      />
     </React.Fragment>
   );
 };

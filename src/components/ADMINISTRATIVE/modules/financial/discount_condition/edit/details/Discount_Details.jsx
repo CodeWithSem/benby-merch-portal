@@ -2,20 +2,19 @@ import React from "react";
 import Select_Field from "assets/elements/Select_Field";
 import Text_Field from "assets/elements/Text_Field";
 import {
-  handle_date_change_function,
   handle_select_change_function,
   handle_text_change_function,
 } from "assets/scripts/functions/input_functions";
 
 const Discount_Details = ({
-  new_discount_con_data,
-  set_new_discount_con_data,
+  edit_discount_con_data,
+  set_edit_discount_con_data,
 }) => {
   const handle_text_change = handle_text_change_function(
-    set_new_discount_con_data,
+    set_edit_discount_con_data,
   );
   const handle_select_change = handle_select_change_function(
-    set_new_discount_con_data,
+    set_edit_discount_con_data,
   );
 
   return (
@@ -28,7 +27,7 @@ const Discount_Details = ({
               { label: "Percent", value: "Percent" },
               { label: "Amount", value: "Amount" },
             ]}
-            value={new_discount_con_data.discount_type}
+            value={edit_discount_con_data?.discount_type}
             on_change={handle_select_change("discount_type")}
           />
         </div>
@@ -37,7 +36,7 @@ const Discount_Details = ({
             label="Discount Value"
             type="number"
             placeholder={0}
-            value={new_discount_con_data.discount_value}
+            value={edit_discount_con_data?.discount_value}
             on_change={handle_text_change("discount_value")}
           />
         </div>
@@ -48,7 +47,7 @@ const Discount_Details = ({
               { label: "Active", value: "Active" },
               { label: "Inactive", value: "Inactive" },
             ]}
-            value={new_discount_con_data.status}
+            value={edit_discount_con_data?.status}
             on_change={handle_select_change("status")}
           />
         </div>
