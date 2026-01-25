@@ -23,7 +23,6 @@ import Select_Field from "assets/elements/Select_Field";
 import Pagination from "assets/elements/Pagination";
 import Spinner from "assets/elements/Spinner";
 import { format_currency } from "assets/scripts/format";
-import Create_Price_Proc from "./create/Create_Price_Proc";
 import {
   api_get_price_proc_list,
   api_set_price_proc_increment,
@@ -31,7 +30,8 @@ import {
 } from "api/firestore_db/financial/price_procedure/tbl_price_proc_api";
 import { Get_TBL_INCREMENTAL_ID } from "api/real_time_db/incremental";
 import Set_Increment_ID from "assets/elements/modals/Set_Increment_ID";
-// import Create_Pricing_Con from "./create/Create_Pricing_Con";
+import Create_Price_Proc from "./Create/Create_Price_Proc";
+import Edit_Price_Proc from "./edit/Edit_Price_Proc";
 
 // /* MOCK API */
 // const api_get_price_proc_list = async () => ({
@@ -75,6 +75,7 @@ const Pricing_Procedure = () => {
   const [display_modal, set_display_modal] = useState("");
   const [truncate_loading, set_truncate_loading] = useState(false);
   const [loading_list, set_loading_list] = useState(false);
+  const [price_element_list, set_price_element_list] = useState([]);
 
   const def_price_proc_data = {
     id: null,
@@ -86,10 +87,10 @@ const Pricing_Procedure = () => {
     customer_group_code: null,
     item_group_code: null,
     base_price: null,
-    currency: "PHP",
-    status: "Active",
+    currency: "",
+    status: "",
     tax_rate: 12,
-    uom: "CS",
+    uom: "",
     discount_category_code: "RD",
     price_element_list: [],
     current_price: null,
@@ -130,7 +131,7 @@ const Pricing_Procedure = () => {
       label: "Discount Category",
       sortable: true,
     },
-    { key: "discount_price", label: "Discount Price", sortable: true },
+    { key: "current_price", label: "Discount Price", sortable: true },
     { key: "currency", label: "Currency", sortable: true },
     { key: "uom", label: "UoM", sortable: true },
     { key: "valid_from", label: "Valid From", sortable: true },
@@ -253,6 +254,7 @@ const Pricing_Procedure = () => {
 
   const handle_edit = (row) => {
     set_edit_data(row);
+    set_price_element_list(row.price_element_list);
     set_page("edit");
   };
 
@@ -456,14 +458,32 @@ const Pricing_Procedure = () => {
                                     : row.discount_category_code}
                                 </span>
                               );
-                            if (col.key === "discount_price")
+                            if (col.key === "current_price")
                               return (
                                 <span>
                                   {row.discount_category_code === ""
                                     ? "-"
-                                    : format_currency(row.base_price, 2, "")}
+                                    : format_currency(row.current_price, 2, "")}
                                 </span>
                               );
+
+                            if (col.key === "status") {
+                              const status_class = {
+                                Active: "bg-green-100 text-green-500",
+                                Inactive: "bg-red-100 text-red-500",
+                              };
+                              return (
+                                <span
+                                  className={`inline-flex items-center justify-center gap-1 rounded-full px-3 py-0.5 text-xs font-medium ${
+                                    status_class[row.status] ||
+                                    "bg-gray-100 text-gray-500"
+                                  }`}
+                                >
+                                  {row.status}
+                                </span>
+                              );
+                            }
+
                             if (col.key === "actions")
                               return (
                                 <div className="flex gap-2">
@@ -478,7 +498,7 @@ const Pricing_Procedure = () => {
                                     <Button_Action
                                       icon={Edit}
                                       tooltip="Edit Record"
-                                      on_click={() => handle_edit_pricing(row)}
+                                      on_click={() => handle_edit(row)}
                                     />
                                   </div>
                                   <div className="relative group flex jusity-center items-center">
@@ -540,8 +560,27 @@ const Pricing_Procedure = () => {
       {page === "create" && (
         <Create_Price_Proc
           set_page={set_page}
+          active_user={active_user}
+          show_toast={show_toast}
           new_price_proc_data={new_price_proc_data}
           set_new_price_proc_data={set_new_price_proc_data}
+          price_element_list={price_element_list}
+          set_price_element_list={set_price_element_list}
+          set_price_proc_list={set_price_proc_list}
+          reset_new_data={reset_new_data}
+        />
+      )}
+
+      {page === "edit" && (
+        <Edit_Price_Proc
+          set_page={set_page}
+          active_user={active_user}
+          show_toast={show_toast}
+          edit_price_proc_data={edit_data}
+          set_edit_price_proc_data={set_edit_data}
+          price_element_list={price_element_list}
+          set_price_element_list={set_price_element_list}
+          set_price_proc_list={set_price_proc_list}
         />
       )}
 

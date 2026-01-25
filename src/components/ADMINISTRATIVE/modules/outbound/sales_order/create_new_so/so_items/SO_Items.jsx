@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useState } from "react";
 import {
   CirclePlus,
   CircleX,
@@ -7,9 +7,7 @@ import {
   Info,
   Search,
   SlidersHorizontal,
-  SquarePen,
   Trash,
-  Trash2,
 } from "lucide-react";
 import { format_currency, format_percentage } from "assets/scripts/format";
 import Text_Field from "assets/elements/Text_Field";
@@ -22,7 +20,6 @@ import Show_Item_Details from "./modals/Show_Item_Details";
 import Edit_Item from "./modals/Edit_Item";
 import Button_Action from "assets/elements/Button_Action";
 import Select_Item from "../../modals/Select_Item";
-import { price_proc_list } from "assets/data/price_proc_list";
 
 const SO_Items = ({ so_data }) => {
   const {
@@ -30,6 +27,7 @@ const SO_Items = ({ so_data }) => {
     new_so_data,
     selected_item_list,
     set_selected_item_list,
+    price_proc_list,
   } = so_data;
 
   const [display_item_modal, set_display_item_modal] = useState("");
@@ -333,6 +331,14 @@ const SO_Items = ({ so_data }) => {
                                 return (
                                   <td key={col.key} className="px-5 py-4">
                                     <div className="flex gap-2">
+                                      <Button_Action
+                                        icon={FileText}
+                                        tooltip="View Details"
+                                        size={20}
+                                        on_click={() =>
+                                          handle_show_details(item)
+                                        }
+                                      />
                                       <Button_Action
                                         icon={Edit}
                                         tooltip="Edit Item"

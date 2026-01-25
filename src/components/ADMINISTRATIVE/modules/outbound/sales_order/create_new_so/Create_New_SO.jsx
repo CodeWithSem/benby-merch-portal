@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Text_Field from "assets/elements/Text_Field";
 import Button from "assets/elements/Button";
 import { ChevronLeft, CirclePlus, Eye, Save, SaveAll } from "lucide-react";
@@ -22,6 +22,11 @@ import Select_Generic from "assets/elements/modals/Select_Generic";
 import { plant_h_list } from "assets/data/plant_h_list";
 import { branch_list } from "assets/data/branch_list";
 import { branch_h_list } from "assets/data/branch_h_list";
+import {
+  handle_checkbox_change_function,
+  handle_date_change_function,
+  handle_text_change_function,
+} from "assets/scripts/functions/input_functions";
 
 const Create_New_SO = ({ set_page, so_data }) => {
   const {
@@ -39,6 +44,7 @@ const Create_New_SO = ({ set_page, so_data }) => {
     set_selected_item_list,
     new_so_data,
     set_new_so_data,
+    price_proc_list,
   } = so_data;
   const [active_tab, set_active_tab] = useState("sales");
   const [display_modal, set_display_modal] = useState("");
@@ -94,6 +100,19 @@ const Create_New_SO = ({ set_page, so_data }) => {
     set_page("main");
   };
 
+  const handle_date_change = handle_date_change_function(set_new_so_data);
+  const handle_text_change = handle_text_change_function(set_new_so_data);
+  const handle_checkbox_change =
+    handle_checkbox_change_function(set_new_so_data);
+  useEffect(() => {
+    if (new_so_data.no_cancel_date) {
+      set_new_so_data((prev) => ({
+        ...prev,
+        po_cancel_date: "", // Clears the date when checkbox is true
+      }));
+    }
+  }, [new_so_data.no_cancel_date]);
+
   // RETURN ORIGIN
   return (
     <React.Fragment>
@@ -128,7 +147,7 @@ const Create_New_SO = ({ set_page, so_data }) => {
               </li>
               <li className="flex items-center gap-1.5 text-sm text-gray-500">
                 <span>/</span>
-                <span className="text-gray-800">Create New SO</span>
+                <span className="text-gray-800">Create</span>
               </li>
             </ol>
           </nav>
@@ -173,27 +192,26 @@ const Create_New_SO = ({ set_page, so_data }) => {
                       label="PO Number"
                       type={"text"}
                       placeholder={"Enter PO Number"}
-                      // value={""}
-                      // on_change={}
+                      value={new_so_data?.po_number}
+                      on_change={handle_text_change("po_number")}
                     />
                   </div>
                   <div>
                     <Date_Field
                       label="PO Cancellation Date"
-                      name="po_cancel_data"
-                      // value={selected_data}
-                      // on_change={handle_date_change}
-                      placeholder="Select Date"
+                      placeholder="MM-DD-YYYY"
+                      value={new_so_data.po_cancel_date}
+                      on_change={handle_date_change("po_cancel_date")}
+                      disabled={new_so_data?.no_cancel_date}
                     />
                   </div>
                   <div className="flex items-end pb-[7px]">
                     <Checkbox_Field
                       label="No Cancellation Date"
-                      name="no_cancel_date"
                       box_size={24}
                       icon_size={14}
-                      checked={false}
-                      on_change={(e) => alert(e.target.checked)}
+                      checked={new_so_data?.no_cancel_date}
+                      on_change={handle_checkbox_change("no_cancel_date")}
                     />
                   </div>
                   <div className="col-span-full">
@@ -339,6 +357,7 @@ const Create_New_SO = ({ set_page, so_data }) => {
               new_so_data,
               selected_item_list,
               set_selected_item_list,
+              price_proc_list,
             }}
           />
           {/* - Section 3 */}

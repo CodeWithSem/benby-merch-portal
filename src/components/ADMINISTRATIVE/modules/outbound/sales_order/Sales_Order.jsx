@@ -39,6 +39,7 @@ import { order_reason_list } from "assets/data/order_reason_list";
 import { plant_list } from "assets/data/plant_list";
 import { sloc_list } from "assets/data/sloc_list";
 import Select_Generic from "assets/elements/modals/Select_Generic";
+import { api_get_price_proc_list } from "api/firestore_db/financial/price_procedure/tbl_price_proc_api";
 
 const Sales_Order = () => {
   const { show_toast } = useToast();
@@ -214,6 +215,24 @@ const Sales_Order = () => {
   const handle_load_data = () => {
     set_show_load_data_button(false);
   };
+
+  const [loading_list, set_loading_list] = useState(false);
+  const [price_proc_list, set_price_proc_list] = useState([]);
+
+  const handle_get_price_proc_list = async () => {
+    set_loading_list(true);
+    const response = await api_get_price_proc_list();
+    if (response.success) {
+      set_price_proc_list(response.data);
+    } else {
+      console.error(response.message);
+    }
+    set_loading_list(false);
+  };
+
+  useEffect(() => {
+    handle_get_price_proc_list();
+  }, []);
 
   // RETURN ORIGIN
   return (
@@ -574,6 +593,7 @@ const Sales_Order = () => {
             set_selected_item_list,
             new_so_data,
             set_new_so_data,
+            price_proc_list,
           }}
         />
       )}

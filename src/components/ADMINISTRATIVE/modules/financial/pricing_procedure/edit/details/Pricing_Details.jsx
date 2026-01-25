@@ -1,0 +1,78 @@
+import React from "react";
+import Text_Field from "assets/elements/Text_Field";
+import { format_currency } from "assets/scripts/format";
+import Date_Field from "assets/elements/Date_Field";
+import { handle_date_change_function } from "assets/scripts/functions/input_functions";
+
+const Pricing_Details = ({
+  edit_price_proc_data,
+  set_edit_price_proc_data,
+}) => {
+  const handle_date_change = handle_date_change_function(
+    set_edit_price_proc_data,
+  );
+  // RETURN ORIGIN
+  return (
+    <React.Fragment>
+      <div className="rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6 dark:border-gray-800 dark:bg-gray-900">
+        <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+          <div>
+            <Text_Field
+              label="Base Price"
+              type={"text"}
+              value={format_currency(
+                edit_price_proc_data?.base_price || 0,
+                2,
+                "",
+              )}
+              disabled
+            />
+          </div>
+          <div>
+            <Text_Field
+              label="Unit of Measure (UoM)"
+              type={"text"}
+              value={edit_price_proc_data?.uom}
+              disabled
+            />
+          </div>
+          <div>
+            <Text_Field
+              label="Currency"
+              type={"text"}
+              value={edit_price_proc_data?.currency}
+              disabled
+            />
+          </div>
+          <div>
+            <Text_Field
+              label="Status"
+              type={"text"}
+              value={edit_price_proc_data?.status}
+              disabled
+            />
+          </div>
+          <div>
+            <Date_Field
+              label="Valid From"
+              placeholder="MM-DD-YYYY"
+              value={edit_price_proc_data.valid_from}
+              on_change={handle_date_change("valid_from")}
+            />
+          </div>
+          <div>
+            <Date_Field
+              label="Valid To"
+              placeholder="MM-DD-YYYY"
+              value={edit_price_proc_data.valid_to}
+              on_change={handle_date_change("valid_to")}
+            />
+          </div>
+          <div></div>
+        </div>
+      </div>
+    </React.Fragment>
+  );
+};
+
+export default Pricing_Details;

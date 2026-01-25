@@ -92,31 +92,7 @@ export const api_create_price_proc = async (new_data, user, show_toast) => {
     }
 
     // ---------------------------------------------
-    // 2. CHECK DUPLICATE price_proc_desc
-    // ---------------------------------------------
-    const q_desc = query(
-      tbl_price_proc_ref,
-      where("price_proc_desc", "==", new_data.price_proc_desc),
-    );
-    const snap_desc = await getDocs(q_desc);
-
-    if (!snap_desc.empty) {
-      show_toast({
-        type: "danger",
-        title: "Error",
-        message: "The description already exists.",
-        icon: <CircleX size={21} className="text-red-500" />,
-      });
-
-      return {
-        success: false,
-        message: "The description already exists.",
-        status: "desc_duplicate",
-      };
-    }
-
-    // ---------------------------------------------
-    // 3. CREATE NEW DATA
+    // 2. CREATE NEW DATA
     // ---------------------------------------------
     const final_new_data = {
       ...new_data,
@@ -202,34 +178,6 @@ export const api_update_price_proc = async (edit_data, user, show_toast) => {
     }
 
     const tbl_path = get_firestore_path(TABLES.PRICE_PROCEDURE);
-    const tbl_price_proc_ref = collection(firestore_db, ...tbl_path);
-
-    // ---------------------------------------------
-    // CHECK DUPLICATE price_proc_desc (exclude same ID)
-    // ---------------------------------------------
-    const q_desc = query(
-      tbl_price_proc_ref,
-      where("price_proc_desc", "==", edit_data.price_proc_desc),
-    );
-    const desc_snap = await getDocs(q_desc);
-
-    if (!desc_snap.empty) {
-      const existing = desc_snap.docs[0];
-      if (existing.id !== String(edit_data.id)) {
-        show_toast({
-          type: "danger",
-          title: "Error",
-          message: "The description already exists.",
-          icon: <CircleX size={21} className="text-red-500" />,
-        });
-
-        return {
-          success: false,
-          message: "The description already exists.",
-          status: "desc_duplicate",
-        };
-      }
-    }
 
     const doc_ref = doc(firestore_db, ...tbl_path, String(edit_data.id));
 

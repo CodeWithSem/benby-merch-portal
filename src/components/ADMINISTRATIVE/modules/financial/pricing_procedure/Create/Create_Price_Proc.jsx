@@ -17,11 +17,16 @@ import { customer_group_list } from "assets/data/customer_group_code";
 import { item_group_list } from "assets/data/item_group_list";
 import { api_create_price_proc } from "api/firestore_db/financial/price_procedure/tbl_price_proc_api";
 import Confirm_Modal from "assets/elements/modals/Confirm_Modal";
+import { validate_required_fields } from "assets/scripts/functions/validate_fields";
 
 const Create_Price_Proc = ({
   set_page,
+  active_user,
+  show_toast,
   new_price_proc_data,
   set_new_price_proc_data,
+  price_element_list,
+  set_price_element_list,
   set_price_proc_list,
   reset_new_data,
 }) => {
@@ -29,7 +34,7 @@ const Create_Price_Proc = ({
   const [is_confirm_modal_open, set_is_confirm_modal_open] = useState(false);
   const [create_loading, set_create_loading] = useState(false);
   const [active_tab, set_active_tab] = useState("pricing_details");
-  const [price_element_list, set_price_element_list] = useState([]);
+
   const select_modal_configs = [
     {
       key: "select_price_proc_category",
@@ -81,7 +86,7 @@ const Create_Price_Proc = ({
           currency: row.currency,
           tax_rate: row.tax_rate,
           status: row.status,
-          discount_category_code: "",
+          // discount_category_code: "",
         }));
         set_price_element_list([pricing_condition_element]);
       },
@@ -184,15 +189,13 @@ const Create_Price_Proc = ({
       current_price,
     };
 
+    console.log("DATA ENTRY:");
+    console.log(final_data);
     try {
       set_create_loading(true);
 
       const response = await api_create_price_proc(
-        {
-          ...final_data,
-          creation_date: get_date_now(),
-          created_by: active_user?.username,
-        },
+        final_data,
         active_user?.username,
         show_toast,
       );
@@ -406,7 +409,10 @@ const Create_Price_Proc = ({
               {/* + Tab Content */}
               <div className="p-6">
                 {active_tab === "pricing_details" && (
-                  <Pricing_Details new_price_proc_data={new_price_proc_data} />
+                  <Pricing_Details
+                    new_price_proc_data={new_price_proc_data}
+                    set_new_price_proc_data={set_new_price_proc_data}
+                  />
                 )}
               </div>
               {/* - Tab Content */}
