@@ -47,7 +47,7 @@ import Set_Increment_ID from "assets/elements/modals/Set_Increment_ID";
 import { get_description } from "assets/scripts/functions/get_description";
 import Spinner from "assets/elements/Spinner";
 import Select_DO from "./modals/select_do/Select_DO";
-import Create_New_WMO from "./create_new_wmo/Create_New_WMO";
+import Create_WMO_GR from "./create_wmo_gr/Create_WMO_GR";
 import Post_View_WMO from "./post_view_wmo/Post_View_WMO";
 // import Edit_PO from "./edit_po/Edit_PO";
 // import Post_View_PO from "./post_view_wmo/Post_View_PO";
@@ -69,8 +69,8 @@ const WM_Order = () => {
   const end = format_date_1(last_day_of_month);
   const [start_date, set_start_date] = useState(start);
   const [end_date, set_end_date] = useState(end);
-  const [gr_start_date, set_gr_start_date] = useState(start);
-  const [gr_end_date, set_gr_end_date] = useState(end);
+  const [do_start_date, set_do_start_date] = useState(start);
+  const [do_end_date, set_do_end_date] = useState(end);
   const [show_load_data_button, set_show_load_data_button] = useState(true);
   const [selected_gr_data, set_selected_gr_data] = useState({});
   const [status_filters, set_status_filters] = useState({
@@ -122,7 +122,7 @@ const WM_Order = () => {
       const response = await api_get_wm_order_list_by_date(
         start_date,
         end_date,
-        show_toast
+        show_toast,
       );
 
       if (response?.success) {
@@ -178,7 +178,7 @@ const WM_Order = () => {
     // WM ORDER STATUS FILTER
     // ---------------------------------------------------
     const active_statuses = Object.keys(status_filters).filter(
-      (status) => status_filters[status]
+      (status) => status_filters[status],
     );
 
     if (active_statuses.length > 0) {
@@ -192,7 +192,7 @@ const WM_Order = () => {
           if (col.key === "actions") return false;
           const val = u[col.key];
           return val?.toString().toLowerCase().includes(q);
-        })
+        }),
       );
     }
 
@@ -235,9 +235,9 @@ const WM_Order = () => {
               ?.toString()
               .toLowerCase()
               .includes(debounced_query.toLowerCase());
-          })
+          }),
         ).length
-      : wm_order_list.length) / show_entries
+      : wm_order_list.length) / show_entries,
   );
 
   const handle_sort = (column) => {
@@ -514,7 +514,7 @@ const WM_Order = () => {
                                       }
                                       on_change={() =>
                                         toggle_status_filter(
-                                          "Partially Received"
+                                          "Partially Received",
                                         )
                                       }
                                     />
@@ -732,7 +732,7 @@ const WM_Order = () => {
       )}
       {/* + Pages */}
       {page === "wmo_creation" && (
-        <Create_New_WMO
+        <Create_WMO_GR
           set_page={set_page}
           active_user={active_user}
           show_toast={show_toast}
@@ -791,10 +791,10 @@ const WM_Order = () => {
         width="max-w-[1000px]"
         height="max-h-[700px]"
         show_toast={show_toast}
-        gr_start_date={gr_start_date}
-        set_gr_start_date={set_gr_start_date}
-        gr_end_date={gr_end_date}
-        set_gr_end_date={set_gr_end_date}
+        do_start_date={do_start_date}
+        set_do_start_date={set_do_start_date}
+        do_end_date={do_end_date}
+        set_do_end_date={set_do_end_date}
         set_new_wmo_data={set_new_wmo_data}
         wm_order_list={wm_order_list}
         set_page={set_page}

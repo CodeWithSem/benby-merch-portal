@@ -5,11 +5,15 @@ import Checkbox_Field from "assets/elements/Checkbox_Field";
 import Button from "assets/elements/Button";
 import Pagination_Modal from "assets/elements/Pagination_Modal";
 import Date_Field from "assets/elements/Date_Field";
+import Select_Field from "assets/elements/Select_Field"; // Added Import
 import { format_date_1 } from "assets/scripts/format";
 import { api_get_goods_receipt_list_by_date } from "api/firestore_db/inbound/goods_receipt/tbl_goods_receipt_api";
+// import { api_get_goods_issue_list_by_date } from "api/firestore_db/outbound/goods_issue/tbl_goods_issue_api";
 import Spinner from "assets/elements/Spinner";
-import { item_master_list, sbin_list } from "../../WMO_DATA_MAP";
+import { item_master_list } from "assets/data/item_master_list";
+import { sbin_list } from "../../WMO_DATA_MAP";
 import { generate_wm_orders } from "assets/scripts/functions/palletization";
+import { api_get_goods_issue_list_by_date } from "api/firestore_db/outbound/goods_issue/tbl_goods_issue_api";
 
 const Select_DO = ({
   is_open,
@@ -17,20 +21,21 @@ const Select_DO = ({
   width = "max-w-[700px]",
   height = "h-[500px]",
   show_toast,
-  gr_start_date,
-  set_gr_start_date,
-  gr_end_date,
-  set_gr_end_date,
+  do_start_date,
+  set_do_start_date,
+  do_end_date,
+  set_do_end_date,
   set_new_wmo_data,
   wm_order_list,
   set_page,
 }) => {
-  const [show_load_data_button, set_show_load_data_button] = useState(true);
   const [loading_list, set_loading_list] = useState(false);
   const [selected_gr, set_selected_gr] = useState({});
   const [wm_order_list_data, set_wm_order_list_data] = useState([]);
 
-  // + Client-Side Filtering
+  // New State for Dynamic Process
+  const [process_type, set_process_type] = useState("Goods Receipt");
+
   const [filtered_wm_order_list, set_filtered_wm_order_list] = useState([]);
   const [show_entries, set_show_entries] = useState(5);
   const [current_page, set_current_page] = useState(1);
@@ -39,15 +44,25 @@ const Select_DO = ({
   const [search_query, set_search_query] = useState("");
   const [debounced_query, set_debounced_query] = useState("");
   const [total_pages, set_total_pages] = useState(0);
-  // - Client-Side Filtering
 
-  const handle_get_goods_receipt_list = async () => {
+  const handle_get_data_list = async () => {
     set_loading_list(true);
-    const response = await api_get_goods_receipt_list_by_date(
-      gr_start_date,
-      gr_end_date,
-      show_toast,
-    );
+    let response;
+
+    if (process_type === "Goods Receipt") {
+      response = await api_get_goods_receipt_list_by_date(
+        do_start_date,
+        do_end_date,
+        show_toast,
+      );
+    } else {
+      response = await api_get_goods_issue_list_by_date(
+        do_start_date,
+        do_end_date,
+        show_toast,
+      );
+    }
+
     if (response.success) {
       set_wm_order_list_data(response.data);
     }
@@ -55,10 +70,9 @@ const Select_DO = ({
   };
 
   useEffect(() => {
-    handle_get_goods_receipt_list();
-  }, [wm_order_list]);
+    handle_get_data_list();
+  }, [wm_order_list, process_type]); // Re-fetch if process type changes
 
-  // --- Debounce Search ---
   useEffect(() => {
     const timer = setTimeout(() => {
       set_debounced_query(search_query);
@@ -67,21 +81,27 @@ const Select_DO = ({
     return () => clearTimeout(timer);
   }, [search_query]);
 
-  // --- Filter, Sort & Paginate ---
   useEffect(() => {
-    let temp = wm_order_list_data.filter((gr) => gr.gr_status === "Posted");
+    // Filter by status depending on process type
+    let temp = wm_order_list_data.filter((item) =>
+      process_type === "Goods Receipt"
+        ? item.gr_status === "Posted"
+        : item.gi_status === "Posted",
+    );
 
-    // SEARCH
     if (debounced_query.trim() !== "") {
       const q = debounced_query.toLowerCase();
-      temp = temp.filter((gr) =>
-        [gr.gr_number, gr.po_number, gr.creation_date].some((f) =>
-          f?.toString().toLowerCase().includes(q),
-        ),
+      temp = temp.filter((item) =>
+        [
+          item.gr_number,
+          item.gi_number,
+          item.po_number,
+          item.so_number,
+          item.creation_date,
+        ].some((f) => f?.toString().toLowerCase().includes(q)),
       );
     }
 
-    // SORT
     temp.sort((a, b) => {
       const val_a = a[sort_by];
       const val_b = b[sort_by];
@@ -92,10 +112,7 @@ const Select_DO = ({
       return 0;
     });
 
-    // TOTAL PAGES
     set_total_pages(Math.ceil(temp.length / show_entries));
-
-    // PAGINATION
     const start_idx = (current_page - 1) * show_entries;
     const end_idx = start_idx + show_entries;
     set_filtered_wm_order_list(temp.slice(start_idx, end_idx));
@@ -106,13 +123,13 @@ const Select_DO = ({
     sort_order,
     current_page,
     show_entries,
+    process_type,
   ]);
 
   const handle_page_change = (page) => set_current_page(page);
 
   const handle_proceed = () => {
     if (!selected_gr) return;
-
     const wm_allocation_list = generate_wm_orders({
       selected_gr,
       item_master_list,
@@ -120,39 +137,33 @@ const Select_DO = ({
     });
 
     set_new_wmo_data((prev) => {
-      const { id: gr_id, ...rest_gr } = selected_gr;
-
+      const { id: doc_id, ...rest_doc } = selected_gr;
       return {
-        ...prev, // keeps WM order id
-        ...rest_gr, // other GR fields
-        gr_id, // explicitly mapped
+        ...prev,
+        ...rest_doc,
+        process_type,
+        gr_id: process_type === "Goods Receipt" ? doc_id : null,
+        gi_id: process_type === "Goods Issue" ? doc_id : null,
         wm_allocation_list,
       };
     });
 
-    console.log(selected_gr);
     set_selected_gr(null);
     set_page("wmo_creation");
     on_close();
   };
 
-  /* 🔁 DATE HANDLERS (UNCHANGED LOGIC) */
-  const handle_change_gr_start_date = (value) => {
-    set_gr_start_date(format_date_1(value));
-  };
-
-  const handle_change_gr_end_date = (value) => {
-    set_gr_end_date(format_date_1(value));
-  };
-
-  const handle_load_data = () => handle_get_goods_receipt_list();
+  const handle_change_do_start_date = (value) =>
+    set_do_start_date(format_date_1(value));
+  const handle_change_do_end_date = (value) =>
+    set_do_end_date(format_date_1(value));
+  const handle_load_data = () => handle_get_data_list();
 
   if (!is_open) return null;
 
   return (
     <div className="fixed inset-0 flex items-center justify-center z-[97] px-4">
       <div className="absolute inset-0 bg-black/50 backdrop-blur-sm z-[98]" />
-
       <div
         className={`relative bg-white rounded-lg shadow-xl ${width} w-full py-7 m-5 z-[99]`}
       >
@@ -164,38 +175,45 @@ const Select_DO = ({
         </button>
 
         <div className="text-lg md:text-xl font-bold mb-5 px-7">
-          Goods Receipt Selection
+          Document Selection
         </div>
 
         <div className={`w-full overflow-y-auto ${height} scrollbar-custom`}>
           <div className="overflow-hidden border border-gray-200 bg-white pt-4">
-            {/* DATE FILTERS */}
-            <div className="px-6 mb-5 grid grid-cols-1 gap-5 md:w-[800px] md:grid-cols-3">
+            {/* UPDATED DATE & PROCESS FILTERS */}
+            <div className="px-6 mb-5 grid grid-cols-1 gap-5 md:w-[800px] md:grid-cols-4">
+              <Select_Field
+                label="Process Type"
+                value={process_type}
+                on_change={(e) => set_process_type(e.target.value)}
+                options={[
+                  { label: "Goods Receipt", value: "Goods Receipt" },
+                  { label: "Goods Issue", value: "Goods Issue" },
+                ]}
+              />
               <Date_Field
                 label="Start Date"
-                value={gr_start_date}
-                on_change={(e) => handle_change_gr_start_date(e.target.value)}
+                value={do_start_date}
+                on_change={(e) => handle_change_do_start_date(e.target.value)}
                 placeholder="Select Date"
               />
               <Date_Field
                 label="End Date"
-                value={gr_end_date}
-                on_change={(e) => handle_change_gr_end_date(e.target.value)}
+                value={do_end_date}
+                on_change={(e) => handle_change_do_end_date(e.target.value)}
                 placeholder="Select Date"
               />
               <div className="flex w-full items-end">
-                {show_load_data_button && (
-                  <Button
-                    variant="primary"
-                    icon={Database}
-                    width="w-[150px]"
-                    icon_position="left"
-                    loading={loading_list}
-                    on_click={handle_load_data}
-                  >
-                    Load Data
-                  </Button>
-                )}
+                <Button
+                  variant="primary"
+                  icon={Database}
+                  width="w-[150px]"
+                  icon_position="left"
+                  loading={loading_list}
+                  on_click={handle_load_data}
+                >
+                  Load Data
+                </Button>
               </div>
             </div>
 
@@ -220,10 +238,14 @@ const Select_DO = ({
                   <tr className="font-semibold text-xs">
                     <th className="px-6 py-3 w-[80px]"></th>
                     <th className="px-6 py-3 text-gray-500 text-left">
-                      GR Number
+                      {process_type === "Goods Receipt"
+                        ? "GR Number"
+                        : "GI Number"}
                     </th>
                     <th className="px-6 py-3 text-gray-500 text-left">
-                      PO Number
+                      {process_type === "Goods Receipt"
+                        ? "PO Number"
+                        : "SO Number"}
                     </th>
                     <th className="px-6 py-3 text-gray-500 text-left">
                       Creation Date
@@ -244,45 +266,42 @@ const Select_DO = ({
                     <tr>
                       <td
                         colSpan={4}
-                        className="text-center py-6 text-gray-500 text-sm"
+                        className="text-center px-5 py-4 text-gray-500 text-sm"
                       >
                         No data found
                       </td>
                     </tr>
                   ) : (
-                    filtered_wm_order_list.map((gr) => (
+                    filtered_wm_order_list.map((item) => (
                       <tr
-                        key={gr.id}
+                        key={item.id}
                         className={`hover:bg-sky-50/50 cursor-pointer text-[12px] ${
-                          selected_gr?.id === gr.id ? "bg-sky-50" : ""
+                          selected_gr?.id === item.id ? "bg-sky-50" : ""
                         }`}
-                        onClick={() => set_selected_gr(gr)}
+                        onClick={() => set_selected_gr(item)}
                       >
                         <td className="px-5 py-4 sm:px-6 text-center">
                           <Checkbox_Field
                             name="check"
                             box_size={20}
                             icon_size={14}
-                            checked={selected_gr?.id === gr.id}
-                            on_change={() => set_selected_gr(gr)}
+                            checked={selected_gr?.id === item.id}
+                            on_change={() => set_selected_gr(item)}
                           />
                         </td>
-
                         <td className="px-5 py-4 sm:px-6">
                           <div className="font-medium text-gray-800">
-                            {gr.gr_number}
+                            {item.gr_number || item.gi_number}
                           </div>
                         </td>
-
                         <td className="px-5 py-4 sm:px-6">
                           <div className="font-medium text-gray-800">
-                            {gr.po_number || "-"}
+                            {item.po_number || item.so_number || "-"}
                           </div>
                         </td>
-
                         <td className="px-5 py-4 sm:px-6">
                           <div className="font-medium text-gray-800 tracking-wide">
-                            {gr.creation_date}
+                            {item.creation_date}
                           </div>
                         </td>
                       </tr>
@@ -305,7 +324,6 @@ const Select_DO = ({
               />
             )}
           </div>
-
           <div className="flex justify-center sm:justify-end gap-2 w-full">
             <Button
               variant="primary"
@@ -315,7 +333,6 @@ const Select_DO = ({
             >
               Proceed
             </Button>
-
             <Button
               variant="white"
               on_click={on_close}

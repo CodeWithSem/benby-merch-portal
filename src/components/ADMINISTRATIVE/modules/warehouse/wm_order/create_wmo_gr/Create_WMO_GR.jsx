@@ -5,11 +5,8 @@ import Button from "assets/elements/Button";
 import Text_Field from "assets/elements/Text_Field";
 import WM_Items from "./wm_items/WM_Items";
 import { api_create_wm_order } from "api/firestore_db/warehouse/wm_order/tbl_wm_order_api";
-// import GR_Items from "./gr_items/GR_Items";
-// import { api_update_po_selected_item_list } from "api/firestore_db/inbound/purchase_order/tbl_purchase_order_api";
-// import { api_create_goods_receipt } from "api/firestore_db/inbound/goods_receipt/tbl_goods_receipt_api";
 
-const Create_New_WMO = ({
+const Create_WMO_GR = ({
   set_page,
   active_user,
   show_toast,
@@ -38,7 +35,7 @@ const Create_New_WMO = ({
       const response = await api_create_wm_order(
         clean_wmo_data,
         active_user?.username,
-        show_toast
+        show_toast,
       );
 
       if (!response?.success) return;
@@ -256,4 +253,4 @@ const Create_New_WMO = ({
   );
 };
 
-export default Create_New_WMO;
+export default Create_WMO_GR;
