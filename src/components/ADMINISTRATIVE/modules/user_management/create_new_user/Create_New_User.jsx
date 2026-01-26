@@ -89,7 +89,7 @@ const Create_New_User = ({
         user_category_code,
         user_role_code,
         active_user?.username,
-        show_toast
+        show_toast,
       );
 
       set_user_list((prev) => [...prev, result]);
@@ -272,7 +272,7 @@ const Create_New_User = ({
                     new_user_data.user_category_code,
                     user_category_list,
                     "user_category_code",
-                    "user_category_desc"
+                    "user_category_desc",
                   )} //--> batch_type_code
                   on_click={() => set_display_modal("select_user_category")}
                   disabled
@@ -285,7 +285,7 @@ const Create_New_User = ({
                     new_user_data.user_role_code,
                     user_role_list,
                     "user_role_code",
-                    "user_role_desc"
+                    "user_role_desc",
                   )} //--> user_role_code
                   on_click={() => set_display_modal("select_user_role")}
                   disabled
