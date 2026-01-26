@@ -105,7 +105,8 @@ const Select_Item = ({
       return;
     }
 
-    const unit_price = resolve_unit_price({
+    // 🔹 Destructure the result
+    const { price, record } = resolve_unit_price({
       item_code: selected_item.item_code,
       customer_code,
       customer_group_code,
@@ -119,10 +120,11 @@ const Select_Item = ({
       item_code: selected_item.item_code,
       item_desc: selected_item.item_desc,
       uom: selected_item.uom,
-      unit_price,
-      total: unit_price * prev.quantity,
-      // base_price: unit_price,
-      // current_price: unit_price,
+      unit_price: price, // Use the extracted price
+      total: price * prev.quantity,
+
+      // 🔹 Save the matched pricing record for future reference
+      price_procedure: record,
     }));
 
     set_selected_item(null);

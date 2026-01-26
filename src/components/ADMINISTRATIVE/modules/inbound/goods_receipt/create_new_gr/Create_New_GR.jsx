@@ -37,7 +37,7 @@ const Create_New_GR = ({
       } = selected_po_data;
 
       const received_item_list = selected_item_list.filter(
-        ({ quantity_received }) => quantity_received > 0
+        ({ quantity_received }) => quantity_received > 0,
       );
 
       if (!received_item_list.length) {
@@ -55,13 +55,13 @@ const Create_New_GR = ({
           ...rest,
           quantity_open: quantity_left,
           quantity_left,
-        })
+        }),
       );
 
       await api_update_po_selected_item_list(
         po_id,
         cleaned_item_list,
-        show_toast
+        show_toast,
       );
 
       const gr_data = {
@@ -71,13 +71,14 @@ const Create_New_GR = ({
         po_type,
         po_creation_date,
         received_item_list,
-        gr_status: "Pending",
+        gr_status: "Approved", // FOR TESTING
+        // gr_status: "Pending",
       };
 
       const response = await api_create_goods_receipt(
         gr_data,
         active_user?.username,
-        show_toast
+        show_toast,
       );
 
       if (!response?.success) return;
@@ -218,7 +219,7 @@ const Create_New_GR = ({
                 loading={create_loading}
                 disabled={
                   selected_po_data.selected_item_list.filter(
-                    ({ quantity_received }) => quantity_received > 0
+                    ({ quantity_received }) => quantity_received > 0,
                   ).length === 0
                 }
                 on_click={() => set_is_confirm_modal_open(true)}

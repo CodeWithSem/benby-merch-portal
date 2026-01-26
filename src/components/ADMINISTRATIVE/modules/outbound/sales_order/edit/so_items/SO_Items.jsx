@@ -24,7 +24,7 @@ import Select_Item from "../../modals/Select_Item";
 const SO_Items = ({ so_data }) => {
   const {
     show_toast,
-    new_so_data,
+    edit_so_data,
     selected_item_list,
     set_selected_item_list,
     price_proc_list,
@@ -41,6 +41,7 @@ const SO_Items = ({ so_data }) => {
     quantity: 1,
     total: "",
   });
+  const [view_item_data, set_view_item_data] = useState({});
 
   const filtered_item_list = selected_item_list.filter((item) =>
     item.item_desc.toLowerCase().includes(search_query.toLowerCase()),
@@ -97,7 +98,7 @@ const SO_Items = ({ so_data }) => {
   };
 
   const handle_show_select_item_modal = () => {
-    if (!new_so_data.customer_code) {
+    if (!edit_so_data.customer_code) {
       show_toast({
         type: "danger",
         title: "Invalid",
@@ -105,7 +106,7 @@ const SO_Items = ({ so_data }) => {
         icon: <CircleX size={21} className="text-red-500" />,
       });
       return;
-    } else if (!new_so_data.customer_sh_code) {
+    } else if (!edit_so_data.customer_sh_code) {
       show_toast({
         type: "danger",
         title: "Invalid",
@@ -117,8 +118,9 @@ const SO_Items = ({ so_data }) => {
     set_display_item_modal("select_item");
   };
 
-  const handle_show_details = () => {
-    set_display_item_modal("show_details");
+  const handle_view = (data) => {
+    set_view_item_data(data);
+    set_display_item_modal("view_details");
   };
   const handle_edit_item = () => {
     set_display_item_modal("edit_item");
@@ -335,9 +337,7 @@ const SO_Items = ({ so_data }) => {
                                         icon={FileText}
                                         tooltip="View Details"
                                         size={20}
-                                        on_click={() =>
-                                          handle_show_details(item)
-                                        }
+                                        on_click={() => handle_view(item)}
                                       />
                                       <Button_Action
                                         icon={Edit}
@@ -502,9 +502,10 @@ const SO_Items = ({ so_data }) => {
       </div>
       {/* + Modals */}
       <Show_Item_Details
-        is_open={display_item_modal === "show_details"}
+        is_open={display_item_modal === "view_details"}
         on_close={() => set_display_item_modal("")}
         width="max-w-[1280px]"
+        view_item_data={view_item_data}
       />
       <Edit_Item
         is_open={display_item_modal === "edit_item"}
@@ -514,9 +515,9 @@ const SO_Items = ({ so_data }) => {
       <Select_Item
         is_open={display_item_modal === "select_item"}
         on_close={() => set_display_item_modal("")}
-        sales_org_code={new_so_data.sales_org_code}
-        dist_channel_code={new_so_data.dist_channel_code}
-        customer_code={new_so_data.customer_code}
+        sales_org_code={edit_so_data.sales_org_code}
+        dist_channel_code={edit_so_data.dist_channel_code}
+        customer_code={edit_so_data.customer_code}
         customer_group_code={""}
         item_group_code={""}
         price_proc_list={price_proc_list}

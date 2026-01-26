@@ -272,8 +272,8 @@ const Edit_Pricing_Con = ({
       <Confirm_Modal
         is_open={is_confirm_modal_open}
         title="Confirm Pricing Condition Update"
-        description_1="You are about to update this Pricing Condition."
-        description_2="Please review all the details before proceeding."
+        description_1="You are about to edit this Pricing Condition. Once edited, it will be updated to the database."
+        description_2="Please review all the details — before proceeding."
         description_3="Are you sure you want to continue?"
         on_confirm={handle_update}
         on_cancel={() => set_is_confirm_modal_open(false)}

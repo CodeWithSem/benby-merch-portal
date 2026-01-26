@@ -1,43 +1,69 @@
 import React, { useState } from "react";
-import { format_date_1, get_date_now } from "assets/scripts/format";
 import { ChevronLeft, FileInput } from "lucide-react";
-import Text_Field from "assets/elements/Text_Field";
 import Button from "assets/elements/Button";
-import GI_Items from "./gi_items/GI_Items";
+import Text_Field from "assets/elements/Text_Field";
+import GI_Items from "./gi_items/GI_Items"; // Updated to GI_Items
+import { api_post_goods_issue } from "api/firestore_db/outbound/goods_issue/tbl_goods_issue_api"; // Updated API path
 
-const Post_View_GI = ({ set_page, for_posting }) => {
-  const [display_modal, set_display_modal] = useState("");
+const Post_View_GI = ({
+  set_page,
+  active_user,
+  show_toast,
+  view_gi_data, // Changed from view_gr_data
+  for_posting,
+  set_gi_list, // Changed from set_gr_list
+}) => {
   const [is_confirm_modal_open, set_is_confirm_modal_open] = useState(false);
+  const [post_loading, set_post_loading] = useState(false);
 
-  const handle_post_gi = () => {
-    alert("Post GI");
+  const handle_post_gi = async () => {
+    const final_gi_data = {
+      ...view_gi_data,
+      gi_status: "Posted", // Changed from gr_status
+    };
+
+    try {
+      set_post_loading(true);
+      const response = await api_post_goods_issue(
+        final_gi_data,
+        active_user?.username,
+        show_toast,
+      );
+      if (response.success) {
+        set_gi_list((prev) =>
+          prev.map((item) =>
+            item.id === response.data.id ? response.data : item,
+          ),
+        );
+        handle_go_back();
+      }
+    } catch (error) {
+      console.error("Failed to post goods issue:", error);
+    } finally {
+      close_confirm_modal();
+    }
   };
 
-  const handle_go_back = () => {
-    set_page("main");
+  const close_confirm_modal = () => {
+    set_is_confirm_modal_open(false);
+    set_post_loading(false);
   };
 
   const Confirm_Modal = () => {
     return (
       <React.Fragment>
         <div className="fixed inset-0 flex items-center justify-center z-[100]">
-          {/* + Blur */}
           <div className="absolute inset-0 bg-black/50 backdrop-blur-sm z-[101]"></div>
-          {/* - Blur */}
-          {/* + Modal Content */}
-          <div
-            className={`relative bg-white rounded-lg shadow-xl max-w-[500px] w-full p-10 m-5 z-[102]`}
-          >
+          <div className="relative bg-white rounded-lg shadow-xl max-w-[500px] w-full p-10 m-5 z-[102]">
             <div className="w-full flex justify-center items-center text-lg md:text-xl font-bold mb-4">
               Confirm Goods Issue Posting
             </div>
             <p className="w-full text-center text-sm leading-6 text-gray-500 dark:text-gray-400 pt-4">
-              You are about to post this Goods Issue. Once posted, it will be
-              finalized and no further changes can be made.
+              You are about to post this Goods Issue. Once posted, the inventory
+              will be deducted and the record will be updated in the database.
             </p>
             <p className="w-full text-center text-sm leading-6 text-gray-500 dark:text-gray-400 pt-4">
-              Please review all details — including items, quantities, and
-              batches — before proceeding.
+              Please review all quantities — before proceeding.
             </p>
             <p className="w-full text-center text-sm leading-6 text-gray-500 dark:text-gray-400 py-4">
               Are you sure you want to continue?
@@ -46,6 +72,7 @@ const Post_View_GI = ({ set_page, for_posting }) => {
               <Button
                 width="w-[100px]"
                 variant="primary"
+                loading={post_loading}
                 on_click={handle_post_gi}
               >
                 Yes
@@ -54,24 +81,26 @@ const Post_View_GI = ({ set_page, for_posting }) => {
                 width="w-[100px]"
                 variant="white"
                 on_click={() => set_is_confirm_modal_open(false)}
+                disabled={post_loading}
               >
                 No
               </Button>
             </div>
           </div>
-          {/* - Modal Content */}
         </div>
       </React.Fragment>
     );
   };
 
-  // RETURN ORIGIN
+  const handle_go_back = () => {
+    set_page("main");
+  };
+
   return (
     <React.Fragment>
       <div className="w-full">
         <div className="flex flex-wrap items-center justify-between gap-3 py-5">
           <h1 className="text-xl">Outbound</h1>
-          {/* + Breadcrumbs */}
           <nav>
             <ol className="flex flex-wrap items-center gap-1.5">
               <li>
@@ -100,15 +129,14 @@ const Post_View_GI = ({ set_page, for_posting }) => {
               <li className="flex items-center gap-1.5 text-sm text-gray-500">
                 <span>/</span>
                 <span className="text-gray-800">
-                  {for_posting ? "Post GI" : "View GI"}
+                  {for_posting ? "Post" : "View"}
                 </span>
               </li>
             </ol>
           </nav>
-          {/* - Breadcrumbs */}
         </div>
+
         <div className="w-full bg-white rounded-lg border">
-          {/* + Header */}
           <div className="flex flex-wrap items-center justify-between gap-3 p-5">
             <div className="flex items-center gap-3">
               <Button
@@ -119,18 +147,14 @@ const Post_View_GI = ({ set_page, for_posting }) => {
                 on_click={handle_go_back}
               ></Button>
               <h1 className="text-lg">
-                {for_posting ? "Post Goods Issue" : "View Goods Issue"}
+                {for_posting ? "Post" : "View"} Goods Issue
               </h1>
             </div>
-
-            <div className="flex gap-2">
-              <div className="text-gray-500 text-sm tracking-wider">
-                {format_date_1(get_date_now())}
-              </div>
+            <div className="flex gap-2 text-gray-500 text-sm tracking-wider">
+              {view_gi_data.creation_date}
             </div>
           </div>
-          {/* - Header */}
-          {/* + Section 1 */}
+
           <div className="p-5 sm:p-6 border-t">
             <div className="w-full">
               <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
@@ -138,17 +162,17 @@ const Post_View_GI = ({ set_page, for_posting }) => {
                   <div className="grid grid-cols-1 gap-5">
                     <div className="col-span-full">
                       <Text_Field
-                        label="SO Number"
+                        label="SO Number" // Changed from PO Number
                         type="text"
-                        value="SO-XXXXXXXXX"
+                        value={view_gi_data.so_number}
                         disabled
                       />
                     </div>
                     <div className="col-span-full">
                       <Text_Field
-                        label="DO Number"
+                        label="GI Number" // Changed from GR Number
                         type="text"
-                        value="DO-XXXXXXXXX"
+                        value={view_gi_data.gi_number}
                         disabled
                       />
                     </div>
@@ -158,9 +182,9 @@ const Post_View_GI = ({ set_page, for_posting }) => {
                   <div className="grid grid-cols-1 gap-5">
                     <div className="col-span-full">
                       <Text_Field
-                        label="Creation Date"
+                        label="SO Creation Date" // Changed from PO Creation Date
                         type="text"
-                        value="MM-DD-YYYY"
+                        value={view_gi_data.so_creation_date}
                         disabled
                       />
                     </div>
@@ -169,35 +193,40 @@ const Post_View_GI = ({ set_page, for_posting }) => {
               </div>
             </div>
           </div>
-          {/* - Section 1 */}
-          {/* + Section 2 */}
-          <GI_Items for_posting={for_posting} />
-          {/* - Section 2 */}
-          {/* + Section 3 */}
-          {for_posting && (
-            <div className="p-4 sm:p-8 border-t">
-              <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
+
+          {/* Section 2: Items List */}
+          <GI_Items view_gi_data={view_gi_data} for_posting={for_posting} />
+
+          <div className="p-4 sm:p-8 border-t">
+            <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
+              {for_posting && (
                 <Button
                   variant="primary"
                   size="lg"
+                  width="w-[120px]"
                   icon={FileInput}
                   icon_position="left"
+                  disabled={post_loading}
                   on_click={() => set_is_confirm_modal_open(true)}
                 >
-                  Post GI
+                  Post
                 </Button>
-                <Button variant="white" size="lg" on_click={handle_go_back}>
-                  Cancel
-                </Button>
-              </div>
+              )}
+
+              <Button
+                variant="white"
+                size="lg"
+                width="w-[120px]"
+                on_click={handle_go_back}
+                disabled={for_posting ? post_loading : false}
+              >
+                {for_posting ? "Cancel" : "Close"}
+              </Button>
             </div>
-          )}
-          {/* - Section 3 */}
+          </div>
         </div>
       </div>
-      {/* + Modals */}
       {is_confirm_modal_open && <Confirm_Modal />}
-      {/* - Modals */}
     </React.Fragment>
   );
 };

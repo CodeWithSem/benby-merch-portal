@@ -143,13 +143,13 @@ const Edit_PO = ({
       const response = await api_update_purchase_order(
         final_po_data,
         active_user?.username,
-        show_toast
+        show_toast,
       );
       if (response.success) {
         set_po_list((prev) =>
           prev.map((item) =>
-            item.id === response.data.id ? response.data : item
-          )
+            item.id === response.data.id ? response.data : item,
+          ),
         );
         handle_go_back();
       }
@@ -249,7 +249,7 @@ const Edit_PO = ({
                       edit_po_data.po_type_code,
                       po_type_list,
                       "po_type_code",
-                      "po_type_desc"
+                      "po_type_desc",
                     )}
                     disabled
                   />
@@ -264,7 +264,7 @@ const Edit_PO = ({
                       edit_po_data.vendor_code,
                       vendor_master_list,
                       "vendor_code",
-                      "vendor_desc"
+                      "vendor_desc",
                     )}
                     on_click={() => set_display_modal("select_vendor")}
                     disabled
@@ -280,7 +280,7 @@ const Edit_PO = ({
                       edit_po_data.branch_code,
                       branch_list,
                       "branch_code",
-                      "branch_desc"
+                      "branch_desc",
                     )}
                     on_click={() => set_display_modal("select_branch")}
                     disabled
@@ -296,7 +296,7 @@ const Edit_PO = ({
                       edit_po_data.plant_code,
                       plant_list,
                       "plant_code",
-                      "plant_desc"
+                      "plant_desc",
                     )}
                     on_click={() => set_display_modal("select_plant")}
                     disabled
@@ -313,7 +313,7 @@ const Edit_PO = ({
                       edit_po_data.sloc_code,
                       sloc_list,
                       "sloc_code",
-                      "sloc_desc"
+                      "sloc_desc",
                     )}
                     on_click={() => set_display_modal("select_sloc")}
                     disabled
@@ -493,7 +493,7 @@ const Edit_PO = ({
       <Confirm_Modal
         is_open={is_confirm_modal_open}
         title="Confirm Purchase Order Update"
-        description_1="You are about to edit this Branch. Once edited, it will be updated to the database."
+        description_1="You are about to edit this Purchase Order. Once edited, it will be updated to the database."
         description_2="Please review all the details — before proceeding."
         description_3="Are you sure you want to continue?"
         on_confirm={handle_edit}

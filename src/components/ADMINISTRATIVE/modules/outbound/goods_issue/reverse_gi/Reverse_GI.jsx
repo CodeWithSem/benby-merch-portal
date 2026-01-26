@@ -2,42 +2,43 @@ import React, { useState } from "react";
 import { ChevronLeft, FileX } from "lucide-react";
 import Button from "assets/elements/Button";
 import Text_Field from "assets/elements/Text_Field";
-import GR_Items from "./gr_items/GR_Items";
-import { api_reverse_goods_receipt } from "api/firestore_db/inbound/goods_receipt/tbl_goods_receipt_api";
+import GI_Items from "./gi_items/GI_Items"; // Updated to GI_Items
+import { api_reverse_goods_issue } from "api/firestore_db/outbound/goods_issue/tbl_goods_issue_api"; // Updated API path
+import Confirm_Modal from "assets/elements/modals/Confirm_Modal";
 
-const Reverse_GR = ({
+const Reverse_GI = ({
   set_page,
   active_user,
   show_toast,
-  reverse_gr_data,
-  set_gr_list,
+  reverse_gi_data, // Changed from reverse_gr_data
+  set_gi_list, // Changed from set_gr_list
 }) => {
   const [is_confirm_modal_open, set_is_confirm_modal_open] = useState(false);
   const [reverse_loading, set_reverse_loading] = useState(false);
 
-  const handle_reverse_gr = async () => {
+  const handle_reverse_gi = async () => {
     try {
       set_reverse_loading(true);
 
-      const response = await api_reverse_goods_receipt(
-        reverse_gr_data,
+      const response = await api_reverse_goods_issue(
+        reverse_gi_data,
         active_user?.username,
         show_toast,
       );
 
       if (response.success) {
-        // Update the GR list in parent
-        set_gr_list((prev) =>
+        // Update the GI list in parent
+        set_gi_list((prev) =>
           prev.map((item) =>
-            item.po_id === reverse_gr_data.po_id
-              ? { ...item, gr_status: "Reversed" }
+            item.so_id === reverse_gi_data.so_id
+              ? { ...item, gi_status: "Reversed" }
               : item,
           ),
         );
         handle_go_back();
       }
     } catch (error) {
-      console.error("Failed to reverse GR:", error);
+      console.error("Failed to reverse GI:", error);
     } finally {
       close_confirm_modal();
     }
@@ -48,49 +49,6 @@ const Reverse_GR = ({
     set_reverse_loading(false);
   };
 
-  const Confirm_Modal = () => {
-    return (
-      <React.Fragment>
-        <div className="fixed inset-0 flex items-center justify-center z-[100]">
-          <div
-            className="absolute inset-0 bg-black/50 backdrop-blur-sm z-[101]"
-            onClick={close_confirm_modal}
-          ></div>
-          <div className="relative bg-white rounded-lg shadow-xl max-w-[500px] w-full p-10 m-5 z-[102]">
-            <div className="w-full flex justify-center items-center text-lg md:text-xl font-bold mb-4">
-              Confirm Goods Receipt Reversal
-            </div>
-            <p className="w-full text-center text-sm leading-6 text-gray-500 dark:text-gray-400 pt-4">
-              You are about to reverse this Goods Receipt. This will restore the
-              original quantities in the related Purchase Order.
-            </p>
-            <p className="w-full text-center text-sm leading-6 text-gray-500 dark:text-gray-400 py-4">
-              Are you sure you want to continue?
-            </p>
-            <div className="flex justify-center gap-2 mt-4">
-              <Button
-                width="w-[100px]"
-                variant="danger"
-                loading={reverse_loading}
-                on_click={handle_reverse_gr}
-              >
-                Yes
-              </Button>
-              <Button
-                width="w-[100px]"
-                variant="white"
-                on_click={close_confirm_modal}
-                disabled={reverse_loading}
-              >
-                No
-              </Button>
-            </div>
-          </div>
-        </div>
-      </React.Fragment>
-    );
-  };
-
   const handle_go_back = () => {
     set_page("main");
   };
@@ -99,7 +57,7 @@ const Reverse_GR = ({
     <React.Fragment>
       <div className="w-full">
         <div className="flex flex-wrap items-center justify-between gap-3 py-5">
-          <h1 className="text-xl">Inbound</h1>
+          <h1 className="text-xl">Outbound</h1>
           {/* Breadcrumbs */}
           <nav>
             <ol className="flex flex-wrap items-center gap-1.5">
@@ -114,7 +72,7 @@ const Reverse_GR = ({
                   className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-sky-500 cursor-pointer"
                   onClick={handle_go_back}
                 >
-                  Inbound
+                  Outbound
                 </a>
               </li>
               <li className="flex items-center gap-1.5 text-sm text-gray-500">
@@ -123,12 +81,12 @@ const Reverse_GR = ({
                   className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-sky-500 cursor-pointer"
                   onClick={handle_go_back}
                 >
-                  Goods Receipt
+                  Goods Issue
                 </a>
               </li>
               <li className="flex items-center gap-1.5 text-sm text-gray-500">
                 <span>/</span>
-                <span className="text-gray-800">Reverse</span>
+                <span className="text-gray-800 font-medium">Reverse</span>
               </li>
             </ol>
           </nav>
@@ -145,14 +103,14 @@ const Reverse_GR = ({
                 width="w-[20px]"
                 on_click={handle_go_back}
               />
-              <h1 className="text-lg">Reverse Goods Receipt</h1>
+              <h1 className="text-lg">Reverse Goods Issue</h1>
             </div>
             <div className="flex gap-2 text-gray-500 text-sm tracking-wider">
-              {reverse_gr_data.creation_date}
+              {reverse_gi_data.creation_date}
             </div>
           </div>
 
-          {/* Section 1: GR info */}
+          {/* Section 1: GI info */}
           <div className="p-5 sm:p-6 border-t">
             <div className="w-full">
               <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
@@ -160,17 +118,17 @@ const Reverse_GR = ({
                   <div className="grid grid-cols-1 gap-5">
                     <div className="col-span-full">
                       <Text_Field
-                        label="PO Number"
+                        label="SO Number" // Changed from PO
                         type="text"
-                        value={reverse_gr_data.po_number}
+                        value={reverse_gi_data.so_number}
                         disabled
                       />
                     </div>
                     <div className="col-span-full">
                       <Text_Field
-                        label="GR Number"
+                        label="GI Number" // Changed from GR
                         type="text"
-                        value={reverse_gr_data.gr_number}
+                        value={reverse_gi_data.gi_number}
                         disabled
                       />
                     </div>
@@ -180,9 +138,9 @@ const Reverse_GR = ({
                   <div className="grid grid-cols-1 gap-5">
                     <div className="col-span-full">
                       <Text_Field
-                        label="PO Creation Date"
+                        label="SO Creation Date" // Changed from PO
                         type="text"
-                        value={reverse_gr_data.po_creation_date}
+                        value={reverse_gi_data.so_creation_date}
                         disabled
                       />
                     </div>
@@ -193,7 +151,8 @@ const Reverse_GR = ({
           </div>
 
           {/* Section 2: Items */}
-          <GR_Items reverse_gr_data={reverse_gr_data} for_posting={false} />
+          {/* Passing for_posting={false} ensures Issued Qty is displayed read-only */}
+          <GI_Items view_gi_data={reverse_gi_data} for_posting={false} />
 
           {/* Section 3: Actions */}
           <div className="p-4 sm:p-8 border-t">
@@ -223,9 +182,20 @@ const Reverse_GR = ({
         </div>
 
         {is_confirm_modal_open && <Confirm_Modal />}
+        <Confirm_Modal
+          is_open={is_confirm_modal_open}
+          confirm_variant="danger"
+          title="Confirm Goods Issue Reversal"
+          description_1="You are about to reverse this Goods Issue. This action will restore stock levels and update the related Sales Order."
+          description_2="Please review all the details — before proceeding."
+          description_3="Are you sure you want to continue?"
+          on_confirm={handle_reverse_gi}
+          on_cancel={() => set_is_confirm_modal_open(false)}
+          confirm_loading={reverse_loading}
+        />
       </div>
     </React.Fragment>
   );
 };
 
-export default Reverse_GR;
+export default Reverse_GI;

@@ -121,7 +121,7 @@ const Purchase_Order = () => {
     const response = await api_get_purchase_order_list_by_date(
       start_date,
       end_date,
-      show_toast
+      show_toast,
     );
     if (response.success) {
       set_po_list(response.data);
@@ -168,11 +168,8 @@ const Purchase_Order = () => {
   useEffect(() => {
     let temp = [...po_list];
 
-    // ---------------------------------------------------
-    // PO STATUS FILTER
-    // ---------------------------------------------------
     const active_statuses = Object.keys(status_filters).filter(
-      (status) => status_filters[status]
+      (status) => status_filters[status],
     );
 
     if (active_statuses.length > 0) {
@@ -187,14 +184,14 @@ const Purchase_Order = () => {
           u.vendor_code,
           vendor_master_list,
           "vendor_code",
-          "vendor_desc"
+          "vendor_desc",
         );
 
         const company_desc = get_description(
           u.od_company_code,
           company_list,
           "company_code",
-          "company_desc"
+          "company_desc",
         );
 
         return (
@@ -263,7 +260,7 @@ const Purchase_Order = () => {
         vendor_desc.toLowerCase().includes(q) ||
         company_desc.toLowerCase().includes(q)
       );
-    }).length / show_entries
+    }).length / show_entries,
   );
 
   const handle_sort = (column) => {
@@ -581,7 +578,7 @@ const Purchase_Order = () => {
                                       }
                                       on_change={() =>
                                         toggle_status_filter(
-                                          "Partially Received"
+                                          "Partially Received",
                                         )
                                       }
                                     />
@@ -679,7 +676,7 @@ const Purchase_Order = () => {
                                   row.od_company_code,
                                   company_list,
                                   "company_code",
-                                  "company_desc"
+                                  "company_desc",
                                 );
                               }
                               if (col.key === "vendor_code") {
@@ -687,7 +684,7 @@ const Purchase_Order = () => {
                                   row.vendor_code,
                                   vendor_master_list,
                                   "vendor_code",
-                                  "vendor_desc"
+                                  "vendor_desc",
                                 );
                               }
                               if (col.key === "po_status") {

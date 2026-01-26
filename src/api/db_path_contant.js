@@ -10,6 +10,10 @@ export const TABLES = {
   BATCH_MASTER: "TBL_BATCH_MASTER",
   VENDOR_MASTER: "TBL_VENDOR_MASTER",
   // - Inbound Module ==================================
+  // - Outbound Module =================================
+  SALES_ORDER: "TBL_SALES_ORDER",
+  GOODS_ISSUE: "TBL_GOODS_ISSUE",
+  // - Outbound Module =================================
   // + Warehouse Module ================================
   STORAGE_BIN: "TBL_STORAGE_BIN",
   ITEM_MASTER: "TBL_ITEM_MASTER",

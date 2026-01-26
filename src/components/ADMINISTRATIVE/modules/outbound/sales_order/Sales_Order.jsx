@@ -13,6 +13,8 @@ import {
   FileUp,
   FileInput,
   Database,
+  Trash2,
+  FileDigit,
 } from "lucide-react";
 import { format_date_1 } from "assets/scripts/format";
 
@@ -23,8 +25,8 @@ import Button_Action from "assets/elements/Button_Action";
 import Checkbox_Field from "assets/elements/Checkbox_Field";
 import Date_Field from "assets/elements/Date_Field";
 import Pagination from "assets/elements/Pagination";
-import Create_New_SO from "./create_new_so/Create_New_SO";
-import Edit_SO from "./edit_so/Edit_SO";
+import Create_New_SO from "./create/Create_New_SO";
+import Edit_SO from "./edit/Edit_SO";
 import Post_View_SO from "./post_view_so/Post_View_SO";
 import Select_SO_Type from "./modals/select_so_type/Select_SO_Type";
 import Delete_SO from "./modals/delete_so/Delete_SO";
@@ -40,8 +42,19 @@ import { plant_list } from "assets/data/plant_list";
 import { sloc_list } from "assets/data/sloc_list";
 import Select_Generic from "assets/elements/modals/Select_Generic";
 import { api_get_price_proc_list } from "api/firestore_db/financial/price_procedure/tbl_price_proc_api";
+import { Get_TBL_INCREMENTAL_ID } from "api/real_time_db/incremental";
+import {
+  api_get_sales_order_list_by_date,
+  api_set_sales_order_increment,
+  api_truncate_sales_order,
+} from "api/firestore_db/outbound/sales_order/tbl_sales_order_api";
+import { Use_App } from "context/app_context";
+import Set_Increment_ID from "assets/elements/modals/Set_Increment_ID";
+import Spinner from "assets/elements/Spinner";
+import { get_description } from "assets/scripts/functions/get_description";
 
 const Sales_Order = () => {
+  const { active_user } = Use_App();
   const { show_toast } = useToast();
   const [show_filter, set_show_filter] = useState(false);
   const [page, set_page] = useState("main");
@@ -52,35 +65,98 @@ const Sales_Order = () => {
   const [end_date, set_end_date] = useState(today);
   const [show_load_data_button, set_show_load_data_button] = useState(false);
   const [selected_item_list, set_selected_item_list] = useState([]);
+  const [loading_list, set_loading_list] = useState(false);
+  const [truncate_loading, set_truncate_loading] = useState(false);
+  const [init_loading, set_init_loading] = useState(false);
+  const [price_proc_list, set_price_proc_list] = useState([]);
+  const [status_filters, set_status_filters] = useState({
+    Draft: true,
+    Pending: true,
+    Approved: true,
+    Posted: true,
+    "Partially Issued": true,
+    "Fully Issued": true,
+  });
 
+  const [current_id, set_current_id] = useState(0);
   const [new_so_data, set_new_so_data] = useState({});
+  const [edit_data, set_edit_data] = useState({});
+
+  useEffect(() => {
+    Get_TBL_INCREMENTAL_ID("TBL_SALES_ORDER", (value) => {
+      set_new_so_data((prev) => ({
+        ...prev,
+        id: value,
+        so_number: `SO-${String(value).padStart(9, "0")}`,
+      }));
+      set_current_id(value);
+    });
+  }, []);
 
   const columns = [
+    { key: "index", label: "No.", sortable: false },
     { key: "so_number", label: "SO Number", sortable: true },
-    { key: "so_type", label: "SO Type", sortable: true },
-    { key: "customer", label: "Customer", sortable: true },
+    { key: "so_type_code", label: "SO Type", sortable: true },
+    { key: "customer_code", label: "Customer", sortable: true },
     { key: "creation_date", label: "Creation Date", sortable: true },
-    { key: "status", label: "Status", sortable: true },
+    { key: "so_status", label: "Status", sortable: true },
     { key: "actions", label: "", sortable: false },
   ];
 
   const [so_list, set_so_list] = useState([
-    {
-      id: 1,
-      so_number: "SO-XXXXXXXXX",
-      so_type: "LFSO",
-      customer: "QS IT Services",
-      creation_date: "MM-DD-YYYY",
-      status: "Pending",
-    },
+    // {
+    //   id: 1,
+    //   so_number: "SO-XXXXXXXXX",
+    //   so_type: "LFSO",
+    //   customer: "QS IT Services",
+    //   creation_date: "MM-DD-YYYY",
+    //   status: "Pending",
+    // },
   ]);
+
+  const handle_get_sales_order_list = async () => {
+    set_loading_list(true);
+    const response = await api_get_sales_order_list_by_date(
+      start_date,
+      end_date,
+      show_toast,
+    );
+    if (response.success) {
+      set_so_list(response.data);
+    } else {
+      console.error(response.message);
+    }
+    set_loading_list(false);
+    // set_show_load_data_button(false);
+  };
+
+  useEffect(() => {
+    handle_get_sales_order_list();
+  }, []);
+
+  const handle_truncate = async () => {
+    try {
+      set_truncate_loading(true);
+      await api_truncate_sales_order(show_toast);
+      handle_get_sales_order_list();
+
+      set_display_modal("");
+    } catch (error) {
+      console.log(error);
+    } finally {
+      set_truncate_loading(false);
+    }
+  };
+
+  const handle_set_incremental_id = () => {
+    set_display_modal("set_incremental_id");
+  };
 
   // + Client-Side Filtering
   const [filtered_so_list, set_filtered_so_list] = useState([]);
-  const [loading, set_loading] = useState(false);
-  const [select_option, set_select_option] = useState(5);
+  const [show_entries, set_show_entries] = useState(5);
   const [current_page, set_current_page] = useState(1);
-  const [sort_by, set_sort_by] = useState("timestamp");
+  const [sort_by, set_sort_by] = useState("id");
   const [sort_order, set_sort_order] = useState("asc");
   const [search_query, set_search_query] = useState("");
   const [debounced_query, set_debounced_query] = useState("");
@@ -96,32 +172,56 @@ const Sales_Order = () => {
   useEffect(() => {
     let temp = [...so_list];
 
-    // + Column Filter
+    const active_statuses = Object.keys(status_filters).filter(
+      (status) => status_filters[status],
+    );
+
+    if (active_statuses.length > 0) {
+      temp = temp.filter((data) => active_statuses.includes(data.so_status));
+    }
+
     if (debounced_query.trim() !== "") {
       const q = debounced_query.toLowerCase();
-      temp = temp.filter((u) =>
-        columns.some((col) => {
-          if (col.key === "actions") return false;
-          const val = u[col.key];
-          return val?.toString().toLowerCase().includes(q);
-        }),
-      );
+
+      temp = temp.filter((u) => {
+        const customer_desc = get_description(
+          u.customer_code,
+          customer_master_list,
+          "customer_code",
+          "customer_desc",
+        );
+
+        return (
+          // Search raw fields
+          columns.some((col) => {
+            if (col.key === "actions") return false;
+            const val = u[col.key];
+            return val?.toString().toLowerCase().includes(q);
+          }) ||
+          // Search derived descriptions
+          customer_desc.toLowerCase().includes(q)
+        );
+      });
     }
 
     temp.sort((a, b) => {
       const val_a = a[sort_by];
       const val_b = b[sort_by];
-
       if (val_a == null) return 1;
       if (val_b == null) return -1;
-
       if (val_a < val_b) return sort_order === "asc" ? -1 : 1;
       if (val_a > val_b) return sort_order === "asc" ? 1 : -1;
       return 0;
     });
 
-    const start_idx = (current_page - 1) * select_option;
-    const end_idx = start_idx + select_option;
+    temp = temp.map((item, idx) => ({
+      ...item,
+      index: idx + 1, // continuous index
+    }));
+
+    const start_idx = (current_page - 1) * show_entries;
+    const end_idx = start_idx + show_entries;
+
     set_filtered_so_list(temp.slice(start_idx, end_idx));
   }, [
     so_list,
@@ -129,22 +229,28 @@ const Sales_Order = () => {
     sort_by,
     sort_order,
     current_page,
-    select_option,
+    show_entries,
+    status_filters,
   ]);
 
   const total_pages = Math.ceil(
-    (debounced_query
-      ? so_list.filter((u) =>
-          columns.some((col) => {
-            if (col.key === "actions") return false;
-            const val = u[col.key];
-            return val
-              ?.toString()
-              .toLowerCase()
-              .includes(debounced_query.toLowerCase());
-          }),
-        ).length
-      : so_list.length) / select_option,
+    so_list.filter((u) => {
+      if (!debounced_query.trim()) return true;
+
+      const q = debounced_query.toLowerCase();
+
+      const customer_desc =
+        customer_master_list.find((v) => v.customer_code === u.customer_code)
+          ?.customer_desc || "";
+
+      return (
+        columns.some((col) => {
+          if (col.key === "actions") return false;
+          const val = u[col.key];
+          return val?.toString().toLowerCase().includes(q);
+        }) || customer_desc.toLowerCase().includes(q)
+      );
+    }).length / show_entries,
   );
 
   const handle_sort = (column) => {
@@ -176,6 +282,13 @@ const Sales_Order = () => {
     },
   ];
 
+  const toggle_status_filter = (status) => {
+    set_status_filters((prev) => ({
+      ...prev,
+      [status]: !prev[status],
+    }));
+  };
+
   const handle_create_new_so = () => {
     set_display_modal("select_so_type_h");
   };
@@ -194,7 +307,9 @@ const Sales_Order = () => {
     set_page("post_view_so");
   };
 
-  const handle_edit_so = () => {
+  const handle_edit = (data) => {
+    set_edit_data(data);
+    set_selected_item_list(data.selected_item_list);
     set_page("edit_so");
   };
 
@@ -213,21 +328,18 @@ const Sales_Order = () => {
   };
 
   const handle_load_data = () => {
-    set_show_load_data_button(false);
+    handle_get_sales_order_list();
   };
 
-  const [loading_list, set_loading_list] = useState(false);
-  const [price_proc_list, set_price_proc_list] = useState([]);
-
   const handle_get_price_proc_list = async () => {
-    set_loading_list(true);
+    set_init_loading(true);
     const response = await api_get_price_proc_list();
     if (response.success) {
       set_price_proc_list(response.data);
     } else {
       console.error(response.message);
     }
-    set_loading_list(false);
+    set_init_loading(false);
   };
 
   useEffect(() => {
@@ -269,6 +381,29 @@ const Sales_Order = () => {
               <div className="flex flex-wrap items-center justify-between gap-3 p-5">
                 <h1 className="text-lg">Sales Order</h1>
                 <div className="flex gap-2">
+                  {active_user?.category === "DEV" && (
+                    <Button
+                      variant="success"
+                      icon={FileDigit}
+                      icon_position="left"
+                      width="w-[110px]"
+                      on_click={handle_set_incremental_id}
+                    >
+                      Set ID
+                    </Button>
+                  )}
+                  {active_user?.category === "DEV" && (
+                    <Button
+                      variant="danger"
+                      icon={Trash2}
+                      icon_position="left"
+                      width="w-[110px]"
+                      loading={truncate_loading}
+                      on_click={handle_truncate}
+                    >
+                      Truncate
+                    </Button>
+                  )}
                   <Button
                     variant="primary"
                     icon={PlusCircle}
@@ -303,16 +438,15 @@ const Sales_Order = () => {
                     on_change={(e) => handle_change_end_date(e.target.value)}
                     placeholder="Select Date"
                   />
-                  {show_load_data_button && (
-                    <Button
-                      variant="primary"
-                      icon={Database}
-                      icon_position="left"
-                      on_click={handle_load_data}
-                    >
-                      Load Data
-                    </Button>
-                  )}
+                  <Button
+                    variant="primary"
+                    icon={Database}
+                    icon_position="left"
+                    loading={loading_list}
+                    on_click={handle_load_data}
+                  >
+                    Load Data
+                  </Button>
                 </div>
               </div>
               {/* - Section 1 */}
@@ -325,9 +459,9 @@ const Sales_Order = () => {
                       <div className="w-[90px]">
                         <Select_Field
                           name="option"
-                          value={select_option}
+                          value={show_entries}
                           on_change={(e) => {
-                            set_select_option(Number(e.target.value));
+                            set_show_entries(Number(e.target.value));
                             set_current_page(1);
                           }}
                           options={[
@@ -342,7 +476,7 @@ const Sales_Order = () => {
                         variant="white"
                         icon={RefreshCw}
                         icon_position="left"
-                        //   on_click={() => load_data()}
+                        on_click={handle_get_sales_order_list}
                       ></Button>
                     </div>
 
@@ -365,7 +499,6 @@ const Sales_Order = () => {
                             width="w-[100px]"
                             icon={SlidersHorizontal}
                             icon_position="left"
-                            // loading
                             on_click={() => set_show_filter((prev) => !prev)}
                           >
                             Filter
@@ -377,32 +510,65 @@ const Sales_Order = () => {
                                 className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40"
                                 onClick={() => set_show_filter(false)}
                               ></div>
-                              <div className="absolute top-full mt-2 right-0 z-50 bg-white border rounded-lg shadow-md p-4 w-[260px]">
-                                <div className="mt-4">
-                                  <Checkbox_Field
-                                    label="Is Draft?"
-                                    name="terms"
-                                    box_size={20}
-                                    icon_size={12}
-                                    checked={false}
-                                    on_change={(e) => alert(e.target.checked)}
-                                  />
+                              <div className="absolute top-full mt-2 right-0 z-50 bg-white border rounded-lg shadow-md p-4 w-[260px] mb-[40]">
+                                <div className="mt-2">
+                                  <h1 className="mb-3 text-gray-600 text-sm">
+                                    SO Status
+                                  </h1>
+                                  <div className="grid grid-cols-1 gap-3">
+                                    <Checkbox_Field
+                                      label="Draft"
+                                      checked={status_filters["Draft"]}
+                                      on_change={() =>
+                                        toggle_status_filter("Draft")
+                                      }
+                                    />
+                                    <Checkbox_Field
+                                      label="Pending"
+                                      checked={status_filters["Pending"]}
+                                      on_change={() =>
+                                        toggle_status_filter("Pending")
+                                      }
+                                    />
+                                    <Checkbox_Field
+                                      label="Approved"
+                                      checked={status_filters["Approved"]}
+                                      on_change={() =>
+                                        toggle_status_filter("Approved")
+                                      }
+                                    />
+                                    <Checkbox_Field
+                                      label="Posted"
+                                      checked={status_filters["Posted"]}
+                                      on_change={() =>
+                                        toggle_status_filter("Posted")
+                                      }
+                                    />
+                                    <Checkbox_Field
+                                      label="Partially Issued"
+                                      checked={
+                                        status_filters["Partially Issued"]
+                                      }
+                                      on_change={() =>
+                                        toggle_status_filter("Partially Issued")
+                                      }
+                                    />
+                                    <Checkbox_Field
+                                      label="Fully Issued"
+                                      checked={status_filters["Fully Issued"]}
+                                      on_change={() =>
+                                        toggle_status_filter("Fully Issued")
+                                      }
+                                    />
+                                  </div>
                                 </div>
-
-                                <div className="flex justify-end gap-2 mt-4">
-                                  <Button
-                                    size="sm"
-                                    variant="primary"
-                                    on_click={() => set_show_filter(false)}
-                                  >
-                                    Apply
-                                  </Button>
+                                <div className="flex justify-end gap-2 mt-5">
                                   <Button
                                     size="sm"
                                     variant="secondary"
                                     on_click={() => set_show_filter(false)}
                                   >
-                                    Cancel
+                                    Close
                                   </Button>
                                 </div>
                               </div>
@@ -416,9 +582,9 @@ const Sales_Order = () => {
                   </div>
                   {/* + Table */}
                   <div className="overflow-x-auto">
-                    {loading ? (
-                      <div className="p-6 text-center text-gray-500 text-sm">
-                        Loading...
+                    {loading_list ? (
+                      <div className="p-6 flex justify-center items-center text-gray-500 text-sm">
+                        <Spinner />
                       </div>
                     ) : filtered_so_list.length === 0 ? (
                       <div className="p-6 text-center text-gray-500 text-sm">
@@ -475,16 +641,36 @@ const Sales_Order = () => {
                           {filtered_so_list.map((row, idx) => {
                             const render_cell = (col, row) => {
                               const value = row[col.key];
-                              if (col.key === "status") {
+
+                              if (col.key === "customer_code") {
+                                return get_description(
+                                  row.customer_code,
+                                  customer_master_list,
+                                  "customer_code",
+                                  "customer_desc",
+                                );
+                              }
+
+                              if (col.key === "so_status") {
+                                const so_status_class = {
+                                  Draft: "bg-gray-100 text-gray-500",
+                                  Pending: "bg-yellow-100 text-yellow-500",
+                                  "Partially Issued":
+                                    "bg-yellow-100 text-yellow-500",
+                                  Posted: "bg-green-100 text-green-500",
+                                  Approved: "bg-green-100 text-green-500",
+                                  "Fully Issued": "bg-green-100 text-green-500",
+                                  Rejected: "bg-red-100 text-red-500",
+                                };
+
                                 return (
                                   <span
                                     className={`inline-flex items-center justify-center gap-1 rounded-full px-3 py-0.5 text-xs font-medium ${
-                                      row.status === "Posted"
-                                        ? "bg-green-100 text-green-500"
-                                        : "bg-yellow-100 text-yellow-600"
+                                      so_status_class[row.so_status] ||
+                                      "bg-gray-100 text-gray-500"
                                     }`}
                                   >
-                                    {row.status}
+                                    {row.so_status}
                                   </span>
                                 );
                               }
@@ -498,18 +684,23 @@ const Sales_Order = () => {
                                         on_click={() => handle_view_so(row.id)}
                                       />
                                     </div>
-                                    <div className="relative group flex jusity-center items-center">
-                                      <Button_Action
-                                        icon={FileInput}
-                                        tooltip="Post Record"
-                                        on_click={() => handle_post_so(row.id)}
-                                      />
-                                    </div>
+                                    {row.so_status === "Approved" && (
+                                      <div className="relative group flex jusity-center items-center">
+                                        <Button_Action
+                                          icon={FileInput}
+                                          tooltip="Post Record"
+                                          on_click={() =>
+                                            handle_post_so(row.id)
+                                          }
+                                        />
+                                      </div>
+                                    )}
+
                                     <div className="relative group flex jusity-center items-center">
                                       <Button_Action
                                         icon={Edit}
                                         tooltip="Edit Record"
-                                        on_click={() => handle_edit_so(row.id)}
+                                        on_click={() => handle_edit(row)}
                                       />
                                     </div>
                                     <div className="relative group flex jusity-center items-center">
@@ -578,6 +769,7 @@ const Sales_Order = () => {
       {page === "so_creation" && (
         <Create_New_SO
           set_page={set_page}
+          active_user={active_user}
           so_data={{
             show_toast,
             so_type_list,
@@ -594,16 +786,32 @@ const Sales_Order = () => {
             new_so_data,
             set_new_so_data,
             price_proc_list,
+            set_so_list,
           }}
         />
       )}
       {page === "edit_so" && (
         <Edit_SO
           set_page={set_page}
-          customer_master_list={customer_master_list}
-          customer_sh_list={customer_sh_list}
-          plant_list={plant_list}
-          sloc_list={sloc_list}
+          active_user={active_user}
+          so_data={{
+            show_toast,
+            so_type_list,
+            sales_org_list,
+            dist_channel_list,
+            customer_master_list,
+            customer_sh_list,
+            ship_to_h_list,
+            order_reason_list,
+            plant_list,
+            sloc_list,
+            selected_item_list,
+            set_selected_item_list,
+            edit_so_data: edit_data,
+            set_edit_so_data: set_edit_data,
+            price_proc_list,
+            set_so_list,
+          }}
         />
       )}
       {page === "post_view_so" && (
@@ -635,6 +843,13 @@ const Sales_Order = () => {
         is_open={display_modal === "delete_so"}
         on_close={() => set_display_modal("")}
         width="max-w-[1280px]"
+      />
+      <Set_Increment_ID
+        is_open={display_modal === "set_incremental_id"}
+        on_close={() => set_display_modal("")}
+        show_toast={show_toast}
+        current_id={current_id}
+        api_set_increment_id={api_set_sales_order_increment}
       />
       {/* - Modals */}
     </React.Fragment>

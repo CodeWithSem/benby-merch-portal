@@ -53,7 +53,7 @@ const Select_Batch = ({
   const handle_change_batch_qty = (e, batch_id) => {
     const value = parseInt(e.target.value) || "";
     set_selected_batches((prev) =>
-      prev.map((b) => (b.id === batch_id ? { ...b, quantity: value } : b))
+      prev.map((b) => (b.id === batch_id ? { ...b, quantity: value } : b)),
     );
   };
 
@@ -70,7 +70,7 @@ const Select_Batch = ({
       data = data.filter(
         (d) =>
           d.batch_code.toLowerCase().includes(q) ||
-          d.batch_desc.toLowerCase().includes(q)
+          d.batch_desc.toLowerCase().includes(q),
       );
     }
 
@@ -90,15 +90,15 @@ const Select_Batch = ({
       (d) =>
         d.item_sort_id === selected_receive_item?.id &&
         (d.batch_code.toLowerCase().includes(search_query.toLowerCase()) ||
-          d.batch_desc.toLowerCase().includes(search_query.toLowerCase()))
-    ).length || 0) / rows_per_page
+          d.batch_desc.toLowerCase().includes(search_query.toLowerCase())),
+    ).length || 0) / rows_per_page,
   );
 
   // Calculate total batch qty whenever batch quantities change
   useEffect(() => {
     const total = selected_batches.reduce(
       (sum, b) => sum + (parseInt(b.quantity) || 0),
-      0
+      0,
     );
     set_total_batch_qty(total);
   }, [selected_batches]);
@@ -199,7 +199,7 @@ const Select_Batch = ({
                         {filtered_batch_list.length > 0 ? (
                           filtered_batch_list.map((data) => {
                             const isChecked = selected_batches.some(
-                              (b) => b.id === data.id
+                              (b) => b.id === data.id,
                             );
 
                             return (

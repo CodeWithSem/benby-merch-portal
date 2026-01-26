@@ -46,6 +46,7 @@ import {
   api_set_goods_receipt_increment,
   api_truncate_goods_receipt,
 } from "api/firestore_db/inbound/goods_receipt/tbl_goods_receipt_api";
+import Spinner from "assets/elements/Spinner";
 
 const Goods_Receipt = () => {
   const { active_user } = Use_App();
@@ -98,7 +99,7 @@ const Goods_Receipt = () => {
     const response = await api_get_goods_receipt_list_by_date(
       gr_start_date,
       gr_end_date,
-      show_toast
+      show_toast,
     );
     if (response.success) {
       set_gr_list(response.data);
@@ -151,7 +152,7 @@ const Goods_Receipt = () => {
           if (col.key === "actions") return false;
           const val = u[col.key];
           return val?.toString().toLowerCase().includes(q);
-        })
+        }),
       );
     }
 
@@ -189,9 +190,9 @@ const Goods_Receipt = () => {
               ?.toString()
               .toLowerCase()
               .includes(debounced_query.toLowerCase());
-          })
+          }),
         ).length
-      : gr_list.length) / select_option
+      : gr_list.length) / select_option,
   );
 
   const handle_sort = (column) => {
@@ -212,6 +213,7 @@ const Goods_Receipt = () => {
   const handle_get_batch_master_list = async () => {
     const response = await api_get_batch_master_list();
     if (response.success) {
+      console.log(response.data);
       set_batch_list(response.data);
     } else {
       console.error(response.message);
@@ -484,8 +486,8 @@ const Goods_Receipt = () => {
                   {/* + Table */}
                   <div className="overflow-x-auto">
                     {loading_list ? (
-                      <div className="p-6 text-center text-gray-500 text-sm">
-                        Loading...
+                      <div className="p-6 flex justify-center items-center text-gray-500 text-sm">
+                        <Spinner />
                       </div>
                     ) : filtered_gr_list.length === 0 ? (
                       <div className="p-6 text-center text-gray-500 text-sm">
@@ -541,7 +543,7 @@ const Goods_Receipt = () => {
                         <tbody className="bg-white">
                           {filtered_gr_list.map((row, idx) => {
                             const company = company_list.find(
-                              (c) => c.company_code === row.company_code
+                              (c) => c.company_code === row.company_code,
                             );
                             const render_cell = (col, row) => {
                               const value = row[col.key];
@@ -559,7 +561,7 @@ const Goods_Receipt = () => {
                                   Pending: "bg-yellow-100 text-yellow-500",
                                   "Partially Received":
                                     "bg-yellow-100 text-yellow-500",
-                                  Posted: "bg-orange-100 text-orange-500",
+                                  Posted: "bg-green-100 text-green-500",
                                   Approved: "bg-green-100 text-green-500",
                                   "Fully Received":
                                     "bg-green-100 text-green-500",
@@ -590,7 +592,7 @@ const Goods_Receipt = () => {
                                         on_click={() => handle_view_gr(row)}
                                       />
                                     </div>
-                                    {row.gr_status !== "Reversed" && (
+                                    {row.gr_status === "Approved" && (
                                       <div className="relative group flex jusity-center items-center">
                                         <Button_Action
                                           icon={FileInput}
@@ -599,19 +601,19 @@ const Goods_Receipt = () => {
                                         />
                                       </div>
                                     )}
-
-                                    {row.gr_status !== "Reversed" && (
-                                      <div className="relative group flex jusity-center items-center">
-                                        <Button_Action
-                                          icon={FileX}
-                                          variant="danger"
-                                          tooltip="Reversal"
-                                          on_click={() =>
-                                            handle_reverse_gr(row)
-                                          }
-                                        />
-                                      </div>
-                                    )}
+                                    {row.gr_status !== "Reversed" &&
+                                      row.gr_status !== "Posted" && (
+                                        <div className="relative group flex jusity-center items-center">
+                                          <Button_Action
+                                            icon={FileX}
+                                            variant="danger"
+                                            tooltip="Reversal"
+                                            on_click={() =>
+                                              handle_reverse_gr(row)
+                                            }
+                                          />
+                                        </div>
+                                      )}
                                   </div>
                                 );
                               }

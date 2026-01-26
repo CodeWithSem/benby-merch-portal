@@ -10,15 +10,20 @@ import Status from "./item_sub_details/Status";
 import Condition from "./item_sub_details/Condition";
 import Pricing from "./item_sub_details/Pricing";
 
-const Show_Item_Details = ({ is_open, on_close, width = "max-w-[700px]" }) => {
-  const [active_tab, set_active_tab] = useState("item_data_1");
+const Show_Item_Details = ({
+  is_open,
+  on_close,
+  width = "max-w-[700px]",
+  view_item_data,
+}) => {
+  const [active_tab, set_active_tab] = useState("pricing");
 
   const tabs = [
-    { key: "item_data_1", title: "Item Data 1" },
-    { key: "item_data_2", title: "Item Data 2" },
-    { key: "billing", title: "Billing" },
-    { key: "status", title: "Status" },
-    { key: "condition", title: "Condition" },
+    // { key: "item_data_1", title: "Item Data 1" },
+    // { key: "item_data_2", title: "Item Data 2" },
+    // { key: "billing", title: "Billing" },
+    // { key: "status", title: "Status" },
+    // { key: "condition", title: "Condition" },
     { key: "pricing", title: "Pricing" },
   ];
 
@@ -55,15 +60,15 @@ const Show_Item_Details = ({ is_open, on_close, width = "max-w-[700px]" }) => {
                           <Text_Field
                             label="Item Code"
                             type={"text"}
-                            // value={text}
+                            value={view_item_data?.item_code}
                             disabled
                           />
                         </div>
                         <div className="w-full lg:col-span-9">
                           <Text_Field
                             label="Item Description"
-                            type={"number"}
-                            // value={text}
+                            type={"text"}
+                            value={view_item_data?.item_desc}
                             disabled
                           />
                         </div>
@@ -99,7 +104,9 @@ const Show_Item_Details = ({ is_open, on_close, width = "max-w-[700px]" }) => {
                       {active_tab === "billing" && <Billing />}
                       {active_tab === "status" && <Status />}
                       {active_tab === "condition" && <Condition />}
-                      {active_tab === "pricing" && <Pricing />}
+                      {active_tab === "pricing" && (
+                        <Pricing view_item_data={view_item_data} />
+                      )}
                     </div>
                     {/* - Tab Content */}
                   </div>
@@ -110,9 +117,9 @@ const Show_Item_Details = ({ is_open, on_close, width = "max-w-[700px]" }) => {
           {/* - Modal Body */}
           {/* + Modal Footer */}
           <div className="flex justify-end gap-2 mt-5">
-            <Button width="w-[100px]" variant="primary" on_click={on_close}>
+            {/* <Button width="w-[100px]" variant="primary" on_click={on_close}>
               Proceed
-            </Button>
+            </Button> */}
             <Button width="w-[100px]" variant="white" on_click={on_close}>
               Close
             </Button>

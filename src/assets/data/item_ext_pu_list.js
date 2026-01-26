@@ -1,6 +1,6 @@
 export const item_ext_pu_list = [
   {
-    id: 1,
+    id: "8802_BR-001_PL-001_SLOC-01",
     item_code: "8802",
     branch_code: "BR-001",
     plant_code: "PL-001",

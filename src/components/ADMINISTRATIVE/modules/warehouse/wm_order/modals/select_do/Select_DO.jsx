@@ -9,10 +9,7 @@ import { format_date_1 } from "assets/scripts/format";
 import { api_get_goods_receipt_list_by_date } from "api/firestore_db/inbound/goods_receipt/tbl_goods_receipt_api";
 import Spinner from "assets/elements/Spinner";
 import { item_master_list, sbin_list } from "../../WMO_DATA_MAP";
-import {
-  generate_gr_pallets,
-  generate_wm_orders,
-} from "assets/scripts/functions/palletization";
+import { generate_wm_orders } from "assets/scripts/functions/palletization";
 
 const Select_DO = ({
   is_open,
@@ -49,7 +46,7 @@ const Select_DO = ({
     const response = await api_get_goods_receipt_list_by_date(
       gr_start_date,
       gr_end_date,
-      show_toast
+      show_toast,
     );
     if (response.success) {
       set_wm_order_list_data(response.data);
@@ -79,8 +76,8 @@ const Select_DO = ({
       const q = debounced_query.toLowerCase();
       temp = temp.filter((gr) =>
         [gr.gr_number, gr.po_number, gr.creation_date].some((f) =>
-          f?.toString().toLowerCase().includes(q)
-        )
+          f?.toString().toLowerCase().includes(q),
+        ),
       );
     }
 

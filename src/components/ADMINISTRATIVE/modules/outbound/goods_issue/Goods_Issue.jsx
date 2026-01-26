@@ -1,73 +1,136 @@
 import React, { useEffect, useState } from "react";
-import { useToast } from "../../../layout/Toast_Provider";
-import { format_date_1 } from "assets/scripts/format";
+
 import {
-  Search,
   ChevronDown,
   ChevronUp,
-  Edit,
-  Trash,
-  View,
+  Database,
+  FileDigit,
+  FileInput,
+  FileOutput,
+  FileUp,
+  FileX,
   PlusCircle,
   RefreshCw,
+  Search,
   SlidersHorizontal,
-  FileUp,
-  FileInput,
-  Database,
+  Trash2,
+  View,
 } from "lucide-react";
-import Icon_Field from "assets/elements/Icon_Field";
-import Select_Field from "assets/elements/Select_Field";
-import Pagination from "assets/elements/Pagination";
+
+import { useToast } from "../../../layout/Toast_Provider";
+import { Use_App } from "context/app_context";
+
+import { format_date_1 } from "assets/scripts/format";
+
 import Button from "assets/elements/Button";
 import Button_Action from "assets/elements/Button_Action";
+import Checkbox_Field from "assets/elements/Checkbox_Field";
 import Date_Field from "assets/elements/Date_Field";
+import Icon_Field from "assets/elements/Icon_Field";
+import Pagination from "assets/elements/Pagination";
+import Select_Field from "assets/elements/Select_Field";
+
+import Set_Increment_ID from "assets/elements/modals/Set_Increment_ID";
 import Create_New_GI from "./create_new_gi/Create_New_GI";
-import Edit_GI from "./edit_gi/Edit_GI";
-import Post_View_GI from "./post_view_gi/Post_View_GI";
-import Select_SO from "./modals/select_so/Select_SO";
 import Delete_GI from "./modals/delete_gi/Delete_GI";
+import Post_View_GI from "./post_view_gi/Post_View_GI";
+import Reverse_GI from "./reverse_gi/Reverse_GI";
+import Select_SO from "./modals/select_so/Select_SO";
+
+import { company_list } from "assets/data/company_list";
+// Assuming you have a sales order type list or similar for outbound
+import { so_type_list } from "assets/data/so_type_list";
+
+import { Get_TBL_INCREMENTAL_ID } from "api/real_time_db/incremental";
+import { api_get_batch_master_list } from "api/firestore_db/inbound/batch/tbl_batch_master_api";
+import {
+  api_get_goods_issue_list_by_date,
+  api_set_goods_issue_increment,
+  api_truncate_goods_issue,
+} from "api/firestore_db/outbound/goods_issue/tbl_goods_issue_api";
+import Spinner from "assets/elements/Spinner";
 
 const Goods_Issue = () => {
+  const { active_user } = Use_App();
   const { show_toast } = useToast();
   const [show_filter, set_show_filter] = useState(false);
   const [page, set_page] = useState("main");
   const [display_modal, set_display_modal] = useState("");
+  const [loading_list, set_loading_list] = useState(false);
+  const [truncate_loading, set_truncate_loading] = useState(false);
   const [for_posting, set_for_posting] = useState(false);
-  const today = format_date_1(new Date());
-  const [start_date, set_start_date] = useState(today);
-  const [end_date, set_end_date] = useState(today);
-  const [show_load_data_button, set_show_load_data_button] = useState(false);
 
-  const customer_list = [
-    { id: 1, customer_code: "CS-001", customer_desc: "Customer Description 1" },
-    { id: 2, customer_code: "CS-002", customer_desc: "Customer Description 2" },
-  ];
+  const now = new Date();
+  const first_day_of_month = new Date(now.getFullYear(), now.getMonth(), 1);
+  const last_day_of_month = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+  const start = format_date_1(first_day_of_month);
+  const end = format_date_1(last_day_of_month);
+
+  const [gi_start_date, set_gi_start_date] = useState(start);
+  const [gi_end_date, set_gi_end_date] = useState(end);
+  const [so_start_date, set_so_start_date] = useState(start);
+  const [so_end_date, set_so_end_date] = useState(end);
+  const [selected_so_data, set_selected_so_data] = useState({});
+  const [new_gi_data, set_new_gi_data] = useState({});
+  const [view_gi_data, set_view_gi_data] = useState({});
+  const [reverse_gi_data, set_reverse_gi_data] = useState({});
+  const [current_id, set_current_id] = useState(0);
+
+  useEffect(() => {
+    Get_TBL_INCREMENTAL_ID("TBL_GOODS_ISSUE", (value) => {
+      set_new_gi_data((prev) => ({
+        ...prev,
+        id: value,
+        gi_number: `GI-${String(value).padStart(9, "0")}`,
+      }));
+      set_current_id(value);
+    });
+  }, []);
 
   const columns = [
     { key: "so_number", label: "SO Number", sortable: true },
-    { key: "do_number", label: "DO Number", sortable: true },
+    { key: "gi_number", label: "GI Number", sortable: true },
     { key: "so_type", label: "SO Type", sortable: true },
-    { key: "customer", label: "Customer", sortable: true },
     { key: "creation_date", label: "Creation Date", sortable: true },
-    { key: "status", label: "Status", sortable: true },
+    { key: "gi_status", label: "Status", sortable: true },
     { key: "actions", label: "", sortable: false },
   ];
 
-  const [gi_list, set_gi_list] = useState([
-    {
-      id: 1,
-      so_number: "SO-XXXXXXXXX",
-      do_number: "DO-XXXXXXXXX",
-      so_type: "LF-SO",
-      customer_code: "CS-001",
-      creation_date: "MM-DD-YYYY",
-      status: "Pending",
-    },
-  ]);
+  const [gi_list, set_gi_list] = useState([]);
+
+  const handle_get_goods_issue_list = async () => {
+    set_loading_list(true);
+    const response = await api_get_goods_issue_list_by_date(
+      gi_start_date,
+      gi_end_date,
+      show_toast,
+    );
+    if (response.success) {
+      set_gi_list(response.data);
+    } else {
+      console.error(response.message);
+    }
+    set_loading_list(false);
+  };
+
+  useEffect(() => {
+    handle_get_goods_issue_list();
+  }, []);
+
+  const handle_truncate = async () => {
+    set_truncate_loading(true);
+    await api_truncate_goods_issue(show_toast);
+    handle_get_goods_issue_list();
+    set_truncate_loading(false);
+    set_display_modal("");
+  };
+
+  const handle_set_incremental_id = () => {
+    set_display_modal("set_incremental_id");
+  };
 
   // + Client-Side Filtering
   const [filtered_gi_list, set_filtered_gi_list] = useState([]);
-  const [loading, set_loading] = useState(false);
   const [select_option, set_select_option] = useState(5);
   const [current_page, set_current_page] = useState(1);
   const [sort_by, set_sort_by] = useState("timestamp");
@@ -93,7 +156,7 @@ const Goods_Issue = () => {
           if (col.key === "actions") return false;
           const val = u[col.key];
           return val?.toString().toLowerCase().includes(q);
-        })
+        }),
       );
     }
 
@@ -111,7 +174,6 @@ const Goods_Issue = () => {
 
     const start_idx = (current_page - 1) * select_option;
     const end_idx = start_idx + select_option;
-
     set_filtered_gi_list(temp.slice(start_idx, end_idx));
   }, [
     gi_list,
@@ -132,9 +194,9 @@ const Goods_Issue = () => {
               ?.toString()
               .toLowerCase()
               .includes(debounced_query.toLowerCase());
-          })
+          }),
         ).length
-      : gi_list.length) / select_option
+      : gi_list.length) / select_option,
   );
 
   const handle_sort = (column) => {
@@ -150,6 +212,21 @@ const Goods_Issue = () => {
   const handle_page_change = (page) => set_current_page(page);
   // - Client-Side Filtering
 
+  const [batch_list, set_batch_list] = useState([]);
+
+  const handle_get_batch_master_list = async () => {
+    const response = await api_get_batch_master_list();
+    if (response.success) {
+      set_batch_list(response.data);
+    } else {
+      console.error(response.message);
+    }
+  };
+
+  useEffect(() => {
+    handle_get_batch_master_list();
+  }, []);
+
   const handle_create_new_gi = () => {
     set_display_modal("select_so");
   };
@@ -158,44 +235,41 @@ const Goods_Issue = () => {
     alert("Under Maintenance");
   };
 
-  const handle_view_gi = () => {
+  const handle_view_gi = (data) => {
     set_for_posting(false);
+    set_view_gi_data(data);
     set_page("post_view_gi");
   };
 
-  const handle_post_gi = () => {
+  const handle_post_gi = (data) => {
     set_for_posting(true);
+    set_view_gi_data(data);
     set_page("post_view_gi");
   };
 
-  const handle_edit_gi = (id) => {
-    set_page("edit_gi");
+  const handle_reverse_gi = (data) => {
+    set_reverse_gi_data(data);
+    set_page("reverse_gi");
   };
 
-  const handle_delete_gi = () => {
-    set_display_modal("delete_gi");
+  const handle_change_gi_start_date = (value) => {
+    set_gi_start_date(format_date_1(value));
   };
 
-  const handle_change_start_date = (value) => {
-    set_start_date(format_date_1(value));
-    set_show_load_data_button(true);
-  };
-
-  const handle_change_end_date = (value) => {
-    set_end_date(format_date_1(value));
-    set_show_load_data_button(true);
+  const handle_change_gi_end_date = (value) => {
+    set_gi_end_date(format_date_1(value));
   };
 
   const handle_load_data = () => {
-    set_show_load_data_button(false);
+    handle_get_goods_issue_list();
   };
 
-  // RETURN ORIGIN
   return (
     <React.Fragment>
       {page === "main" && (
         <React.Fragment>
           <div className="w-full">
+            {/* + Title */}
             <div className="flex flex-wrap items-center justify-between gap-3 py-5">
               <h1 className="text-xl">Outbound</h1>
               {/* + Breadcrumbs */}
@@ -220,11 +294,37 @@ const Goods_Issue = () => {
               </nav>
               {/* - Breadcrumbs */}
             </div>
+            {/* - Title */}
+
+            {/* + Main Container */}
             <div className="w-full bg-white rounded-lg border">
               {/* + Header */}
               <div className="flex flex-wrap items-center justify-between gap-3 p-5">
                 <h1 className="text-lg">Goods Issue</h1>
                 <div className="flex gap-2">
+                  {active_user?.category === "DEV" && (
+                    <Button
+                      variant="success"
+                      icon={FileDigit}
+                      icon_position="left"
+                      width="w-[110px]"
+                      on_click={handle_set_incremental_id}
+                    >
+                      Set ID
+                    </Button>
+                  )}
+                  {active_user?.category === "DEV" && (
+                    <Button
+                      variant="danger"
+                      icon={Trash2}
+                      icon_position="left"
+                      width="w-[110px]"
+                      loading={truncate_loading}
+                      on_click={handle_truncate}
+                    >
+                      Truncate
+                    </Button>
+                  )}
                   <Button
                     variant="primary"
                     icon={PlusCircle}
@@ -244,35 +344,38 @@ const Goods_Issue = () => {
                 </div>
               </div>
               {/* - Header */}
-              {/* + Section 1 */}
+
+              {/* + Section 1: Filters */}
               <div className="p-5 sm:p-6 border-t">
-                <div className="grid grid-cols-1 gap-5 md:w-[250px]">
+                <div className="grid grid-cols-1 gap-5 md:w-[220px]">
                   <Date_Field
                     label="Start Date"
-                    value={start_date}
-                    on_change={(e) => handle_change_start_date(e.target.value)}
+                    value={gi_start_date}
+                    on_change={(e) =>
+                      handle_change_gi_start_date(e.target.value)
+                    }
                     placeholder="Select Date"
                   />
                   <Date_Field
                     label="End Date"
-                    value={end_date}
-                    on_change={(e) => handle_change_end_date(e.target.value)}
+                    value={gi_end_date}
+                    on_change={(e) => handle_change_gi_end_date(e.target.value)}
                     placeholder="Select Date"
                   />
-                  {show_load_data_button && (
-                    <Button
-                      variant="primary"
-                      icon={Database}
-                      icon_position="left"
-                      on_click={handle_load_data}
-                    >
-                      Load Data
-                    </Button>
-                  )}
+                  <Button
+                    variant="primary"
+                    icon={Database}
+                    icon_position="left"
+                    loading={loading_list}
+                    on_click={handle_load_data}
+                  >
+                    Load Data
+                  </Button>
                 </div>
               </div>
               {/* - Section 1 */}
-              {/* + Section 2 */}
+
+              {/* + Section 2: Table List */}
               <div className="p-5 sm:p-6 border-t">
                 <div className="w-full border rounded-lg">
                   <div className="w-full md:flex md:justify-between p-4 gap-4">
@@ -298,9 +401,9 @@ const Goods_Issue = () => {
                         variant="white"
                         icon={RefreshCw}
                         icon_position="left"
+                        on_click={handle_load_data}
                       ></Button>
                     </div>
-
                     <div className="w-full mt-4 md:mt-0 md:w-[600px]">
                       <div className="w-full flex items-center gap-2">
                         <div className="w-full">
@@ -312,7 +415,6 @@ const Goods_Issue = () => {
                             on_change={(e) => set_search_query(e.target.value)}
                           />
                         </div>
-                        {/* + Dropdown Filter */}
                         <div className="relative">
                           <Button
                             variant="white"
@@ -323,12 +425,42 @@ const Goods_Issue = () => {
                           >
                             Filter
                           </Button>
-                          {/* + Dropdown Content */}
                           {show_filter && (
                             <React.Fragment>
-                              <div className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40"></div>
+                              <div
+                                className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40"
+                                onClick={() => set_show_filter(false)}
+                              ></div>
                               <div className="absolute top-full mt-2 right-0 z-50 bg-white border rounded-lg shadow-md p-4 w-[260px]">
-                                <div className="flex justify-end gap-2 mt-4">
+                                <div className="mt-2">
+                                  <h1 className="mb-3 text-gray-600 text-sm">
+                                    GI Status
+                                  </h1>
+                                  <div className="grid grid-cols-1 gap-3">
+                                    <Checkbox_Field
+                                      label="Posted"
+                                      box_size={24}
+                                      icon_size={14}
+                                      checked={false}
+                                      on_change={(e) => alert(e.target.checked)}
+                                    />
+                                    <Checkbox_Field
+                                      label="Pending"
+                                      box_size={24}
+                                      icon_size={14}
+                                      checked={false}
+                                      on_change={(e) => alert(e.target.checked)}
+                                    />
+                                    <Checkbox_Field
+                                      label="Draft"
+                                      box_size={24}
+                                      icon_size={14}
+                                      checked={false}
+                                      on_change={(e) => alert(e.target.checked)}
+                                    />
+                                  </div>
+                                </div>
+                                <div className="flex justify-end gap-2 mt-5">
                                   <Button
                                     size="sm"
                                     variant="primary"
@@ -341,23 +473,22 @@ const Goods_Issue = () => {
                                     variant="secondary"
                                     on_click={() => set_show_filter(false)}
                                   >
-                                    Cancel
+                                    Close
                                   </Button>
                                 </div>
                               </div>
                             </React.Fragment>
                           )}
-                          {/* - Dropdown Content */}
                         </div>
-                        {/* - Dropdown Filter */}
                       </div>
                     </div>
                   </div>
-                  {/* + Table */}
+
+                  {/* + Table Content */}
                   <div className="overflow-x-auto">
-                    {loading ? (
-                      <div className="p-6 text-center text-gray-500 text-sm">
-                        Loading...
+                    {loading_list ? (
+                      <div className="p-6 flex justify-center items-center text-gray-500 text-sm">
+                        <Spinner />
                       </div>
                     ) : filtered_gi_list.length === 0 ? (
                       <div className="p-6 text-center text-gray-500 text-sm">
@@ -367,129 +498,142 @@ const Goods_Issue = () => {
                       <table className="min-w-full">
                         <thead className="bg-gray-100">
                           <tr className="whitespace-nowrap">
-                            {columns.map((col, i) => {
-                              const is_sorted = sort_by === col.key;
-                              return (
-                                <th
-                                  key={col.key}
-                                  onClick={() =>
-                                    col.sortable && handle_sort(col.key)
-                                  }
-                                  className={`border px-4 py-3 text-left text-[12px] font-medium text-gray-700 ${
-                                    col.sortable
-                                      ? "cursor-pointer select-none"
-                                      : ""
-                                  } ${i === 0 ? "border-l-0" : ""} ${
-                                    i === columns.length - 1 ? "border-r-0" : ""
-                                  }`}
-                                >
-                                  <div className="flex items-center justify-between w-full">
-                                    <span>{col.label}</span>
-                                    {col.sortable &&
-                                      is_sorted &&
-                                      (sort_order === "asc" ? (
-                                        <ChevronUp
-                                          size={14}
-                                          className="text-gray-500"
-                                        />
-                                      ) : (
-                                        <ChevronDown
-                                          size={14}
-                                          className="text-gray-500"
-                                        />
-                                      ))}
-                                  </div>
-                                </th>
-                              );
-                            })}
+                            {columns.map((col, i) => (
+                              <th
+                                key={col.key}
+                                onClick={() =>
+                                  col.sortable && handle_sort(col.key)
+                                }
+                                className={`border px-4 py-3 text-left text-[12px] font-medium text-gray-700 ${
+                                  col.sortable
+                                    ? "cursor-pointer select-none"
+                                    : ""
+                                } ${i === 0 ? "border-l-0" : ""} ${
+                                  i === columns.length - 1 ? "border-r-0" : ""
+                                }`}
+                              >
+                                <div className="flex items-center justify-between w-full">
+                                  <span>{col.label}</span>
+                                  {col.sortable &&
+                                    sort_by === col.key &&
+                                    (sort_order === "asc" ? (
+                                      <ChevronUp
+                                        size={14}
+                                        className="text-gray-500"
+                                      />
+                                    ) : (
+                                      <ChevronDown
+                                        size={14}
+                                        className="text-gray-500"
+                                      />
+                                    ))}
+                                </div>
+                              </th>
+                            ))}
                           </tr>
                         </thead>
                         <tbody className="bg-white">
                           {filtered_gi_list.map((row, idx) => {
-                            const customer = customer_list.find(
-                              (c) => c.customer_code === row.customer_code
+                            const company = company_list.find(
+                              (c) => c.company_code === row.company_code,
                             );
-
-                            const render_cell = (col, row) => {
-                              const value = row[col.key];
-                              if (col.key === "customer") {
-                                return (
-                                  <div>{customer?.customer_desc || "-"}</div>
-                                );
-                              }
-                              if (col.key === "status") {
-                                return (
-                                  <span
-                                    className={`inline-flex items-center justify-center gap-1 rounded-full px-3 py-0.5 text-xs font-medium ${
-                                      row.status === "Posted"
-                                        ? "bg-green-100 text-green-500"
-                                        : "bg-yellow-100 text-yellow-600"
-                                    }`}
-                                  >
-                                    {row.status}
-                                  </span>
-                                );
-                              }
-                              if (col.key === "actions") {
-                                return (
-                                  <div className="flex gap-2">
-                                    <div className="relative group flex jusity-center items-center">
-                                      <Button_Action
-                                        icon={View}
-                                        tooltip="View Record"
-                                        on_click={() => handle_view_gi(row.id)}
-                                      />
-                                    </div>
-                                    <div className="relative group flex jusity-center items-center">
-                                      <Button_Action
-                                        icon={FileInput}
-                                        tooltip="Post Record"
-                                        on_click={() => handle_post_gi(row.id)}
-                                      />
-                                    </div>
-                                    <div className="relative group flex jusity-center items-center">
-                                      <Button_Action
-                                        icon={Edit}
-                                        tooltip="Edit Record"
-                                        on_click={() => handle_edit_gi(row.id)}
-                                      />
-                                    </div>
-                                    <div className="relative group flex jusity-center items-center">
-                                      <Button_Action
-                                        class_name="mb-[1px]"
-                                        icon={Trash}
-                                        variant="danger"
-                                        tooltip="Delete Record"
-                                        on_click={() =>
-                                          handle_delete_gi(row.id)
-                                        }
-                                      />
-                                    </div>
-                                  </div>
-                                );
-                              }
-                              return value;
-                            };
 
                             return (
                               <tr
                                 key={idx}
-                                className="hover:bg-gray-50 whitespace-nowrap"
+                                className="hover:bg-gray-50 whitespace-nowrap transition-colors"
                               >
-                                {columns.map((col, i) => (
-                                  <td
-                                    key={i}
-                                    className={`border px-4 py-4 text-[12px] text-gray-600 ${
-                                      i === 0 ? "border-l-0" : ""
-                                    } ${
-                                      i === columns.length - 1
-                                        ? "border-r-0 text-left"
-                                        : ""
-                                    }`}
-                                  >
-                                    {render_cell(col, row)}
-                                  </td>
-                                ))}
+                                {columns.map((col, i) => {
+                                  const value = row[col.key];
+                                  let cell_content;
+
+                                  // + Logic for Cell Rendering
+                                  if (col.key === "company") {
+                                    cell_content = (
+                                      <div>{company?.company_desc || "-"}</div>
+                                    );
+                                  } else if (col.key === "gi_status") {
+                                    const gi_status_classes = {
+                                      Draft: "bg-gray-100 text-gray-500",
+                                      Pending: "bg-yellow-100 text-yellow-500",
+                                      "Partially Issued":
+                                        "bg-yellow-100 text-yellow-500",
+                                      Posted: "bg-green-100 text-green-500",
+                                      Approved: "bg-green-100 text-green-500",
+                                      "Fully Issued":
+                                        "bg-green-100 text-green-500",
+                                      Reversed: "bg-red-100 text-red-500",
+                                      Rejected: "bg-red-100 text-red-500",
+                                    };
+
+                                    cell_content = (
+                                      <span
+                                        className={`inline-flex items-center justify-center gap-1 rounded-full px-3 py-0.5 text-xs font-medium ${
+                                          gi_status_classes[row.gi_status] ||
+                                          "bg-gray-100 text-gray-500"
+                                        }`}
+                                      >
+                                        {row.gi_status}
+                                      </span>
+                                    );
+                                  } else if (col.key === "actions") {
+                                    cell_content = (
+                                      <div className="flex gap-2">
+                                        <div className="relative group flex justify-center items-center">
+                                          <Button_Action
+                                            icon={View}
+                                            tooltip="View Record"
+                                            on_click={() => handle_view_gi(row)}
+                                          />
+                                        </div>
+
+                                        {row.gi_status === "Approved" && (
+                                          <div className="relative group flex justify-center items-center">
+                                            <Button_Action
+                                              icon={FileInput}
+                                              tooltip="Post Record"
+                                              on_click={() =>
+                                                handle_post_gi(row)
+                                              }
+                                            />
+                                          </div>
+                                        )}
+                                        {row.gi_status !== "Reversed" &&
+                                          row.gi_status !== "Posted" && (
+                                            <div className="relative group flex justify-center items-center">
+                                              <Button_Action
+                                                icon={FileX}
+                                                variant="danger"
+                                                tooltip="Reversal"
+                                                on_click={() =>
+                                                  handle_reverse_gi(row)
+                                                }
+                                              />
+                                            </div>
+                                          )}
+                                      </div>
+                                    );
+                                  } else {
+                                    // Default: Render the raw value from the row
+                                    cell_content = value;
+                                  }
+                                  // - Logic for Cell Rendering
+
+                                  return (
+                                    <td
+                                      key={i}
+                                      className={`border px-4 py-4 text-[12px] text-gray-600 ${
+                                        i === 0 ? "border-l-0" : ""
+                                      } ${
+                                        i === columns.length - 1
+                                          ? "border-r-0 text-left"
+                                          : ""
+                                      }`}
+                                    >
+                                      {cell_content}
+                                    </td>
+                                  );
+                                })}
                               </tr>
                             );
                           })}
@@ -497,7 +641,8 @@ const Goods_Issue = () => {
                       </table>
                     )}
                   </div>
-                  {/* - Table */}
+                  {/* - Table Content */}
+
                   {/* + Pagination */}
                   {total_pages > 0 && (
                     <Pagination
@@ -512,28 +657,72 @@ const Goods_Issue = () => {
               </div>
               {/* - Section 2 */}
             </div>
+            {/* - Main Container */}
           </div>
         </React.Fragment>
       )}
-      {/* + Pages */}
-      {page === "gi_creation" && <Create_New_GI set_page={set_page} />}
-      {page === "edit_gi" && <Edit_GI set_page={set_page} />}
-      {page === "post_view_gi" && (
-        <Post_View_GI set_page={set_page} for_posting={for_posting} />
+
+      {/* + Secondary Pages */}
+      {page === "gi_creation" && (
+        <Create_New_GI
+          set_page={set_page}
+          active_user={active_user}
+          show_toast={show_toast}
+          batch_list={batch_list}
+          selected_so_data={selected_so_data}
+          set_selected_so_data={set_selected_so_data}
+          new_gi_data={new_gi_data}
+          set_gi_list={set_gi_list}
+        />
       )}
-      {/* - Pages */}
+      {page === "post_view_gi" && (
+        <Post_View_GI
+          set_page={set_page}
+          active_user={active_user}
+          show_toast={show_toast}
+          view_gi_data={view_gi_data}
+          for_posting={for_posting}
+          set_gi_list={set_gi_list}
+        />
+      )}
+      {page === "reverse_gi" && (
+        <Reverse_GI
+          set_page={set_page}
+          active_user={active_user}
+          show_toast={show_toast}
+          reverse_gi_data={reverse_gi_data}
+          set_gi_list={set_gi_list}
+        />
+      )}
+      {/* - Secondary Pages */}
+
       {/* + Modals */}
       <Select_SO
         is_open={display_modal === "select_so"}
         on_close={() => set_display_modal("")}
-        width="max-w-[1280px]"
+        width="max-w-[1000px]"
         height="max-h-[700px]"
+        show_toast={show_toast}
+        so_start_date={so_start_date}
+        set_so_start_date={set_so_start_date}
+        so_end_date={so_end_date}
+        set_so_end_date={set_so_end_date}
+        so_type_list={so_type_list}
+        set_selected_so_data={set_selected_so_data}
+        gi_list={gi_list}
         set_page={set_page}
       />
       <Delete_GI
         is_open={display_modal === "delete_gi"}
         on_close={() => set_display_modal("")}
         width="max-w-[1280px]"
+      />
+      <Set_Increment_ID
+        is_open={display_modal === "set_incremental_id"}
+        on_close={() => set_display_modal("")}
+        show_toast={show_toast}
+        current_id={current_id}
+        api_set_increment_id={api_set_goods_issue_increment}
       />
       {/* - Modals */}
     </React.Fragment>

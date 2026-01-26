@@ -1,7 +1,14 @@
 import React, { useEffect, useState } from "react";
 import Text_Field from "assets/elements/Text_Field";
 import Button from "assets/elements/Button";
-import { ChevronLeft, CirclePlus, Eye, Save, SaveAll } from "lucide-react";
+import {
+  ChevronLeft,
+  CirclePlus,
+  Eye,
+  RefreshCcwDot,
+  Save,
+  SaveAll,
+} from "lucide-react";
 import Text_Code_Field from "assets/elements/Text_Code_Field";
 import { get_date_now, format_date_1 } from "assets/scripts/format";
 import Date_Field from "assets/elements/Date_Field";
@@ -27,8 +34,13 @@ import {
   handle_date_change_function,
   handle_text_change_function,
 } from "assets/scripts/functions/input_functions";
+import {
+  api_create_sales_order,
+  api_update_sales_order,
+} from "api/firestore_db/outbound/sales_order/tbl_sales_order_api";
+import Confirm_Modal from "assets/elements/modals/Confirm_Modal";
 
-const Create_New_SO = ({ set_page, so_data }) => {
+const Edit_SO = ({ set_page, active_user, so_data }) => {
   const {
     show_toast,
     so_type_list,
@@ -42,12 +54,15 @@ const Create_New_SO = ({ set_page, so_data }) => {
     sloc_list,
     selected_item_list,
     set_selected_item_list,
-    new_so_data,
-    set_new_so_data,
+    edit_so_data,
+    set_edit_so_data,
     price_proc_list,
+    set_so_list,
   } = so_data;
   const [active_tab, set_active_tab] = useState("sales");
   const [display_modal, set_display_modal] = useState("");
+  const [is_confirm_modal_open, set_is_confirm_modal_open] = useState(false);
+  const [update_loading, set_update_loading] = useState(false);
 
   const select_modal_configs = [
     // {
@@ -72,18 +87,6 @@ const Create_New_SO = ({ set_page, so_data }) => {
     { key: "customer", title: "Customer" },
   ];
 
-  const handle_open_plant_modal = () => {
-    set_display_modal("select_plant");
-  };
-
-  const handle_open_sloc_modal = () => {
-    set_display_modal("select_sloc");
-  };
-
-  const handle_open_item_modal = () => {
-    set_display_modal("select_item");
-  };
-
   const handle_preview = () => {
     alert("Under Maintenance");
   };
@@ -92,33 +95,62 @@ const Create_New_SO = ({ set_page, so_data }) => {
     alert("Under Maintenance");
   };
 
-  const handle_save = () => {
-    alert("Under Maintenance");
+  const handle_update = async () => {
+    const items_with_tracking = selected_item_list.map((item) => ({
+      ...item,
+      quantity_open: item.quantity,
+      quantity_left: item.quantity,
+    }));
+
+    const final_so_data = {
+      ...edit_so_data,
+      selected_item_list: items_with_tracking,
+      so_status: "Pending",
+    };
+
+    try {
+      set_update_loading(true);
+      const response = await api_update_sales_order(
+        final_so_data,
+        active_user?.username,
+        show_toast,
+      );
+      if (response.success) {
+        set_so_list((prev) =>
+          prev.map((item) =>
+            item.id === response.data.id ? response.data : item,
+          ),
+        );
+        handle_go_back();
+      }
+    } catch (error) {
+      console.error("Failed to create a new data:", error);
+    }
   };
 
   const handle_go_back = () => {
     set_page("main");
   };
 
-  const handle_date_change = handle_date_change_function(set_new_so_data);
-  const handle_text_change = handle_text_change_function(set_new_so_data);
+  const handle_date_change = handle_date_change_function(set_edit_so_data);
+  const handle_text_change = handle_text_change_function(set_edit_so_data);
   const handle_checkbox_change =
-    handle_checkbox_change_function(set_new_so_data);
+    handle_checkbox_change_function(set_edit_so_data);
   useEffect(() => {
-    if (new_so_data.no_cancel_date) {
-      set_new_so_data((prev) => ({
+    if (edit_so_data.no_cancel_date) {
+      set_edit_so_data((prev) => ({
         ...prev,
         po_cancel_date: "", // Clears the date when checkbox is true
       }));
     }
-  }, [new_so_data.no_cancel_date]);
+  }, [edit_so_data.no_cancel_date]);
 
   // RETURN ORIGIN
   return (
     <React.Fragment>
       <div className="w-full">
         <div className="flex flex-wrap items-center justify-between gap-3 py-5">
-          <h1 className="text-xl">Inbound</h1>
+          <h1 className="text-xl">Outbound</h1>
           {/* + Breadcrumbs */}
           <nav>
             <ol className="flex flex-wrap items-center gap-1.5">
@@ -133,7 +165,7 @@ const Create_New_SO = ({ set_page, so_data }) => {
                   className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-sky-500 cursor-pointer"
                   onClick={handle_go_back}
                 >
-                  Inbound
+                  Outbound
                 </a>
               </li>
               <li className="flex items-center gap-1.5 text-sm text-gray-500">
@@ -147,7 +179,7 @@ const Create_New_SO = ({ set_page, so_data }) => {
               </li>
               <li className="flex items-center gap-1.5 text-sm text-gray-500">
                 <span>/</span>
-                <span className="text-gray-800">Create</span>
+                <span className="text-gray-800">Edit</span>
               </li>
             </ol>
           </nav>
@@ -164,7 +196,7 @@ const Create_New_SO = ({ set_page, so_data }) => {
                 width="w-[20px]"
                 on_click={handle_go_back}
               ></Button>
-              <h1 className="text-lg">Sales Order Creation</h1>
+              <h1 className="text-lg">Edit Sales Order</h1>
             </div>
 
             <div className="flex gap-2">
@@ -183,7 +215,7 @@ const Create_New_SO = ({ set_page, so_data }) => {
                     <Text_Field
                       label="SO Number"
                       type={"text"}
-                      value={"AUTO GENERATED"}
+                      value={edit_so_data?.so_number}
                       disabled
                     />
                   </div>
@@ -192,7 +224,7 @@ const Create_New_SO = ({ set_page, so_data }) => {
                       label="PO Number"
                       type={"text"}
                       placeholder={"Enter PO Number"}
-                      value={new_so_data?.po_number}
+                      value={edit_so_data?.po_number}
                       on_change={handle_text_change("po_number")}
                     />
                   </div>
@@ -200,9 +232,9 @@ const Create_New_SO = ({ set_page, so_data }) => {
                     <Date_Field
                       label="PO Cancellation Date"
                       placeholder="MM-DD-YYYY"
-                      value={new_so_data.po_cancel_date}
+                      value={edit_so_data.po_cancel_date}
                       on_change={handle_date_change("po_cancel_date")}
-                      disabled={new_so_data?.no_cancel_date}
+                      disabled={edit_so_data?.no_cancel_date}
                     />
                   </div>
                   <div className="flex items-end pb-[7px]">
@@ -210,7 +242,7 @@ const Create_New_SO = ({ set_page, so_data }) => {
                       label="No Cancellation Date"
                       box_size={24}
                       icon_size={14}
-                      checked={new_so_data?.no_cancel_date}
+                      checked={edit_so_data?.no_cancel_date}
                       on_change={handle_checkbox_change("no_cancel_date")}
                     />
                   </div>
@@ -219,9 +251,9 @@ const Create_New_SO = ({ set_page, so_data }) => {
                       label="SO Type"
                       code_width="150px"
                       show_search_button={false}
-                      code_value={new_so_data.so_type_code}
+                      code_value={edit_so_data.so_type_code}
                       text_value={get_description(
-                        new_so_data.so_type_code,
+                        edit_so_data.so_type_code,
                         so_type_list,
                         "so_type_code",
                         "so_type_desc",
@@ -234,9 +266,9 @@ const Create_New_SO = ({ set_page, so_data }) => {
                       label="Sales Organization"
                       code_width="150px"
                       show_search_button={false}
-                      code_value={new_so_data.sales_org_code}
+                      code_value={edit_so_data.sales_org_code}
                       text_value={get_description(
-                        new_so_data.sales_org_code,
+                        edit_so_data.sales_org_code,
                         sales_org_list,
                         "sales_org_code",
                         "sales_org_desc",
@@ -249,9 +281,9 @@ const Create_New_SO = ({ set_page, so_data }) => {
                       label="Distribution Channel"
                       code_width="150px"
                       show_search_button={false}
-                      code_value={new_so_data.dist_channel_code}
+                      code_value={edit_so_data.dist_channel_code}
                       text_value={get_description(
-                        new_so_data.dist_channel_code,
+                        edit_so_data.dist_channel_code,
                         dist_channel_list,
                         "dist_channel_code",
                         "dist_channel_desc",
@@ -263,9 +295,9 @@ const Create_New_SO = ({ set_page, so_data }) => {
                     <Text_Code_Field
                       label="Sold to Party / Address"
                       code_width="150px"
-                      code_value={new_so_data.customer_code}
+                      code_value={edit_so_data.customer_code}
                       text_value={get_description(
-                        new_so_data.customer_code,
+                        edit_so_data.customer_code,
                         customer_master_list,
                         "customer_code",
                         "customer_desc",
@@ -278,10 +310,10 @@ const Create_New_SO = ({ set_page, so_data }) => {
                     <Text_Code_Field
                       label="Ship to Party / Address"
                       code_width="150px"
-                      show_search_button={!!new_so_data.customer_code}
-                      code_value={new_so_data.customer_sh_code}
+                      show_search_button={!!edit_so_data.customer_code}
+                      code_value={edit_so_data.customer_sh_code}
                       text_value={get_description(
-                        new_so_data.customer_sh_code,
+                        edit_so_data.customer_sh_code,
                         customer_sh_list,
                         "customer_sh_code",
                         "customer_sh_desc",
@@ -323,8 +355,8 @@ const Create_New_SO = ({ set_page, so_data }) => {
                   <Sales
                     so_data={{
                       order_reason_list,
-                      new_so_data,
-                      set_new_so_data,
+                      edit_so_data,
+                      set_edit_so_data,
                     }}
                   />
                 )}
@@ -337,8 +369,8 @@ const Create_New_SO = ({ set_page, so_data }) => {
                       plant_h_list,
                       sloc_list,
                       set_selected_item_list,
-                      new_so_data,
-                      set_new_so_data,
+                      edit_so_data,
+                      set_edit_so_data,
                     }}
                   />
                 )}
@@ -354,7 +386,7 @@ const Create_New_SO = ({ set_page, so_data }) => {
           <SO_Items
             so_data={{
               show_toast,
-              new_so_data,
+              edit_so_data,
               selected_item_list,
               set_selected_item_list,
               price_proc_list,
@@ -365,31 +397,13 @@ const Create_New_SO = ({ set_page, so_data }) => {
           <div className="p-4 sm:p-8 border-t">
             <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
               <Button
-                variant="white"
-                size="lg"
-                icon={Eye}
-                icon_position="left"
-                on_click={handle_preview}
-              >
-                Preview
-              </Button>
-              <Button
                 variant="primary"
                 size="lg"
-                icon={SaveAll}
+                icon={RefreshCcwDot}
                 icon_position="left"
-                on_click={handle_save_as_draft}
+                on_click={() => set_is_confirm_modal_open(true)}
               >
-                Save as Draft
-              </Button>
-              <Button
-                variant="primary"
-                size="lg"
-                icon={CirclePlus}
-                icon_position="left"
-                on_click={handle_save}
-              >
-                Create
+                Update
               </Button>
               <Button variant="white" size="lg" on_click={handle_go_back}>
                 Cancel
@@ -414,7 +428,7 @@ const Create_New_SO = ({ set_page, so_data }) => {
           source_desc={cfg.desc}
           lookup_lists={cfg.lookup}
           target_field={cfg.target}
-          set_data={set_new_so_data}
+          set_data={set_edit_so_data}
           on_after_select={cfg.on_after_select}
         />
       ))}
@@ -425,56 +439,32 @@ const Create_New_SO = ({ set_page, so_data }) => {
         width="max-w-[1000px]"
         height="max-h-[700px]"
         customer_master_list={customer_master_list}
-        set_data={set_new_so_data}
+        set_data={set_edit_so_data}
         set_selected_item_list={set_selected_item_list}
       />
-      {/* <Select_Sold_To
-        is_open={display_modal === "select_sold_to"}
-        on_close={() => set_display_modal("")}
-        width="max-w-[1000px]"
-        height="max-h-[700px]"
-        customer_master_list={customer_master_list}
-      /> */}
       <Select_Ship_To
         is_open={display_modal === "select_ship_to"}
         on_close={() => set_display_modal("")}
         width="max-w-[1000px]"
         height="max-h-[700px]"
-        selected_customer_code={new_so_data.customer_code}
+        selected_customer_code={edit_so_data.customer_code}
         customer_master_list={customer_master_list}
         customer_sh_list={customer_sh_list}
         ship_to_h_list={ship_to_h_list}
-        set_data={set_new_so_data}
+        set_data={set_edit_so_data}
       />
-      {/* <Select_Ship_To
-        is_open={display_modal === "select_ship_to"}
-        on_close={() => set_display_modal("")}
-        width="max-w-[1000px]"
-        height="max-h-[700px]"
-        customer_sh_list={customer_sh_list}
-      /> */}
-      {/* <Select_Plant
-        is_open={display_modal === "select_plant"}
-        on_close={() => set_display_modal("")}
-        width="max-w-[1000px]"
-        height="max-h-[700px]"
-        plant_list={plant_list}
+      <Confirm_Modal
+        is_open={is_confirm_modal_open}
+        title="Confirm Sales Order Update"
+        description_1="You are about to edit this Sales Order. Once edited, it will be updated to the database."
+        description_2="Please review all the details before proceeding."
+        description_3="Are you sure you want to continue?"
+        on_confirm={handle_update}
+        on_cancel={() => set_is_confirm_modal_open(false)}
+        confirm_loading={update_loading}
       />
-      <Select_SLOC
-        is_open={display_modal === "select_sloc"}
-        on_close={() => set_display_modal("")}
-        width="max-w-[1000px]"
-        height="max-h-[700px]"
-        sloc_list={sloc_list}
-      />
-      <Select_Item
-        is_open={display_modal === "select_item"}
-        on_close={() => set_display_modal("")}
-        width="max-w-[1000px]"
-        height="max-h-[700px]"
-      /> */}
     </React.Fragment>
   );
 };
 
-export default Create_New_SO;
+export default Edit_SO;

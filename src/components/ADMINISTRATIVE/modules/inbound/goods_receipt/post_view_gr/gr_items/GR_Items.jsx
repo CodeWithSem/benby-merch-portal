@@ -7,7 +7,7 @@ const GR_Items = ({ view_gr_data, for_posting }) => {
   const [search_query, set_search_query] = useState("");
 
   const filtered_items = view_gr_data?.received_item_list?.filter((item) =>
-    item.item_desc?.toLowerCase().includes(search_query.toLowerCase())
+    item.item_desc?.toLowerCase().includes(search_query.toLowerCase()),
   );
 
   // RETURN ORIGIN

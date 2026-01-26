@@ -25,22 +25,22 @@ import {
 import { CheckCircle2, CircleX } from "lucide-react";
 
 // + [Get]
-export const api_get_purchase_order_list_by_date = async (
+export const api_get_sales_order_list_by_date = async (
   start_date,
   end_date,
   show_toast,
 ) => {
   try {
-    const tbl_purchase_order_ref = collection(
+    const tbl_sales_order_ref = collection(
       firestore_db,
-      ...get_firestore_path(TABLES.PURCHASE_ORDER),
+      ...get_firestore_path(TABLES.SALES_ORDER),
     );
 
     const start = convert_date_to_sort(start_date);
     const end = convert_date_to_sort(end_date);
 
     const q = query(
-      tbl_purchase_order_ref,
+      tbl_sales_order_ref,
       where("creation_date_sort", ">=", start),
       where("creation_date_sort", "<=", end),
     );
@@ -66,18 +66,18 @@ export const api_get_purchase_order_list_by_date = async (
 };
 // - [Get]
 // + [Create]
-export const api_create_purchase_order = async (new_data, user, show_toast) => {
+export const api_create_sales_order = async (new_data, user, show_toast) => {
   try {
-    const tbl_purchase_order_ref = collection(
+    const tbl_sales_order_ref = collection(
       firestore_db,
-      ...get_firestore_path(TABLES.PURCHASE_ORDER),
+      ...get_firestore_path(TABLES.SALES_ORDER),
     );
 
     // ---------------------------------------------
     // 1. CHECK DUPLICATE po_number
     // ---------------------------------------------
     const q_code = query(
-      tbl_purchase_order_ref,
+      tbl_sales_order_ref,
       where("po_number", "==", new_data.po_number),
     );
     const snap_code = await getDocs(q_code);
@@ -106,10 +106,10 @@ export const api_create_purchase_order = async (new_data, user, show_toast) => {
       created_by: user || "N/A",
     };
 
-    const doc_ref = doc(tbl_purchase_order_ref, String(new_data.id));
+    const doc_ref = doc(tbl_sales_order_ref, String(new_data.id));
 
     await setDoc(doc_ref, final_new_data);
-    await api_update_purchase_order_increment(new_data.id);
+    await api_update_sales_order_increment(new_data.id);
     show_toast({
       type: "success",
       title: "Created Successfully",
@@ -138,15 +138,15 @@ export const api_create_purchase_order = async (new_data, user, show_toast) => {
 };
 // - [Create]
 // + [Update Incremental ID]
-export const api_update_purchase_order_increment = async (id) => {
+export const api_update_sales_order_increment = async (id) => {
   const new_id = id + 1;
   try {
-    const tbl_purchase_order_incre_ref = ref(
+    const tbl_sales_order_incre_ref = ref(
       realtime_db,
-      get_incremental_path(TABLES.PURCHASE_ORDER),
+      get_incremental_path(TABLES.SALES_ORDER),
     );
 
-    await set(tbl_purchase_order_incre_ref, new_id);
+    await set(tbl_sales_order_incre_ref, new_id);
 
     return {
       success: true,
@@ -163,11 +163,7 @@ export const api_update_purchase_order_increment = async (id) => {
 };
 // - [Update Incremental ID]
 // + [Update]
-export const api_update_purchase_order = async (
-  edit_data,
-  user,
-  show_toast,
-) => {
+export const api_update_sales_order = async (edit_data, user, show_toast) => {
   try {
     if (!edit_data.id) {
       return {
@@ -176,7 +172,7 @@ export const api_update_purchase_order = async (
       };
     }
 
-    const tbl_path = get_firestore_path(TABLES.PURCHASE_ORDER);
+    const tbl_path = get_firestore_path(TABLES.SALES_ORDER);
 
     // ---------------------------------------------------
     // 1. PROCEED WITH UPDATE
@@ -222,12 +218,12 @@ export const api_update_purchase_order = async (
 };
 // - [Update]
 // + [Update Selected Item List + PO Status]
-export const api_update_po_selected_item_list = async (
-  po_id,
+export const api_update_so_selected_item_list = async (
+  so_id,
   selected_item_list,
 ) => {
   try {
-    if (!po_id) {
+    if (!so_id) {
       return {
         success: false,
         message: "PO ID is required.",
@@ -244,31 +240,29 @@ export const api_update_po_selected_item_list = async (
     // ---------------------------------------------------
     // 1. DETERMINE PO STATUS
     // ---------------------------------------------------
-    const is_fully_received = selected_item_list.every(
+    const is_fully_issued = selected_item_list.every(
       (item) => Number(item.quantity_left) === 0,
     );
 
-    const po_status = is_fully_received
-      ? "Fully Received"
-      : "Partially Received";
+    const so_status = is_fully_issued ? "Fully Issued" : "Partially Issued";
 
     // ---------------------------------------------------
     // 2. UPDATE FIRESTORE
     // ---------------------------------------------------
-    const tbl_path = get_firestore_path(TABLES.PURCHASE_ORDER);
-    const doc_ref = doc(firestore_db, ...tbl_path, String(po_id));
+    const tbl_path = get_firestore_path(TABLES.SALES_ORDER);
+    const doc_ref = doc(firestore_db, ...tbl_path, String(so_id));
 
     await updateDoc(doc_ref, {
       selected_item_list,
-      po_status,
+      so_status,
     });
 
     return {
       success: true,
-      id: po_id,
+      id: so_id,
       data: {
         selected_item_list,
-        po_status,
+        so_status,
       },
     };
   } catch (error) {
@@ -281,7 +275,7 @@ export const api_update_po_selected_item_list = async (
 };
 // - [Update Selected Item List + PO Status]
 // + [Post]
-export const api_post_purchase_order = async (post_data, user, show_toast) => {
+export const api_post_sales_order = async (post_data, user, show_toast) => {
   try {
     if (!post_data.id) {
       return {
@@ -290,7 +284,7 @@ export const api_post_purchase_order = async (post_data, user, show_toast) => {
       };
     }
 
-    const tbl_path = get_firestore_path(TABLES.PURCHASE_ORDER);
+    const tbl_path = get_firestore_path(TABLES.SALES_ORDER);
 
     // ---------------------------------------------------
     // 1. PROCEED WITH UPDATE
@@ -336,7 +330,7 @@ export const api_post_purchase_order = async (post_data, user, show_toast) => {
 };
 // - [Post]
 // + [Delete]
-export const api_delete_purchase_order = async (id) => {
+export const api_delete_sales_order = async (id) => {
   if (!id) {
     return {
       success: false,
@@ -345,12 +339,12 @@ export const api_delete_purchase_order = async (id) => {
   }
 
   try {
-    const tbl_purchase_order_ref = collection(
+    const tbl_sales_order_ref = collection(
       firestore_db,
-      ...get_firestore_path(TABLES.PURCHASE_ORDER),
+      ...get_firestore_path(TABLES.SALES_ORDER),
     );
 
-    const doc_ref = doc(tbl_purchase_order_ref, String(id));
+    const doc_ref = doc(tbl_sales_order_ref, String(id));
     await deleteDoc(doc_ref);
 
     return {
@@ -369,21 +363,21 @@ export const api_delete_purchase_order = async (id) => {
 
 // - [Delete]
 // + [Truncate]
-export const api_truncate_purchase_order = async (show_toast) => {
+export const api_truncate_sales_order = async (show_toast) => {
   try {
-    const tbl_purchase_order_ref = collection(
+    const tbl_sales_order_ref = collection(
       firestore_db,
-      ...get_firestore_path(TABLES.PURCHASE_ORDER),
+      ...get_firestore_path(TABLES.SALES_ORDER),
     );
 
-    const snapshot = await getDocs(tbl_purchase_order_ref);
+    const snapshot = await getDocs(tbl_sales_order_ref);
 
     const delete_promises = snapshot.docs.map((document) =>
-      deleteDoc(doc(tbl_purchase_order_ref, document.id)),
+      deleteDoc(doc(tbl_sales_order_ref, document.id)),
     );
 
     await Promise.all(delete_promises);
-    await api_reset_purchase_order_increment();
+    await api_reset_sales_order_increment();
 
     show_toast({
       type: "success",
@@ -412,14 +406,14 @@ export const api_truncate_purchase_order = async (show_toast) => {
 };
 // - [Truncate]
 // + [Reset Incremental ID]
-export const api_reset_purchase_order_increment = async () => {
+export const api_reset_sales_order_increment = async () => {
   try {
-    const tbl_purchase_order_incre_ref = ref(
+    const tbl_sales_order_incre_ref = ref(
       realtime_db,
-      get_incremental_path(TABLES.PURCHASE_ORDER),
+      get_incremental_path(TABLES.SALES_ORDER),
     );
 
-    await set(tbl_purchase_order_incre_ref, 1);
+    await set(tbl_sales_order_incre_ref, 1);
 
     return {
       success: true,
@@ -436,7 +430,7 @@ export const api_reset_purchase_order_increment = async () => {
 };
 // - [Reset Incremental ID]
 // + [Set Incremental ID Manually]
-export const api_set_purchase_order_increment = async (new_id) => {
+export const api_set_sales_order_increment = async (new_id) => {
   if (typeof new_id !== "number" || new_id <= 0) {
     return {
       success: false,
@@ -445,12 +439,12 @@ export const api_set_purchase_order_increment = async (new_id) => {
   }
 
   try {
-    const tbl_purchase_order_incre_ref = ref(
+    const tbl_sales_order_incre_ref = ref(
       realtime_db,
-      get_incremental_path(TABLES.PURCHASE_ORDER),
+      get_incremental_path(TABLES.SALES_ORDER),
     );
 
-    await set(tbl_purchase_order_incre_ref, new_id);
+    await set(tbl_sales_order_incre_ref, new_id);
 
     return {
       success: true,

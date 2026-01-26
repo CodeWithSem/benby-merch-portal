@@ -151,6 +151,8 @@ const Create_New_PO = ({
       }
     } catch (error) {
       console.error("Failed to create a new data:", error);
+    } finally {
+      set_create_loading(false);
     }
   };
 

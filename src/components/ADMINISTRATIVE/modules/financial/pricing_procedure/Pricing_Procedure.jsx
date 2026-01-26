@@ -30,7 +30,7 @@ import {
 } from "api/firestore_db/financial/price_procedure/tbl_price_proc_api";
 import { Get_TBL_INCREMENTAL_ID } from "api/real_time_db/incremental";
 import Set_Increment_ID from "assets/elements/modals/Set_Increment_ID";
-import Create_Price_Proc from "./Create/Create_Price_Proc";
+import Create_Price_Proc from "./create/Create_Price_Proc";
 import Edit_Price_Proc from "./edit/Edit_Price_Proc";
 
 // /* MOCK API */
@@ -91,7 +91,7 @@ const Pricing_Procedure = () => {
     status: "",
     tax_rate: 12,
     uom: "",
-    discount_category_code: "RD",
+    discount_category_code: "",
     price_element_list: [],
     current_price: null,
   };
