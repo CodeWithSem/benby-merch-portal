@@ -11,7 +11,7 @@ import { api_get_goods_receipt_list_by_date } from "api/firestore_db/inbound/goo
 // import { api_get_goods_issue_list_by_date } from "api/firestore_db/outbound/goods_issue/tbl_goods_issue_api";
 import Spinner from "assets/elements/Spinner";
 import { item_master_list } from "assets/data/item_master_list";
-import { sbin_list } from "../../WMO_DATA_MAP";
+import { sbin_list } from "assets/data/sbin_list";
 import { generate_wm_orders } from "assets/scripts/functions/palletization";
 import { api_get_goods_issue_list_by_date } from "api/firestore_db/outbound/goods_issue/tbl_goods_issue_api";
 
@@ -30,7 +30,7 @@ const Select_DO = ({
   set_page,
 }) => {
   const [loading_list, set_loading_list] = useState(false);
-  const [selected_gr, set_selected_gr] = useState({});
+  const [selected_do, set_selected_do] = useState({});
   const [wm_order_list_data, set_wm_order_list_data] = useState([]);
 
   // New State for Dynamic Process
@@ -129,27 +129,35 @@ const Select_DO = ({
   const handle_page_change = (page) => set_current_page(page);
 
   const handle_proceed = () => {
-    if (!selected_gr) return;
+    if (!selected_do) return;
     const wm_allocation_list = generate_wm_orders({
-      selected_gr,
+      selected_do,
       item_master_list,
       sbin_list,
     });
 
     set_new_wmo_data((prev) => {
-      const { id: doc_id, ...rest_doc } = selected_gr;
-      return {
+      const { id: doc_id, ...rest_doc } = selected_do;
+      const data = {
         ...prev,
         ...rest_doc,
         process_type,
-        gr_id: process_type === "Goods Receipt" ? doc_id : null,
-        gi_id: process_type === "Goods Issue" ? doc_id : null,
         wm_allocation_list,
       };
+      console.log(data);
+      return data;
     });
 
-    set_selected_gr(null);
-    set_page("wmo_creation");
+    set_selected_do(null);
+    switch (process_type) {
+      case "Goods Receipt":
+        set_page("wmo_gr_creation");
+        break;
+      case "Goods Issue":
+        set_page("wmo_gi_creation");
+        break;
+    }
+
     on_close();
   };
 
@@ -276,17 +284,17 @@ const Select_DO = ({
                       <tr
                         key={item.id}
                         className={`hover:bg-sky-50/50 cursor-pointer text-[12px] ${
-                          selected_gr?.id === item.id ? "bg-sky-50" : ""
+                          selected_do?.id === item.id ? "bg-sky-50" : ""
                         }`}
-                        onClick={() => set_selected_gr(item)}
+                        onClick={() => set_selected_do(item)}
                       >
                         <td className="px-5 py-4 sm:px-6 text-center">
                           <Checkbox_Field
                             name="check"
                             box_size={20}
                             icon_size={14}
-                            checked={selected_gr?.id === item.id}
-                            on_change={() => set_selected_gr(item)}
+                            checked={selected_do?.id === item.id}
+                            on_change={() => set_selected_do(item)}
                           />
                         </td>
                         <td className="px-5 py-4 sm:px-6">
@@ -329,7 +337,7 @@ const Select_DO = ({
               variant="primary"
               on_click={handle_proceed}
               class_name="w-full md:w-[100px]"
-              disabled={!selected_gr}
+              disabled={!selected_do}
             >
               Proceed
             </Button>

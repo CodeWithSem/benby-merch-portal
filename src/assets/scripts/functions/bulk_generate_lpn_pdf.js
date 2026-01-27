@@ -3,13 +3,15 @@ import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import JsBarcode from "jsbarcode";
 
-export function bulk_generate_lpn_pdf({ pallets, selected_gr }) {
+export function bulk_generate_lpn_pdf({ pallets, selected_do }) {
+  // Use A4 in points to match your single LPN generator
   const doc = new jsPDF("p", "pt", "a4");
   const pageWidth = doc.internal.pageSize.getWidth();
   const margin = 40;
   const contentWidth = pageWidth - margin * 2;
 
   pallets.forEach((pallet, index) => {
+    // Add a new page for every pallet after the first one
     if (index > 0) {
       doc.addPage();
     }
@@ -17,12 +19,11 @@ export function bulk_generate_lpn_pdf({ pallets, selected_gr }) {
     let currentY = 30;
 
     // --- BORDER SYNCHRONIZATION ---
-    // Set global line width to 1 to match autoTable
     doc.setLineWidth(1);
-    doc.setDrawColor(0, 0, 0); // Pure black
+    doc.setDrawColor(0, 0, 0);
 
-    // Outer Border (Height adjusted to 420 to fit all content)
-    doc.rect(margin, 20, contentWidth, 380);
+    // Outer Border (EXACTLY 320 height as per your single generator)
+    doc.rect(margin, 20, contentWidth, 320);
 
     // 1️⃣ Header
     doc.setFontSize(14);
@@ -38,21 +39,22 @@ export function bulk_generate_lpn_pdf({ pallets, selected_gr }) {
       theme: "grid",
       styles: {
         lineColor: [0, 0, 0],
-        lineWidth: 1, // Matches doc.setLineWidth(1)
-        fontSize: 10,
+        lineWidth: 1,
         textColor: [0, 0, 0],
+        fontSize: 10,
+        font: "helvetica",
       },
       body: [
         [
           {
-            content: `INB DO#:  ${selected_gr.gr_number}`,
+            content: `INB DO #:  ${selected_do.do_number}`,
             styles: { fontStyle: "bold" },
           },
-          { content: `GR Date: ${selected_gr.creation_date}` },
+          { content: `GR Date: ${selected_do.creation_date}` },
         ],
         [
           {
-            content: `PO#:  ${selected_gr.po_number}`,
+            content: `PO #:  ${selected_do.po_number}`,
             styles: { fontStyle: "bold" },
           },
           { content: `Pallet Config: ${pallet.pallet_config}` },
@@ -72,12 +74,13 @@ export function bulk_generate_lpn_pdf({ pallets, selected_gr }) {
     doc.text(`${pallet.item_desc}`, pageWidth / 2, currentY, {
       align: "center",
     });
+
     doc.setFontSize(12);
     doc.text(
       `PALLET ID :          ${pallet.lpn_no}`,
       pageWidth / 2,
       currentY + 18,
-      { align: "center" }
+      { align: "center" },
     );
 
     // 4️⃣ Barcode
@@ -98,7 +101,7 @@ export function bulk_generate_lpn_pdf({ pallets, selected_gr }) {
       xPosition,
       currentY + 25,
       barcodeWidth,
-      100
+      100,
     );
 
     // 5️⃣ Bottom Info Table
@@ -108,7 +111,7 @@ export function bulk_generate_lpn_pdf({ pallets, selected_gr }) {
       theme: "grid",
       styles: {
         lineColor: [0, 0, 0],
-        lineWidth: 1, // Matches doc.setLineWidth(1)
+        lineWidth: 1,
         fontSize: 10,
         cellPadding: 5,
         textColor: [0, 0, 0],
@@ -123,12 +126,17 @@ export function bulk_generate_lpn_pdf({ pallets, selected_gr }) {
           {
             content: `Bin:  ${pallet.to_sbin_code || ""}`,
             rowSpan: 2,
-            styles: { fontSize: 18, fontStyle: "bold", valign: "middle" },
+            styles: {
+              fontSize: 18,
+              fontStyle: "bold",
+              halign: "left",
+              valign: "middle",
+            },
           },
         ],
         [
           {
-            content: `Qty:     ${pallet.quantity}${pallet.uom || ""}    /   ${
+            content: `Quantity:     ${pallet.quantity}${pallet.uom || ""}    /   ${
               pallet.pallet_config
             }`,
           },
@@ -141,5 +149,5 @@ export function bulk_generate_lpn_pdf({ pallets, selected_gr }) {
     });
   });
 
-  doc.save(`BULK_LPN_${selected_gr.gr_number || "EXPORT"}.pdf`);
+  doc.save(`BULK_LPN_${selected_do.do_number || "EXPORT"}.pdf`);
 }

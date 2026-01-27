@@ -49,6 +49,7 @@ import Spinner from "assets/elements/Spinner";
 import Select_DO from "./modals/select_do/Select_DO";
 import Create_WMO_GR from "./create_wmo_gr/Create_WMO_GR";
 import Post_View_WMO from "./post_view_wmo/Post_View_WMO";
+import Create_WMO_GI from "./create_wmo_gi/Create_WMO_GI";
 // import Edit_PO from "./edit_po/Edit_PO";
 // import Post_View_PO from "./post_view_wmo/Post_View_PO";
 
@@ -89,6 +90,14 @@ const WM_Order = () => {
   const [view_wmo_data, set_view_wmo_data] = useState({});
   const [selected_item_list, set_selected_item_list] = useState([]);
   const [selected_approval_list, set_selected_approval_list] = useState([]);
+
+  const reset_new_data = () => {
+    set_new_wmo_data((prev) => ({
+      id: prev.id,
+      wmo_number: prev.wmo_number,
+    }));
+    // set_new_wmo_data({});
+  };
 
   useEffect(() => {
     Get_TBL_INCREMENTAL_ID("TBL_WM_ORDER", (value) => {
@@ -312,7 +321,7 @@ const WM_Order = () => {
         <React.Fragment>
           <div className="w-full">
             <div className="flex flex-wrap items-center justify-between gap-3 py-5">
-              <h1 className="text-xl">Inbound</h1>
+              <h1 className="text-xl">Warehouse</h1>
               {/* + Breadcrumbs */}
               <nav>
                 <ol className="flex flex-wrap items-center gap-1.5">
@@ -324,7 +333,7 @@ const WM_Order = () => {
                   <li className="flex items-center gap-1.5 text-sm text-gray-500">
                     <span>/</span>
                     <a className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-sky-500 cursor-pointer">
-                      Inbound
+                      Warehouse
                     </a>
                   </li>
                   <li className="flex items-center gap-1.5 text-sm text-gray-500">
@@ -731,13 +740,24 @@ const WM_Order = () => {
         </React.Fragment>
       )}
       {/* + Pages */}
-      {page === "wmo_creation" && (
+      {page === "wmo_gr_creation" && (
         <Create_WMO_GR
           set_page={set_page}
           active_user={active_user}
           show_toast={show_toast}
           new_wmo_data={new_wmo_data}
           set_wm_order_list={set_wm_order_list}
+          reset_new_data={reset_new_data}
+        />
+      )}
+      {page === "wmo_gi_creation" && (
+        <Create_WMO_GI
+          set_page={set_page}
+          active_user={active_user}
+          show_toast={show_toast}
+          new_wmo_data={new_wmo_data}
+          set_wm_order_list={set_wm_order_list}
+          reset_new_data={reset_new_data}
         />
       )}
       {/* {page === "edit_po" && (
@@ -761,6 +781,7 @@ const WM_Order = () => {
           show_toast={show_toast}
           view_wmo_data={view_wmo_data}
           for_posting={for_posting}
+          set_wm_order_list={set_wm_order_list}
         />
       )}
       {/* - Pages */}

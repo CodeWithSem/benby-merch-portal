@@ -5,8 +5,9 @@ import Button from "assets/elements/Button";
 import Text_Field from "assets/elements/Text_Field";
 import WM_Items from "./wm_items/WM_Items";
 import { api_create_wm_order } from "api/firestore_db/warehouse/wm_order/tbl_wm_order_api";
+import { inventory_master_list } from "assets/data/inventory_master_list";
 
-const Create_WMO_GR = ({
+const Create_WMO_GI = ({
   set_page,
   active_user,
   show_toast,
@@ -18,36 +19,37 @@ const Create_WMO_GR = ({
   const [create_loading, set_create_loading] = useState(false);
 
   const handle_create_wmo = async () => {
-    try {
-      set_create_loading(true);
-      const {
-        gr_number, // original field
-        creation_date,
-        received_item_list, // remove this
-        ...rest
-      } = new_wmo_data;
+    console.log(inventory_master_list);
+    // try {
+    //   set_create_loading(true);
+    //   const {
+    //     gr_number, // original field
+    //     creation_date,
+    //     received_item_list, // remove this
+    //     ...rest
+    //   } = new_wmo_data;
 
-      const clean_wmo_data = {
-        ...rest,
-        do_number: gr_number, // ✅ renamed field
-        do_creation_date: creation_date,
-      };
+    //   const clean_wmo_data = {
+    //     ...rest,
+    //     do_number: gr_number, // ✅ renamed field
+    //     do_creation_date: creation_date,
+    //   };
 
-      const response = await api_create_wm_order(
-        clean_wmo_data,
-        active_user?.username,
-        show_toast,
-      );
+    //   const response = await api_create_wm_order(
+    //     clean_wmo_data,
+    //     active_user?.username,
+    //     show_toast,
+    //   );
 
-      if (!response?.success) return;
+    //   if (!response?.success) return;
 
-      set_wm_order_list((prev) => [...prev, response.data]);
-      handle_go_back();
-    } catch (error) {
-      console.error("handle_create_gr error:", error);
-    } finally {
-      close_confirm_modal();
-    }
+    //   set_wm_order_list((prev) => [...prev, response.data]);
+    //   handle_go_back();
+    // } catch (error) {
+    //   console.error("handle_create_gr error:", error);
+    // } finally {
+    //   close_confirm_modal();
+    // }
   };
 
   const close_confirm_modal = () => {
@@ -179,9 +181,9 @@ const Create_WMO_GR = ({
                     </div>
                     <div className="col-span-full">
                       <Text_Field
-                        label="PO Number"
+                        label="SO Number"
                         type="text"
-                        value={new_wmo_data.po_number}
+                        value={new_wmo_data.so_number}
                         disabled
                       />
                     </div>
@@ -189,7 +191,7 @@ const Create_WMO_GR = ({
                       <Text_Field
                         label="DO Number"
                         type="text"
-                        value={new_wmo_data.gr_number}
+                        value={new_wmo_data.gi_number}
                         disabled
                       />
                     </div>
@@ -255,4 +257,4 @@ const Create_WMO_GR = ({
   );
 };
 
-export default Create_WMO_GR;
+export default Create_WMO_GI;

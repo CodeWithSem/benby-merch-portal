@@ -28,7 +28,7 @@ import { CheckCircle2, CircleX } from "lucide-react";
 export const api_get_wm_order_list_by_date = async (
   start_date,
   end_date,
-  show_toast
+  show_toast,
 ) => {
   try {
     if (!start_date || !end_date) {
@@ -40,7 +40,7 @@ export const api_get_wm_order_list_by_date = async (
     }
     const tbl_wm_order_ref = collection(
       firestore_db,
-      ...get_firestore_path(TABLES.WM_ORDER)
+      ...get_firestore_path(TABLES.WM_ORDER),
     );
 
     console.log(start_date);
@@ -51,7 +51,7 @@ export const api_get_wm_order_list_by_date = async (
     const q = query(
       tbl_wm_order_ref,
       where("creation_date_sort", ">=", start),
-      where("creation_date_sort", "<=", end)
+      where("creation_date_sort", "<=", end),
     );
 
     const snapshot = await getDocs(q);
@@ -79,7 +79,7 @@ export const api_create_wm_order = async (new_data, user, show_toast) => {
   try {
     const tbl_wm_order_ref = collection(
       firestore_db,
-      ...get_firestore_path(TABLES.WM_ORDER)
+      ...get_firestore_path(TABLES.WM_ORDER),
     );
 
     // ---------------------------------------------
@@ -87,7 +87,7 @@ export const api_create_wm_order = async (new_data, user, show_toast) => {
     // ---------------------------------------------
     const q_code = query(
       tbl_wm_order_ref,
-      where("po_number", "==", new_data.po_number)
+      where("po_number", "==", new_data.po_number),
     );
     const snap_code = await getDocs(q_code);
 
@@ -153,7 +153,7 @@ export const api_update_wm_order_increment = async (id) => {
   try {
     const tbl_wm_order_incre_ref = ref(
       realtime_db,
-      get_incremental_path(TABLES.WM_ORDER)
+      get_incremental_path(TABLES.WM_ORDER),
     );
 
     await set(tbl_wm_order_incre_ref, new_id);
@@ -230,7 +230,7 @@ export const api_update_wm_order = async (edit_data, user, show_toast) => {
 // + [Update Selected Item List + WMO Status]
 export const api_update_po_selected_item_list = async (
   po_id,
-  selected_item_list
+  selected_item_list,
 ) => {
   try {
     if (!po_id) {
@@ -251,7 +251,7 @@ export const api_update_po_selected_item_list = async (
     // 1. DETERMINE WMO STATUS
     // ---------------------------------------------------
     const is_fully_received = selected_item_list.every(
-      (item) => Number(item.quantity_left) === 0
+      (item) => Number(item.quantity_left) === 0,
     );
 
     const po_status = is_fully_received
@@ -305,6 +305,7 @@ export const api_post_wm_order = async (post_data, user, show_toast) => {
 
     const updated_post_data = {
       ...post_data,
+      wmo_status: "Posted",
       post_date: format_date_1(get_date_now()),
       post_by: user || "N/A",
     };
@@ -353,7 +354,7 @@ export const api_delete_wm_order = async (id) => {
   try {
     const tbl_wm_order_ref = collection(
       firestore_db,
-      ...get_firestore_path(TABLES.WM_ORDER)
+      ...get_firestore_path(TABLES.WM_ORDER),
     );
 
     const doc_ref = doc(tbl_wm_order_ref, String(id));
@@ -379,13 +380,13 @@ export const api_truncate_wm_order = async (show_toast) => {
   try {
     const tbl_wm_order_ref = collection(
       firestore_db,
-      ...get_firestore_path(TABLES.WM_ORDER)
+      ...get_firestore_path(TABLES.WM_ORDER),
     );
 
     const snapshot = await getDocs(tbl_wm_order_ref);
 
     const delete_promises = snapshot.docs.map((document) =>
-      deleteDoc(doc(tbl_wm_order_ref, document.id))
+      deleteDoc(doc(tbl_wm_order_ref, document.id)),
     );
 
     await Promise.all(delete_promises);
@@ -422,7 +423,7 @@ export const api_reset_wm_order_increment = async () => {
   try {
     const tbl_wm_order_incre_ref = ref(
       realtime_db,
-      get_incremental_path(TABLES.WM_ORDER)
+      get_incremental_path(TABLES.WM_ORDER),
     );
 
     await set(tbl_wm_order_incre_ref, 1);
@@ -453,7 +454,7 @@ export const api_set_wm_order_increment = async (new_id) => {
   try {
     const tbl_wm_order_incre_ref = ref(
       realtime_db,
-      get_incremental_path(TABLES.WM_ORDER)
+      get_incremental_path(TABLES.WM_ORDER),
     );
 
     await set(tbl_wm_order_incre_ref, new_id);

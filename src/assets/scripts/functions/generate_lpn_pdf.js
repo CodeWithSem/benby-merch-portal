@@ -2,15 +2,19 @@ import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import JsBarcode from "jsbarcode";
 
-export function generate_lpn_pdf({ pallet, selected_gr }) {
-  // Use a smaller custom size or maintain A4 but draw a specific box
+export function generate_lpn_pdf({ pallet, selected_do }) {
   const doc = new jsPDF("p", "pt", "a4");
   const pageWidth = doc.internal.pageSize.getWidth();
   const margin = 40;
   const contentWidth = pageWidth - margin * 2;
   let currentY = 30;
 
-  // Outer Border for the Label look
+  // --- GLOBAL STYLING ALIGNMENT ---
+  doc.setLineWidth(1); // Align with table lineWidth: 1
+  doc.setDrawColor(0, 0, 0); // Pure black borders
+  doc.setTextColor(0, 0, 0); // Pure black text for manual entries
+
+  // Outer Border
   doc.rect(margin, 20, contentWidth, 320);
 
   // 1️⃣ Header
@@ -27,7 +31,7 @@ export function generate_lpn_pdf({ pallet, selected_gr }) {
     theme: "grid",
     styles: {
       lineColor: [0, 0, 0],
-      lineWidth: 1,
+      lineWidth: 1, // Matches global lineWidth
       textColor: [0, 0, 0],
       fontSize: 10,
       font: "helvetica",
@@ -35,14 +39,14 @@ export function generate_lpn_pdf({ pallet, selected_gr }) {
     body: [
       [
         {
-          content: `INB DO#:  ${selected_gr.gr_number}`,
+          content: `INB DO #:  ${selected_do.do_number}`,
           styles: { fontStyle: "bold" },
         },
-        { content: `GR Date: ${selected_gr.creation_date}` },
+        { content: `GR Date: ${selected_do.creation_date}` },
       ],
       [
         {
-          content: `PO#:  ${selected_gr.po_number}`,
+          content: `PO #:  ${selected_do.po_number}`,
           styles: { fontStyle: "bold" },
         },
         { content: `Pallet Config: ${pallet.pallet_config}` },
@@ -66,10 +70,10 @@ export function generate_lpn_pdf({ pallet, selected_gr }) {
     `PALLET ID :          ${pallet.lpn_no}`,
     pageWidth / 2,
     currentY + 18,
-    { align: "center" }
+    { align: "center" },
   );
 
-  // 4️⃣ Barcode (Larger to match image)
+  // 4️⃣ Barcode
   const barcodeCanvas = document.createElement("canvas");
   JsBarcode(barcodeCanvas, pallet.lpn_no, {
     format: "CODE128",
@@ -78,27 +82,27 @@ export function generate_lpn_pdf({ pallet, selected_gr }) {
     margin: 0,
   });
   const barcodeDataUrl = barcodeCanvas.toDataURL("image/png");
-  const barcodeWidth = 300; // Define your desired width
-  const xPosition = (pageWidth - barcodeWidth) / 2; // Center it on the page
+  const barcodeWidth = 300;
+  const xPosition = (pageWidth - barcodeWidth) / 2;
 
   doc.addImage(
     barcodeDataUrl,
     "PNG",
-    xPosition, // The X coordinate
-    currentY + 25, // The Y coordinate
-    barcodeWidth, // <--- The Width
-    100 // The Height
+    xPosition,
+    currentY + 25,
+    barcodeWidth,
+    100,
   );
 
   // 5️⃣ Bottom Info Table
-  // Note: We use rowSpan for the Bin to make it large like the image
   autoTable(doc, {
     startY: currentY + 150,
     margin: { left: margin, right: margin },
     theme: "grid",
     styles: {
       lineColor: [0, 0, 0],
-      lineWidth: 1,
+      lineWidth: 1, // Matches global lineWidth
+      textColor: [0, 0, 0],
       fontSize: 10,
       cellPadding: 5,
     },
@@ -117,12 +121,13 @@ export function generate_lpn_pdf({ pallet, selected_gr }) {
             fontStyle: "bold",
             halign: "left",
             valign: "middle",
+            textColor: [0, 0, 0],
           },
         },
       ],
       [
         {
-          content: `Qty:     ${pallet.quantity}${pallet.uom || ""}    /   ${
+          content: `Quantity:     ${pallet.quantity}${pallet.uom || ""}    /   ${
             pallet.pallet_config
           }`,
         },

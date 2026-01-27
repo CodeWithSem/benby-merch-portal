@@ -7,7 +7,7 @@ export const api_post_wm_orders_rtdb = async (
   wm_allocation_list,
   meta,
   active_user,
-  show_toast
+  show_toast,
 ) => {
   try {
     if (!Array.isArray(wm_allocation_list) || wm_allocation_list.length === 0) {
@@ -19,7 +19,7 @@ export const api_post_wm_orders_rtdb = async (
 
       const record_ref = ref(
         realtime_db,
-        `${get_realtime_path(TABLES.WM_ORDER)}/${row.lpn_no}`
+        `${get_realtime_path(TABLES.WM_ORDER)}/${row.lpn_no}`,
       );
 
       const payload = {
@@ -65,7 +65,7 @@ export const api_post_wm_orders_rtdb = async (
 
     await Promise.all(promises);
 
-    show_toast?.("WM Order successfully posted", "success");
+    // show_toast?.("WM Order successfully posted", "success");
     return true;
   } catch (error) {
     console.error("WM Order Posting Error:", error);

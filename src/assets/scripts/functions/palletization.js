@@ -1,14 +1,5 @@
 // palletization.js
 
-/**
- * Palletize a received item (quantity in cases)
- * @param {string} item_code - Item code
- * @param {number} quantity - Total quantity in cases from GR
- * @param {Array} item_master_list - Master data for items
- * @param {number} lpn_start - Starting LPN number
- * @param {number} lpn_timestamp - Unix timestamp (same for whole GR)
- * @returns {Array} Array of pallet objects (LPNs)
- */
 export function palletize_item({
   item_code,
   quantity,
@@ -54,20 +45,14 @@ export function palletize_item({
   return pallets;
 }
 
-/**
- * Generate pallet list for a full GR
- * @param {Object} selected_gr - GR object with received_item_list
- * @param {Array} item_master_list - Item master list
- * @returns {Array} Array of pallet objects (LPNs)
- */
-export function generate_gr_pallets({ selected_gr, item_master_list }) {
-  if (!selected_gr?.received_item_list) return [];
+export function generate_gr_pallets({ selected_do, item_master_list }) {
+  if (!selected_do?.received_item_list) return [];
 
   const unixTimestamp = Date.now(); // ✅ ONE timestamp per GR
   let lpn_counter = 1;
   const pallets = [];
 
-  selected_gr.received_item_list.forEach((item) => {
+  selected_do.received_item_list.forEach((item) => {
     const { item_code, batch_list } = item;
 
     batch_list.forEach((batch) => {
@@ -100,14 +85,6 @@ export function generate_gr_pallets({ selected_gr, item_master_list }) {
   return pallets;
 }
 
-/**
- * Allocate pallets (LPNs) to storage bins
- * 1 LPN = 1 storage bin
- * @param {Array} pallets - Array of pallets generated from GR
- * @param {Array} item_master_list - Master list
- * @param {Array} sbin_list - List of storage bins
- * @returns {Array} Array of allocated pallets with bin info
- */
 export function allocate_lpn_to_bins({ pallets, item_master_list, sbin_list }) {
   const bins = sbin_list.map((b) => ({
     ...b,
@@ -137,7 +114,7 @@ export function allocate_lpn_to_bins({ pallets, item_master_list, sbin_list }) {
       (b) =>
         b.stype_code === dest_stype &&
         b.is_available === true &&
-        b.assigned === false
+        b.assigned === false,
     );
 
     if (bin) {
@@ -165,20 +142,13 @@ export function allocate_lpn_to_bins({ pallets, item_master_list, sbin_list }) {
   return allocations;
 }
 
-/**
- * Generate full WM Orders from GR
- * @param {Object} selected_gr - GR object
- * @param {Array} item_master_list - Master list
- * @param {Array} sbin_list - List of storage bins
- * @returns {Array} Array of WM order lines with pallets assigned to bins
- */
 export function generate_wm_orders({
-  selected_gr,
+  selected_do,
   item_master_list,
   sbin_list,
 }) {
   // 1️⃣ Palletize all received items
-  const pallets = generate_gr_pallets({ selected_gr, item_master_list });
+  const pallets = generate_gr_pallets({ selected_do, item_master_list });
 
   // 2️⃣ Allocate pallets to storage bins (1 LPN = 1 bin)
   const wm_allocation_list = allocate_lpn_to_bins({
