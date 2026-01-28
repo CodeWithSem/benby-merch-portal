@@ -46,7 +46,7 @@ export function generate_lpn_pdf({ pallet, selected_do }) {
       ],
       [
         {
-          content: `PO #:  ${selected_do.po_number}`,
+          content: `PO #:  ${selected_do.ref_number}`,
           styles: { fontStyle: "bold" },
         },
         { content: `Pallet Config: ${pallet.pallet_config}` },

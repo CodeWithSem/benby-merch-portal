@@ -1,68 +1,110 @@
 import React, { useState } from "react";
-import { ChevronLeft, CirclePlus, CircleX } from "lucide-react";
-import { format_date_1, get_date_now } from "assets/scripts/format";
+import { ChevronLeft, FileInput } from "lucide-react";
 import Button from "assets/elements/Button";
 import Text_Field from "assets/elements/Text_Field";
 import WM_Items from "./wm_items/WM_Items";
-import { api_create_wm_order } from "api/firestore_db/warehouse/wm_order/tbl_wm_order_api";
+import {
+  api_post_wm_orders_rtdb,
+  api_unpost_wm_orders_rtdb,
+} from "api/real_time_db/warehouse/wm_order/tbl_wm_order_api_rtdb";
+import {
+  api_post_wm_order,
+  api_update_wm_order_status,
+} from "api/firestore_db/warehouse/wm_order/tbl_wm_order_api";
 import Confirm_Modal from "assets/elements/modals/Confirm_Modal";
 
-const Create_WMO_GR = ({
+const Post_View_WMO_GR = ({
   set_page,
   active_user,
   show_toast,
-  new_wmo_data,
+  view_wmo_data,
+  for_posting,
   set_wm_order_list,
-  reset_new_data,
 }) => {
   const [is_confirm_modal_open, set_is_confirm_modal_open] = useState(false);
-  const [create_loading, set_create_loading] = useState(false);
+  const [post_loading, set_post_loading] = useState(false);
 
-  const handle_create_wmo = async () => {
+  const handle_post_wmo = async () => {
+    set_post_loading(true);
+
     try {
-      set_create_loading(true);
-      const {
-        po_number,
-        gr_number,
-        creation_date,
-        received_item_list,
-        ...rest
-      } = new_wmo_data;
-
-      console.log(po_number);
-
-      const clean_wmo_data = {
-        ...rest,
-        ref_number: po_number,
-        do_number: gr_number,
-        do_creation_date: creation_date,
-      };
-
-      const response = await api_create_wm_order(
-        clean_wmo_data.process_type,
-        clean_wmo_data,
-        active_user?.username,
+      const firestore_res = await api_post_wm_order(
+        view_wmo_data,
+        active_user,
         show_toast,
       );
 
-      if (!response?.success) return;
+      if (firestore_res.success) {
+        set_wm_order_list((prev) =>
+          prev.map((item) =>
+            item.id === firestore_res.data.id ? firestore_res.data : item,
+          ),
+        );
+        const rtdb_success = await api_post_wm_orders_rtdb(
+          view_wmo_data.process_type,
+          view_wmo_data.wm_allocation_list,
+          {
+            wmo_number: view_wmo_data.wmo_number,
+            ref_number: view_wmo_data.ref_number,
+            do_number: view_wmo_data.do_number,
+          },
+          active_user,
+          show_toast,
+        );
 
-      set_wm_order_list((prev) => [...prev, response.data]);
-      handle_go_back();
+        if (rtdb_success) {
+          close_confirm_modal();
+          set_page("main");
+        }
+      }
     } catch (error) {
-      console.error("handle_create_wmo error:", error);
+      console.error("Sequence Error:", error);
     } finally {
-      close_confirm_modal();
+      set_post_loading(false);
+    }
+  };
+
+  const handle_unpost_wmo = async () => {
+    set_post_loading(true); // Reuse loading state to disable buttons
+
+    try {
+      // 1. Remove from Realtime DB (Handhelds)
+      const rtdb_deleted = await api_unpost_wm_orders_rtdb(
+        view_wmo_data.process_type,
+        view_wmo_data.wm_allocation_list,
+        show_toast,
+      );
+
+      if (rtdb_deleted) {
+        const firestore_res = await api_update_wm_order_status(
+          view_wmo_data.id,
+          "Pending",
+        );
+
+        if (firestore_res.success) {
+          set_wm_order_list((prev) =>
+            prev.map((item) =>
+              item.id === view_wmo_data.id
+                ? { ...item, wmo_status: "Pending" }
+                : item,
+            ),
+          );
+          set_page("main");
+        }
+      }
+    } catch (error) {
+      console.error("Unpost Error:", error);
+    } finally {
+      set_post_loading(false);
     }
   };
 
   const close_confirm_modal = () => {
     set_is_confirm_modal_open(false);
-    set_create_loading(false);
+    set_post_loading(false);
   };
 
   const handle_go_back = () => {
-    reset_new_data();
     set_page("main");
   };
 
@@ -100,7 +142,9 @@ const Create_WMO_GR = ({
               </li>
               <li className="flex items-center gap-1.5 text-sm text-gray-500">
                 <span>/</span>
-                <span className="text-gray-800">Create</span>
+                <span className="text-gray-800">
+                  {for_posting ? "Post" : "View"}
+                </span>
               </li>
             </ol>
           </nav>
@@ -117,10 +161,12 @@ const Create_WMO_GR = ({
                 width="w-[20px]"
                 on_click={handle_go_back}
               ></Button>
-              <h1 className="text-lg">WM Order Creation</h1>
+              <h1 className="text-lg">
+                {for_posting ? "Post" : "View"} WM Order
+              </h1>
             </div>
             <div className="flex gap-2 text-gray-500 text-sm tracking-wider">
-              {format_date_1(get_date_now())}
+              {view_wmo_data.creation_date}
             </div>
           </div>
           {/* - Header */}
@@ -134,7 +180,7 @@ const Create_WMO_GR = ({
                       <Text_Field
                         label="WM Order Number"
                         type="text"
-                        value={new_wmo_data.wmo_number}
+                        value={view_wmo_data.wmo_number}
                         disabled
                       />
                     </div>
@@ -142,7 +188,7 @@ const Create_WMO_GR = ({
                       <Text_Field
                         label="PO Number"
                         type="text"
-                        value={new_wmo_data.po_number}
+                        value={view_wmo_data.ref_number}
                         disabled
                       />
                     </div>
@@ -150,7 +196,7 @@ const Create_WMO_GR = ({
                       <Text_Field
                         label="DO Number"
                         type="text"
-                        value={new_wmo_data.gr_number}
+                        value={view_wmo_data.do_number}
                         disabled
                       />
                     </div>
@@ -162,7 +208,7 @@ const Create_WMO_GR = ({
                       <Text_Field
                         label="PO Creation Date"
                         type="text"
-                        value={new_wmo_data.po_creation_date}
+                        value={view_wmo_data.po_creation_date}
                         disabled
                       />
                     </div>
@@ -170,7 +216,7 @@ const Create_WMO_GR = ({
                       <Text_Field
                         label="DO Creation Date"
                         type="text"
-                        value={new_wmo_data.creation_date}
+                        value={view_wmo_data.do_creation_date}
                         disabled
                       />
                     </div>
@@ -181,28 +227,45 @@ const Create_WMO_GR = ({
           </div>
           {/* - Section 1 */}
           {/* + Section 2 */}
-          <WM_Items new_wmo_data={new_wmo_data} />
+          <WM_Items view_wmo_data={view_wmo_data} for_posting={for_posting} />
           {/* - Section 2 */}
           {/* + Section 3 */}
           <div className="p-4 sm:p-8 border-t">
             <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
-              <Button
-                variant="primary"
-                size="lg"
-                width="w-[120px]"
-                icon={CirclePlus}
-                icon_position="left"
-                disabled={create_loading}
-                on_click={() => set_is_confirm_modal_open(true)}
-              >
-                Create
-              </Button>
+              {!for_posting &&
+                active_user?.category === "DEV" &&
+                view_wmo_data.wmo_status === "Posted" && (
+                  <Button
+                    variant="danger"
+                    size="lg"
+                    width="w-[120px]"
+                    icon={FileInput}
+                    icon_position="left"
+                    on_click={handle_unpost_wmo}
+                  >
+                    Unpost
+                  </Button>
+                )}
+
+              {for_posting && (
+                <Button
+                  variant="primary"
+                  size="lg"
+                  width="w-[120px]"
+                  icon={FileInput}
+                  icon_position="left"
+                  disabled={post_loading}
+                  on_click={() => set_is_confirm_modal_open(true)}
+                >
+                  Post
+                </Button>
+              )}
               <Button
                 variant="white"
                 size="lg"
                 width="w-[120px]"
                 on_click={handle_go_back}
-                disabled={create_loading}
+                disabled={post_loading}
               >
                 Cancel
               </Button>
@@ -213,16 +276,16 @@ const Create_WMO_GR = ({
       </div>
       <Confirm_Modal
         is_open={is_confirm_modal_open}
-        title="Confirm WM Order Creation"
-        description_1="You are about to create a new WM Order. Once created, it will be added to the database."
+        title="Confirm WM Order Posting"
+        description_1="You are about to post this WM Order. Once posted, it will be updated to the database."
         description_2="Please review all the details — before proceeding."
         description_3="Are you sure you want to continue?"
-        on_confirm={handle_create_wmo}
+        on_confirm={handle_post_wmo}
         on_cancel={() => set_is_confirm_modal_open(false)}
-        confirm_loading={create_loading}
+        confirm_loading={post_loading}
       />
     </React.Fragment>
   );
 };
 
-export default Create_WMO_GR;
+export default Post_View_WMO_GR;

@@ -14,6 +14,8 @@ import { item_master_list } from "assets/data/item_master_list";
 import { sbin_list } from "assets/data/sbin_list";
 import { generate_wm_orders } from "assets/scripts/functions/palletization";
 import { api_get_goods_issue_list_by_date } from "api/firestore_db/outbound/goods_issue/tbl_goods_issue_api";
+import { inventory_master_list } from "assets/data/inventory_master_list";
+import { generate_gi_wm_orders } from "assets/scripts/functions/generate_gi_wm_order";
 
 const Select_DO = ({
   is_open,
@@ -130,25 +132,37 @@ const Select_DO = ({
 
   const handle_proceed = () => {
     if (!selected_do) return;
-    const wm_allocation_list = generate_wm_orders({
-      selected_do,
-      item_master_list,
-      sbin_list,
-    });
 
+    let wm_allocation_list = [];
+
+    // 1. Determine which allocation logic to run
+    if (process_type === "Goods Receipt") {
+      wm_allocation_list = generate_wm_orders({
+        selected_do,
+        item_master_list,
+        sbin_list,
+      });
+    } else if (process_type === "Goods Issue") {
+      // Call the new GI logic
+      wm_allocation_list = generate_gi_wm_orders({
+        selected_gi: selected_do,
+        inventory_master_list, // This is your source of truth for stock
+        sbin_list,
+      });
+    }
+
+    // 2. Set the data for the next page
     set_new_wmo_data((prev) => {
       const { id: doc_id, ...rest_doc } = selected_do;
-      const data = {
+      return {
         ...prev,
         ...rest_doc,
         process_type,
         wm_allocation_list,
       };
-      console.log(data);
-      return data;
     });
 
-    set_selected_do(null);
+    // 3. Navigation
     switch (process_type) {
       case "Goods Receipt":
         set_page("wmo_gr_creation");
@@ -156,8 +170,11 @@ const Select_DO = ({
       case "Goods Issue":
         set_page("wmo_gi_creation");
         break;
+      default:
+        break;
     }
 
+    set_selected_do(null);
     on_close();
   };
 
@@ -193,7 +210,10 @@ const Select_DO = ({
               <Select_Field
                 label="Process Type"
                 value={process_type}
-                on_change={(e) => set_process_type(e.target.value)}
+                on_change={(e) => {
+                  set_process_type(e.target.value);
+                  set_selected_do({});
+                }}
                 options={[
                   { label: "Goods Receipt", value: "Goods Receipt" },
                   { label: "Goods Issue", value: "Goods Issue" },
@@ -337,7 +357,7 @@ const Select_DO = ({
               variant="primary"
               on_click={handle_proceed}
               class_name="w-full md:w-[100px]"
-              disabled={!selected_do}
+              disabled={!selected_do?.id}
             >
               Proceed
             </Button>

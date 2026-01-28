@@ -96,10 +96,11 @@ const Sidebar = ({
       icon: <Warehouse size={18} />,
       sub_items: [
         { name: "WM Order", sub_module_code: "WH1" },
-        { name: "Storage Bin", sub_module_code: "WH2" },
-        { name: "Stock Transfer", sub_module_code: "WH3" },
-        { name: "Inventory Master", sub_module_code: "WH4" },
-        { name: "Item Master", sub_module_code: "WH5" },
+        { name: "WM Transaction", sub_module_code: "WH2" },
+        { name: "Storage Bin", sub_module_code: "WH3" },
+        { name: "Stock Transfer", sub_module_code: "WH4" },
+        { name: "Inventory Master", sub_module_code: "WH5" },
+        { name: "Item Master", sub_module_code: "WH6" },
       ],
     },
     {

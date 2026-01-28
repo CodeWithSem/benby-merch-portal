@@ -6,6 +6,7 @@ import Text_Field from "assets/elements/Text_Field";
 import WM_Items from "./wm_items/WM_Items";
 import { api_create_wm_order } from "api/firestore_db/warehouse/wm_order/tbl_wm_order_api";
 import { inventory_master_list } from "assets/data/inventory_master_list";
+import Confirm_Modal from "assets/elements/modals/Confirm_Modal";
 
 const Create_WMO_GI = ({
   set_page,
@@ -19,87 +20,39 @@ const Create_WMO_GI = ({
   const [create_loading, set_create_loading] = useState(false);
 
   const handle_create_wmo = async () => {
-    console.log(inventory_master_list);
-    // try {
-    //   set_create_loading(true);
-    //   const {
-    //     gr_number, // original field
-    //     creation_date,
-    //     received_item_list, // remove this
-    //     ...rest
-    //   } = new_wmo_data;
+    try {
+      set_create_loading(true);
+      const { so_number, gi_number, creation_date, issued_item_list, ...rest } =
+        new_wmo_data;
 
-    //   const clean_wmo_data = {
-    //     ...rest,
-    //     do_number: gr_number, // ✅ renamed field
-    //     do_creation_date: creation_date,
-    //   };
+      const clean_wmo_data = {
+        ...rest,
+        ref_number: so_number,
+        do_number: gi_number,
+        do_creation_date: creation_date,
+      };
 
-    //   const response = await api_create_wm_order(
-    //     clean_wmo_data,
-    //     active_user?.username,
-    //     show_toast,
-    //   );
+      const response = await api_create_wm_order(
+        clean_wmo_data.process_type,
+        clean_wmo_data,
+        active_user?.username,
+        show_toast,
+      );
 
-    //   if (!response?.success) return;
+      if (!response?.success) return;
 
-    //   set_wm_order_list((prev) => [...prev, response.data]);
-    //   handle_go_back();
-    // } catch (error) {
-    //   console.error("handle_create_gr error:", error);
-    // } finally {
-    //   close_confirm_modal();
-    // }
+      set_wm_order_list((prev) => [...prev, response.data]);
+      handle_go_back();
+    } catch (error) {
+      console.error("handle_create_wmo error:", error);
+    } finally {
+      close_confirm_modal();
+    }
   };
 
   const close_confirm_modal = () => {
     set_is_confirm_modal_open(false);
     set_create_loading(false);
-  };
-
-  const Confirm_Modal = () => {
-    return (
-      <React.Fragment>
-        <div className="fixed inset-0 flex items-center justify-center z-[100]">
-          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm z-[101]"></div>
-          <div
-            className={`relative bg-white rounded-lg shadow-xl max-w-[500px] w-full p-10 m-5 z-[102]`}
-          >
-            <div className="w-full flex justify-center items-center text-lg md:text-xl font-bold mb-4">
-              Confirm WM Order Creation
-            </div>
-            <p className="w-full text-center text-sm leading-6 text-gray-500 dark:text-gray-400 pt-4">
-              You are about to create a new WM Order. Once created, it will be
-              added to the database.
-            </p>
-            <p className="w-full text-center text-sm leading-6 text-gray-500 dark:text-gray-400 pt-4">
-              Please review all the details — before proceeding.
-            </p>
-            <p className="w-full text-center text-sm leading-6 text-gray-500 dark:text-gray-400 py-4">
-              Are you sure you want to continue?
-            </p>
-            <div className="flex justify-center gap-2 mt-4">
-              <Button
-                width="w-[100px]"
-                variant="primary"
-                loading={create_loading}
-                on_click={handle_create_wmo}
-              >
-                Yes
-              </Button>
-              <Button
-                width="w-[100px]"
-                variant="white"
-                on_click={() => set_is_confirm_modal_open(false)}
-                disabled={create_loading}
-              >
-                No
-              </Button>
-            </div>
-          </div>
-        </div>
-      </React.Fragment>
-    );
   };
 
   const handle_go_back = () => {
@@ -201,9 +154,9 @@ const Create_WMO_GI = ({
                   <div className="grid grid-cols-1 gap-5">
                     <div className="col-span-full">
                       <Text_Field
-                        label="PO Creation Date"
+                        label="SO Creation Date"
                         type="text"
-                        value={new_wmo_data.po_creation_date}
+                        value={new_wmo_data.so_creation_date}
                         disabled
                       />
                     </div>
@@ -252,7 +205,16 @@ const Create_WMO_GI = ({
           {/* - Section 3 */}
         </div>
       </div>
-      {is_confirm_modal_open && <Confirm_Modal />}
+      <Confirm_Modal
+        is_open={is_confirm_modal_open}
+        title="Confirm WM Order Creation"
+        description_1="You are about to create a new WM Order. Once created, it will be added to the database."
+        description_2="Please review all the details — before proceeding."
+        description_3="Are you sure you want to continue?"
+        on_confirm={handle_create_wmo}
+        on_cancel={() => set_is_confirm_modal_open(false)}
+        confirm_loading={create_loading}
+      />
     </React.Fragment>
   );
 };

@@ -68,12 +68,12 @@ const WM_Items = ({ new_wmo_data }) => {
                 <th className="px-5 py-4 font-semibold border-r">
                   WM Order UoM
                 </th>
-                <th className="px-5 py-4 font-semibold border-r">
+                {/* <th className="px-5 py-4 font-semibold border-r">
                   Confirmed Qty
                 </th>
                 <th className="px-5 py-4 font-semibold border-r">
                   Confirmed UoM
-                </th>
+                </th> */}
                 <th className="px-5 py-4 font-semibold border-r">Batch</th>
                 <th className="px-5 py-4 font-semibold border-r">
                   Source Storage Bin
@@ -90,10 +90,11 @@ const WM_Items = ({ new_wmo_data }) => {
                 <th className="px-5 py-4 font-semibold border-r">
                   Storage Unit Type
                 </th>
-                <th className="px-5 py-4 font-semibold border-r">
+                {/* <th className="px-5 py-4 font-semibold border-r">
                   WM Order Status
                 </th>
-                <th className="px-5 py-4 font-semibold">TO Status</th>
+                <th className="px-5 py-4 font-semibold border-r">TO Status</th> */}
+                <th className="px-5 py-4 font-semibold">Remarks</th>
                 {/* <th className="px-5 py-4 font-semibold"></th> */}
               </tr>
             </thead>
@@ -103,9 +104,9 @@ const WM_Items = ({ new_wmo_data }) => {
                   key={item.lpn_no || index}
                   className={`text-xs cursor-pointer ${
                     selected_row_id === index
-                      ? "bg-sky-50"
+                      ? `${item.remarks === "INSUFFICIENT STOCK" ? "bg-red-50" : "bg-sky-50"}`
                       : "hover:bg-gray-50/50"
-                  }`}
+                  } ${item.remarks === "INSUFFICIENT STOCK" ? "bg-red-50 hover:bg-red-50" : ""}`}
                   onClick={() => set_selected_row_id(index)}
                 >
                   <td className="px-5 py-4 border-r">{index + 1}</td>
@@ -113,18 +114,21 @@ const WM_Items = ({ new_wmo_data }) => {
                   <td className="px-5 py-4 border-r">{item.item_desc}</td>
                   <td className="px-5 py-4 border-r">{item.quantity}</td>
                   <td className="px-5 py-4 border-r">{item.uom}</td>
-                  <td className="px-5 py-4 border-r">
+                  {/* <td className="px-5 py-4 border-r">
                     {item.quantity_confirmed}
                   </td>
-                  <td className="px-5 py-4 border-r">{item.uom}</td>
+                  <td className="px-5 py-4 border-r">{item.uom}</td> */}
                   <td className="px-5 py-4 border-r">{item.batch_code}</td>
                   <td className="px-5 py-4 border-r">{item.from_sbin_code}</td>
                   <td className="px-5 py-4 border-r">{item.from_stype_code}</td>
                   <td className="px-5 py-4 border-r">{item.to_sbin_code}</td>
                   <td className="px-5 py-4 border-r">{item.to_stype_code}</td>
                   <td className="px-5 py-4 border-r">{item.sutype}</td>
-                  <td className="px-5 py-4 border-r">{item.wm_order_status}</td>
-                  <td className="px-5 py-4">{item.transfer_order_status}</td>
+                  {/* <td className="px-5 py-4 border-r">{item.wm_order_status}</td>
+                  <td className="px-5 py-4 border-r">
+                    {item.transfer_order_status}
+                  </td> */}
+                  <td className="px-5 py-4">{item.remarks}</td>
                   {/* <td className="px-5 py-2 text-gray-600">
                     <Button
                       variant="primary"

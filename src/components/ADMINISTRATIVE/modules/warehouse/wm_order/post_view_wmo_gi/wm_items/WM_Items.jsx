@@ -52,7 +52,7 @@ const WM_Items = ({ view_wmo_data, for_posting }) => {
                 />
               </div>
               {/* + Dropdown Filter */}
-              <div className="relative">
+              {/* <div className="relative">
                 <Button
                   variant="primary"
                   width="w-[180px]"
@@ -62,7 +62,7 @@ const WM_Items = ({ view_wmo_data, for_posting }) => {
                 >
                   Generate LPN
                 </Button>
-              </div>
+              </div> */}
               {/* - Dropdown Filter */}
             </div>
           </div>
@@ -83,12 +83,12 @@ const WM_Items = ({ view_wmo_data, for_posting }) => {
                 <th className="px-5 py-4 font-semibold border-r">
                   WM Order UoM
                 </th>
-                <th className="px-5 py-4 font-semibold border-r">
+                {/* <th className="px-5 py-4 font-semibold border-r">
                   Confirmed Qty
                 </th>
                 <th className="px-5 py-4 font-semibold border-r">
                   Confirmed UoM
-                </th>
+                </th> */}
                 <th className="px-5 py-4 font-semibold border-r">Batch</th>
                 <th className="px-5 py-4 font-semibold border-r">
                   Source Storage Bin
@@ -105,11 +105,11 @@ const WM_Items = ({ view_wmo_data, for_posting }) => {
                 <th className="px-5 py-4 font-semibold border-r">
                   Storage Unit Type
                 </th>
-                <th className="px-5 py-4 font-semibold border-r">
+                {/* <th className="px-5 py-4 font-semibold border-r">
                   WM Order Status
                 </th>
-                <th className="px-5 py-4 font-semibold border-r">TO Status</th>
-                <th className="px-5 py-4 font-semibold"></th>
+                <th className="px-5 py-4 font-semibold border-r">TO Status</th> */}
+                {/* <th className="px-5 py-4 font-semibold"></th> */}
               </tr>
             </thead>
             <tbody className="divide-y bg-white">
@@ -128,21 +128,21 @@ const WM_Items = ({ view_wmo_data, for_posting }) => {
                   <td className="px-5 py-4 border-r">{item.item_desc}</td>
                   <td className="px-5 py-4 border-r">{item.quantity}</td>
                   <td className="px-5 py-4 border-r">{item.uom}</td>
-                  <td className="px-5 py-4 border-r">
+                  {/* <td className="px-5 py-4 border-r">
                     {item.quantity_confirmed}
                   </td>
-                  <td className="px-5 py-4 border-r">{item.uom}</td>
+                  <td className="px-5 py-4 border-r">{item.uom}</td> */}
                   <td className="px-5 py-4 border-r">{item.batch_code}</td>
                   <td className="px-5 py-4 border-r">{item.from_sbin_code}</td>
                   <td className="px-5 py-4 border-r">{item.from_stype_code}</td>
                   <td className="px-5 py-4 border-r">{item.to_sbin_code}</td>
                   <td className="px-5 py-4 border-r">{item.to_stype_code}</td>
                   <td className="px-5 py-4 border-r">{item.sutype}</td>
-                  <td className="px-5 py-4 border-r">{item.wm_order_status}</td>
+                  {/* <td className="px-5 py-4 border-r">{item.wm_order_status}</td>
                   <td className="px-5 py-4 border-r">
                     {item.transfer_order_status}
-                  </td>
-                  <td className="px-5 py-2 text-gray-600">
+                  </td> */}
+                  {/* <td className="px-5 py-2 text-gray-600">
                     <Button
                       variant="primary"
                       size="sm"
@@ -152,7 +152,7 @@ const WM_Items = ({ view_wmo_data, for_posting }) => {
                     >
                       LPN
                     </Button>
-                  </td>
+                  </td> */}
                 </tr>
               ))}
             </tbody>

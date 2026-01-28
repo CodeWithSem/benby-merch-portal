@@ -47,6 +47,7 @@ import { Use_App } from "../../../context/app_context";
 import Pricing_Condition from "../modules/financial/pricing_condition/Pricing_Condition";
 import Discount_Condition from "../modules/financial/discount_condition/Discount_Condition";
 import Pricing_Procedure from "../modules/financial/pricing_procedure/Pricing_Procedure";
+import WM_Transaction from "../modules/warehouse/wm_transaction/WM_Transaction";
 
 const Layout = () => {
   const { set_page } = Use_App();
@@ -114,6 +115,8 @@ const Layout = () => {
         return <Truck />;
       case "Warehouse-WM Order":
         return <WM_Order />;
+      case "Warehouse-WM Transaction":
+        return <WM_Transaction />;
       case "Warehouse-Storage Bin":
         return <Storage_Bin />;
       case "Warehouse-Stock Transfer":

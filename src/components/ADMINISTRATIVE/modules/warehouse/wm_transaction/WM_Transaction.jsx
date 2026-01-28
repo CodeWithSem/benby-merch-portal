@@ -14,47 +14,28 @@ import {
   Database,
   Trash2,
   FileDigit,
+  FileText,
+  FileCheck,
+  FileX,
 } from "lucide-react";
 import { useToast } from "../../../layout/Toast_Provider";
-import { format_date_1 } from "assets/scripts/format";
+import { format_date_1, get_date_now } from "assets/scripts/format";
 import Icon_Field from "assets/elements/Icon_Field";
 import Select_Field from "assets/elements/Select_Field";
 import Pagination from "assets/elements/Pagination";
 import Button from "assets/elements/Button";
 import Checkbox_Field from "assets/elements/Checkbox_Field";
-import Date_Field from "assets/elements/Date_Field";
-// import Create_New_PO from "./create_new_po/Create_New_PO";
-// import Select_PO_Type from "./modals/select_po_type/Select_PO_Type";
-// import Delete_PO from "./modals/delete_po/Delete_PO";
-import Button_Action from "assets/elements/Button_Action";
-// import {
-//   company_list,
-//   purc_org_list,
-//   purc_group_list,
-//   po_type_list,
-//   po_type_h_list,
-//   vendor_master_list,
-// } from "./PO_DATA_MAP";
-// import Select_Generic from "assets/elements/modals/Select_Generic";
-import { Get_TBL_INCREMENTAL_ID } from "api/real_time_db/incremental";
-import {
-  api_get_wm_order_list_by_date,
-  api_set_wm_order_increment,
-  api_truncate_wm_order,
-} from "api/firestore_db/warehouse/wm_order/tbl_wm_order_api";
-import { Use_App } from "context/app_context";
-import Set_Increment_ID from "assets/elements/modals/Set_Increment_ID";
-import { get_description } from "assets/scripts/functions/get_description";
-import Spinner from "assets/elements/Spinner";
-import Select_DO from "./modals/select_do/Select_DO";
-import Create_WMO_GR from "./create_wmo_gr/Create_WMO_GR";
-import Post_View_WMO_GR from "./post_view_wmo_gr/Post_View_WMO_GR";
-import Create_WMO_GI from "./create_wmo_gi/Create_WMO_GI";
-import Post_View_WMO_GI from "./post_view_wmo_gi/Post_View_WMO_GI";
-// import Edit_PO from "./edit_po/Edit_PO";
-// import Post_View_PO from "./post_view_wmo/Post_View_PO";
 
-const WM_Order = () => {
+import { Use_App } from "context/app_context";
+import Spinner from "assets/elements/Spinner";
+import {
+  api_get_wm_orders_rtdb_listener,
+  api_update_wm_order_item_rtdb,
+} from "api/real_time_db/warehouse/wm_order/tbl_wm_order_api_rtdb";
+import Button_Action from "assets/elements/Button_Action";
+import { api_create_inventory_master_rtdb } from "api/real_time_db/warehouse/inventory_master/tbl_inventory_master_api_rtdb";
+
+const WM_Transaction = () => {
   const { active_user } = Use_App();
   const { show_toast } = useToast();
   // + Variables
@@ -76,40 +57,11 @@ const WM_Order = () => {
   const [show_load_data_button, set_show_load_data_button] = useState(true);
   const [selected_gr_data, set_selected_gr_data] = useState({});
   const [status_filters, set_status_filters] = useState({
-    Draft: true,
     Pending: true,
-    Approved: true,
-    Posted: true,
-    "Partially Received": true,
-    "Fully Received": true,
+    Complete: true,
   });
+  const [process_type, set_process_type] = useState("Goods Receipt");
   // - Variables
-
-  const [current_id, set_current_id] = useState(0);
-  const [new_wmo_data, set_new_wmo_data] = useState({});
-  const [edit_po_data, set_edit_po_data] = useState({});
-  const [view_wmo_data, set_view_wmo_data] = useState({});
-  const [selected_item_list, set_selected_item_list] = useState([]);
-  const [selected_approval_list, set_selected_approval_list] = useState([]);
-
-  const reset_new_data = () => {
-    set_new_wmo_data((prev) => ({
-      id: prev.id,
-      wmo_number: prev.wmo_number,
-    }));
-    // set_new_wmo_data({});
-  };
-
-  useEffect(() => {
-    Get_TBL_INCREMENTAL_ID("TBL_WM_ORDER", (value) => {
-      set_new_wmo_data((prev) => ({
-        ...prev,
-        id: value,
-        wmo_number: `WMO-${String(value).padStart(9, "0")}`,
-      }));
-      set_current_id(value);
-    });
-  }, []);
 
   // + Columns
   const columns = [
@@ -117,52 +69,40 @@ const WM_Order = () => {
     { key: "wmo_number", label: "WM Order Number", sortable: true },
     { key: "do_number", label: "DO Number", sortable: true },
     { key: "ref_number", label: "Reference", sortable: true },
-    { key: "creation_date", label: "Creation Date", sortable: true },
-    { key: "wmo_status", label: "Status", sortable: true },
+    { key: "item_code", label: "Item Code", sortable: true },
+    { key: "from_sbin_code", label: "Source", sortable: true },
+    { key: "to_sbin_code", label: "Destination", sortable: true },
+    { key: "quantity_confirm", label: "Confirmed Qty", sortable: true },
+    { key: "transfer_order_status", label: "Status", sortable: true },
     { key: "actions", label: "", sortable: false },
   ];
   // - Columns
 
   const [wm_order_list, set_wm_order_list] = useState([]);
 
-  const handle_get_wm_order_list = async () => {
-    try {
-      set_loading_list(true);
+  const handle_get_wm_order_list = async (process_type) => {
+    // Start loading UI
+    set_loading_list(true);
 
-      const response = await api_get_wm_order_list_by_date(
-        start_date,
-        end_date,
-        show_toast,
-      );
+    // Initialize the listener
+    // We pass the process_type (e.g., "Goods Receipt")
+    const unsubscribe = api_get_wm_orders_rtdb_listener(
+      process_type,
+      (data) => {
+        // This block runs every time data changes in Firebase
+        set_wm_order_list(data);
+        set_loading_list(false);
+      },
+    );
 
-      if (response?.success) {
-        set_wm_order_list(response.data || []);
-      } else {
-        console.error(response?.message || "Failed to fetch WM order list");
-      }
-    } catch (error) {
-      console.error("Error fetching WM order list:", error);
-    } finally {
-      set_loading_list(false);
-      // set_show_load_data_button(false);
-    }
+    // CLEANUP: This is critical. It stops the listener when
+    // the user navigates away or process_type changes.
+    return () => unsubscribe();
   };
 
   useEffect(() => {
-    handle_get_wm_order_list();
-  }, []);
-
-  const handle_truncate = async () => {
-    set_truncate_loading(true);
-    await api_truncate_wm_order(show_toast);
-    handle_get_wm_order_list();
-    set_truncate_loading(false);
-    set_display_modal("");
-  };
-
-  const handle_set_incremental_id = () => {
-    set_display_modal("set_incremental_id");
-  };
+    handle_get_wm_order_list(process_type);
+  }, [process_type]);
 
   // + Client-Side Filtering
   const [filtered_wm_order_list, set_filtered_wm_order_list] = useState([]);
@@ -192,7 +132,9 @@ const WM_Order = () => {
     );
 
     if (active_statuses.length > 0) {
-      temp = temp.filter((po) => active_statuses.includes(po.wmo_status));
+      temp = temp.filter((data) =>
+        active_statuses.includes(data.transfer_order_status),
+      );
     }
 
     if (debounced_query.trim() !== "") {
@@ -270,57 +212,84 @@ const WM_Order = () => {
     }));
   };
 
-  const handle_create_new_po = () => {
-    set_display_modal("select_do");
-  };
-
-  const handle_upload_po = () => {
-    alert("Under Maintenance");
-  };
-
   const handle_view_wmo = (data) => {
-    set_for_posting(false);
-    set_view_wmo_data(data);
-    if (data.process_type === "Goods Receipt") {
-      set_page("post_view_wmo_gr");
-    } else {
-      set_page("post_view_wmo_gi");
+    console.log(data);
+  };
+
+  //   const handle_wmo_confirm = (data) => {
+  //     set_wm_order_list((prev) =>
+  //       prev.map((item) => {
+  //         if (item.id === data.id) {
+  //           return {
+  //             ...item,
+  //             quantity_confirm: data.quantity,
+  //             transfer_order_status: "Complete",
+  //           };
+  //         }
+  //         return item;
+  //       }),
+  //     );
+  //   };
+  //   const handle_wmo_revert = (data) => {
+  //     set_wm_order_list((prev) =>
+  //       prev.map((item) => {
+  //         if (item.id === data.id) {
+  //           return {
+  //             ...item,
+  //             quantity_confirm: 0,
+  //             transfer_order_status: "Pending",
+  //           };
+  //         }
+  //         return item;
+  //       }),
+  //     );
+  //   };
+
+  const handle_wmo_confirm = async (data) => {
+    // 1. Update the WM Order Item to 'Complete'
+    const wm_updates = {
+      quantity_confirm: data.quantity,
+      transfer_order_status: "Complete",
+      confirm_date: format_date_1(get_date_now()),
+    };
+
+    const wm_res = await api_update_wm_order_item_rtdb(
+      data.process_type,
+      data.lpn_no,
+      wm_updates,
+    );
+
+    if (wm_res.success) {
+      // 2. Create the Inventory Master Record
+      // Note: We pass the full 'data' object which contains WMO, PO, and Item info
+      const inv_res = await api_create_inventory_master_rtdb(data, active_user);
+
+      if (inv_res.success) {
+        show_toast?.({
+          type: "success",
+          title: "Confirmed",
+          message: `LPN ${data.lpn_no} moved to Inventory at ${data.to_sbin_code}`,
+        });
+      }
     }
   };
 
-  const handle_post_wmo = (data) => {
-    set_for_posting(true);
-    set_view_wmo_data(data);
-    if (data.process_type === "Goods Receipt") {
-      set_page("post_view_wmo_gr");
-    } else {
-      set_page("post_view_wmo_gi");
-    }
-  };
+  const handle_wmo_revert = async (data) => {
+    const updates = {
+      quantity_confirm: 0,
+      transfer_order_status: "Pending",
+      confirm_date: "",
+    };
 
-  const handle_edit_po = (data) => {
-    set_edit_po_data(data);
-    set_selected_item_list(data.selected_item_list);
-    set_selected_approval_list(data.selected_approval_list);
-    set_page("edit_po");
-  };
-
-  const handle_delete_po = () => {
-    set_display_modal("delete_po");
-  };
-
-  const handle_change_start_date = (value) => {
-    set_start_date(format_date_1(value));
-    // set_show_load_data_button(true);
-  };
-
-  const handle_change_end_date = (value) => {
-    set_end_date(format_date_1(value));
-    // set_show_load_data_button(true);
+    await api_update_wm_order_item_rtdb(
+      data.process_type,
+      data.lpn_no,
+      updates,
+    );
   };
 
   const handle_load_data = () => {
-    handle_get_wm_order_list();
+    handle_get_wm_order_list(process_type);
   };
 
   // RETURN ORIGIN
@@ -347,7 +316,7 @@ const WM_Order = () => {
                   </li>
                   <li className="flex items-center gap-1.5 text-sm text-gray-500">
                     <span>/</span>
-                    <span className="text-gray-800">WM Order</span>
+                    <span className="text-gray-800">WM Transaction</span>
                   </li>
                 </ol>
               </nav>
@@ -356,47 +325,16 @@ const WM_Order = () => {
             <div className="w-full bg-white rounded-lg border">
               {/* + Header */}
               <div className="flex flex-wrap items-center justify-between gap-3 p-5">
-                <h1 className="text-lg">WM Order</h1>
+                <h1 className="text-lg">WM Transaction</h1>
                 <div className="flex gap-2">
-                  {active_user?.category === "DEV" && (
-                    <Button
-                      variant="success"
-                      icon={FileDigit}
-                      icon_position="left"
-                      width="w-[110px]"
-                      on_click={handle_set_incremental_id}
-                    >
-                      Set ID
-                    </Button>
-                  )}
-                  {active_user?.category === "DEV" && (
-                    <Button
-                      variant="danger"
-                      icon={Trash2}
-                      icon_position="left"
-                      width="w-[110px]"
-                      loading={truncate_loading}
-                      on_click={handle_truncate}
-                    >
-                      Truncate
-                    </Button>
-                  )}
                   <Button
-                    variant="primary"
-                    icon={PlusCircle}
+                    variant="success"
+                    icon={FileText}
                     icon_position="left"
-                    on_click={handle_create_new_po}
+                    // on_click={handle_create_new_po}
                   >
-                    Create New WM Order
+                    Generate Report
                   </Button>
-                  {/* <Button
-                    variant="primary"
-                    icon={FileUp}
-                    icon_position="left"
-                    on_click={handle_upload_po}
-                  >
-                    Upload
-                  </Button> */}
                 </div>
               </div>
               {/* - Header */}
@@ -404,19 +342,18 @@ const WM_Order = () => {
               <div className="p-5 sm:p-6 border-t">
                 {/* + Date Range Filter */}
                 <div className="grid grid-cols-1 gap-5 md:w-[220px]">
-                  <Date_Field
-                    label="Start Date"
-                    value={start_date}
-                    on_change={(e) => handle_change_start_date(e.target.value)}
-                    placeholder="Select Date"
+                  <Select_Field
+                    label="Process Type"
+                    value={process_type}
+                    on_change={(e) => {
+                      set_process_type(e.target.value);
+                    }}
+                    options={[
+                      { label: "Goods Receipt", value: "Goods Receipt" },
+                      { label: "Goods Issue", value: "Goods Issue" },
+                    ]}
                   />
-                  <Date_Field
-                    label="End Date"
-                    value={end_date}
-                    on_change={(e) => handle_change_end_date(e.target.value)}
-                    placeholder="Select Date"
-                  />
-                  {show_load_data_button && (
+                  {/* {show_load_data_button && (
                     <Button
                       variant="primary"
                       icon={Database}
@@ -426,7 +363,7 @@ const WM_Order = () => {
                     >
                       Load Data
                     </Button>
-                  )}
+                  )} */}
                 </div>
                 {/* - Date Range Filter */}
               </div>
@@ -458,7 +395,7 @@ const WM_Order = () => {
                         variant="white"
                         icon={RefreshCw}
                         icon_position="left"
-                        on_click={handle_get_wm_order_list}
+                        on_click={handle_load_data}
                       ></Button>
                     </div>
                     <div className="w-full mt-4 md:mt-0 md:w-[600px]">
@@ -494,16 +431,9 @@ const WM_Order = () => {
                               <div className="absolute top-full mt-2 right-0 z-50 bg-white border rounded-lg shadow-md p-4 w-[260px] mb-[40]">
                                 <div className="mt-2">
                                   <h1 className="mb-3 text-gray-600 text-sm">
-                                    PO Status
+                                    TO Status
                                   </h1>
                                   <div className="grid grid-cols-1 gap-3">
-                                    <Checkbox_Field
-                                      label="Draft"
-                                      checked={status_filters["Draft"]}
-                                      on_change={() =>
-                                        toggle_status_filter("Draft")
-                                      }
-                                    />
                                     <Checkbox_Field
                                       label="Pending"
                                       checked={status_filters["Pending"]}
@@ -512,35 +442,10 @@ const WM_Order = () => {
                                       }
                                     />
                                     <Checkbox_Field
-                                      label="Approved"
-                                      checked={status_filters["Approved"]}
+                                      label="Complete"
+                                      checked={status_filters["Complete"]}
                                       on_change={() =>
-                                        toggle_status_filter("Approved")
-                                      }
-                                    />
-                                    <Checkbox_Field
-                                      label="Posted"
-                                      checked={status_filters["Posted"]}
-                                      on_change={() =>
-                                        toggle_status_filter("Posted")
-                                      }
-                                    />
-                                    <Checkbox_Field
-                                      label="Partially Received"
-                                      checked={
-                                        status_filters["Partially Received"]
-                                      }
-                                      on_change={() =>
-                                        toggle_status_filter(
-                                          "Partially Received",
-                                        )
-                                      }
-                                    />
-                                    <Checkbox_Field
-                                      label="Fully Received"
-                                      checked={status_filters["Fully Received"]}
-                                      on_change={() =>
-                                        toggle_status_filter("Fully Received")
+                                        toggle_status_filter("Complete")
                                       }
                                     />
                                   </div>
@@ -625,46 +530,36 @@ const WM_Order = () => {
                             // + Cell Renderer
                             const render_cell = (col, row) => {
                               const value = row[col.key];
-                              //   if (col.key === "od_company_code") {
-                              //     return get_description(
-                              //       row.od_company_code,
-                              //       company_list,
-                              //       "company_code",
-                              //       "company_desc"
-                              //     );
-                              //   }
-                              //   if (col.key === "vendor_code") {
-                              //     return get_description(
-                              //       row.vendor_code,
-                              //       vendor_master_list,
-                              //       "vendor_code",
-                              //       "vendor_desc"
-                              //     );
-                              //   }
-                              if (col.key === "wmo_status") {
-                                const wmo_status_classes = {
-                                  Draft: "bg-gray-100 text-gray-500",
+
+                              if (col.key === "quantity_confirm") {
+                                return (
+                                  <span>
+                                    {row.quantity_confirm || 0} / {row.quantity}
+                                  </span>
+                                );
+                              }
+
+                              if (col.key === "transfer_order_status") {
+                                const transfer_order_status_classes = {
                                   Pending: "bg-yellow-100 text-yellow-500",
                                   "Partially Received":
                                     "bg-yellow-100 text-yellow-500",
-                                  Posted: "bg-green-100 text-green-500",
-                                  Approved: "bg-green-100 text-green-500",
-                                  "Fully Received":
-                                    "bg-green-100 text-green-500",
-                                  Rejected: "bg-red-100 text-red-500",
+                                  Complete: "bg-green-100 text-green-500",
                                 };
 
                                 return (
                                   <span
                                     className={`inline-flex items-center justify-center gap-1 rounded-full px-3 py-0.5 text-xs font-medium ${
-                                      wmo_status_classes[row.wmo_status] ||
-                                      "bg-gray-100 text-gray-500"
+                                      transfer_order_status_classes[
+                                        row.transfer_order_status
+                                      ] || "bg-gray-100 text-gray-500"
                                     }`}
                                   >
-                                    {row.wmo_status}
+                                    {row.transfer_order_status}
                                   </span>
                                 );
                               }
+
                               if (col.key === "actions") {
                                 return (
                                   <div className="flex gap-2">
@@ -675,24 +570,25 @@ const WM_Order = () => {
                                         on_click={() => handle_view_wmo(row)}
                                       />
                                     </div>
-                                    {row.wmo_status === "Pending" && (
+                                    {active_user?.category === "DEV" && (
                                       <div className="relative group flex jusity-center items-center">
                                         <Button_Action
-                                          icon={FileInput}
-                                          tooltip="Post Record"
-                                          on_click={() => handle_post_wmo(row)}
+                                          icon={FileCheck}
+                                          tooltip="Confirm"
+                                          on_click={() =>
+                                            handle_wmo_confirm(row)
+                                          }
                                         />
                                       </div>
                                     )}
-                                    {row.wmo_status !== "Posted" && (
+                                    {active_user?.category === "DEV" && (
                                       <div className="relative group flex jusity-center items-center">
                                         <Button_Action
-                                          class_name="mb-[1px]"
-                                          icon={Trash}
                                           variant="danger"
-                                          tooltip="Delete Record"
+                                          icon={FileX}
+                                          tooltip="Revert"
                                           on_click={() =>
-                                            handle_delete_po(row.id)
+                                            handle_wmo_revert(row)
                                           }
                                         />
                                       </div>
@@ -750,112 +646,8 @@ const WM_Order = () => {
           </div>
         </React.Fragment>
       )}
-      {/* + Pages */}
-      {page === "wmo_gr_creation" && (
-        <Create_WMO_GR
-          set_page={set_page}
-          active_user={active_user}
-          show_toast={show_toast}
-          new_wmo_data={new_wmo_data}
-          set_wm_order_list={set_wm_order_list}
-          reset_new_data={reset_new_data}
-        />
-      )}
-      {page === "wmo_gi_creation" && (
-        <Create_WMO_GI
-          set_page={set_page}
-          active_user={active_user}
-          show_toast={show_toast}
-          new_wmo_data={new_wmo_data}
-          set_wm_order_list={set_wm_order_list}
-          reset_new_data={reset_new_data}
-        />
-      )}
-      {/* {page === "edit_po" && (
-        <Edit_PO
-          set_page={set_page}
-          active_user={active_user}
-          show_toast={show_toast}
-          edit_po_data={edit_po_data}
-          set_edit_po_data={set_edit_po_data}
-          selected_item_list={selected_item_list}
-          set_selected_item_list={set_selected_item_list}
-          selected_approval_list={selected_approval_list}
-          set_selected_approval_list={set_selected_approval_list}
-          set_wm_order_list={set_wm_order_list}
-        />
-      )} */}
-      {page === "post_view_wmo_gr" && (
-        <Post_View_WMO_GR
-          set_page={set_page}
-          active_user={active_user}
-          show_toast={show_toast}
-          view_wmo_data={view_wmo_data}
-          for_posting={for_posting}
-          set_wm_order_list={set_wm_order_list}
-        />
-      )}
-      {page === "post_view_wmo_gi" && (
-        <Post_View_WMO_GI
-          set_page={set_page}
-          active_user={active_user}
-          show_toast={show_toast}
-          view_wmo_data={view_wmo_data}
-          for_posting={for_posting}
-          set_wm_order_list={set_wm_order_list}
-        />
-      )}
-      {/* - Pages */}
-      {/* + Modals */}
-      {/* {select_modal_configs.map((cfg) => (
-        <Select_Generic
-          key={cfg.key}
-          is_open={display_modal === cfg.key}
-          on_close={() => set_display_modal("")}
-          width={cfg.width}
-          height="max-h-[1280px]"
-          modal_label={cfg.label}
-          show_creation_date={cfg.show_creation_date}
-          column_names={cfg.column}
-          source_list={cfg.list}
-          source_code={cfg.code}
-          source_desc={cfg.desc}
-          lookup_lists={cfg.lookup}
-          target_field={cfg.target}
-          set_data={set_new_wmo_data}
-          on_after_select={cfg.on_after_select}
-        />
-      ))} */}
-      {/* - Modals */}
-      <Select_DO
-        is_open={display_modal === "select_do"}
-        on_close={() => set_display_modal("")}
-        width="max-w-[1000px]"
-        height="max-h-[700px]"
-        show_toast={show_toast}
-        do_start_date={do_start_date}
-        set_do_start_date={set_do_start_date}
-        do_end_date={do_end_date}
-        set_do_end_date={set_do_end_date}
-        set_new_wmo_data={set_new_wmo_data}
-        wm_order_list={wm_order_list}
-        set_page={set_page}
-      />
-      {/* <Delete_PO
-        is_open={display_modal === "delete_po"}
-        on_close={() => set_display_modal("")}
-        width="max-w-[1280px]"
-      /> */}
-      <Set_Increment_ID
-        is_open={display_modal === "set_incremental_id"}
-        on_close={() => set_display_modal("")}
-        show_toast={show_toast}
-        current_id={current_id}
-        api_set_increment_id={api_set_wm_order_increment}
-      />
-      {/* - Modals */}
     </React.Fragment>
   );
 };
 
-export default WM_Order;
+export default WM_Transaction;

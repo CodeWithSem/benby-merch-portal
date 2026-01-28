@@ -43,8 +43,6 @@ export const api_get_wm_order_list_by_date = async (
       ...get_firestore_path(TABLES.WM_ORDER),
     );
 
-    console.log(start_date);
-    console.log(end_date);
     const start = convert_date_to_sort(start_date);
     const end = convert_date_to_sort(end_date);
 
@@ -75,7 +73,12 @@ export const api_get_wm_order_list_by_date = async (
 };
 // - [Get]
 // + [Create]
-export const api_create_wm_order = async (new_data, user, show_toast) => {
+export const api_create_wm_order = async (
+  process_type,
+  new_data,
+  user,
+  show_toast,
+) => {
   try {
     const tbl_wm_order_ref = collection(
       firestore_db,
@@ -83,24 +86,27 @@ export const api_create_wm_order = async (new_data, user, show_toast) => {
     );
 
     // ---------------------------------------------
-    // 1. CHECK DUPLICATE po_number
+    // 1. DYNAMIC DUPLICATE CHECK
     // ---------------------------------------------
+    // Determine which field to check based on process_type
+
     const q_code = query(
       tbl_wm_order_ref,
-      where("po_number", "==", new_data.po_number),
+      where("ref_number", "==", new_data.ref_number),
     );
+
     const snap_code = await getDocs(q_code);
 
     if (!snap_code.empty) {
       show_toast({
         type: "danger",
         title: "Error",
-        message: "This WM order number already exists.",
+        message: `A WM order for ${new_data.ref_number} already exists.`,
         icon: <CircleX size={21} className="text-red-500" />,
       });
       return {
         success: false,
-        message: `This WM order number already exists.`,
+        message: `Duplicate ${reference_field} found.`,
         status: "number_duplicate",
       };
     }
@@ -110,6 +116,7 @@ export const api_create_wm_order = async (new_data, user, show_toast) => {
     // ---------------------------------------------
     const final_new_data = {
       ...new_data,
+      process_type, // Ensure process_type is saved in the record
       creation_date: format_date_1(get_date_now()),
       creation_date_sort: format_date_sort(get_date_now()),
       wmo_status: "Pending",
@@ -120,12 +127,14 @@ export const api_create_wm_order = async (new_data, user, show_toast) => {
 
     await setDoc(doc_ref, final_new_data);
     await api_update_wm_order_increment(new_data.id);
+
     show_toast({
       type: "success",
       title: "Created Successfully",
-      message: "A new record has been added.",
+      message: `WM Order has been added.`,
       icon: <CheckCircle2 size={21} className="text-green-500" />,
     });
+
     return {
       success: true,
       message: "WMO created successfully",
@@ -134,16 +143,8 @@ export const api_create_wm_order = async (new_data, user, show_toast) => {
     };
   } catch (error) {
     console.error("Error adding data: ", error);
-    show_toast({
-      type: "danger",
-      title: "Error",
-      message: "Something went wrong. Please try again.",
-      icon: <CircleX size={21} className="text-red-500" />,
-    });
-    return {
-      success: false,
-      message: error.message || "Failed to create WMO",
-    };
+    // ... error toast logic
+    return { success: false, message: error.message };
   }
 };
 // - [Create]
@@ -282,6 +283,33 @@ export const api_update_po_selected_item_list = async (
     return {
       success: false,
       message: error.message || "Failed to update data",
+    };
+  }
+};
+
+export const api_update_wm_order_status = async (doc_id, new_status) => {
+  try {
+    // 1. Reference the document
+    const doc_ref = doc(
+      firestore_db,
+      ...get_firestore_path(TABLES.WM_ORDER),
+      String(doc_id),
+    );
+
+    // 2. Perform the partial update
+    await updateDoc(doc_ref, {
+      wmo_status: new_status,
+    });
+
+    return {
+      success: true,
+      message: `Status updated to ${new_status}`,
+    };
+  } catch (error) {
+    console.error("Error updating WM Order status:", error);
+    return {
+      success: false,
+      message: error.message || "Failed to update status",
     };
   }
 };

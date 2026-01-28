@@ -60,9 +60,15 @@ const Sales_Order = () => {
   const [page, set_page] = useState("main");
   const [display_modal, set_display_modal] = useState("");
   const [for_posting, set_for_posting] = useState(false);
-  const today = format_date_1(new Date());
-  const [start_date, set_start_date] = useState(today);
-  const [end_date, set_end_date] = useState(today);
+
+  const now = new Date();
+  const first_day_of_month = new Date(now.getFullYear(), now.getMonth(), 1);
+  const last_day_of_month = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+  const start = format_date_1(first_day_of_month);
+  const end = format_date_1(last_day_of_month);
+
+  const [start_date, set_start_date] = useState(start);
+  const [end_date, set_end_date] = useState(end);
   const [show_load_data_button, set_show_load_data_button] = useState(false);
   const [selected_item_list, set_selected_item_list] = useState([]);
   const [loading_list, set_loading_list] = useState(false);

@@ -3,10 +3,17 @@ import { ChevronLeft, FileInput } from "lucide-react";
 import Button from "assets/elements/Button";
 import Text_Field from "assets/elements/Text_Field";
 import WM_Items from "./wm_items/WM_Items";
-import { api_post_wm_orders_rtdb } from "../../../../../../api/real_time_db//warehouse/wm_order/tbl_wm_order_api_rtdb";
-import { api_post_wm_order } from "api/firestore_db/warehouse/wm_order/tbl_wm_order_api";
+import {
+  api_post_wm_orders_rtdb,
+  api_unpost_wm_orders_rtdb,
+} from "api/real_time_db/warehouse/wm_order/tbl_wm_order_api_rtdb";
+import {
+  api_post_wm_order,
+  api_update_wm_order_status,
+} from "api/firestore_db/warehouse/wm_order/tbl_wm_order_api";
+import Confirm_Modal from "assets/elements/modals/Confirm_Modal";
 
-const Post_View_WMO = ({
+const Post_View_WMO_GI = ({
   set_page,
   active_user,
   show_toast,
@@ -21,15 +28,12 @@ const Post_View_WMO = ({
     set_post_loading(true);
 
     try {
-      // PHASE 1: Post to Firestore
-      // We pass view_wmo_data (ensuring it has an .id)
       const firestore_res = await api_post_wm_order(
         view_wmo_data,
         active_user,
         show_toast,
       );
 
-      // Only proceed to RTDB if Firestore was successful
       if (firestore_res.success) {
         set_wm_order_list((prev) =>
           prev.map((item) =>
@@ -37,10 +41,11 @@ const Post_View_WMO = ({
           ),
         );
         const rtdb_success = await api_post_wm_orders_rtdb(
+          view_wmo_data.process_type,
           view_wmo_data.wm_allocation_list,
           {
             wmo_number: view_wmo_data.wmo_number,
-            po_number: view_wmo_data.po_number,
+            ref_number: view_wmo_data.ref_number,
             do_number: view_wmo_data.do_number,
           },
           active_user,
@@ -48,7 +53,7 @@ const Post_View_WMO = ({
         );
 
         if (rtdb_success) {
-          set_is_confirm_modal_open(false);
+          close_confirm_modal();
           set_page("main");
         }
       }
@@ -59,54 +64,44 @@ const Post_View_WMO = ({
     }
   };
 
+  const handle_unpost_wmo = async () => {
+    set_post_loading(true); // Reuse loading state to disable buttons
+
+    try {
+      // 1. Remove from Realtime DB (Handhelds)
+      const rtdb_deleted = await api_unpost_wm_orders_rtdb(
+        view_wmo_data.process_type,
+        view_wmo_data.wm_allocation_list,
+        show_toast,
+      );
+
+      if (rtdb_deleted) {
+        const firestore_res = await api_update_wm_order_status(
+          view_wmo_data.id,
+          "Pending",
+        );
+
+        if (firestore_res.success) {
+          set_wm_order_list((prev) =>
+            prev.map((item) =>
+              item.id === view_wmo_data.id
+                ? { ...item, wmo_status: "Pending" }
+                : item,
+            ),
+          );
+          set_page("main");
+        }
+      }
+    } catch (error) {
+      console.error("Unpost Error:", error);
+    } finally {
+      set_post_loading(false);
+    }
+  };
+
   const close_confirm_modal = () => {
     set_is_confirm_modal_open(false);
     set_post_loading(false);
-  };
-
-  const Confirm_Modal = () => {
-    return (
-      <React.Fragment>
-        <div className="fixed inset-0 flex items-center justify-center z-[100]">
-          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm z-[101]"></div>
-          <div
-            className={`relative bg-white rounded-lg shadow-xl max-w-[500px] w-full p-10 m-5 z-[102]`}
-          >
-            <div className="w-full flex justify-center items-center text-lg md:text-xl font-bold mb-4">
-              Confirm WM Order Posting
-            </div>
-            <p className="w-full text-center text-sm leading-6 text-gray-500 dark:text-gray-400 pt-4">
-              You are about to post this WM Order. Once posted, it will be
-              updated to the database.
-            </p>
-            <p className="w-full text-center text-sm leading-6 text-gray-500 dark:text-gray-400 pt-4">
-              Please review all the details — before proceeding.
-            </p>
-            <p className="w-full text-center text-sm leading-6 text-gray-500 dark:text-gray-400 py-4">
-              Are you sure you want to continue?
-            </p>
-            <div className="flex justify-center gap-2 mt-4">
-              <Button
-                width="w-[100px]"
-                variant="primary"
-                loading={post_loading}
-                on_click={handle_post_wmo}
-              >
-                Yes
-              </Button>
-              <Button
-                width="w-[100px]"
-                variant="white"
-                on_click={() => set_is_confirm_modal_open(false)}
-                disabled={post_loading}
-              >
-                No
-              </Button>
-            </div>
-          </div>
-        </div>
-      </React.Fragment>
-    );
   };
 
   const handle_go_back = () => {
@@ -191,9 +186,9 @@ const Post_View_WMO = ({
                     </div>
                     <div className="col-span-full">
                       <Text_Field
-                        label="PO Number"
+                        label="SO Number"
                         type="text"
-                        value={view_wmo_data.po_number}
+                        value={view_wmo_data.ref_number}
                         disabled
                       />
                     </div>
@@ -213,7 +208,7 @@ const Post_View_WMO = ({
                       <Text_Field
                         label="PO Creation Date"
                         type="text"
-                        value={view_wmo_data.po_creation_date}
+                        value={view_wmo_data.so_creation_date}
                         disabled
                       />
                     </div>
@@ -237,6 +232,20 @@ const Post_View_WMO = ({
           {/* + Section 3 */}
           <div className="p-4 sm:p-8 border-t">
             <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
+              {!for_posting &&
+                active_user?.category === "DEV" &&
+                view_wmo_data.wmo_status === "Posted" && (
+                  <Button
+                    variant="danger"
+                    size="lg"
+                    width="w-[120px]"
+                    icon={FileInput}
+                    icon_position="left"
+                    on_click={handle_unpost_wmo}
+                  >
+                    Unpost
+                  </Button>
+                )}
               {for_posting && (
                 <Button
                   variant="primary"
@@ -264,9 +273,18 @@ const Post_View_WMO = ({
           {/* - Section 3 */}
         </div>
       </div>
-      {is_confirm_modal_open && <Confirm_Modal />}
+      <Confirm_Modal
+        is_open={is_confirm_modal_open}
+        title="Confirm WM Order Posting"
+        description_1="You are about to post this WM Order. Once posted, it will be updated to the database."
+        description_2="Please review all the details — before proceeding."
+        description_3="Are you sure you want to continue?"
+        on_confirm={handle_post_wmo}
+        on_cancel={() => set_is_confirm_modal_open(false)}
+        confirm_loading={post_loading}
+      />
     </React.Fragment>
   );
 };
 
-export default Post_View_WMO;
+export default Post_View_WMO_GI;

@@ -86,10 +86,17 @@ export function generate_gr_pallets({ selected_do, item_master_list }) {
 }
 
 export function allocate_lpn_to_bins({ pallets, item_master_list, sbin_list }) {
-  const bins = sbin_list.map((b) => ({
-    ...b,
-    assigned: false,
+  // 1. Setup Virtual Bin tracking (like in GI)
+  // We track current_capacity to ensure we don't exceed max_bin_capacity
+  let virtual_bins = sbin_list.map((bin) => ({
+    ...bin,
+    current_capacity: bin.bin_capacity || 0,
   }));
+
+  // 2. Identify the dynamic Source Bin from sbin_list (stype: "GRZ")
+  const source_bin = virtual_bins.find(
+    (b) => b.stype_code === "GRZ" && b.is_available,
+  );
 
   const allocations = [];
 
@@ -100,41 +107,48 @@ export function allocate_lpn_to_bins({ pallets, item_master_list, sbin_list }) {
       allocations.push({
         ...pallet,
         from_stype_code: "GRZ",
-        from_sbin_code: "GRZ-01",
+        from_sbin_code: source_bin?.sbin_code || "GRZ01",
         to_stype_code: null,
         to_sbin_code: null,
-        remark: "ITEM NOT FOUND IN MASTER",
+        remarks: "ITEM NOT FOUND IN MASTER",
       });
       return;
     }
 
     const dest_stype = item.wm1_stock_dest_code;
 
-    const bin = bins.find(
+    // 3. Find Suitable Destination Bin (Same logic as GI find)
+    // - Must match the item's designated Storage Type
+    // - Must have enough remaining capacity for this pallet's quantity
+    const target_bin = virtual_bins.find(
       (b) =>
         b.stype_code === dest_stype &&
         b.is_available === true &&
-        b.assigned === false,
+        b.max_bin_capacity - b.current_capacity >= pallet.quantity,
     );
 
-    if (bin) {
+    if (target_bin) {
       allocations.push({
         ...pallet,
+        // Source
         from_stype_code: "GRZ",
-        from_sbin_code: "GRZ-01",
-        to_stype_code: bin.stype_code,
-        to_sbin_code: bin.sbin_code,
+        from_sbin_code: source_bin?.sbin_code || "GRZ01",
+
+        // Destination (Automatically designated)
+        to_stype_code: target_bin.stype_code,
+        to_sbin_code: target_bin.sbin_code,
       });
 
-      bin.assigned = true;
+      // 4. Update Virtual Capacity so the next pallet knows this bin is filling up
+      target_bin.current_capacity += pallet.quantity;
     } else {
       allocations.push({
         ...pallet,
         from_stype_code: "GRZ",
-        from_sbin_code: "GRZ-01",
+        from_sbin_code: source_bin?.sbin_code || "GRZ01",
         to_stype_code: dest_stype,
         to_sbin_code: null,
-        remark: "NO AVAILABLE BIN",
+        remarks: "NO AVAILABLE BIN IN ZONE",
       });
     }
   });
