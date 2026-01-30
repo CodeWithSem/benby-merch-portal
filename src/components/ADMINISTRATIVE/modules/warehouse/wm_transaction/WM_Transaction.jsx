@@ -260,17 +260,11 @@ const WM_Transaction = () => {
     );
 
     if (wm_res.success) {
-      // 2. Create the Inventory Master Record
-      // Note: We pass the full 'data' object which contains WMO, PO, and Item info
-      const inv_res = await api_create_inventory_master_rtdb(data, active_user);
-
-      if (inv_res.success) {
-        show_toast?.({
-          type: "success",
-          title: "Confirmed",
-          message: `LPN ${data.lpn_no} moved to Inventory at ${data.to_sbin_code}`,
-        });
-      }
+      show_toast?.({
+        type: "success",
+        title: "Confirmed",
+        message: `LPN: ${data.lpn_no} is confirmed.`,
+      });
     }
   };
 
@@ -281,11 +275,19 @@ const WM_Transaction = () => {
       confirm_date: "",
     };
 
-    await api_update_wm_order_item_rtdb(
+    const wm_res = await api_update_wm_order_item_rtdb(
       data.process_type,
       data.lpn_no,
       updates,
     );
+
+    if (wm_res.success) {
+      show_toast?.({
+        type: "danger",
+        title: "Unconfirmed",
+        message: `LPN: ${data.lpn_no} is unconfirmed.`,
+      });
+    }
   };
 
   const handle_load_data = () => {

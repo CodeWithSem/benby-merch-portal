@@ -16,6 +16,7 @@ export const TABLES = {
   // - Outbound Module =================================
   // + Warehouse Module ================================
   STORAGE_BIN: "TBL_STORAGE_BIN",
+  STORAGE_BIN_MASTER: "TBL_STORAGE_BIN_MASTER",
   ITEM_MASTER: "TBL_ITEM_MASTER",
   ITEM_EXT_SALES_DATA: "TBL_ITEM_EXT_SALES_DATA",
   ITEM_EXT_SALES_DATA_PLANT: "TBL_ITEM_EXT_SALES_DATA_PLANT",

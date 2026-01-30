@@ -1,11 +1,40 @@
-import { ref, set } from "firebase/database";
+import { onValue, ref, set, update } from "firebase/database";
 import { realtime_db } from "assets/scripts/firebase";
 import { get_realtime_path, TABLES } from "../../../db_path_contant";
 import { format_date_1, get_date_now } from "assets/scripts/format";
 
+export const api_get_inventory_master_rtdb = (callback) => {
+  const inventory_ref = ref(
+    realtime_db,
+    get_realtime_path(TABLES.INVENTORY_MASTER),
+  );
+
+  // onValue returns an unsubscribe function
+  return onValue(
+    inventory_ref,
+    (snapshot) => {
+      const data = snapshot.val();
+      if (data) {
+        // Convert the Firebase object into an array
+        const list = Object.keys(data).map((key) => ({
+          ...data[key],
+          // Ensure id is present even if not in the payload
+          id: data[key].id || key,
+        }));
+        callback(list);
+      } else {
+        callback([]);
+      }
+    },
+    (error) => {
+      console.error("Fetch Inventory Master Error:", error);
+      callback(null, error);
+    },
+  );
+};
+
 export const api_create_inventory_master_rtdb = async (data, active_user) => {
   try {
-    // Path: .../INVENTORY_MASTER/DATA/SBIN_CODE
     const record_ref = ref(
       realtime_db,
       `${get_realtime_path(TABLES.INVENTORY_MASTER)}/${data.to_sbin_code}`,
@@ -15,35 +44,88 @@ export const api_create_inventory_master_rtdb = async (data, active_user) => {
       id: data.to_sbin_code,
       lpn_no: data.lpn_no,
       inventory_status: "Active",
-      location_details: {
-        sbin_code: data.to_sbin_code,
-        stype_code: data.to_stype_code,
-      },
-      product_details: {
-        item_code: data.item_code,
-        quantity_on_hand: data.quantity,
-        uom: data.uom,
-        pallet_config: data.pallet_config,
-        sutype: data.sutype,
-      },
-      stock_tracking: {
-        batch_code: data.batch_code,
-        manufacture_date: data.manufacture_date,
-        sled_bbd: data.sled_bbd,
-      },
-      audit_trail: {
-        reference_wmo: data.wmo_number,
-        reference_po: data.ref_number,
-        reference_do: data.do_number,
-        confirm_by: active_user?.username || "SYSTEM",
-        confirm_date: format_date_1(get_date_now()),
-      },
+      // Location (Flat)
+      sbin_code: data.to_sbin_code,
+      stype_code: data.to_stype_code,
+      // Product (Flat)
+      item_code: data.item_code,
+      quantity_on_hand: data.quantity,
+      uom: data.uom,
+      pallet_config: data.pallet_config,
+      sutype: data.sutype,
+      // Tracking (Flat)
+      batch_code: data.batch_code,
+      manufacture_date: data.manufacture_date,
+      sled_bbd: data.sled_bbd,
+      // Audit (Flat)
+      reference_wmo: data.wmo_number,
+      reference_po: data.ref_number,
+      reference_do: data.do_number,
+      confirm_by: active_user?.username || "SYSTEM",
+      confirm_date: format_date_1(get_date_now()),
     };
 
     await set(record_ref, payload);
     return { success: true };
   } catch (error) {
     console.error("Inventory Master Creation Error:", error);
+    return { success: false, message: error.message };
+  }
+};
+
+/**
+ * Creates multiple flat inventory records in one atomic request
+ */
+export const api_bulk_create_inventory_master_rtdb = async (
+  wm_allocation_list,
+  meta,
+  active_user,
+) => {
+  try {
+    if (!Array.isArray(wm_allocation_list) || wm_allocation_list.length === 0) {
+      throw new Error("No items provided for inventory update");
+    }
+
+    const updates = {};
+    const base_path = get_realtime_path(TABLES.INVENTORY_MASTER);
+    const timestamp = format_date_1(get_date_now());
+    const username = active_user?.username || "SYSTEM";
+
+    wm_allocation_list.forEach((item) => {
+      if (!item.to_sbin_code) return;
+
+      const payload = {
+        id: item.to_sbin_code,
+        lpn_no: item.lpn_no,
+        inventory_status: "Active",
+        // Location (Flat)
+        sbin_code: item.to_sbin_code,
+        stype_code: item.to_stype_code,
+        // Product (Flat)
+        item_code: item.item_code,
+        quantity_on_hand: item.quantity,
+        uom: item.uom,
+        pallet_config: item.pallet_config,
+        sutype: item.sutype,
+        // Tracking (Flat)
+        batch_code: item.batch_code,
+        manufacture_date: item.manufacture_date,
+        sled_bbd: item.sled_bbd,
+        // Audit (Flat)
+        reference_wmo: meta.wmo_number,
+        reference_po: meta.ref_number,
+        reference_do: meta.do_number,
+        confirm_by: username,
+        confirm_date: timestamp,
+      };
+
+      updates[`${base_path}/${item.to_sbin_code}`] = payload;
+    });
+
+    await update(ref(realtime_db), updates);
+    return { success: true };
+  } catch (error) {
+    console.error("Bulk Inventory Master Creation Error:", error);
     return { success: false, message: error.message };
   }
 };

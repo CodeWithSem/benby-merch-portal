@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { useToast } from "../../../layout/Toast_Provider";
 import {
   Search,
@@ -7,86 +7,72 @@ import {
   View,
   RefreshCw,
   FileUp,
-  Database,
   SlidersHorizontal,
+  MapPin,
+  Package,
 } from "lucide-react";
 import Button from "assets/elements/Button";
 import Icon_Field from "assets/elements/Icon_Field";
 import Select_Field from "assets/elements/Select_Field";
 import Text_Code_Field from "assets/elements/Text_Code_Field";
 import Pagination from "assets/elements/Pagination";
-import Select_Branch from "./modals/Select_Branch";
-import Select_Plant from "./modals/Select_Plant";
-import Select_SLOC from "./modals/Select_SLOC";
+import { get_description } from "assets/scripts/functions/get_description";
+import { item_master_list } from "assets/data/item_master_list";
+import { api_get_inventory_master_rtdb } from "api/real_time_db/warehouse/inventory_master/tbl_inventory_master_api_rtdb";
+import Spinner from "assets/elements/Spinner";
+import Button_Action from "assets/elements/Button_Action";
 
 const Inventory_Master = () => {
   const { show_toast } = useToast();
   const [show_filter, set_show_filter] = useState(false);
-  const [page, set_page] = useState("main");
-  const [display_modal, set_display_modal] = useState("");
-  const [show_load_data_button, set_show_load_data_button] = useState(true);
-
-  const item_list = [
-    { id: 1, item_code: "ITM-000000001", item_desc: "Item Description 1" },
-    { id: 2, item_code: "ITM-000000002", item_desc: "Item Description 2" },
-    { id: 3, item_code: "ITM-000000003", item_desc: "Item Description 3" },
-  ];
-
-  const columns = [
-    { key: "index", label: "No.", sortable: true },
-    { key: "item_code", label: "Item Code", sortable: true },
-    { key: "item_desc", label: "Item Description", sortable: true },
-    { key: "batch_code", label: "Batch Code", sortable: true },
-    { key: "branch_code", label: "Branch Code", sortable: true },
-    { key: "plant_code", label: "Plant Code", sortable: true },
-    { key: "sloc_code", label: "SLOC Code", sortable: true },
-    { key: "qty_available", label: "Qty Available", sortable: true },
-    { key: "uom", label: "UoM", sortable: true },
-    { key: "actions", label: "", sortable: false },
-  ];
-
-  const [inv_item_list, set_inv_item_list] = useState([
-    {
-      id: 1,
-      branch_code: "BR-001",
-      plant_code: "PL-001",
-      sloc_code: "SL-001",
-      item_code: "ITM-000000001",
-      batch_code: "BATCH-001",
-      qty_available: 50,
-      uom: "PC",
-    },
-    {
-      id: 2,
-      branch_code: "BR-001",
-      plant_code: "PL-001",
-      sloc_code: "SL-001",
-      item_code: "ITM-000000002",
-      batch_code: "BATCH-002",
-      qty_available: 100,
-      uom: "PC",
-    },
-    {
-      id: 3,
-      branch_code: "BR-001",
-      plant_code: "PL-001",
-      sloc_code: "SL-001",
-      item_code: "ITM-000000003",
-      batch_code: "BATCH-003",
-      qty_available: 20,
-      uom: "PC",
-    },
-  ]);
-
-  // + Client-Side Filtering
-  const [filtered_inv_item_list, set_filtered_inv_item_list] = useState([]);
+  const [view_mode, set_view_mode] = useState("bin"); // "bin" or "item"
+  const [inv_item_list, set_inv_item_list] = useState([]);
   const [loading, set_loading] = useState(false);
-  const [select_option, set_select_option] = useState(5);
+  const [show_entries, set_show_entries] = useState(5);
   const [current_page, set_current_page] = useState(1);
-  const [sort_by, set_sort_by] = useState("timestamp");
+  const [sort_by, set_sort_by] = useState("id");
   const [sort_order, set_sort_order] = useState("asc");
   const [search_query, set_search_query] = useState("");
   const [debounced_query, set_debounced_query] = useState("");
+
+  // Columns change based on view_mode
+  const columns = useMemo(() => {
+    const base = [
+      { key: "index", label: "No.", sortable: false },
+      { key: "item_code", label: "Item Code", sortable: true },
+      { key: "item_desc", label: "Item Description", sortable: true },
+      { key: "quantity_on_hand", label: "Quantity", sortable: true },
+      { key: "uom", label: "UoM", sortable: true },
+      { key: "actions", label: "", sortable: false },
+    ];
+
+    if (view_mode === "bin") {
+      base.splice(1, 0, {
+        key: "sbin_code",
+        label: "Storage Bin",
+        sortable: true,
+      });
+    }
+
+    if (view_mode === "item") {
+      return base.filter((col) => col.key !== "actions");
+    }
+
+    return base;
+  }, [view_mode]);
+
+  useEffect(() => {
+    set_loading(true);
+    const unsubscribe = api_get_inventory_master_rtdb((data, error) => {
+      if (error) {
+        show_toast("Error loading inventory", "error");
+      } else {
+        set_inv_item_list(data || []);
+      }
+      set_loading(false);
+    });
+    return () => unsubscribe();
+  }, []);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -96,57 +82,76 @@ const Inventory_Master = () => {
     return () => clearTimeout(timer);
   }, [search_query]);
 
-  useEffect(() => {
-    let temp = [...inv_item_list];
+  // Data Processing (Mapping, Aggregating, Searching, Sorting, Paging)
+  const processed_data = useMemo(() => {
+    // 1. Map Descriptions
+    let temp = inv_item_list.map((inv) => ({
+      ...inv,
+      item_desc: get_description(
+        inv.item_code,
+        item_master_list,
+        "item_code",
+        "item_desc",
+      ),
+    }));
 
+    // 2. Aggregate logic for "Per Item"
+    if (view_mode === "item") {
+      const aggregated = {};
+
+      temp.forEach((item) => {
+        const { item_code, item_desc, quantity_on_hand, uom } = item;
+
+        if (!aggregated[item_code]) {
+          // Create a new object containing ONLY these specific fields
+          aggregated[item_code] = {
+            item_code,
+            item_desc,
+            quantity_on_hand: Number(quantity_on_hand),
+            uom,
+          };
+        } else {
+          // Sum the quantity for the existing entry
+          aggregated[item_code].quantity_on_hand += Number(quantity_on_hand);
+        }
+      });
+
+      temp = Object.values(aggregated);
+    }
+
+    // 3. Filter
     if (debounced_query.trim() !== "") {
       const q = debounced_query.toLowerCase();
       temp = temp.filter((u) =>
         columns.some((col) => {
-          if (col.key === "actions") return false;
-          const val = u[col.key];
-          return val?.toString().toLowerCase().includes(q);
-        })
+          if (col.key === "actions" || col.key === "index") return false;
+          return u[col.key]?.toString().toLowerCase().includes(q);
+        }),
       );
     }
 
+    // 4. Sort
     temp.sort((a, b) => {
-      const val_a = a[sort_by];
-      const val_b = b[sort_by];
-
-      if (val_a == null) return 1;
-      if (val_b == null) return -1;
-
-      if (val_a < val_b) return sort_order === "asc" ? -1 : 1;
-      if (val_a > val_b) return sort_order === "asc" ? 1 : -1;
-      return 0;
+      const val_a = a[sort_by] ?? "";
+      const val_b = b[sort_by] ?? "";
+      if (typeof val_a === "string") {
+        return sort_order === "asc"
+          ? val_a.localeCompare(val_b)
+          : val_b.localeCompare(val_a);
+      }
+      return sort_order === "asc" ? val_a - val_b : val_b - val_a;
     });
 
-    const start_idx = (current_page - 1) * select_option;
-    const end_idx = start_idx + select_option;
-    set_filtered_inv_item_list(temp.slice(start_idx, end_idx));
-  }, [
-    inv_item_list,
-    debounced_query,
-    sort_by,
-    sort_order,
-    current_page,
-    select_option,
-  ]);
+    return temp;
+  }, [inv_item_list, view_mode, debounced_query, sort_by, sort_order, columns]);
 
-  const total_pages = Math.ceil(
-    (debounced_query
-      ? inv_item_list.filter((u) =>
-          columns.some((col) => {
-            if (col.key === "actions") return false;
-            const val = u[col.key];
-            return val
-              ?.toString()
-              .toLowerCase()
-              .includes(debounced_query.toLowerCase());
-          })
-        ).length
-      : inv_item_list.length) / select_option
+  const total_pages = Math.max(
+    1,
+    Math.ceil(processed_data.length / show_entries),
+  );
+  const paginated_data = processed_data.slice(
+    (current_page - 1) * show_entries,
+    current_page * show_entries,
   );
 
   const handle_sort = (column) => {
@@ -159,114 +164,77 @@ const Inventory_Master = () => {
     set_current_page(1);
   };
 
-  const handle_page_change = (page) => set_current_page(page);
-  // - Client-Side Filtering
-
-  const handle_select_branch = () => {
-    set_display_modal("select_branch");
-  };
-  const handle_select_plant = () => {
-    set_display_modal("select_plant");
-  };
-  const handle_select_sloc = () => {
-    set_display_modal("select_sloc");
+  const handle_view = (row) => {
+    console.log(row);
   };
 
-  const handle_upload_inv = () => {
-    alert("Upload Inventory");
-  };
-
-  // RETURN ORIGIN
   return (
     <React.Fragment>
       <div className="w-full">
         <div className="flex flex-wrap items-center justify-between gap-3 py-5">
           <h1 className="text-xl">Warehouse</h1>
-          {/* + Breadcrumbs */}
           <nav>
-            <ol className="flex flex-wrap items-center gap-1.5">
+            <ol className="flex flex-wrap items-center gap-1.5 text-sm text-gray-500">
               <li>
-                <a className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-sky-500 cursor-pointer">
-                  Home
-                </a>
+                <a className="hover:text-sky-500 cursor-pointer">Home</a>
               </li>
-              <li className="flex items-center gap-1.5 text-sm text-gray-500">
-                <span>/</span>
-                <a className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-sky-500 cursor-pointer">
-                  Warehouse
-                </a>
+              <li>/</li>
+              <li>
+                <a className="hover:text-sky-500 cursor-pointer">Warehouse</a>
               </li>
-              <li className="flex items-center gap-1.5 text-sm text-gray-500">
-                <span>/</span>
-                <span className="text-gray-800">Inventory Master</span>
-              </li>
+              <li>/</li>
+              <li className="text-gray-800">Inventory Master</li>
             </ol>
           </nav>
-          {/* - Breadcrumbs */}
         </div>
+
         <div className="w-full bg-white rounded-lg border">
-          {/* + Header */}
           <div className="flex flex-wrap items-center justify-between gap-3 p-5">
             <h1 className="text-lg">Inventory Master</h1>
-            <div className="flex gap-2">
-              <Button
-                variant="primary"
-                icon={FileUp}
-                icon_position="left"
-                on_click={handle_upload_inv}
+
+            {/* START: YOUR REQUESTED DESIGN */}
+            <div className="flex bg-gray-100 p-1 rounded-lg border">
+              <button
+                onClick={() => {
+                  set_view_mode("bin");
+                  set_current_page(1);
+                  set_sort_by("sbin_code");
+                }}
+                className={`flex items-center gap-2 px-4 py-1.5 text-xs rounded-md transition-all outline-none ${
+                  view_mode === "bin"
+                    ? "bg-white shadow-sm text-sky-600"
+                    : "text-gray-500 hover:text-gray-700"
+                }`}
               >
-                Upload
-              </Button>
+                <MapPin size={14} /> Per Bin
+              </button>
+              <button
+                onClick={() => {
+                  set_view_mode("item");
+                  set_current_page(1);
+                  set_sort_by("item_code");
+                }}
+                className={`flex items-center gap-2 px-4 py-1.5 text-xs rounded-md transition-all outline-none ${
+                  view_mode === "item"
+                    ? "bg-white shadow-sm text-sky-600"
+                    : "text-gray-500 hover:text-gray-700"
+                }`}
+              >
+                <Package size={14} /> Per Item
+              </button>
             </div>
+            {/* END: YOUR REQUESTED DESIGN */}
           </div>
-          {/* - Header */}
-          {/* + Section 1 */}
+
           <div className="p-5 sm:p-6 border-t">
-            <div className="grid grid-cols-1 gap-5">
-              <Text_Code_Field
-                label="Branch"
-                code_width="150px"
-                show_search_button={true}
-                on_click={handle_select_branch}
-                // has_clear_button={true}
-                on_clear={() => alert("Clear Branch")}
-                disabled
-              />
-              <Text_Code_Field
-                label="Plant / DC"
-                code_width="150px"
-                show_search_button={true}
-                on_click={handle_select_plant}
-                // has_clear_button={true}
-                on_clear={() => alert("Clear Plant")}
-                disabled
-              />
-              <Text_Code_Field
-                label="SLOC"
-                code_width="150px"
-                show_search_button={true}
-                on_click={handle_select_sloc}
-                // has_clear_button={true}
-                on_clear={() => alert("Clear SLOC")}
-                disabled
-              />
-              {show_load_data_button && (
-                <div className="flex md:justify-end">
-                  <Button
-                    variant="primary"
-                    icon={Database}
-                    icon_position="left"
-                    class_name="w-full md:w-auto"
-                    // on_click={handle_load_data}
-                  >
-                    Load Data
-                  </Button>
-                </div>
-              )}
-            </div>
+            <Text_Code_Field
+              label="Warehouse"
+              code_width="150px"
+              show_search_button={true}
+              disabled
+            />
           </div>
-          {/* - Section 1 */}
-          {/* + Section 2 */}
+
           <div className="p-5 sm:p-6 border-t">
             <div className="w-full border rounded-lg">
               <div className="w-full md:flex md:justify-between p-4 gap-4">
@@ -274,10 +242,9 @@ const Inventory_Master = () => {
                   <div>Show</div>
                   <div className="w-[90px]">
                     <Select_Field
-                      name="option"
-                      value={select_option}
+                      value={show_entries}
                       on_change={(e) => {
-                        set_select_option(Number(e.target.value));
+                        set_show_entries(Number(e.target.value));
                         set_current_page(1);
                       }}
                       options={[
@@ -288,76 +255,38 @@ const Inventory_Master = () => {
                     />
                   </div>
                   <div className="mr-2">entries</div>
-                  <Button
-                    variant="white"
-                    icon={RefreshCw}
-                    icon_position="left"
-                    //   on_click={() => load_data()}
-                  ></Button>
+                  <Button variant="white" icon={RefreshCw} />
                 </div>
 
-                <div className="w-full mt-4 md:mt-0 md:w-[600px]">
-                  <div className="w-full flex items-center gap-2">
-                    <div className="w-full">
-                      <Icon_Field
-                        placeholder="Search..."
-                        icon={Search}
-                        icon_position="left"
-                        value={search_query}
-                        on_change={(e) => set_search_query(e.target.value)}
-                      />
-                    </div>
-                    {/* + Dropdown Filter */}
-                    <div className="relative">
-                      <Button
-                        variant="white"
-                        width="w-[100px]"
-                        icon={SlidersHorizontal}
-                        icon_position="left"
-                        on_click={() => set_show_filter((prev) => !prev)}
-                      >
-                        Filter
-                      </Button>
-                      {/* + Dropdown Content */}
-                      {show_filter && (
-                        <React.Fragment>
-                          <div
-                            className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40"
-                            onClick={() => set_show_filter(false)}
-                          ></div>
-                          <div className="absolute top-full mt-2 right-0 z-50 bg-white border rounded-lg shadow-md p-4 w-[260px]">
-                            <div className="flex justify-end gap-2 mt-4">
-                              <Button
-                                size="sm"
-                                variant="primary"
-                                on_click={() => set_show_filter(false)}
-                              >
-                                Apply
-                              </Button>
-                              <Button
-                                size="sm"
-                                variant="secondary"
-                                on_click={() => set_show_filter(false)}
-                              >
-                                Cancel
-                              </Button>
-                            </div>
-                          </div>
-                        </React.Fragment>
-                      )}
-                      {/* - Dropdown Content */}
-                    </div>
-                    {/* - Dropdown Filter */}
+                <div className="w-full mt-4 md:mt-0 md:w-[600px] flex items-center gap-2">
+                  <div className="w-full">
+                    <Icon_Field
+                      placeholder="Search..."
+                      icon={Search}
+                      icon_position="left"
+                      value={search_query}
+                      on_change={(e) => set_search_query(e.target.value)}
+                    />
+                  </div>
+                  <div className="relative">
+                    <Button
+                      variant="white"
+                      width="w-[100px]"
+                      icon={SlidersHorizontal}
+                      on_click={() => set_show_filter(!show_filter)}
+                    >
+                      Filter
+                    </Button>
                   </div>
                 </div>
               </div>
-              {/* + Table */}
+
               <div className="overflow-x-auto">
                 {loading ? (
-                  <div className="p-6 text-center text-gray-500 text-sm">
-                    Loading...
+                  <div className="p-6 flex justify-center items-center text-gray-500 text-sm">
+                    <Spinner />
                   </div>
-                ) : filtered_inv_item_list.length === 0 ? (
+                ) : paginated_data.length === 0 ? (
                   <div className="p-6 text-center text-gray-500 text-sm">
                     No data found
                   </div>
@@ -365,101 +294,69 @@ const Inventory_Master = () => {
                   <table className="min-w-full whitespace-nowrap">
                     <thead className="bg-gray-100">
                       <tr>
-                        {columns.map((col, i) => {
-                          const renderHeaderCell = (col) => {
-                            const is_sorted = sort_by === col.key;
-
-                            return (
-                              <div className="flex items-center justify-between w-full">
-                                <span>{col.label}</span>
-                                {col.sortable &&
-                                  is_sorted &&
-                                  (sort_order === "asc" ? (
-                                    <ChevronUp
-                                      size={14}
-                                      className="text-gray-500"
-                                    />
-                                  ) : (
-                                    <ChevronDown
-                                      size={14}
-                                      className="text-gray-500"
-                                    />
-                                  ))}
-                              </div>
-                            );
-                          };
-                          return (
-                            <th
-                              key={col.key}
-                              onClick={() =>
-                                col.sortable && handle_sort(col.key)
-                              }
-                              className={`border px-4 py-3 text-left text-[12px] font-medium text-gray-700 ${
-                                col.sortable ? "cursor-pointer select-none" : ""
-                              } ${i === 0 ? "border-l-0" : ""} ${
-                                i === columns.length - 1 ? "border-r-0" : ""
-                              }`}
-                            >
-                              {renderHeaderCell(col)}
-                            </th>
-                          );
-                        })}
+                        {columns.map((col, i) => (
+                          <th
+                            key={col.key}
+                            onClick={() => col.sortable && handle_sort(col.key)}
+                            className={`border px-4 py-3 text-left text-[12px] font-medium text-gray-700 ${
+                              col.sortable ? "cursor-pointer select-none" : ""
+                            } ${i === 0 ? "border-l-0" : ""} ${i === columns.length - 1 ? "border-r-0" : ""}`}
+                          >
+                            <div className="flex items-center justify-between w-full">
+                              <span>{col.label}</span>
+                              {col.sortable &&
+                                sort_by === col.key &&
+                                (sort_order === "asc" ? (
+                                  <ChevronUp size={14} />
+                                ) : (
+                                  <ChevronDown size={14} />
+                                ))}
+                            </div>
+                          </th>
+                        ))}
                       </tr>
                     </thead>
                     <tbody className="bg-white">
-                      {filtered_inv_item_list.map((row, idx) => {
-                        const item_data = item_list.find(
-                          (c) => c.item_code === row.item_code
-                        );
+                      {paginated_data.map((row, idx) => {
+                        // + Cell Renderer
                         const render_cell = (col, row) => {
                           const value = row[col.key];
+
                           if (col.key === "index") {
-                            return <div>{idx + 1}</div>;
+                            return (current_page - 1) * show_entries + idx + 1;
                           }
+
                           if (col.key === "item_desc") {
                             return (
                               <div className="whitespace-normal">
-                                {item_data?.item_desc || "-"}
+                                {row.item_desc}
                               </div>
                             );
                           }
-                          if (col.key === "status") {
-                            return (
-                              <span
-                                className={`inline-flex items-center justify-center gap-1 rounded-full px-3 py-0.5 text-xs font-medium ${
-                                  {
-                                    Draft: "bg-yellow-100 text-yellow-600",
-                                    Approved: "bg-green-100 text-green-500",
-                                    "In Transit":
-                                      "bg-yellow-100 text-yellow-600",
-                                    Received: "bg-green-100 text-green-500",
-                                    Cancelled: "bg-red-100 text-red-500",
-                                  }[row.status] || "bg-gray-100 text-gray-500"
-                                }`}
-                              >
-                                {row.status}
-                              </span>
-                            );
-                          }
+
                           if (col.key === "actions") {
                             return (
                               <div className="flex gap-2">
-                                <div className="relative group flex jusity-center items-center">
-                                  <button className="text-gray-500 hover:text-sky-600 text-[12px] outline-none">
-                                    <View size={19} />
-                                  </button>
-                                  <span className="absolute bottom-full mb-1 left-1/2 transform -translate-x-1/2 px-2 py-1 text-xs text-white bg-sky-600 rounded opacity-0 group-hover:opacity-100 transition-opacity">
-                                    View Record
-                                  </span>
+                                <div className="relative group flex justify-center items-center">
+                                  <Button_Action
+                                    icon={View}
+                                    tooltip="View Record"
+                                    on_click={() => handle_view(row)}
+                                  />
                                 </div>
                               </div>
                             );
                           }
+
                           return value;
                         };
+                        // - Cell Renderer
 
                         return (
-                          <tr key={idx} className="hover:bg-gray-50">
+                          <tr
+                            key={idx}
+                            className="hover:bg-gray-50 whitespace-nowrap"
+                          >
                             {columns.map((col, i) => (
                               <td
                                 key={i}
@@ -481,42 +378,19 @@ const Inventory_Master = () => {
                   </table>
                 )}
               </div>
-              {/* - Table */}
-              {/* + Pagination */}
+
               {total_pages > 0 && (
                 <Pagination
                   current_page={current_page}
                   total_pages={total_pages}
-                  on_page_change={handle_page_change}
+                  on_page_change={set_current_page}
                   variant="compact"
                 />
               )}
-              {/* - Pagination */}
             </div>
           </div>
-          {/* - Section 2 */}
         </div>
       </div>
-      {/* + Modals */}
-      <Select_Branch
-        is_open={display_modal === "select_branch"}
-        on_close={() => set_display_modal("")}
-        width="max-w-[1000px]"
-        height="max-h-[700px]"
-      />
-      <Select_Plant
-        is_open={display_modal === "select_plant"}
-        on_close={() => set_display_modal("")}
-        width="max-w-[1000px]"
-        height="max-h-[700px]"
-      />
-      <Select_SLOC
-        is_open={display_modal === "select_sloc"}
-        on_close={() => set_display_modal("")}
-        width="max-w-[1000px]"
-        height="max-h-[700px]"
-      />
-      {/* - Modals */}
     </React.Fragment>
   );
 };

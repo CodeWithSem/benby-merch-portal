@@ -29,7 +29,7 @@ const Select_Branch = ({
       data = data.filter(
         (data) =>
           data.branch_code.toLowerCase().includes(q) ||
-          data.branch_desc.toLowerCase().includes(q)
+          data.branch_desc.toLowerCase().includes(q),
       );
     }
 
@@ -42,8 +42,8 @@ const Select_Branch = ({
     branch_list.filter(
       (data) =>
         data.branch_code.toLowerCase().includes(search_query.toLowerCase()) ||
-        data.branch_desc.toLowerCase().includes(search_query.toLowerCase())
-    ).length / rows_per_page
+        data.branch_desc.toLowerCase().includes(search_query.toLowerCase()),
+    ).length / rows_per_page,
   );
 
   const handle_page_change = (page) => set_current_page(page);

@@ -13,10 +13,19 @@ import {
   FileDigit,
 } from "lucide-react";
 import { useToast } from "../../../layout/Toast_Provider";
+// import { branch_list, plant_list, sloc_list } from "./BATCH_DATA_MAP";
 import Icon_Field from "assets/elements/Icon_Field";
 import Select_Field from "assets/elements/Select_Field";
 import Button from "assets/elements/Button";
 import Pagination from "assets/elements/Pagination";
+// import Create_New_Batch from "./create_new_sbin/Create_New_Batch";
+// import Edit_Batch from "./edit_sbin/Edit_Batch";
+// import Select_Branch from "./modals/Select_Branch";
+// import Select_Plant from "./modals/Select_Plant";
+// import Select_SLOC from "./modals/Select_SLOC";
+// import Select_Item from "./modals/Select_Item";
+// import View_Batch from "./view_sbin/View_Batch";
+// import Delete_Batch from "./modals/delete_sbin/Delete_Batch";
 import Button_Action from "assets/elements/Button_Action";
 import { Use_App } from "context/app_context";
 import Spinner from "assets/elements/Spinner";
@@ -32,7 +41,6 @@ import { Get_TBL_INCREMENTAL_ID } from "api/real_time_db/incremental";
 import Edit_SBIN from "./edit_sbin/Edit_SBIN";
 import View_SBIN from "./view_sbin/View_SBIN";
 import Delete_SBIN from "./modals/delete_sbin/Delete_SBIN";
-import { api_get_sbin_master_rtdb } from "api/real_time_db/warehouse/storage_bin/tbl_sbin_master_api_rtdb";
 
 const Storage_Bin = () => {
   const { active_user } = Use_App();
@@ -42,10 +50,21 @@ const Storage_Bin = () => {
   const [loading_list, set_loading_list] = useState(false);
   const [truncate_loading, set_truncate_loading] = useState(false);
 
+  const [current_id, set_current_id] = useState(0);
   const [new_sbin_data, set_new_sbin_data] = useState({});
   const [edit_sbin_data, set_edit_sbin_data] = useState({});
   const [delete_sbin_data, set_delete_sbin_data] = useState({});
   const [view_sbin_data, set_view_sbin_data] = useState({});
+
+  useEffect(() => {
+    Get_TBL_INCREMENTAL_ID("TBL_STORAGE_BIN", (value) => {
+      set_new_sbin_data((prev) => ({
+        ...prev,
+        id: value,
+      }));
+      set_current_id(value);
+    });
+  }, []);
 
   const columns = [
     { key: "index", label: "#", sortable: false },
@@ -61,25 +80,14 @@ const Storage_Bin = () => {
   const [sbin_list, set_sbin_list] = useState([]);
 
   const handle_get_sbin_list = async () => {
-    // set_loading_list(true);
-    // const response = await api_get_sbin_list();
-    // if (response.success) {
-    //   set_sbin_list(response.data);
-    // } else {
-    //   console.error(response.message);
-    // }
-    // set_loading_list(false);
     set_loading_list(true);
-    const unsubscribe = api_get_sbin_master_rtdb((data, error) => {
-      if (error) {
-        console.error("Failed to fetch bins:", error);
-      } else {
-        set_sbin_list(data);
-      }
-      set_loading_list(false);
-    });
-
-    return () => unsubscribe();
+    const response = await api_get_sbin_list();
+    if (response.success) {
+      set_sbin_list(response.data);
+    } else {
+      console.error(response.message);
+    }
+    set_loading_list(false);
   };
 
   useEffect(() => {
@@ -510,6 +518,13 @@ const Storage_Bin = () => {
         show_toast={show_toast}
         delete_sbin_data={delete_sbin_data}
         set_sbin_list={set_sbin_list}
+      />
+      <Set_Increment_ID
+        is_open={display_modal === "set_incremental_id"}
+        on_close={() => set_display_modal("")}
+        show_toast={show_toast}
+        current_id={current_id}
+        api_set_increment_id={api_set_sbin_increment}
       />
       {/* - Modals */}
     </React.Fragment>

@@ -86,26 +86,32 @@ export const api_unpost_wm_orders_rtdb = async (
       throw new Error("No WM Orders to unpost");
     }
 
-    // Map through the list to create removal promises
-    const promises = wm_allocation_list.map((row) => {
-      if (!row.lpn_no) return Promise.resolve();
+    const updates = {};
+    const wm_base_path = get_realtime_path(TABLES.WM_ORDER);
+    const inv_base_path = get_realtime_path(TABLES.INVENTORY_MASTER);
+    const path_suffix = process_type === "Goods Receipt" ? "GR" : "GI";
 
-      // Mirror the path logic used in the post function
-      const record_ref = ref(
-        realtime_db,
-        `${get_realtime_path(TABLES.WM_ORDER)}/${process_type === "Goods Receipt" ? "GR" : "GI"}/${row.lpn_no}`,
-      );
+    wm_allocation_list.forEach((row) => {
+      // 1. Remove from WM_ORDER branch
+      if (row.lpn_no) {
+        const wm_path = `${wm_base_path}/${path_suffix}/${row.lpn_no}`;
+        updates[wm_path] = null;
+      }
 
-      // remove() deletes the node at the specified reference
-      return remove(record_ref);
+      // 2. Remove from INVENTORY_MASTER branch
+      if (row.to_sbin_code) {
+        const inv_path = `${inv_base_path}/${row.to_sbin_code}`;
+        updates[inv_path] = null;
+      }
     });
 
-    await Promise.all(promises);
+    // Atomic update: setting a path to null in Firebase performs a remove()
+    await update(ref(realtime_db), updates);
 
     show_toast?.({
       type: "success",
       title: "Unposted Successfully",
-      message: "WM Order records have been removed from Realtime DB.",
+      message: "Records removed from both WM Orders and Inventory Master.",
     });
 
     return true;
@@ -114,7 +120,7 @@ export const api_unpost_wm_orders_rtdb = async (
     show_toast?.({
       type: "danger",
       title: "Unpost Failed",
-      message: error.message || "Failed to remove WM Order",
+      message: error.message || "Failed to remove records",
     });
     return false;
   }

@@ -625,22 +625,6 @@ const WM_Order = () => {
                             // + Cell Renderer
                             const render_cell = (col, row) => {
                               const value = row[col.key];
-                              //   if (col.key === "od_company_code") {
-                              //     return get_description(
-                              //       row.od_company_code,
-                              //       company_list,
-                              //       "company_code",
-                              //       "company_desc"
-                              //     );
-                              //   }
-                              //   if (col.key === "vendor_code") {
-                              //     return get_description(
-                              //       row.vendor_code,
-                              //       vendor_master_list,
-                              //       "vendor_code",
-                              //       "vendor_desc"
-                              //     );
-                              //   }
                               if (col.key === "wmo_status") {
                                 const wmo_status_classes = {
                                   Draft: "bg-gray-100 text-gray-500",

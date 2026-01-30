@@ -26,7 +26,7 @@ export const api_get_sbin_list = async () => {
   try {
     const tbl_sbin_ref = collection(
       firestore_db,
-      ...get_firestore_path(TABLES.STORAGE_BIN)
+      ...get_firestore_path(TABLES.STORAGE_BIN),
     );
 
     const query_snapshot = await getDocs(tbl_sbin_ref);
@@ -59,7 +59,7 @@ export const api_create_sbin = async (new_data, user, show_toast) => {
   try {
     const tbl_sbin_ref = collection(
       firestore_db,
-      ...get_firestore_path(TABLES.STORAGE_BIN)
+      ...get_firestore_path(TABLES.STORAGE_BIN),
     );
 
     // ---------------------------------------------
@@ -67,7 +67,7 @@ export const api_create_sbin = async (new_data, user, show_toast) => {
     // ---------------------------------------------
     const q_code = query(
       tbl_sbin_ref,
-      where("sbin_code", "==", new_data.sbin_code)
+      where("sbin_code", "==", new_data.sbin_code),
     );
     const snap_code = await getDocs(q_code);
 
@@ -90,7 +90,7 @@ export const api_create_sbin = async (new_data, user, show_toast) => {
     // ---------------------------------------------
     const q_desc = query(
       tbl_sbin_ref,
-      where("sbin_desc", "==", new_data.sbin_desc)
+      where("sbin_desc", "==", new_data.sbin_desc),
     );
     const snap_desc = await getDocs(q_desc);
 
@@ -160,7 +160,7 @@ export const api_update_sbin_increment = async (id) => {
   try {
     const tbl_sbin_incre_ref = ref(
       realtime_db,
-      get_incremental_path(TABLES.STORAGE_BIN)
+      get_incremental_path(TABLES.STORAGE_BIN),
     );
 
     await set(tbl_sbin_incre_ref, new_id);
@@ -201,7 +201,7 @@ export const api_update_sbin = async (edit_data, user, show_toast) => {
     // ---------------------------------------------------
     const q_desc = query(
       tbl_sbin_ref,
-      where("sbin_desc", "==", edit_data.sbin_desc)
+      where("sbin_desc", "==", edit_data.sbin_desc),
     );
 
     const desc_snap = await getDocs(q_desc);
@@ -282,7 +282,7 @@ export const api_bulk_upload_sbin = async (upload_data_list) => {
     const batch = writeBatch(firestore_db);
     const tbl_sbin_ref = collection(
       firestore_db,
-      ...get_firestore_path(TABLES.STORAGE_BIN)
+      ...get_firestore_path(TABLES.STORAGE_BIN),
     );
 
     upload_data_list.forEach((item) => {
@@ -317,7 +317,7 @@ export const api_delete_sbin = async (id, show_toast) => {
   try {
     const tbl_sbin_ref = collection(
       firestore_db,
-      ...get_firestore_path(TABLES.STORAGE_BIN)
+      ...get_firestore_path(TABLES.STORAGE_BIN),
     );
 
     const doc_ref = doc(tbl_sbin_ref, String(id));
@@ -356,13 +356,13 @@ export const api_truncate_sbin = async (show_toast) => {
   try {
     const tbl_sbin_ref = collection(
       firestore_db,
-      ...get_firestore_path(TABLES.STORAGE_BIN)
+      ...get_firestore_path(TABLES.STORAGE_BIN),
     );
 
     const snapshot = await getDocs(tbl_sbin_ref);
 
     const delete_promises = snapshot.docs.map((document) =>
-      deleteDoc(doc(tbl_sbin_ref, document.id))
+      deleteDoc(doc(tbl_sbin_ref, document.id)),
     );
 
     await Promise.all(delete_promises);
@@ -399,7 +399,7 @@ export const api_reset_sbin_increment = async () => {
   try {
     const tbl_sbin_incre_ref = ref(
       realtime_db,
-      get_incremental_path(TABLES.STORAGE_BIN)
+      get_incremental_path(TABLES.STORAGE_BIN),
     );
 
     await set(tbl_sbin_incre_ref, 1);
@@ -430,7 +430,7 @@ export const api_set_sbin_increment = async (new_id) => {
   try {
     const tbl_sbin_incre_ref = ref(
       realtime_db,
-      get_incremental_path(TABLES.STORAGE_BIN)
+      get_incremental_path(TABLES.STORAGE_BIN),
     );
 
     await set(tbl_sbin_incre_ref, new_id);
