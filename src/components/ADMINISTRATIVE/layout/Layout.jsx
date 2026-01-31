@@ -117,10 +117,10 @@ const Layout = () => {
         return <WM_Order />;
       case "Warehouse-WM Transaction":
         return <WM_Transaction />;
-      case "Warehouse-Storage Bin":
-        return <Storage_Bin />;
       case "Warehouse-Stock Transfer":
         return <Stock_Transfer />;
+      case "Warehouse-Storage Bin":
+        return <Storage_Bin />;
       case "Warehouse-Inventory Master":
         return <Inventory_Master />;
       case "Warehouse-Item Master":

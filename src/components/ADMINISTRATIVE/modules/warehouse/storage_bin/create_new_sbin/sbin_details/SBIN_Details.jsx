@@ -68,7 +68,7 @@ const SBIN_Details = ({
   // RETURN ORIGIN
   return (
     <React.Fragment>
-      <div className="rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6 dark:border-gray-800 dark:bg-gray-900">
+      {/* <div className="rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6 dark:border-gray-800 dark:bg-gray-900">
         <div className="grid grid-cols-1 gap-5">
           <div>
             <Text_Code_Field
@@ -119,27 +119,28 @@ const SBIN_Details = ({
             />
           </div>
         </div>
-      </div>
-      <div className="mt-5 rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6 dark:border-gray-800 dark:bg-gray-900">
+      </div> */}
+      <div className="rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6 dark:border-gray-800 dark:bg-gray-900">
         <h1 className="mb-5 font-semibold text-sky-700">Capacity and Weight</h1>
         <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
           <div className="flex gap-2">
             <div className="w-full">
               <Text_Field
-                label="Total Bin Capacity"
+                label="Bin Capacity"
                 type={"number"}
                 placeholder="0"
                 value={new_sbin_data.bin_capacity} //--> bin_capacity
-                on_change={handle_text_change("bin_capacity", "number")}
+                // on_change={handle_text_change("bin_capacity", "number")}
+                disabled
               />
             </div>
-            <div className="pt-[24px] w-[250px]">
+            {/* <div className="pt-[24px] w-[250px]">
               <Select_Field
                 options={uom_options}
-                value={new_sbin_data.bin_capacity_uom || ""} //--> bin_capacity_uom
+                value={new_sbin_data.bin_capacity_uom || ""}
                 on_change={handle_select_change("bin_capacity_uom")}
               />
-            </div>
+            </div> */}
           </div>
           <div className="flex gap-2">
             <div className="w-full">
@@ -147,15 +148,15 @@ const SBIN_Details = ({
                 label="Max Bin Capacity"
                 type={"number"}
                 placeholder="0"
-                value={new_sbin_data.max_bin_capacity} //--> max_bin_capacity
+                value={new_sbin_data.max_bin_capacity}
                 on_change={handle_text_change("max_bin_capacity", "number")}
               />
             </div>
             <div className="pt-[24px] w-[250px]">
               <Select_Field
                 options={uom_options}
-                value={new_sbin_data.max_bin_capacity_uom || ""} //--> max_bin_capacity_uom
-                on_change={handle_select_change("max_bin_capacity_uom")}
+                value={new_sbin_data.uom || ""} //--> max_bin_capacity_uom
+                on_change={handle_select_change("uom")}
               />
             </div>
           </div>
@@ -177,7 +178,7 @@ const SBIN_Details = ({
           </div>
           <div>
             <Checkbox_Field
-              label="Blocked for Remnoval of Stocks"
+              label="Blocked for Removal of Stocks"
               box_size={24}
               icon_size={14}
               checked={new_sbin_data.block_removal_stock} //--> block_removal_stock

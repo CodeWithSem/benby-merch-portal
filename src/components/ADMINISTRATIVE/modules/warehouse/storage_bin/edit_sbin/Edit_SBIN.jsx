@@ -15,6 +15,8 @@ import {
 import { stype_list, warehouse_list } from "../SBIN_DATA_MAP";
 import Select_Generic from "assets/elements/modals/Select_Generic";
 import SBIN_Details from "./sbin_details/SBIN_Details";
+import { api_update_sbin_rtdb } from "api/real_time_db/warehouse/storage_bin/tbl_sbin_master_api_rtdb";
+import { item_master_list } from "assets/data/item_master_list";
 
 const Edit_SBIN = ({
   set_page,
@@ -66,9 +68,11 @@ const Edit_SBIN = ({
         { name: "stype_code", label: "Storage Type" },
         { name: "sbin_code", label: "Storage Bin Code" },
         { name: "sbin_desc", label: "Storage Bin Description" },
-        { name: "sbtype_code", label: "Storage Bin Type" },
-        { name: "ssec_code", label: "Storage Section" },
-        { name: "pick_area_code", label: "Picking Area" },
+        { name: "max_bin_capacity", label: "Max Bin Capacity" },
+        { name: "uom", label: "Storage  Bin UoM" },
+        // { name: "sbtype_code", label: "Storage Bin Type" },
+        // { name: "ssec_code", label: "Storage Section" },
+        // { name: "pick_area_code", label: "Picking Area" },
       ],
       show_toast,
     });
@@ -83,17 +87,17 @@ const Edit_SBIN = ({
     }
     try {
       set_update_loading(true);
-      const response = await api_update_sbin(
+      const response = await api_update_sbin_rtdb(
         edit_sbin_data,
         active_user?.username,
-        show_toast
+        show_toast,
       );
       if (response.success) {
-        set_sbin_list((prev) =>
-          prev.map((item) =>
-            item.id === response.data.id ? response.data : item
-          )
-        );
+        // set_sbin_list((prev) =>
+        //   prev.map((item) =>
+        //     item.id === response.data.id ? response.data : item,
+        //   ),
+        // );
         handle_go_back();
       }
     } catch (error) {
@@ -231,7 +235,7 @@ const Edit_SBIN = ({
                     edit_sbin_data.warehouse_code,
                     warehouse_list,
                     "warehouse_code",
-                    "warehouse_desc"
+                    "warehouse_desc",
                   )}
                   bg_dis_color="bg-slate-50"
                   text_dis_color="text-slate-500"
@@ -248,7 +252,7 @@ const Edit_SBIN = ({
                     edit_sbin_data.stype_code,
                     stype_list,
                     "stype_code",
-                    "stype_desc"
+                    "stype_desc",
                   )}
                   bg_dis_color="bg-slate-50"
                   text_dis_color="text-slate-500"
@@ -269,6 +273,23 @@ const Edit_SBIN = ({
                 value={edit_sbin_data.sbin_desc} //--> sbin_desc
                 on_change={handle_text_change("sbin_desc")}
               />
+              <div>
+                <Text_Code_Field
+                  label="Item"
+                  code_width="150px"
+                  show_search_button={false}
+                  code_value={edit_sbin_data.item_code}
+                  text_value={get_description(
+                    edit_sbin_data.item_code,
+                    item_master_list,
+                    "item_code",
+                    "item_desc",
+                  )}
+                  bg_dis_color="bg-slate-50"
+                  text_dis_color="text-slate-500"
+                  disabled
+                />
+              </div>
             </div>
           </div>
           {/* - Section 1 */}

@@ -8,10 +8,11 @@ import Text_Field from "assets/elements/Text_Field";
 import { get_description } from "assets/scripts/functions/get_description";
 import { handle_text_change_function } from "assets/scripts/functions/input_functions";
 import { validate_required_fields } from "assets/scripts/functions/validate_fields";
-import { api_create_sbin } from "api/firestore_db/warehouse/storage_bin/tbl_storage_bin_api";
-import { stype_list, warehouse_list } from "../SBIN_DATA_MAP";
+import { warehouse_list } from "assets/data/warehouse_list";
+import { stype_list } from "assets/data/stype_list";
 import Select_Generic from "assets/elements/modals/Select_Generic";
 import SBIN_Details from "./sbin_details/SBIN_Details";
+import { api_create_sbin_rtdb } from "api/real_time_db/warehouse/storage_bin/tbl_sbin_master_api_rtdb";
 
 const Create_New_SBIN = ({
   set_page,
@@ -63,9 +64,11 @@ const Create_New_SBIN = ({
         { name: "stype_code", label: "Storage Type" },
         { name: "sbin_code", label: "Storage Bin Code" },
         { name: "sbin_desc", label: "Storage Bin Description" },
-        { name: "sbtype_code", label: "Storage Bin Type" },
-        { name: "ssec_code", label: "Storage Section" },
-        { name: "pick_area_code", label: "Picking Area" },
+        { name: "max_bin_capacity", label: "Max Bin Capacity" },
+        { name: "uom", label: "Storage  Bin UoM" },
+        // { name: "sbtype_code", label: "Storage Bin Type" },
+        // { name: "ssec_code", label: "Storage Section" },
+        // { name: "pick_area_code", label: "Picking Area" },
       ],
       show_toast,
     });
@@ -73,25 +76,53 @@ const Create_New_SBIN = ({
     return is_valid;
   };
 
+  // const handle_create = async () => {
+  //   if (!validate_sbin_data_fields()) {
+  //     close_confirm_modal();
+  //     return;
+  //   }
+  //   try {
+  //     set_create_loading(true);
+  //     const response = await api_create_sbin(
+  //       new_sbin_data,
+  //       active_user?.username,
+  //       show_toast,
+  //     );
+  //     if (response.success) {
+  //       set_sbin_list((prev) => [...prev, response.data]);
+  //       set_new_sbin_data({});
+  //       handle_go_back();
+  //     }
+  //   } catch (error) {
+  //     console.error("Failed to create a new data:", error);
+  //   } finally {
+  //     close_confirm_modal();
+  //   }
+  // };
+
   const handle_create = async () => {
     if (!validate_sbin_data_fields()) {
       close_confirm_modal();
       return;
     }
+
     try {
       set_create_loading(true);
-      const response = await api_create_sbin(
+
+      // Call the RTDB version
+      const response = await api_create_sbin_rtdb(
         new_sbin_data,
         active_user?.username,
-        show_toast
+        show_toast,
       );
+
       if (response.success) {
-        set_sbin_list((prev) => [...prev, response.data]);
+        // set_sbin_list((prev) => [...prev, response.data]);
         set_new_sbin_data({});
         handle_go_back();
       }
     } catch (error) {
-      console.error("Failed to create a new data:", error);
+      console.error("Failed to create a new data in RTDB:", error);
     } finally {
       close_confirm_modal();
     }
@@ -225,7 +256,7 @@ const Create_New_SBIN = ({
                     new_sbin_data.warehouse_code,
                     warehouse_list,
                     "warehouse_code",
-                    "warehouse_desc"
+                    "warehouse_desc",
                   )}
                   on_click={() => set_display_modal("select_warehouse")}
                   disabled
@@ -241,7 +272,7 @@ const Create_New_SBIN = ({
                     new_sbin_data.stype_code,
                     stype_list,
                     "stype_code",
-                    "stype_desc"
+                    "stype_desc",
                   )}
                   on_click={() => set_display_modal("select_stype")}
                   disabled

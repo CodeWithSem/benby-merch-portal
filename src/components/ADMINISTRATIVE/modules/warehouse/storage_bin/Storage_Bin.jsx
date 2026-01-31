@@ -11,6 +11,7 @@ import {
   FileUp,
   Trash2,
   FileDigit,
+  Upload,
 } from "lucide-react";
 import { useToast } from "../../../layout/Toast_Provider";
 import Icon_Field from "assets/elements/Icon_Field";
@@ -31,8 +32,12 @@ import { api_set_sbtype_ind_increment } from "api/firestore_db/maintenance/wareh
 import { Get_TBL_INCREMENTAL_ID } from "api/real_time_db/incremental";
 import Edit_SBIN from "./edit_sbin/Edit_SBIN";
 import View_SBIN from "./view_sbin/View_SBIN";
-import Delete_SBIN from "./modals/delete_sbin/Delete_SBIN";
-import { api_get_sbin_master_rtdb } from "api/real_time_db/warehouse/storage_bin/tbl_sbin_master_api_rtdb";
+import Delete_SBIN from "./delete/Delete_SBIN";
+import {
+  api_get_sbin_master_rtdb,
+  api_truncate_sbin_rtdb,
+} from "api/real_time_db/warehouse/storage_bin/tbl_sbin_master_api_rtdb";
+import Upload_SBIN from "./upload/Upload_SBIN";
 
 const Storage_Bin = () => {
   const { active_user } = Use_App();
@@ -53,8 +58,9 @@ const Storage_Bin = () => {
     { key: "sbin_desc", label: "Storage Bin Description", sortable: true },
     { key: "warehouse_code", label: "Warehouse Code", sortable: true },
     { key: "stype_code", label: "Storage Type Code", sortable: true },
-    { key: "creation_date", label: "Creation Date", sortable: true },
-    { key: "is_available", label: "Status", sortable: false },
+    { key: "bin_capacity", label: "Capacity", sortable: true },
+    // { key: "creation_date", label: "Creation Date", sortable: true },
+    { key: "status", label: "Status", sortable: false },
     { key: "actions", label: "", sortable: false },
   ];
 
@@ -88,7 +94,7 @@ const Storage_Bin = () => {
 
   const handle_truncate_sbin_list = async () => {
     set_truncate_loading(true);
-    const response = await api_truncate_sbin(show_toast);
+    const response = await api_truncate_sbin_rtdb(show_toast);
     if (response.success) {
       handle_get_sbin_list();
     } else {
@@ -189,7 +195,9 @@ const Storage_Bin = () => {
 
   const handle_create_new_sbin = () => set_page("sbin_creation");
 
-  const handle_upload_sbin = () => alert("Under Maintenance");
+  const handle_upload_sbin = () => {
+    set_page("upload_sbin");
+  };
 
   const handle_view_sbin = (data) => {
     set_view_sbin_data(data);
@@ -240,7 +248,7 @@ const Storage_Bin = () => {
             <div className="flex flex-wrap items-center justify-between gap-3 p-5">
               <h1 className="text-lg">Storage Bin</h1>
               <div className="flex gap-2">
-                {active_user?.category === "DEV" && (
+                {/* {active_user?.category === "DEV" && (
                   <Button
                     variant="success"
                     icon={FileDigit}
@@ -250,7 +258,7 @@ const Storage_Bin = () => {
                   >
                     Set ID
                   </Button>
-                )}
+                )} */}
                 {active_user?.category === "DEV" && (
                   <Button
                     variant="danger"
@@ -384,23 +392,34 @@ const Storage_Bin = () => {
                             if (col.key === "index") {
                               return <span>{row.index}</span>;
                             }
-                            if (col.key === "is_available") {
+
+                            if (col.key === "bin_capacity") {
+                              return (
+                                <span>
+                                  {row.bin_capacity} / {row.max_bin_capacity}
+                                </span>
+                              );
+                            }
+
+                            if (col.key === "status") {
                               function bin_status(status) {
-                                if (status) {
-                                  return "bg-green-100 text-green-500";
-                                } else {
-                                  return "bg-red-100 text-red-500";
+                                switch (status) {
+                                  case "Available":
+                                    return "bg-green-100 text-green-500";
+                                  case "Occupied":
+                                    return "bg-red-100 text-red-500";
+                                  default:
+                                    return "bg-gray-100 text-gray-500";
                                 }
                               }
 
                               return (
                                 <span
-                                  className={`inline-flex items-center justify-center gap-1 rounded-full px-3 py-0.5 text-xs font-medium ${
-                                    bin_status(row.is_available) ||
-                                    "bg-gray-100 text-gray-500"
-                                  }`}
+                                  className={`inline-flex items-center justify-center gap-1 rounded-full px-3 py-0.5 text-xs font-medium ${bin_status(
+                                    row.status,
+                                  )}`}
                                 >
-                                  {row.is_available ? "Available" : "Occupied"}
+                                  {row.status}
                                 </span>
                               );
                             }
@@ -414,22 +433,26 @@ const Storage_Bin = () => {
                                       on_click={() => handle_view_sbin(row)}
                                     />
                                   </div>
-                                  <div className="relative group flex jusity-center items-center">
-                                    <Button_Action
-                                      icon={Edit}
-                                      tooltip="Edit Record"
-                                      on_click={() => handle_edit_sbin(row)}
-                                    />
-                                  </div>
-                                  <div className="relative group flex jusity-center items-center">
-                                    <Button_Action
-                                      class_name="mb-[1px]"
-                                      icon={Trash}
-                                      variant="danger"
-                                      tooltip="Delete Record"
-                                      on_click={() => handle_delete_sbin(row)}
-                                    />
-                                  </div>
+                                  {active_user?.category === "DEV" && (
+                                    <div className="relative group flex jusity-center items-center">
+                                      <Button_Action
+                                        icon={Edit}
+                                        tooltip="Edit Record"
+                                        on_click={() => handle_edit_sbin(row)}
+                                      />
+                                    </div>
+                                  )}
+                                  {active_user?.category === "DEV" && (
+                                    <div className="relative group flex jusity-center items-center">
+                                      <Button_Action
+                                        class_name="mb-[1px]"
+                                        icon={Trash}
+                                        variant="danger"
+                                        tooltip="Delete Record"
+                                        on_click={() => handle_delete_sbin(row)}
+                                      />
+                                    </div>
+                                  )}
                                 </div>
                               );
                             }
@@ -499,6 +522,13 @@ const Storage_Bin = () => {
       )}
       {page === "view_sbin" && (
         <View_SBIN set_page={set_page} view_sbin_data={view_sbin_data} />
+      )}
+      {page === "upload_sbin" && (
+        <Upload_SBIN
+          set_page={set_page}
+          active_user={active_user}
+          show_toast={show_toast}
+        />
       )}
       {/* - Pages */}
       {/* + Modals */}

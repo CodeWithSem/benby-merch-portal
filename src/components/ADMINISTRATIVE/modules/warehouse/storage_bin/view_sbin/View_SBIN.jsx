@@ -4,7 +4,8 @@ import Button from "assets/elements/Button";
 import Text_Code_Field from "assets/elements/Text_Code_Field";
 import Text_Field from "assets/elements/Text_Field";
 import { get_description } from "assets/scripts/functions/get_description";
-import { stype_list, warehouse_list } from "../SBIN_DATA_MAP";
+import { warehouse_list } from "assets/data/warehouse_list";
+import { stype_list } from "assets/data/stype_list";
 import SBIN_Details from "./sbin_details/SBIN_Details";
 
 const View_SBIN = ({ set_page, view_sbin_data }) => {
@@ -88,7 +89,7 @@ const View_SBIN = ({ set_page, view_sbin_data }) => {
                     view_sbin_data.warehouse_code,
                     warehouse_list,
                     "warehouse_code",
-                    "warehouse_desc"
+                    "warehouse_desc",
                   )}
                   bg_dis_color="bg-slate-50"
                   text_dis_color="text-slate-500"
@@ -105,7 +106,7 @@ const View_SBIN = ({ set_page, view_sbin_data }) => {
                     view_sbin_data.stype_code,
                     stype_list,
                     "stype_code",
-                    "stype_desc"
+                    "stype_desc",
                   )}
                   bg_dis_color="bg-slate-50"
                   text_dis_color="text-slate-500"

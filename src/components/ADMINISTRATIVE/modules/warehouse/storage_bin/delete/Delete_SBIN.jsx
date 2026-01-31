@@ -5,6 +5,7 @@ import { CheckCircle2, CircleX, X } from "lucide-react";
 import Text_Field from "assets/elements/Text_Field";
 import Button from "assets/elements/Button";
 import { api_delete_sbin } from "api/firestore_db/warehouse/storage_bin/tbl_storage_bin_api";
+import { api_delete_sbin_rtdb } from "api/real_time_db/warehouse/storage_bin/tbl_sbin_master_api_rtdb";
 
 const Delete_SBIN = ({
   is_open,
@@ -21,10 +22,10 @@ const Delete_SBIN = ({
     try {
       set_delete_loading(true);
 
-      const response = await api_delete_sbin(id, show_toast);
+      const response = await api_delete_sbin_rtdb(id, show_toast);
 
       if (response.success) {
-        set_sbin_list((prev) => prev.filter((item) => item.id !== id));
+        // set_sbin_list((prev) => prev.filter((item) => item.id !== id));
         close_modal();
       }
     } catch (error) {

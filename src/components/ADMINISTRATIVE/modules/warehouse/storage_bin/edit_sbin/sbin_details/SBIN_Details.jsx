@@ -69,7 +69,7 @@ const SBIN_Details = ({
   // RETURN ORIGIN
   return (
     <React.Fragment>
-      <div className="rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6 dark:border-gray-800 dark:bg-gray-900">
+      {/* <div className="rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6 dark:border-gray-800 dark:bg-gray-900">
         <div className="grid grid-cols-1 gap-5">
           <div>
             <Text_Code_Field
@@ -120,8 +120,8 @@ const SBIN_Details = ({
             />
           </div>
         </div>
-      </div>
-      <div className="mt-5 rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6 dark:border-gray-800 dark:bg-gray-900">
+      </div> */}
+      <div className="rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6 dark:border-gray-800 dark:bg-gray-900">
         <h1 className="mb-5 font-semibold text-sky-700">Capacity and Weight</h1>
         <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
           <div className="flex gap-2">
@@ -134,13 +134,13 @@ const SBIN_Details = ({
                 on_change={handle_text_change("bin_capacity", "number")}
               />
             </div>
-            <div className="pt-[24px] w-[250px]">
+            {/* <div className="pt-[24px] w-[250px]">
               <Select_Field
                 options={uom_options}
                 value={edit_sbin_data.bin_capacity_uom || ""} //--> bin_capacity_uom
                 on_change={handle_select_change("bin_capacity_uom")}
               />
-            </div>
+            </div> */}
           </div>
           <div className="flex gap-2">
             <div className="w-full">
@@ -155,10 +155,21 @@ const SBIN_Details = ({
             <div className="pt-[24px] w-[250px]">
               <Select_Field
                 options={uom_options}
-                value={edit_sbin_data.max_bin_capacity_uom || ""} //--> max_bin_capacity_uom
-                on_change={handle_select_change("max_bin_capacity_uom")}
+                value={edit_sbin_data.uom || ""} //--> max_bin_capacity_uom
+                on_change={handle_select_change("uom")}
               />
             </div>
+          </div>
+          <div>
+            <Select_Field
+              label="Status"
+              options={[
+                { label: "Available", value: "Available" },
+                { label: "Occupied", value: "Occupied" },
+              ]}
+              value={edit_sbin_data.status || ""}
+              on_change={handle_select_change("status")}
+            />
           </div>
         </div>
       </div>

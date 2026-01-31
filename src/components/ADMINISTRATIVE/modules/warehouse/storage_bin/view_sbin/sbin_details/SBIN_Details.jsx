@@ -10,7 +10,7 @@ const SBIN_Details = ({ view_sbin_data }) => {
   // RETURN ORIGIN
   return (
     <React.Fragment>
-      <div className="rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6 dark:border-gray-800 dark:bg-gray-900">
+      {/* <div className="rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6 dark:border-gray-800 dark:bg-gray-900">
         <div className="grid grid-cols-1 gap-5">
           <div>
             <Text_Code_Field
@@ -64,8 +64,8 @@ const SBIN_Details = ({ view_sbin_data }) => {
             />
           </div>
         </div>
-      </div>
-      <div className="mt-5 rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6 dark:border-gray-800 dark:bg-gray-900">
+      </div> */}
+      <div className="rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6 dark:border-gray-800 dark:bg-gray-900">
         <h1 className="mb-5 font-semibold text-sky-700">Capacity and Weight</h1>
         <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
           <div className="flex gap-2">
@@ -77,13 +77,13 @@ const SBIN_Details = ({ view_sbin_data }) => {
                 disabled
               />
             </div>
-            <div className="pt-[24px] w-[250px]">
+            {/* <div className="pt-[24px] w-[250px]">
               <Text_Field
                 type={"text"}
                 value={view_sbin_data.bin_capacity_uom || ""} //--> bin_capacity_uom
                 disabled
               />
-            </div>
+            </div> */}
           </div>
           <div className="flex gap-2">
             <div className="w-full">
@@ -97,10 +97,18 @@ const SBIN_Details = ({ view_sbin_data }) => {
             <div className="pt-[24px] w-[250px]">
               <Text_Field
                 type={"text"}
-                value={view_sbin_data.max_bin_capacity_uom || ""} //--> max_bin_capacity_uom
+                value={view_sbin_data.uom || ""} //--> max_bin_capacity_uom
                 disabled
               />
             </div>
+          </div>
+          <div>
+            <Text_Field
+              label="Status"
+              type={"text"}
+              value={view_sbin_data.status}
+              disabled
+            />
           </div>
         </div>
       </div>
