@@ -105,7 +105,7 @@ const PO_Items = ({
   };
 
   const handle_show_select_item_modal = () => {
-    if (!new_po_data.branch_code) {
+    if (!new_po_data.plant_code) {
       show_toast({
         type: "danger",
         title: "Invalid",
@@ -113,7 +113,7 @@ const PO_Items = ({
         icon: <CircleX size={21} className="text-red-500" />,
       });
       return;
-    } else if (!new_po_data.plant_code) {
+    } else if (!new_po_data.warehouse_code) {
       show_toast({
         type: "danger",
         title: "Invalid",
@@ -417,8 +417,8 @@ const PO_Items = ({
       <Select_Item
         is_open={display_item_modal === "select_item"}
         on_close={() => set_display_item_modal("")}
-        branch_code={new_po_data.branch_code}
         plant_code={new_po_data.plant_code}
+        warehouse_code={new_po_data.warehouse_code}
         sloc_code={new_po_data.sloc_code}
         set_selected_item_data={set_selected_item_data}
         selected_item_list={selected_item_list}

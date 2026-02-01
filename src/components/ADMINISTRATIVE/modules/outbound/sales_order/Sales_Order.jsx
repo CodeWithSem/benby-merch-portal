@@ -25,11 +25,11 @@ import Button_Action from "assets/elements/Button_Action";
 import Checkbox_Field from "assets/elements/Checkbox_Field";
 import Date_Field from "assets/elements/Date_Field";
 import Pagination from "assets/elements/Pagination";
-import Create_New_SO from "./create/Create_New_SO";
+import Create_SO from "./create/Create_SO";
 import Edit_SO from "./edit/Edit_SO";
 import Post_View_SO from "./post_view_so/Post_View_SO";
+import Delete_SO from "./delete/Delete_SO";
 import Select_SO_Type from "./modals/select_so_type/Select_SO_Type";
-import Delete_SO from "./modals/delete_so/Delete_SO";
 import { so_type_h_list } from "assets/data/so_type_h_list";
 import { so_type_list } from "assets/data/so_type_list";
 import { sales_org_list } from "assets/data/sales_org_list";
@@ -87,6 +87,7 @@ const Sales_Order = () => {
   const [current_id, set_current_id] = useState(0);
   const [new_so_data, set_new_so_data] = useState({});
   const [edit_data, set_edit_data] = useState({});
+  const [delete_data, set_delete_data] = useState({});
 
   useEffect(() => {
     Get_TBL_INCREMENTAL_ID("TBL_SALES_ORDER", (value) => {
@@ -319,7 +320,8 @@ const Sales_Order = () => {
     set_page("edit_so");
   };
 
-  const handle_delete_so = () => {
+  const handle_delete_so = (data) => {
+    set_delete_data(data);
     set_display_modal("delete_so");
   };
 
@@ -701,23 +703,22 @@ const Sales_Order = () => {
                                         />
                                       </div>
                                     )}
-
-                                    <div className="relative group flex jusity-center items-center">
-                                      <Button_Action
-                                        icon={Edit}
-                                        tooltip="Edit Record"
-                                        on_click={() => handle_edit(row)}
-                                      />
-                                    </div>
+                                    {row.so_status === "Pending" && (
+                                      <div className="relative group flex jusity-center items-center">
+                                        <Button_Action
+                                          icon={Edit}
+                                          tooltip="Edit Record"
+                                          on_click={() => handle_edit(row)}
+                                        />
+                                      </div>
+                                    )}
                                     <div className="relative group flex jusity-center items-center">
                                       <Button_Action
                                         class_name="mb-[1px]"
                                         icon={Trash}
                                         variant="danger"
                                         tooltip="Delete Record"
-                                        on_click={() =>
-                                          handle_delete_so(row.id)
-                                        }
+                                        on_click={() => handle_delete_so(row)}
                                       />
                                     </div>
                                   </div>
@@ -773,7 +774,7 @@ const Sales_Order = () => {
       )}
       {/* + Pages */}
       {page === "so_creation" && (
-        <Create_New_SO
+        <Create_SO
           set_page={set_page}
           active_user={active_user}
           so_data={{
@@ -849,6 +850,7 @@ const Sales_Order = () => {
         is_open={display_modal === "delete_so"}
         on_close={() => set_display_modal("")}
         width="max-w-[1280px]"
+        delete_so_data={delete_data}
       />
       <Set_Increment_ID
         is_open={display_modal === "set_incremental_id"}

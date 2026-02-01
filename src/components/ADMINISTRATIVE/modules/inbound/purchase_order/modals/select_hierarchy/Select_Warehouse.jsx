@@ -4,57 +4,135 @@ import Icon_Field from "assets/elements/Icon_Field";
 import Checkbox_Field from "assets/elements/Checkbox_Field";
 import Button from "assets/elements/Button";
 import Pagination_Modal from "assets/elements/Pagination_Modal";
-import { format_currency } from "assets/scripts/format";
 
-const Select_Item = ({
+const Select_Warehouse = ({
   is_open,
   on_close,
   width = "max-w-[700px]",
   height = "h-[500px]",
+  selected_plant_code,
+  plant_list,
+  warehouse_list,
+  plant_h_list,
+  set_data,
+  set_selected_item_list,
 }) => {
-  const [item_list, set_item_list] = useState([]);
-
   // + Client-Side Filtering
-  const [filtered_item_list, set_filtered_item_list] = useState([]);
+  const [filtered_plant_h_list, set_filtered_plant_h_list] = useState([]);
   const [current_page, set_current_page] = useState(1);
   const [rows_per_page, set_rows_per_page] = useState(5);
   const [search_query, set_search_query] = useState("");
-  const [selected_item, set_selected_item] = useState(null);
+  const [selected_plant_h, set_selected_plant_h] = useState(null);
+
+  const lookup_columns = [
+    {
+      code_key: "plant_code",
+      list: plant_list,
+      desc_key: "plant_desc",
+    },
+    {
+      code_key: "warehouse_code",
+      list: warehouse_list,
+      desc_key: "warehouse_desc",
+    },
+  ];
+
+  const apply_lookups = (data, lookup_columns) => {
+    return data.map((row) => {
+      const updated = { ...row };
+
+      lookup_columns.forEach(({ code_key, list, desc_key }) => {
+        const code_value = row[code_key];
+        const match = list.find((item) => item[code_key] === code_value);
+
+        updated[desc_key] = match ? match[desc_key] : "";
+      });
+
+      return updated;
+    });
+  };
+
+  const get_searchable_fields = (lookup_columns) => {
+    const fields = [];
+
+    lookup_columns.forEach(({ code_key, desc_key }) => {
+      fields.push(code_key);
+      fields.push(desc_key);
+    });
+
+    return fields;
+  };
 
   useEffect(() => {
-    let data = [...item_list];
+    // 1. Start with plant_h_list
+    let data = apply_lookups(plant_h_list, lookup_columns);
 
+    // 2. Filter by selected_plant_code
+    if (selected_plant_code) {
+      data = data.filter((row) => row.plant_code === selected_plant_code);
+    }
+
+    // 3. Searchable fields
+    const search_fields = get_searchable_fields(lookup_columns);
+
+    // 4. Perform search
     if (search_query.trim() !== "") {
       const q = search_query.toLowerCase();
-      data = data.filter(
-        (data) =>
-          data.item_code.toLowerCase().includes(q) ||
-          data.item_desc.toLowerCase().includes(q),
+
+      data = data.filter((row) =>
+        search_fields.some((field) =>
+          row[field]?.toString().toLowerCase().includes(q),
+        ),
       );
     }
 
+    // 4. Pagination
     const start_idx = (current_page - 1) * rows_per_page;
     const end_idx = start_idx + rows_per_page;
-    set_filtered_item_list(data.slice(start_idx, end_idx));
-  }, [item_list, search_query, current_page, rows_per_page]);
 
-  const total_pages = Math.ceil(
-    item_list.filter(
-      (data) =>
-        data.item_code.toLowerCase().includes(search_query.toLowerCase()) ||
-        data.item_desc.toLowerCase().includes(search_query.toLowerCase()),
-    ).length / rows_per_page,
-  );
+    set_filtered_plant_h_list(data.slice(start_idx, end_idx));
+  }, [
+    plant_h_list,
+    selected_plant_code,
+    search_query,
+    current_page,
+    rows_per_page,
+  ]);
+
+  // 1. Apply lookup to plant_h_list
+  const lookup_applied_list = apply_lookups(plant_h_list, lookup_columns);
+
+  // 2. Generate searchable fields
+  const search_fields = get_searchable_fields(lookup_columns);
+
+  // 3. Filter count based on search
+  const filtered_count = lookup_applied_list.filter((row) => {
+    const q = search_query.toLowerCase();
+
+    return search_fields.some((field) =>
+      row[field]?.toString().toLowerCase().includes(q),
+    );
+  }).length;
+
+  // 4. Calculate total pages
+  const total_pages = Math.ceil(filtered_count / rows_per_page);
 
   const handle_page_change = (page) => set_current_page(page);
   // - Client-Side Filtering
 
-  const handle_select_item = () => {
-    if (!selected_item) {
-      alert("Please select a item before proceeding.");
+  const handle_select_plant = () => {
+    if (!selected_plant_h) {
+      alert("Please select a data before proceeding.");
       return;
     }
-    alert(`Selected: ${selected_item.item_desc}`);
+    set_data((prev) => ({
+      ...prev,
+      warehouse_code: selected_plant_h.warehouse_code,
+      sloc_code: "",
+    }));
+    set_selected_item_list([]);
+    set_selected_plant_h(null);
+    on_close();
   };
 
   // RETURN ORIGIN
@@ -64,6 +142,7 @@ const Select_Item = ({
         {/* + Blur */}
         <div className="absolute inset-0 bg-black/50 backdrop-blur-sm z-[98]"></div>
         {/* - Blur */}
+
         {/* + Modal Content */}
         <div
           className={`relative bg-white rounded-lg shadow-xl ${width} w-full py-7 m-5 z-[99]`}
@@ -76,7 +155,7 @@ const Select_Item = ({
           </button>
           {/* + Modal Label */}
           <div className="text-lg md:text-xl font-bold mb-5 px-7">
-            Item Selection
+            Warehouse Selection
           </div>
           {/* - Modal Label */}
           {/* + Modal Body */}
@@ -104,10 +183,7 @@ const Select_Item = ({
                     <tr className="font-semibold text-xs">
                       <th className="px-6 py-3 w-[80px]"></th>
                       <th className="px-6 py-3 text-gray-500 text-left">
-                        Item
-                      </th>
-                      <th className="px-6 py-3 text-gray-500 text-left">
-                        Unit Price
+                        Warehouse
                       </th>
                       <th className="px-6 py-3 text-gray-500 text-left">
                         Creation Date
@@ -116,23 +192,23 @@ const Select_Item = ({
                   </thead>
 
                   <tbody className="divide-y divide-gray-100">
-                    {filtered_item_list.length === 0 ? (
+                    {filtered_plant_h_list.length === 0 ? (
                       <tr>
                         <td
-                          colSpan={4}
+                          colSpan={3}
                           className="text-center py-6 text-gray-500 text-sm"
                         >
                           No data found
                         </td>
                       </tr>
                     ) : (
-                      filtered_item_list.map((data) => (
+                      filtered_plant_h_list.map((data) => (
                         <tr
                           key={data.id}
                           className={`hover:bg-sky-50/50 cursor-pointer text-[12px] ${
-                            selected_item?.id === data.id ? "bg-sky-50" : ""
+                            selected_plant_h?.id === data.id ? "bg-sky-50" : ""
                           }`}
-                          onClick={() => set_selected_item(data)}
+                          onClick={() => set_selected_plant_h(data)}
                         >
                           <td className="px-5 py-4 sm:px-6 text-center">
                             <div className="flex justify-center items-center">
@@ -140,23 +216,20 @@ const Select_Item = ({
                                 name="check"
                                 box_size={18}
                                 icon_size={12}
-                                checked={selected_item?.id === data.id}
-                                on_change={() => set_selected_item(data)}
+                                checked={selected_plant_h?.id === data.id}
+                                on_change={() => set_selected_plant_h(data)}
                               />
                             </div>
                           </td>
                           <td className="px-5 py-4 sm:px-6">
-                            <div className="block font-medium">
+                            <div className="block font-medium text-gray-800">
                               <span className="block text-gray-500 text-[10px]">
-                                {data.item_code}
+                                {data.warehouse_code}
                               </span>
-                              <span className="block text-gray-800 text-sm">
-                                {data.item_desc}
+                              <span className="block text-gray-800 text-[13px]">
+                                {data.warehouse_desc}
                               </span>
                             </div>
-                          </td>
-                          <td className="px-6 py-3 text-gray-700 tracking-wide">
-                            {format_currency(data.unit_price, 2, true, "")}
                           </td>
                           <td className="px-6 py-3 text-gray-700 tracking-wide">
                             {data.creation_date}
@@ -184,13 +257,13 @@ const Select_Item = ({
               </div>
             )}
             {/* - Pagination */}
-            {/* + Buttons */}
+            {/* + Action Buttons */}
             <div className="flex justify-center sm:justify-end gap-2 w-full">
               <Button
                 variant="primary"
-                on_click={handle_select_item}
+                on_click={handle_select_plant}
                 class_name="w-full md:w-[100px]"
-                disabled={!selected_item}
+                disabled={!selected_plant_h}
               >
                 Proceed
               </Button>
@@ -202,7 +275,7 @@ const Select_Item = ({
                 Close
               </Button>
             </div>
-            {/* - Buttons */}
+            {/* - Action Buttons */}
           </div>
           {/* - Modal Footer */}
         </div>
@@ -211,4 +284,4 @@ const Select_Item = ({
   ) : null;
 };
 
-export default Select_Item;
+export default Select_Warehouse;

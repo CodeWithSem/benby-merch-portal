@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-import { ChevronLeft, CirclePlus, Eye, Save } from "lucide-react";
+import { ChevronLeft, Eye, RefreshCcwDot } from "lucide-react";
 
 import { get_date_now, format_date_1 } from "assets/scripts/format";
 import { get_description } from "assets/scripts/functions/get_description";
@@ -18,17 +18,17 @@ import Approval from "./po_details/Approval";
 import PO_Items from "./po_items/PO_Items";
 
 import Select_Generic from "assets/elements/modals/Select_Generic";
-import Select_Branch from "../modals/select_hierarchy/Select_Branch";
 import Select_Plant from "../modals/select_hierarchy/Select_Plant";
+import Select_Warehouse from "../modals/select_hierarchy/Select_Warehouse";
 import Select_SLOC from "../modals/select_hierarchy/Select_SLOC";
 import Confirm_Modal from "assets/elements/modals/Confirm_Modal";
 
 import { po_type_list } from "assets/data/po_type_list";
 import { vendor_master_list } from "assets/data/vendor_master_list";
-import { branch_list } from "assets/data/branch_list";
-import { branch_h_list } from "assets/data/branch_h_list";
 import { plant_list } from "assets/data/plant_list";
 import { plant_h_list } from "assets/data/plant_h_list";
+import { warehouse_list } from "assets/data/warehouse_list";
+import { warehouse_h_list } from "assets/data/warehouse_h_list";
 import { sloc_list } from "assets/data/sloc_list";
 import { payment_term_list } from "assets/data/payment_term_list";
 import { incoterms_list } from "assets/data/incoterms_list";
@@ -38,14 +38,14 @@ import { district_list } from "assets/data/district_list";
 import { language_list } from "assets/data/language_list";
 import { region_list } from "assets/data/region_list";
 
-import { api_create_purchase_order } from "api/firestore_db/inbound/purchase_order/tbl_purchase_order_api";
+import { api_update_purchase_order } from "api/firestore_db/inbound/purchase_order/tbl_purchase_order_api";
 
-const Create_New_PO = ({
+const Edit_PO = ({
   set_page,
   active_user,
   show_toast,
-  new_po_data,
-  set_new_po_data,
+  edit_po_data,
+  set_edit_po_data,
   selected_item_list,
   set_selected_item_list,
   selected_approval_list,
@@ -55,7 +55,7 @@ const Create_New_PO = ({
   const [active_tab, set_active_tab] = useState("delivery");
   const [display_modal, set_display_modal] = useState("");
   const [is_confirm_modal_open, set_is_confirm_modal_open] = useState(false);
-  const [create_loading, set_create_loading] = useState(false);
+  const [update_loading, set_update_loading] = useState(false);
 
   const tabs = [
     { key: "delivery", title: "Delivery" },
@@ -121,7 +121,7 @@ const Create_New_PO = ({
     alert("Under Maintenance");
   };
 
-  const handle_create = async () => {
+  const handle_edit = async () => {
     const items_with_tracking = selected_item_list.map((item) => ({
       ...item,
       quantity_open: item.quantity,
@@ -129,7 +129,7 @@ const Create_New_PO = ({
     }));
 
     const final_po_data = {
-      ...new_po_data,
+      ...edit_po_data,
       selected_item_list: items_with_tracking,
       selected_approval_list: selected_approval_list.map((role) => ({
         ...role,
@@ -139,28 +139,26 @@ const Create_New_PO = ({
     };
 
     try {
-      set_create_loading(true);
-      const response = await api_create_purchase_order(
+      set_update_loading(true);
+      const response = await api_update_purchase_order(
         final_po_data,
         active_user?.username,
         show_toast,
       );
       if (response.success) {
-        set_po_list((prev) => [...prev, response.data]);
+        set_po_list((prev) =>
+          prev.map((item) =>
+            item.id === response.data.id ? response.data : item,
+          ),
+        );
         handle_go_back();
       }
     } catch (error) {
       console.error("Failed to create a new data:", error);
-    } finally {
-      set_create_loading(false);
     }
   };
 
   const handle_go_back = () => {
-    set_new_po_data((prev) => ({
-      id: prev.id,
-      po_number: prev.po_number,
-    }));
     set_selected_item_list([]);
     set_selected_approval_list([]);
     set_page("main");
@@ -201,7 +199,7 @@ const Create_New_PO = ({
               </li>
               <li className="flex items-center gap-1.5 text-sm text-gray-500">
                 <span>/</span>
-                <span className="text-gray-800">Create</span>
+                <span className="text-gray-800">Edit</span>
               </li>
             </ol>
           </nav>
@@ -220,7 +218,7 @@ const Create_New_PO = ({
                 width="w-[20px]"
                 on_click={handle_go_back}
               ></Button>
-              <h1 className="text-lg">Purchase Order Creation</h1>
+              <h1 className="text-lg">Edit Purchase Order</h1>
             </div>
             <div className="flex gap-2">
               <div className="text-gray-500 text-sm tracking-wider">
@@ -237,7 +235,7 @@ const Create_New_PO = ({
                   <Text_Field
                     label="PO Number"
                     type={"text"}
-                    value={new_po_data.po_number}
+                    value={edit_po_data.po_number}
                     disabled
                   />
                 </div>
@@ -246,9 +244,9 @@ const Create_New_PO = ({
                     label="PO Type"
                     code_width="150px"
                     show_search_button={false}
-                    code_value={new_po_data.po_type_code}
+                    code_value={edit_po_data.po_type_code}
                     text_value={get_description(
-                      new_po_data.po_type_code,
+                      edit_po_data.po_type_code,
                       po_type_list,
                       "po_type_code",
                       "po_type_desc",
@@ -261,9 +259,9 @@ const Create_New_PO = ({
                     label="Vendor"
                     code_width="150px"
                     show_search_button={true}
-                    code_value={new_po_data.vendor_code}
+                    code_value={edit_po_data.vendor_code}
                     text_value={get_description(
-                      new_po_data.vendor_code,
+                      edit_po_data.vendor_code,
                       vendor_master_list,
                       "vendor_code",
                       "vendor_desc",
@@ -274,28 +272,12 @@ const Create_New_PO = ({
                 </div>
                 <div>
                   <Text_Code_Field
-                    label="Branch"
-                    code_width="150px"
-                    show_search_button={true}
-                    code_value={new_po_data.branch_code}
-                    text_value={get_description(
-                      new_po_data.branch_code,
-                      branch_list,
-                      "branch_code",
-                      "branch_desc",
-                    )}
-                    on_click={() => set_display_modal("select_branch")}
-                    disabled
-                  />
-                </div>
-                <div>
-                  <Text_Code_Field
                     label="Plant"
                     code_width="150px"
-                    show_search_button={!!new_po_data.branch_code}
-                    code_value={new_po_data.plant_code}
+                    show_search_button={true}
+                    code_value={edit_po_data.plant_code}
                     text_value={get_description(
-                      new_po_data.plant_code,
+                      edit_po_data.plant_code,
                       plant_list,
                       "plant_code",
                       "plant_desc",
@@ -306,12 +288,28 @@ const Create_New_PO = ({
                 </div>
                 <div>
                   <Text_Code_Field
+                    label="Warehouse"
+                    code_width="150px"
+                    show_search_button={!!edit_po_data.plant_code}
+                    code_value={edit_po_data.warehouse_code}
+                    text_value={get_description(
+                      edit_po_data.warehouse_code,
+                      warehouse_list,
+                      "warehouse_code",
+                      "warehouse_desc",
+                    )}
+                    on_click={() => set_display_modal("select_warehouse")}
+                    disabled
+                  />
+                </div>
+                <div>
+                  <Text_Code_Field
                     label="Storage Location"
                     code_width="150px"
-                    show_search_button={!!new_po_data.plant_code}
-                    code_value={new_po_data.sloc_code}
+                    show_search_button={!!edit_po_data.warehouse_code}
+                    code_value={edit_po_data.sloc_code}
                     text_value={get_description(
-                      new_po_data.sloc_code,
+                      edit_po_data.sloc_code,
                       sloc_list,
                       "sloc_code",
                       "sloc_desc",
@@ -350,7 +348,7 @@ const Create_New_PO = ({
               <div className="p-6">
                 {active_tab === "delivery" && (
                   <Delivery
-                    new_po_data={new_po_data}
+                    edit_po_data={edit_po_data}
                     payment_term_list={payment_term_list}
                     incoterms_list={incoterms_list}
                     selected_item_list={selected_item_list}
@@ -358,7 +356,7 @@ const Create_New_PO = ({
                 )}
                 {active_tab === "address" && (
                   <Address
-                    new_po_data={new_po_data}
+                    edit_po_data={edit_po_data}
                     city_list={city_list}
                     country_list={country_list}
                     district_list={district_list}
@@ -367,13 +365,13 @@ const Create_New_PO = ({
                   />
                 )}
                 {active_tab === "org_data" && (
-                  <Org_Data new_po_data={new_po_data} />
+                  <Org_Data edit_po_data={edit_po_data} />
                 )}
                 {active_tab === "po_status" && <PO_Status />}
                 {active_tab === "shipment" && (
                   <Shipment
-                    new_po_data={new_po_data}
-                    set_new_po_data={set_new_po_data}
+                    edit_po_data={edit_po_data}
+                    set_edit_po_data={set_edit_po_data}
                   />
                 )}
                 {active_tab === "approval" && (
@@ -382,8 +380,8 @@ const Create_New_PO = ({
                     set_display_modal={set_display_modal}
                     selected_approval_list={selected_approval_list}
                     set_selected_approval_list={set_selected_approval_list}
-                    new_po_data={new_po_data}
-                    set_new_po_data={set_new_po_data}
+                    edit_po_data={edit_po_data}
+                    set_edit_po_data={set_edit_po_data}
                   />
                 )}
               </div>
@@ -393,7 +391,7 @@ const Create_New_PO = ({
           {/* - Section 2 */}
           {/* + Section 3 */}
           <PO_Items
-            new_po_data={new_po_data}
+            edit_po_data={edit_po_data}
             show_toast={show_toast}
             selected_item_list={selected_item_list}
             set_selected_item_list={set_selected_item_list}
@@ -415,31 +413,20 @@ const Create_New_PO = ({
               <Button
                 variant="primary"
                 size="lg"
-                width="w-[180px]"
-                icon={Save}
-                icon_position="left"
-                on_click={handle_save_as_draft}
-              >
-                Save as Draft
-              </Button>
-              <Button
-                variant="primary"
-                size="lg"
                 width="w-[120px]"
-                icon={CirclePlus}
+                icon={RefreshCcwDot}
                 icon_position="left"
-                loading={create_loading}
                 disabled={selected_item_list.length === 0}
                 on_click={() => set_is_confirm_modal_open(true)}
               >
-                Create
+                Update
               </Button>
               <Button
                 variant="white"
                 size="lg"
                 width="w-[120px]"
                 on_click={handle_go_back}
-                disabled={create_loading}
+                disabled={update_loading}
               >
                 Cancel
               </Button>
@@ -465,29 +452,29 @@ const Create_New_PO = ({
           source_desc={cfg.desc}
           lookup_lists={cfg.lookup}
           target_field={cfg.target}
-          set_data={set_new_po_data}
+          set_data={set_edit_po_data}
           on_after_select={cfg.on_after_select}
         />
       ))}
-      <Select_Branch
-        is_open={display_modal === "select_branch"}
-        on_close={() => set_display_modal("")}
-        width="max-w-[1000px]"
-        height="max-h-[700px]"
-        branch_list={branch_list}
-        set_data={set_new_po_data}
-        set_selected_item_list={set_selected_item_list}
-      />
       <Select_Plant
         is_open={display_modal === "select_plant"}
         on_close={() => set_display_modal("")}
         width="max-w-[1000px]"
         height="max-h-[700px]"
-        selected_branch_code={new_po_data.branch_code}
-        branch_list={branch_list}
         plant_list={plant_list}
-        branch_h_list={branch_h_list}
-        set_data={set_new_po_data}
+        set_data={set_edit_po_data}
+        set_selected_item_list={set_selected_item_list}
+      />
+      <Select_Warehouse
+        is_open={display_modal === "select_warehouse"}
+        on_close={() => set_display_modal("")}
+        width="max-w-[1000px]"
+        height="max-h-[700px]"
+        selected_plant_code={edit_po_data.plant_code}
+        plant_list={plant_list}
+        warehouse_list={warehouse_list}
+        plant_h_list={plant_h_list}
+        set_data={set_edit_po_data}
         set_selected_item_list={set_selected_item_list}
       />
       <Select_SLOC
@@ -495,26 +482,26 @@ const Create_New_PO = ({
         on_close={() => set_display_modal("")}
         width="max-w-[1000px]"
         height="max-h-[700px]"
-        selected_plant_code={new_po_data.plant_code}
-        plant_list={plant_list}
+        selected_warehouse_code={edit_po_data.warehouse_code}
+        warehouse_list={warehouse_list}
         sloc_list={sloc_list}
-        plant_h_list={plant_h_list}
-        set_data={set_new_po_data}
+        warehouse_h_list={warehouse_h_list}
+        set_data={set_edit_po_data}
         set_selected_item_list={set_selected_item_list}
       />
       <Confirm_Modal
         is_open={is_confirm_modal_open}
-        title="Confirm Purchase Order Creation"
-        description_1="You are about to create a new Purchase Order. Once created, it will be added to the database."
-        description_2="Please review all the details before proceeding."
+        title="Confirm Purchase Order Update"
+        description_1="You are about to edit this Purchase Order. Once edited, it will be updated to the database."
+        description_2="Please review all the details — before proceeding."
         description_3="Are you sure you want to continue?"
-        on_confirm={handle_create}
+        on_confirm={handle_edit}
         on_cancel={() => set_is_confirm_modal_open(false)}
-        confirm_loading={create_loading}
+        confirm_loading={update_loading}
       />
       {/* - Modals */}
     </React.Fragment>
   );
 };
 
-export default Create_New_PO;
+export default Edit_PO;

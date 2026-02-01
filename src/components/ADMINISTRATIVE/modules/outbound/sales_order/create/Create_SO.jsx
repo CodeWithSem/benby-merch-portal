@@ -30,7 +30,7 @@ import {
 import { api_create_sales_order } from "api/firestore_db/outbound/sales_order/tbl_sales_order_api";
 import Confirm_Modal from "assets/elements/modals/Confirm_Modal";
 
-const Create_New_SO = ({ set_page, active_user, so_data }) => {
+const Create_SO = ({ set_page, active_user, so_data }) => {
   const {
     show_toast,
     so_type_list,
@@ -475,4 +475,4 @@ const Create_New_SO = ({ set_page, active_user, so_data }) => {
   );
 };
 
-export default Create_New_SO;
+export default Create_SO;
