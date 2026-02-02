@@ -31,12 +31,12 @@ const Select_Item = ({
         item.branch_code === branch_code &&
         item.plant_code === plant_code &&
         item.sloc_code === sloc_code &&
-        !selected_item_list.some((s) => s.item_code === item.item_code)
+        !selected_item_list.some((s) => s.item_code === item.item_code),
     );
 
     const final_items = filtered_ext.map((item) => {
       const master = item_master_list.find(
-        (m) => m.item_code === item.item_code
+        (m) => m.item_code === item.item_code,
       );
       return {
         ...item,
@@ -58,7 +58,7 @@ const Select_Item = ({
       data = data.filter(
         (d) =>
           d.item_code.toLowerCase().includes(q) ||
-          d.item_desc.toLowerCase().includes(q)
+          d.item_desc.toLowerCase().includes(q),
       );
     }
 
@@ -71,8 +71,8 @@ const Select_Item = ({
     item_list.filter(
       (d) =>
         d.item_code.toLowerCase().includes(search_query.toLowerCase()) ||
-        d.item_desc.toLowerCase().includes(search_query.toLowerCase())
-    ).length / rows_per_page
+        d.item_desc.toLowerCase().includes(search_query.toLowerCase()),
+    ).length / rows_per_page,
   );
 
   const handle_select_item = () => {
