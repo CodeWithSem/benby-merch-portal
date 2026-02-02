@@ -22,7 +22,7 @@ export const api_get_batch_master_list = async () => {
   try {
     const tbl_batch_master_ref = collection(
       firestore_db,
-      ...get_firestore_path(TABLES.BATCH_MASTER)
+      ...get_firestore_path(TABLES.BATCH_MASTER),
     );
 
     const query_snapshot = await getDocs(tbl_batch_master_ref);
@@ -55,7 +55,7 @@ export const api_create_batch_master = async (new_data, user, show_toast) => {
   try {
     const tbl_batch_master_ref = collection(
       firestore_db,
-      ...get_firestore_path(TABLES.BATCH_MASTER)
+      ...get_firestore_path(TABLES.BATCH_MASTER),
     );
 
     // ---------------------------------------------
@@ -63,7 +63,7 @@ export const api_create_batch_master = async (new_data, user, show_toast) => {
     // ---------------------------------------------
     const q_code = query(
       tbl_batch_master_ref,
-      where("batch_code", "==", new_data.batch_code)
+      where("batch_code", "==", new_data.batch_code),
     );
     const snap_code = await getDocs(q_code);
 
@@ -86,7 +86,7 @@ export const api_create_batch_master = async (new_data, user, show_toast) => {
     // ---------------------------------------------
     const q_desc = query(
       tbl_batch_master_ref,
-      where("batch_desc", "==", new_data.batch_desc)
+      where("batch_desc", "==", new_data.batch_desc),
     );
     const snap_desc = await getDocs(q_desc);
 
@@ -108,8 +108,8 @@ export const api_create_batch_master = async (new_data, user, show_toast) => {
     // 3. CREATE NEW DATA
     // ---------------------------------------------
 
-    const custom_id = `${new_data.batch_code}_${new_data.item_code}_${new_data.branch_code}_${new_data.plant_code}_${new_data.sloc_code}`;
-    const item_sort_id = `${new_data.item_code}_${new_data.branch_code}_${new_data.plant_code}_${new_data.sloc_code}`;
+    const custom_id = `${new_data.batch_code}_${new_data.item_code}_${new_data.plant_code}_${new_data.warehouse_code}_${new_data.sloc_code}`;
+    const item_sort_id = `${new_data.item_code}_${new_data.plant_code}_${new_data.warehouse_code}_${new_data.sloc_code}`;
     const doc_ref = doc(tbl_batch_master_ref, custom_id);
 
     const final_new_data = {
@@ -174,7 +174,7 @@ export const api_update_batch_master = async (edit_data, user, show_toast) => {
     // ---------------------------------------------------
     const q_desc = query(
       tbl_batch_master_ref,
-      where("batc_desc", "==", edit_data.batch_desc)
+      where("batc_desc", "==", edit_data.batch_desc),
     );
 
     const desc_snap = await getDocs(q_desc);
@@ -255,7 +255,7 @@ export const api_bulk_upload_batch_master = async (upload_data_list) => {
     const batch = writeBatch(firestore_db);
     const tbl_batch_master_ref = collection(
       firestore_db,
-      ...get_firestore_path(TABLES.BATCH_MASTER)
+      ...get_firestore_path(TABLES.BATCH_MASTER),
     );
 
     upload_data_list.forEach((item) => {
@@ -290,7 +290,7 @@ export const api_delete_batch_master = async (id, show_toast) => {
   try {
     const tbl_batch_master_ref = collection(
       firestore_db,
-      ...get_firestore_path(TABLES.BATCH_MASTER)
+      ...get_firestore_path(TABLES.BATCH_MASTER),
     );
 
     const doc_ref = doc(tbl_batch_master_ref, String(id));
@@ -329,13 +329,13 @@ export const api_truncate_batch_master = async (show_toast) => {
   try {
     const tbl_batch_master_ref = collection(
       firestore_db,
-      ...get_firestore_path(TABLES.BATCH_MASTER)
+      ...get_firestore_path(TABLES.BATCH_MASTER),
     );
 
     const snapshot = await getDocs(tbl_batch_master_ref);
 
     const delete_promises = snapshot.docs.map((document) =>
-      deleteDoc(doc(tbl_batch_master_ref, document.id))
+      deleteDoc(doc(tbl_batch_master_ref, document.id)),
     );
 
     await Promise.all(delete_promises);

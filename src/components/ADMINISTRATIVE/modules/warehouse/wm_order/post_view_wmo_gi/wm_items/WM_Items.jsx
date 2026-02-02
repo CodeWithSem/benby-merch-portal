@@ -1,9 +1,6 @@
 import React, { useState } from "react";
-import { Info, Printer, Search } from "lucide-react";
+import { Info, Search } from "lucide-react";
 import Icon_Field from "assets/elements/Icon_Field";
-import Button from "assets/elements/Button";
-import { generate_lpn_pdf } from "assets/scripts/functions/generate_lpn_pdf";
-import { bulk_generate_lpn_pdf } from "assets/scripts/functions/bulk_generate_lpn_pdf";
 
 const WM_Items = ({ view_wmo_data, for_posting }) => {
   const [selected_row_id, set_selected_row_id] = useState(null);
@@ -18,18 +15,6 @@ const WM_Items = ({ view_wmo_data, for_posting }) => {
       item.item_desc?.toLowerCase().includes(keyword)
     );
   });
-
-  const handleGenerateLPN = (pallet) => {
-    // Pass view_wmo_data instead of selected_do
-    generate_lpn_pdf({ pallet, selected_do: view_wmo_data });
-  };
-
-  const handleBulkGenerateLPN = () => {
-    bulk_generate_lpn_pdf({
-      pallets: filtered_wm_allocation_list,
-      selected_do: view_wmo_data,
-    });
-  };
 
   return (
     <div className="flex flex-col gap-5 border-t p-5 sm:p-6">
@@ -51,19 +36,6 @@ const WM_Items = ({ view_wmo_data, for_posting }) => {
                   on_change={(e) => set_search_term(e.target.value)}
                 />
               </div>
-              {/* + Dropdown Filter */}
-              {/* <div className="relative">
-                <Button
-                  variant="primary"
-                  width="w-[180px]"
-                  icon={Printer}
-                  icon_position="left"
-                  on_click={handleBulkGenerateLPN}
-                >
-                  Generate LPN
-                </Button>
-              </div> */}
-              {/* - Dropdown Filter */}
             </div>
           </div>
         </div>
@@ -83,12 +55,6 @@ const WM_Items = ({ view_wmo_data, for_posting }) => {
                 <th className="px-5 py-4 font-semibold border-r">
                   WM Order UoM
                 </th>
-                {/* <th className="px-5 py-4 font-semibold border-r">
-                  Confirmed Qty
-                </th>
-                <th className="px-5 py-4 font-semibold border-r">
-                  Confirmed UoM
-                </th> */}
                 <th className="px-5 py-4 font-semibold border-r">Batch</th>
                 <th className="px-5 py-4 font-semibold border-r">
                   Source Storage Bin
@@ -105,11 +71,6 @@ const WM_Items = ({ view_wmo_data, for_posting }) => {
                 <th className="px-5 py-4 font-semibold border-r">
                   Storage Unit Type
                 </th>
-                {/* <th className="px-5 py-4 font-semibold border-r">
-                  WM Order Status
-                </th>
-                <th className="px-5 py-4 font-semibold border-r">TO Status</th> */}
-                {/* <th className="px-5 py-4 font-semibold"></th> */}
               </tr>
             </thead>
             <tbody className="divide-y bg-white">
@@ -128,31 +89,12 @@ const WM_Items = ({ view_wmo_data, for_posting }) => {
                   <td className="px-5 py-4 border-r">{item.item_desc}</td>
                   <td className="px-5 py-4 border-r">{item.quantity}</td>
                   <td className="px-5 py-4 border-r">{item.uom}</td>
-                  {/* <td className="px-5 py-4 border-r">
-                    {item.quantity_confirmed}
-                  </td>
-                  <td className="px-5 py-4 border-r">{item.uom}</td> */}
                   <td className="px-5 py-4 border-r">{item.batch_code}</td>
                   <td className="px-5 py-4 border-r">{item.from_sbin_code}</td>
                   <td className="px-5 py-4 border-r">{item.from_stype_code}</td>
                   <td className="px-5 py-4 border-r">{item.to_sbin_code}</td>
                   <td className="px-5 py-4 border-r">{item.to_stype_code}</td>
                   <td className="px-5 py-4 border-r">{item.sutype}</td>
-                  {/* <td className="px-5 py-4 border-r">{item.wm_order_status}</td>
-                  <td className="px-5 py-4 border-r">
-                    {item.transfer_order_status}
-                  </td> */}
-                  {/* <td className="px-5 py-2 text-gray-600">
-                    <Button
-                      variant="primary"
-                      size="sm"
-                      icon={Printer}
-                      icon_position="left"
-                      on_click={() => handleGenerateLPN(item)}
-                    >
-                      LPN
-                    </Button>
-                  </td> */}
                 </tr>
               ))}
             </tbody>

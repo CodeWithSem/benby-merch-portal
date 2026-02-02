@@ -11,10 +11,9 @@ import { api_get_goods_receipt_list_by_date } from "api/firestore_db/inbound/goo
 // import { api_get_goods_issue_list_by_date } from "api/firestore_db/outbound/goods_issue/tbl_goods_issue_api";
 import Spinner from "assets/elements/Spinner";
 import { item_master_list } from "assets/data/item_master_list";
-import { sbin_list } from "assets/data/sbin_list";
 import { generate_wm_orders } from "assets/scripts/functions/palletization";
 import { api_get_goods_issue_list_by_date } from "api/firestore_db/outbound/goods_issue/tbl_goods_issue_api";
-import { inventory_master_list } from "assets/data/inventory_master_list";
+// import { inventory_master_list } from "assets/data/inventory_master_list";
 import { generate_gi_wm_orders } from "assets/scripts/functions/generate_gi_wm_order";
 
 const Select_DO = ({
@@ -29,6 +28,8 @@ const Select_DO = ({
   set_do_end_date,
   set_new_wmo_data,
   wm_order_list,
+  sbin_list,
+  inventory_master_list,
   set_page,
 }) => {
   const [loading_list, set_loading_list] = useState(false);

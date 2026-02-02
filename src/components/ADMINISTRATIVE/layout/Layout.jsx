@@ -48,6 +48,7 @@ import Pricing_Condition from "../modules/financial/pricing_condition/Pricing_Co
 import Discount_Condition from "../modules/financial/discount_condition/Discount_Condition";
 import Pricing_Procedure from "../modules/financial/pricing_procedure/Pricing_Procedure";
 import WM_Transaction from "../modules/warehouse/wm_transaction/WM_Transaction";
+import Excel_Conversion from "../modules/excel_conversion/Excel_Conversion";
 
 const Layout = () => {
   const { set_page } = Use_App();
@@ -93,6 +94,8 @@ const Layout = () => {
       //   return <Edit_Profile />;
       case "Dashboard":
         return <Dashboard />;
+      case "Excel Conversion":
+        return <Excel_Conversion />;
       case "User Management":
         return <User_Management />;
       case "Inbound-Purchase Order":

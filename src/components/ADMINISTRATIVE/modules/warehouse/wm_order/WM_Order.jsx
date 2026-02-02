@@ -51,6 +51,9 @@ import Create_WMO_GR from "./create_wmo_gr/Create_WMO_GR";
 import Post_View_WMO_GR from "./post_view_wmo_gr/Post_View_WMO_GR";
 import Create_WMO_GI from "./create_wmo_gi/Create_WMO_GI";
 import Post_View_WMO_GI from "./post_view_wmo_gi/Post_View_WMO_GI";
+// import { sbin_list } from "assets/data/sbin_list";
+import { api_get_sbin_master_rtdb } from "api/real_time_db/warehouse/storage_bin/tbl_sbin_master_api_rtdb";
+import { api_get_inventory_master_rtdb } from "api/real_time_db/warehouse/inventory_master/tbl_inventory_master_api_rtdb";
 // import Edit_PO from "./edit_po/Edit_PO";
 // import Post_View_PO from "./post_view_wmo/Post_View_PO";
 
@@ -84,6 +87,42 @@ const WM_Order = () => {
     "Fully Received": true,
   });
   // - Variables
+
+  // + Get Storage Bin
+  const [sbin_list, set_sbin_list] = useState([]);
+  const [inventory_master_list, set_inventory_master_list] = useState([]);
+  const handle_get_sbin_list = async () => {
+    // set_loading_list(true);
+    const unsubscribe = api_get_sbin_master_rtdb((data, error) => {
+      if (error) {
+        console.error("Failed to fetch bins:", error);
+      } else {
+        console.log(data);
+        set_sbin_list(data);
+      }
+      // set_loading_list(false);
+    });
+
+    return () => unsubscribe();
+  };
+  // - Get Storage Bin
+  // + Get Storage Bin
+  const handle_get_inventory_master_list = async () => {
+    const unsubscribe = api_get_inventory_master_rtdb((data, error) => {
+      if (error) {
+        show_toast("Error loading inventory", "error");
+      } else {
+        set_inventory_master_list(data || []);
+      }
+      set_loading(false);
+    });
+    return () => unsubscribe();
+  };
+  // - Get Storage Bin
+  useEffect(() => {
+    handle_get_sbin_list();
+    handle_get_inventory_master_list();
+  }, []);
 
   const [current_id, set_current_id] = useState(0);
   const [new_wmo_data, set_new_wmo_data] = useState({});
@@ -823,6 +862,8 @@ const WM_Order = () => {
         set_do_end_date={set_do_end_date}
         set_new_wmo_data={set_new_wmo_data}
         wm_order_list={wm_order_list}
+        sbin_list={sbin_list}
+        inventory_master_list={inventory_master_list}
         set_page={set_page}
       />
       {/* <Delete_PO

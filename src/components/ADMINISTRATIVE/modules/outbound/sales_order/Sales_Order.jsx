@@ -25,11 +25,11 @@ import Button_Action from "assets/elements/Button_Action";
 import Checkbox_Field from "assets/elements/Checkbox_Field";
 import Date_Field from "assets/elements/Date_Field";
 import Pagination from "assets/elements/Pagination";
-import Create_New_SO from "./create/Create_New_SO";
+import Create_SO from "./create/Create_SO";
 import Edit_SO from "./edit/Edit_SO";
-import Post_View_SO from "./post_view_so/Post_View_SO";
+import Post_View_SO from "./post_view/Post_View_SO";
+import Delete_SO from "./delete/Delete_SO";
 import Select_SO_Type from "./modals/select_so_type/Select_SO_Type";
-import Delete_SO from "./modals/delete_so/Delete_SO";
 import { so_type_h_list } from "assets/data/so_type_h_list";
 import { so_type_list } from "assets/data/so_type_list";
 import { sales_org_list } from "assets/data/sales_org_list";
@@ -87,6 +87,8 @@ const Sales_Order = () => {
   const [current_id, set_current_id] = useState(0);
   const [new_so_data, set_new_so_data] = useState({});
   const [edit_data, set_edit_data] = useState({});
+  const [view_data, set_view_data] = useState({});
+  const [delete_data, set_delete_data] = useState({});
 
   useEffect(() => {
     Get_TBL_INCREMENTAL_ID("TBL_SALES_ORDER", (value) => {
@@ -303,13 +305,17 @@ const Sales_Order = () => {
     alert("Under Maintenance");
   };
 
-  const handle_view_so = () => {
+  const handle_view_so = (data) => {
     set_for_posting(false);
+    set_view_data(data);
+    set_selected_item_list(data.selected_item_list);
     set_page("post_view_so");
   };
 
-  const handle_post_so = () => {
+  const handle_post_so = (data) => {
     set_for_posting(true);
+    set_view_data(data);
+    set_selected_item_list(data.selected_item_list);
     set_page("post_view_so");
   };
 
@@ -319,7 +325,8 @@ const Sales_Order = () => {
     set_page("edit_so");
   };
 
-  const handle_delete_so = () => {
+  const handle_delete_so = (data) => {
+    set_delete_data(data);
     set_display_modal("delete_so");
   };
 
@@ -687,7 +694,7 @@ const Sales_Order = () => {
                                       <Button_Action
                                         icon={View}
                                         tooltip="View Record"
-                                        on_click={() => handle_view_so(row.id)}
+                                        on_click={() => handle_view_so(row)}
                                       />
                                     </div>
                                     {row.so_status === "Approved" && (
@@ -695,29 +702,27 @@ const Sales_Order = () => {
                                         <Button_Action
                                           icon={FileInput}
                                           tooltip="Post Record"
-                                          on_click={() =>
-                                            handle_post_so(row.id)
-                                          }
+                                          on_click={() => handle_post_so(row)}
                                         />
                                       </div>
                                     )}
-
-                                    <div className="relative group flex jusity-center items-center">
-                                      <Button_Action
-                                        icon={Edit}
-                                        tooltip="Edit Record"
-                                        on_click={() => handle_edit(row)}
-                                      />
-                                    </div>
+                                    {(row.so_status === "Pending" ||
+                                      row.so_status === "Approved") && (
+                                      <div className="relative group flex jusity-center items-center">
+                                        <Button_Action
+                                          icon={Edit}
+                                          tooltip="Edit Record"
+                                          on_click={() => handle_edit(row)}
+                                        />
+                                      </div>
+                                    )}
                                     <div className="relative group flex jusity-center items-center">
                                       <Button_Action
                                         class_name="mb-[1px]"
                                         icon={Trash}
                                         variant="danger"
                                         tooltip="Delete Record"
-                                        on_click={() =>
-                                          handle_delete_so(row.id)
-                                        }
+                                        on_click={() => handle_delete_so(row)}
                                       />
                                     </div>
                                   </div>
@@ -773,7 +778,7 @@ const Sales_Order = () => {
       )}
       {/* + Pages */}
       {page === "so_creation" && (
-        <Create_New_SO
+        <Create_SO
           set_page={set_page}
           active_user={active_user}
           so_data={{
@@ -821,7 +826,25 @@ const Sales_Order = () => {
         />
       )}
       {page === "post_view_so" && (
-        <Post_View_SO set_page={set_page} for_posting={for_posting} />
+        <Post_View_SO
+          set_page={set_page}
+          active_user={active_user}
+          so_data={{
+            show_toast,
+            so_type_list,
+            sales_org_list,
+            dist_channel_list,
+            customer_master_list,
+            customer_sh_list,
+            order_reason_list,
+            plant_list,
+            sloc_list,
+            selected_item_list,
+            view_so_data: view_data,
+            set_so_list,
+          }}
+          for_posting={for_posting}
+        />
       )}
       {/* - Pages */}
       {/* + Modals */}
@@ -849,6 +872,7 @@ const Sales_Order = () => {
         is_open={display_modal === "delete_so"}
         on_close={() => set_display_modal("")}
         width="max-w-[1280px]"
+        delete_so_data={delete_data}
       />
       <Set_Increment_ID
         is_open={display_modal === "set_incremental_id"}

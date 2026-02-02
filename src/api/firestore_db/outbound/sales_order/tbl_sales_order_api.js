@@ -74,11 +74,11 @@ export const api_create_sales_order = async (new_data, user, show_toast) => {
     );
 
     // ---------------------------------------------
-    // 1. CHECK DUPLICATE po_number
+    // 1. CHECK DUPLICATE so_number
     // ---------------------------------------------
     const q_code = query(
       tbl_sales_order_ref,
-      where("po_number", "==", new_data.po_number),
+      where("so_number", "==", new_data.so_number),
     );
     const snap_code = await getDocs(q_code);
 

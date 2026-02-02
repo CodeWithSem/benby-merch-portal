@@ -35,10 +35,10 @@ import Spinner from "assets/elements/Spinner";
 import Select_Generic from "assets/elements/modals/Select_Generic";
 import Set_Increment_ID from "assets/elements/modals/Set_Increment_ID";
 
-import Create_New_PO from "./create_new_po/Create_New_PO";
-import Edit_PO from "./edit_po/Edit_PO";
-import Post_View_PO from "./post_view_po/Post_View_PO";
-import Delete_PO from "./modals/delete_po/Delete_PO";
+import Create_PO from "./create/Create_PO";
+import Edit_PO from "./edit/Edit_PO";
+import Post_View_PO from "./post_view/Post_View_PO";
+import Delete_PO from "./delete/Delete_PO";
 
 import { company_list } from "assets/data/company_list";
 import { purc_org_list } from "assets/data/purc_org_list";
@@ -806,7 +806,7 @@ const Purchase_Order = () => {
       )}
       {/* + Pages */}
       {page === "po_creation" && (
-        <Create_New_PO
+        <Create_PO
           set_page={set_page}
           active_user={active_user}
           show_toast={show_toast}

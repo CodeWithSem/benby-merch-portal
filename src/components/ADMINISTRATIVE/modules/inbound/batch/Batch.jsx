@@ -21,10 +21,6 @@ import {
   api_truncate_batch_master,
 } from "api/firestore_db/inbound/batch/tbl_batch_master_api";
 
-import { branch_list } from "assets/data/branch_list";
-import { plant_list } from "assets/data/plant_list";
-import { sloc_list } from "assets/data/sloc_list";
-
 import Button from "assets/elements/Button";
 import Button_Action from "assets/elements/Button_Action";
 import Icon_Field from "assets/elements/Icon_Field";
@@ -32,13 +28,10 @@ import Select_Field from "assets/elements/Select_Field";
 import Pagination from "assets/elements/Pagination";
 import Spinner from "assets/elements/Spinner";
 
-import Create_New_Batch from "./create_new_batch/Create_New_Batch";
-import Edit_Batch from "./edit_batch/Edit_Batch";
-import View_Batch from "./view_batch/View_Batch";
+import Create_Batch from "./create/Create_Batch";
+// import Edit_Batch from "./edit/Edit_Batch";
+// import View_Batch from "./view/View_Batch";
 
-import Select_Branch from "./modals/Select_Branch";
-import Select_Plant from "./modals/Select_Plant";
-import Select_SLOC from "./modals/Select_SLOC";
 import Select_Item from "./modals/Select_Item";
 import Delete_Batch from "./modals/delete_batch/Delete_Batch";
 
@@ -443,7 +436,7 @@ const Batch = () => {
       )}
       {/* + Pages */}
       {page === "batch_creation" && (
-        <Create_New_Batch
+        <Create_Batch
           set_page={set_page}
           active_user={active_user}
           show_toast={show_toast}
@@ -452,7 +445,7 @@ const Batch = () => {
           set_batch_list={set_batch_list}
         />
       )}
-      {page === "edit_batch" && (
+      {/* {page === "edit_batch" && (
         <Edit_Batch
           set_page={set_page}
           active_user={active_user}
@@ -464,30 +457,9 @@ const Batch = () => {
       )}
       {page === "view_batch" && (
         <View_Batch set_page={set_page} view_batch_data={view_batch_data} />
-      )}
+      )} */}
       {/* - Pages */}
       {/* + Modals */}
-      <Select_Branch
-        is_open={display_modal === "select_branch"}
-        on_close={() => set_display_modal("")}
-        width="max-w-[1000px]"
-        height="max-h-[700px]"
-        branch_list={branch_list}
-      />
-      <Select_Plant
-        is_open={display_modal === "select_plant"}
-        on_close={() => set_display_modal("")}
-        width="max-w-[1000px]"
-        height="max-h-[700px]"
-        plant_list={plant_list}
-      />
-      <Select_SLOC
-        is_open={display_modal === "select_sloc"}
-        on_close={() => set_display_modal("")}
-        width="max-w-[1000px]"
-        height="max-h-[700px]"
-        sloc_list={sloc_list}
-      />
       <Select_Item
         is_open={display_modal === "select_item"}
         on_close={() => set_display_modal("")}

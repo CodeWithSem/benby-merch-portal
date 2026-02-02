@@ -13,8 +13,8 @@ import Pagination_Modal from "assets/elements/Pagination_Modal";
 const Select_Item = ({
   is_open,
   on_close,
-  branch_code,
   plant_code,
+  warehouse_code,
   sloc_code,
   set_data,
   width = "max-w-[700px]",
@@ -34,15 +34,15 @@ const Select_Item = ({
     // Filter item_ext_pu_list by branch, plant, sloc
     const filtered_ext = item_ext_pu_list.filter(
       (item) =>
-        item.branch_code === branch_code &&
         item.plant_code === plant_code &&
-        item.sloc_code === sloc_code
+        item.warehouse_code === warehouse_code &&
+        item.sloc_code === sloc_code,
     );
 
     // Lookup item_desc from item_master_list
     const final_items = filtered_ext.map((item) => {
       const master = item_master_list.find(
-        (m) => m.item_code === item.item_code
+        (m) => m.item_code === item.item_code,
       );
       return {
         ...item,
@@ -53,7 +53,7 @@ const Select_Item = ({
     set_item_list(final_items);
     set_current_page(1);
     // setSelectedItem(null);
-  }, [is_open, branch_code, plant_code, sloc_code]);
+  }, [is_open, plant_code, warehouse_code, sloc_code]);
 
   // ---------------------------------------------------
   // SEARCH + PAGINATION
@@ -66,7 +66,7 @@ const Select_Item = ({
       data = data.filter(
         (d) =>
           d.item_code.toLowerCase().includes(q) ||
-          d.item_desc.toLowerCase().includes(q)
+          d.item_desc.toLowerCase().includes(q),
       );
     }
 
@@ -79,8 +79,8 @@ const Select_Item = ({
     item_list.filter(
       (d) =>
         d.item_code.toLowerCase().includes(search_query.toLowerCase()) ||
-        d.item_desc.toLowerCase().includes(search_query.toLowerCase())
-    ).length / rows_per_page
+        d.item_desc.toLowerCase().includes(search_query.toLowerCase()),
+    ).length / rows_per_page,
   );
 
   const handle_select_item = () => {

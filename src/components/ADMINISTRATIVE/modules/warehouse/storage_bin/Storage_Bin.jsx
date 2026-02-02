@@ -54,10 +54,10 @@ const Storage_Bin = () => {
 
   const columns = [
     { key: "index", label: "#", sortable: false },
-    { key: "sbin_code", label: "Storage Bin Code", sortable: true },
-    { key: "sbin_desc", label: "Storage Bin Description", sortable: true },
-    { key: "warehouse_code", label: "Warehouse Code", sortable: true },
-    { key: "stype_code", label: "Storage Type Code", sortable: true },
+    { key: "sbin_code", label: "Storage Bin", sortable: true },
+    { key: "sbin_desc", label: "Description", sortable: true },
+    { key: "warehouse_code", label: "Warehouse", sortable: true },
+    { key: "stype_code", label: "Storage Type", sortable: true },
     { key: "bin_capacity", label: "Capacity", sortable: true },
     // { key: "creation_date", label: "Creation Date", sortable: true },
     { key: "status", label: "Status", sortable: false },

@@ -19,6 +19,7 @@ const Create_New_GI = ({
   active_user,
   show_toast,
   batch_list,
+  inv_item_list,
   selected_so_data,
   set_selected_so_data,
   new_gi_data,
@@ -211,6 +212,7 @@ const Create_New_GI = ({
           <GI_Items
             show_toast={show_toast}
             batch_list={batch_list}
+            inv_item_list={inv_item_list}
             selected_so_data={selected_so_data}
             set_selected_so_data={set_selected_so_data}
           />

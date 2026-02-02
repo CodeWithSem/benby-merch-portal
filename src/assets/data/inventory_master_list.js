@@ -8,7 +8,7 @@ export const inventory_master_list = [
     stype_code: "PSA",
     // Product
     item_code: "8802",
-    quantity_on_hand: 48,
+    quantity_on_hand: 0,
     uom: "CS",
     pallet_config: "12x4",
     sutype: "IP",

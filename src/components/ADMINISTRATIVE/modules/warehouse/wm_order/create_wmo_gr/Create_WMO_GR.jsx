@@ -20,6 +20,21 @@ const Create_WMO_GR = ({
 
   const handle_create_wmo = async () => {
     try {
+      const has_bin_error = new_wmo_data.wm_allocation_list?.some(
+        (item) => item.remarks === "NO AVAILABLE BIN",
+      );
+
+      if (has_bin_error) {
+        show_toast({
+          type: "danger",
+          title: "Invalid",
+          message: "Some items have no available bins.",
+          icon: <CircleX size={21} className="text-red-500" />,
+        });
+        set_is_confirm_modal_open(false);
+        return;
+      }
+
       set_create_loading(true);
       const {
         po_number,
@@ -28,8 +43,6 @@ const Create_WMO_GR = ({
         received_item_list,
         ...rest
       } = new_wmo_data;
-
-      console.log(po_number);
 
       const clean_wmo_data = {
         ...rest,

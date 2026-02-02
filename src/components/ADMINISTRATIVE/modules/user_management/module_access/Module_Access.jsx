@@ -36,7 +36,7 @@ const Module_Access = ({ set_page, user_data, active_user, show_toast }) => {
       // remove sub-modules if parent removed
       if (exists) {
         set_selected_sub_modules((subs) =>
-          subs.filter((s) => !s.startsWith(code))
+          subs.filter((s) => !s.startsWith(code)),
         );
       }
 
@@ -49,7 +49,7 @@ const Module_Access = ({ set_page, user_data, active_user, show_toast }) => {
   // ---------------------------------------------
   const toggle_sub_module = (code) => {
     set_selected_sub_modules((prev) =>
-      prev.includes(code) ? prev.filter((s) => s !== code) : [...prev, code]
+      prev.includes(code) ? prev.filter((s) => s !== code) : [...prev, code],
     );
   };
 
@@ -73,7 +73,7 @@ const Module_Access = ({ set_page, user_data, active_user, show_toast }) => {
           sub_module_access: formatted_sub_module_access,
         },
         active_user?.username,
-        show_toast
+        show_toast,
       );
 
       if (!response?.success) {
@@ -207,8 +207,8 @@ const Module_Access = ({ set_page, user_data, active_user, show_toast }) => {
               {sub_module_access_list
                 .filter((s) =>
                   selected_modules.some((m) =>
-                    s.sub_module_access_code.startsWith(m)
-                  )
+                    s.sub_module_access_code.startsWith(m),
+                  ),
                 )
                 .map((s) => (
                   <Checkbox_Field
@@ -217,7 +217,7 @@ const Module_Access = ({ set_page, user_data, active_user, show_toast }) => {
                     box_size={22}
                     icon_size={14}
                     checked={selected_sub_modules.includes(
-                      s.sub_module_access_code
+                      s.sub_module_access_code,
                     )}
                     on_change={() =>
                       toggle_sub_module(s.sub_module_access_code)

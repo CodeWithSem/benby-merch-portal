@@ -31,10 +31,10 @@ const Select_SO_Type = ({
   }, [search_query]);
 
   const sales_org_map = Object.fromEntries(
-    sales_org_list.map((c) => [c.sales_org_code, c])
+    sales_org_list.map((c) => [c.sales_org_code, c]),
   );
   const dist_channel_map = Object.fromEntries(
-    dist_channel_list.map((p) => [p.dist_channel_code, p])
+    dist_channel_list.map((p) => [p.dist_channel_code, p]),
   );
 
   useEffect(() => {
@@ -70,8 +70,10 @@ const Select_SO_Type = ({
 
   const total_pages = Math.ceil(
     so_type_list.filter((so_type) =>
-      so_type.so_type_desc.toLowerCase().includes(debounced_query.toLowerCase())
-    ).length / rows_per_page
+      so_type.so_type_desc
+        .toLowerCase()
+        .includes(debounced_query.toLowerCase()),
+    ).length / rows_per_page,
   );
 
   const handle_page_change = (page) => set_current_page(page);
@@ -151,10 +153,11 @@ const Select_SO_Type = ({
                   ) : (
                     filtered_so_type_list.map((so_type) => {
                       const sales_org = sales_org_list.find(
-                        (c) => c.sales_org_code === so_type.sales_org_code
+                        (c) => c.sales_org_code === so_type.sales_org_code,
                       );
                       const dist_channel = dist_channel_list.find(
-                        (p) => p.dist_channel_code === so_type.dist_channel_code
+                        (p) =>
+                          p.dist_channel_code === so_type.dist_channel_code,
                       );
                       return (
                         <tr

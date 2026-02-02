@@ -1,17 +1,35 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { Info, Search, PackageMinus } from "lucide-react";
 
 import Icon_Field from "assets/elements/Icon_Field";
 import Button from "assets/elements/Button";
-
-// Assuming you have a simple modal or input to set the quantity
-// If you'd prefer an inline input, let me know!
 import Input_Modal from "assets/elements/modals/Input_Modal";
+// Assuming you import your API here or pass it as a prop
+// import { api_get_inventory_master_rtdb } from "assets/scripts/api";
 
-const GI_Items = ({ show_toast, selected_so_data, set_selected_so_data }) => {
+const GI_Items = ({
+  show_toast,
+  inv_item_list,
+  selected_so_data,
+  set_selected_so_data,
+}) => {
   const [selected_item_id, set_selected_item_id] = useState(null);
   const [is_input_modal_open, setIs_input_modal_open] = useState(false);
   const [target_item, set_target_item] = useState(null);
+
+  // 2. Aggregate On-Hand Quantity by Item Code (Excluding GIZ)
+  const on_hand_lookup = useMemo(() => {
+    const totals = {};
+    inv_item_list.forEach((entry) => {
+      // FIX: Only add to total if the storage type is NOT 'GIZ'
+      if (entry.stype_code !== "GIZ") {
+        const code = entry.item_code;
+        const qty = Number(entry.quantity_on_hand) || 0;
+        totals[code] = (totals[code] || 0) + qty;
+      }
+    });
+    return totals;
+  }, [inv_item_list]);
 
   const handle_open_quantity_input = (item) => {
     set_target_item(item);
@@ -20,12 +38,23 @@ const GI_Items = ({ show_toast, selected_so_data, set_selected_so_data }) => {
 
   const handle_quantity_submit = (value) => {
     const qty = Number(value);
+    const on_hand = on_hand_lookup[target_item.item_code] || 0;
 
     if (qty > target_item.quantity_open) {
       show_toast({
         type: "warning",
         title: "Over Issue",
         message: "Issued quantity cannot exceed open quantity.",
+      });
+      return;
+    }
+
+    // Optional: Safety check for physical stock
+    if (qty > on_hand) {
+      show_toast({
+        type: "danger",
+        title: "Insufficient Stock",
+        message: `Only ${on_hand} available on hand.`,
       });
       return;
     }
@@ -72,6 +101,9 @@ const GI_Items = ({ show_toast, selected_so_data, set_selected_so_data }) => {
                 <tr className="border-b border-t text-xs">
                   <th className="px-5 py-4 font-semibold border-r">No.</th>
                   <th className="px-5 py-4 font-semibold border-r">
+                    Item Code
+                  </th>
+                  <th className="px-5 py-4 font-semibold border-r">
                     Item Description
                   </th>
                   <th className="px-5 py-4 font-semibold border-r">
@@ -83,56 +115,86 @@ const GI_Items = ({ show_toast, selected_so_data, set_selected_so_data }) => {
                     Issued Qty
                   </th>
                   <th className="px-5 py-4 font-semibold border-r">Left Qty</th>
+                  <th className="px-5 py-4 font-semibold border-r">
+                    On Hand Qty
+                  </th>
                   <th className="px-5 py-4 font-semibold"></th>
                 </tr>
               </thead>
               <tbody className="divide-y bg-white">
                 {selected_so_data.selected_item_list
                   .filter((item) => Number(item.quantity_open) > 0)
-                  .map((item, index) => (
-                    <tr
-                      key={item.id}
-                      className={`text-xs cursor-pointer ${
-                        selected_item_id === item.id
-                          ? "bg-sky-50"
-                          : "hover:bg-gray-50/50"
-                      }`}
-                      onClick={() => set_selected_item_id(item.id)}
-                    >
-                      <td className="px-5 py-4 text-gray-500 border-r">
-                        {index + 1}
-                      </td>
-                      <td className="px-5 py-4 font-medium text-gray-800 whitespace-normal break-words border-r">
-                        {item.item_desc}
-                      </td>
-                      <td className="px-5 py-4 text-gray-600 border-r">
-                        {item.quantity}
-                      </td>
-                      <td className="px-5 py-4 text-gray-600 border-r">
-                        {item.uom}
-                      </td>
-                      <td className="px-5 py-4 text-gray-600 border-r">
-                        {item.quantity_open}
-                      </td>
-                      <td className="px-5 py-4 text-gray-600 border-r">
-                        {item.quantity_issued || 0}
-                      </td>
-                      <td className="px-5 py-4 text-gray-600 border-r">
-                        {item.quantity_left}
-                      </td>
-                      <td className="px-5 py-2 text-gray-600">
-                        <Button
-                          variant="primary"
-                          size="sm"
-                          icon={PackageMinus}
-                          icon_position="left"
-                          on_click={() => handle_open_quantity_input(item)}
+                  .map((item, index) => {
+                    const total_on_hand = on_hand_lookup[item.item_code] || 0;
+
+                    return (
+                      <tr
+                        key={item.id}
+                        className={`text-xs cursor-pointer ${
+                          selected_item_id === item.id
+                            ? "bg-sky-50"
+                            : "hover:bg-gray-50/50"
+                        }`}
+                        onClick={() => set_selected_item_id(item.id)}
+                      >
+                        <td className="px-5 py-4 text-gray-500 border-r">
+                          {index + 1}
+                        </td>
+                        <td className="px-5 py-4 text-gray-600 border-r">
+                          {item.item_code}
+                        </td>
+                        <td className="px-5 py-4 font-medium text-gray-800 whitespace-normal break-words border-r">
+                          {item.item_desc}
+                        </td>
+                        {/* ON HAND COLUMN */}
+                        <td className="px-5 py-4 text-gray-600 border-r">
+                          {item.quantity}
+                        </td>
+                        <td className="px-5 py-4 text-gray-600 border-r">
+                          {item.uom}
+                        </td>
+                        <td className="px-5 py-4 text-gray-600 border-r">
+                          {item.quantity_open}
+                        </td>
+                        <td className="px-5 py-4 text-gray-600 border-r">
+                          {item.quantity_issued || 0}
+                        </td>
+                        <td className="px-5 py-4 text-gray-600 border-r">
+                          {item.quantity_left}
+                        </td>
+                        <td
+                          className={`px-5 py-4 font-bold border-r ${
+                            total_on_hand < item.quantity_open
+                              ? "text-red-500 bg-red-50" // Red if stock is less than required open qty
+                              : "text-green-500 bg-green-50" // Green if stock is sufficient
+                          }`}
                         >
-                          Issue
-                        </Button>
-                      </td>
-                    </tr>
-                  ))}
+                          <div className="flex items-center justify-between gap-2">
+                            {total_on_hand}
+
+                            {/* Show a small warning badge if there's a shortage */}
+                            {/* {total_on_hand < item.quantity_open && (
+                              <span className="text-[10px] bg-red-600 text-white px-1.5 py-0.5 rounded">
+                                SHORTAGE
+                              </span>
+                            )} */}
+                          </div>
+                        </td>
+                        <td className="px-5 py-2 text-gray-600">
+                          <Button
+                            variant="primary"
+                            size="sm"
+                            disabled={total_on_hand < item.quantity_open}
+                            icon={PackageMinus}
+                            icon_position="left"
+                            on_click={() => handle_open_quantity_input(item)}
+                          >
+                            Issue
+                          </Button>
+                        </td>
+                      </tr>
+                    );
+                  })}
               </tbody>
             </table>
           </div>
@@ -147,14 +209,16 @@ const GI_Items = ({ show_toast, selected_so_data, set_selected_so_data }) => {
         </div>
       </div>
 
-      {/* Simple Modal to input the quantity */}
       <Input_Modal
         is_open={is_input_modal_open}
         on_close={() => setIs_input_modal_open(false)}
         title="Enter Issued Quantity"
         label={`${target_item?.item_desc}`}
         type="number"
-        max_value={target_item?.quantity_open}
+        max_value={Math.min(
+          target_item?.quantity_open,
+          on_hand_lookup[target_item?.item_code] || 0,
+        )}
         on_submit={handle_quantity_submit}
       />
     </React.Fragment>

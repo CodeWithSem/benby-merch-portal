@@ -1,4 +1,4 @@
-import { onValue, ref, set, update } from "firebase/database";
+import { get, increment, onValue, ref, set, update } from "firebase/database";
 import { realtime_db } from "assets/scripts/firebase";
 import { get_realtime_path, TABLES } from "../../../db_path_contant";
 import { format_date_1, get_date_now } from "assets/scripts/format";
@@ -126,6 +126,74 @@ export const api_bulk_create_inventory_master_rtdb = async (
     return { success: true };
   } catch (error) {
     console.error("Bulk Inventory Master Creation Error:", error);
+    return { success: false, message: error.message };
+  }
+};
+
+export const api_bulk_transfer_inventory_master_rtdb = async (
+  wm_allocation_list,
+  meta,
+  active_user,
+) => {
+  try {
+    if (!Array.isArray(wm_allocation_list) || wm_allocation_list.length === 0) {
+      throw new Error("No items provided for inventory transfer");
+    }
+
+    const updates = {};
+    const base_path = get_realtime_path(TABLES.INVENTORY_MASTER);
+    const timestamp = format_date_1(get_date_now());
+    const username = active_user?.username || "SYSTEM";
+
+    for (const item of wm_allocation_list) {
+      const qty = Number(item.quantity);
+
+      // 1. DECREASE FROM SOURCE
+      if (item.from_sbin_code) {
+        const source_path = `${base_path}/${item.from_sbin_code}`;
+        updates[`${source_path}/quantity_on_hand`] = increment(-qty);
+      }
+
+      // 2. INCREASE AT DESTINATION
+      if (item.to_sbin_code) {
+        const dest_path = `${base_path}/${item.to_sbin_code}`;
+
+        // We need to check if the destination record exists to set metadata
+        // If it doesn't exist, we provide the full payload template
+        const dest_snap = await get(ref(realtime_db, dest_path));
+
+        if (!dest_snap.exists()) {
+          updates[dest_path] = {
+            id: item.to_sbin_code,
+            lpn_no: item.lpn_no,
+            inventory_status: "Active",
+            sbin_code: item.to_sbin_code,
+            stype_code: item.to_stype_code,
+            item_code: item.item_code,
+            quantity_on_hand: qty, // First time entry
+            uom: item.uom,
+            pallet_config: item.pallet_config,
+            sutype: item.sutype,
+            batch_code: item.batch_code,
+            manufacture_date: item.manufacture_date,
+            sled_bbd: item.sled_bbd,
+            reference_wmo: meta.wmo_number,
+            reference_po: meta.ref_number,
+            reference_do: meta.do_number,
+            confirm_by: username,
+            confirm_date: timestamp,
+          };
+        } else {
+          // If bin already has items, just increment the quantity
+          updates[`${dest_path}/quantity_on_hand`] = increment(qty);
+        }
+      }
+    }
+
+    await update(ref(realtime_db), updates);
+    return { success: true };
+  } catch (error) {
+    console.error("Bulk Inventory Transfer Error:", error);
     return { success: false, message: error.message };
   }
 };

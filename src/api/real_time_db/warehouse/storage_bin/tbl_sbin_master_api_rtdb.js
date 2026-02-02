@@ -8,6 +8,7 @@ import {
   orderByChild,
   equalTo,
   remove,
+  increment,
 } from "firebase/database";
 import { realtime_db } from "assets/scripts/firebase";
 import { get_realtime_path, TABLES } from "../../../db_path_contant";
@@ -395,3 +396,82 @@ export const api_bulk_upload_sbin_rtdb = async (upload_data_list, user) => {
   }
 };
 // - Upload
+
+// + Transfer Bin Capacity (GR)
+export const api_update_gr_sbin_capacities_rtdb = async (allocation_list) => {
+  try {
+    if (!Array.isArray(allocation_list) || allocation_list.length === 0) {
+      return { success: false, message: "No allocation data provided" };
+    }
+
+    const updates = {};
+    const base_path = get_realtime_path(TABLES.STORAGE_BIN_MASTER);
+
+    allocation_list.forEach((item) => {
+      const qty = Number(item.quantity);
+
+      // We only update the Destination Bin (Rack/Storage)
+      // GRZ01 is the virtual entry point, so we focus on the bin receiving the stock
+      if (item.to_sbin_code) {
+        const dest_path = `${base_path}/${item.to_sbin_code}/bin_capacity`;
+        updates[dest_path] = increment(qty);
+      }
+    });
+
+    await update(ref(realtime_db), updates);
+
+    return {
+      success: true,
+      message: "Storage bin capacities updated for GR successfully",
+    };
+  } catch (error) {
+    console.error("Error updating GR bin capacities: ", error);
+    return {
+      success: false,
+      message: error.message || "Failed to update bin capacities",
+    };
+  }
+};
+// _ Transfer Bin Capacity (GR)
+// + Transfer Bin Capacity (GI)
+export const api_update_gi_sbin_capacities_rtdb = async (allocation_list) => {
+  try {
+    if (!Array.isArray(allocation_list) || allocation_list.length === 0) {
+      return { success: false, message: "No allocation data provided" };
+    }
+
+    const updates = {};
+    const base_path = get_realtime_path(TABLES.STORAGE_BIN_MASTER);
+
+    allocation_list.forEach((item) => {
+      const qty = Number(item.quantity);
+
+      // 1. Update Source Bin (Subtracting capacity)
+      if (item.from_sbin_code) {
+        const source_path = `${base_path}/${item.from_sbin_code}/bin_capacity`;
+        updates[source_path] = increment(-qty);
+      }
+
+      // 2. Update Destination Bin (Adding capacity)
+      if (item.to_sbin_code) {
+        const dest_path = `${base_path}/${item.to_sbin_code}/bin_capacity`;
+        updates[dest_path] = increment(qty);
+      }
+    });
+
+    // Execute all updates at once
+    await update(ref(realtime_db), updates);
+
+    return {
+      success: true,
+      message: "Storage bin capacities updated successfully",
+    };
+  } catch (error) {
+    console.error("Error updating bin capacities: ", error);
+    return {
+      success: false,
+      message: error.message || "Failed to update bin capacities",
+    };
+  }
+};
+// - Transfer Bin Capacity (GI)

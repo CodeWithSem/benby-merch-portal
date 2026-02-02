@@ -20,6 +20,7 @@ import Show_Item_Details from "./modals/Show_Item_Details";
 import Edit_Item from "./modals/Edit_Item";
 import Button_Action from "assets/elements/Button_Action";
 import Select_Item from "../../modals/Select_Item";
+import Remove_Item from "./modals/Remove_Item";
 
 const SO_Items = ({ so_data }) => {
   const {
@@ -42,6 +43,7 @@ const SO_Items = ({ so_data }) => {
     total: "",
   });
   const [view_item_data, set_view_item_data] = useState({});
+  const [remove_item_data, set_remove_item_data] = useState({});
 
   const filtered_item_list = selected_item_list.filter((item) =>
     item.item_desc.toLowerCase().includes(search_query.toLowerCase()),
@@ -166,6 +168,11 @@ const SO_Items = ({ so_data }) => {
     (sum, item) => sum + (item.total || 0),
     0,
   );
+
+  const handle_remove_item = (item) => {
+    set_remove_item_data(item);
+    set_display_item_modal("remove_item");
+  };
 
   // RETURN ORIGIN
   return (
@@ -350,9 +357,9 @@ const SO_Items = ({ so_data }) => {
                                         variant="danger"
                                         tooltip="Remove Item"
                                         size={20}
-                                        // on_click={() =>
-                                        //   handle_remove_item(item)
-                                        // }
+                                        on_click={() =>
+                                          handle_remove_item(item)
+                                        }
                                       />
                                     </div>
                                   </td>
@@ -511,6 +518,13 @@ const SO_Items = ({ so_data }) => {
         is_open={display_item_modal === "edit_item"}
         on_close={() => set_display_item_modal("")}
         width="max-w-[1280px]"
+      />
+      <Remove_Item
+        is_open={display_item_modal === "remove_item"}
+        on_close={() => set_display_item_modal("")}
+        width="max-w-[920px]"
+        remove_item_data={remove_item_data}
+        set_selected_item_list={set_selected_item_list}
       />
       <Select_Item
         is_open={display_item_modal === "select_item"}

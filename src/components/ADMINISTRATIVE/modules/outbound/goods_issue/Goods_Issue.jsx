@@ -49,6 +49,7 @@ import {
   api_truncate_goods_issue,
 } from "api/firestore_db/outbound/goods_issue/tbl_goods_issue_api";
 import Spinner from "assets/elements/Spinner";
+import { api_get_inventory_master_rtdb } from "api/real_time_db/warehouse/inventory_master/tbl_inventory_master_api_rtdb";
 
 const Goods_Issue = () => {
   const { active_user } = Use_App();
@@ -75,6 +76,25 @@ const Goods_Issue = () => {
   const [view_gi_data, set_view_gi_data] = useState({});
   const [reverse_gi_data, set_reverse_gi_data] = useState({});
   const [current_id, set_current_id] = useState(0);
+
+  // + Get Inventory
+  const [inv_item_list, set_inv_item_list] = useState([]);
+
+  useEffect(() => {
+    const unsubscribe = api_get_inventory_master_rtdb((data, error) => {
+      if (error) {
+        show_toast({
+          type: "danger",
+          title: "Error",
+          message: "Error loading inventory",
+        });
+      } else {
+        set_inv_item_list(data || []);
+      }
+    });
+    return () => unsubscribe();
+  }, []);
+  // - Get Inventory
 
   useEffect(() => {
     Get_TBL_INCREMENTAL_ID("TBL_GOODS_ISSUE", (value) => {
@@ -669,6 +689,7 @@ const Goods_Issue = () => {
           active_user={active_user}
           show_toast={show_toast}
           batch_list={batch_list}
+          inv_item_list={inv_item_list}
           selected_so_data={selected_so_data}
           set_selected_so_data={set_selected_so_data}
           new_gi_data={new_gi_data}

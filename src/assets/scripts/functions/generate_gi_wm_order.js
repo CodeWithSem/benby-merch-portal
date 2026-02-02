@@ -14,19 +14,22 @@ export function generate_gi_wm_orders({
   // 1. Setup Virtual Inventory (track stock being taken)
   let virtual_inventory = JSON.parse(JSON.stringify(inventory_master_list));
 
-  // 2. Setup GIZ Bins only (track space being filled)
+  // 2. Setup GIZ Bins only (REVISED: Using status === "Available")
   let giz_bins = sbin_list
-    .filter((bin) => bin.stype_code === "GIZ" && bin.is_available)
+    .filter((bin) => bin.stype_code === "GIZ" && bin.status === "Available")
     .map((bin) => ({
       ...bin,
       current_capacity: bin.bin_capacity || 0,
     }));
 
   selected_gi.issued_item_list.forEach((gi_item) => {
-    let remaining_to_pick = gi_item.quantity;
+    // let remaining_to_pick = gi_item.quantity;
+    let remaining_to_pick = gi_item.quantity_issued || 0;
+
+    // Skip the item if there's nothing to issue
+    if (remaining_to_pick <= 0) return;
 
     // 3. Filter and sort source stock (FLAT ACCESS)
-    // We exclude GIZ so we don't "pick" items that are already at the exit
     const available_stock = virtual_inventory
       .filter(
         (inv) =>
@@ -52,14 +55,13 @@ export function generate_gi_wm_orders({
       );
 
       if (!target_bin) {
-        // If the GIZ zone is full, record the shortage and stop looking for this item
         wm_allocation_list.push({
           item_code: gi_item.item_code,
           item_desc: gi_item.item_desc,
           quantity: remaining_to_pick,
-          remarks: "GIZ ZONE FULL",
+          remarks: "NO AVAILABLE BIN",
         });
-        remaining_to_pick = 0; // Mark as "handled" so insufficient stock doesn't trigger
+        remaining_to_pick = 0;
         break;
       }
 
@@ -72,23 +74,15 @@ export function generate_gi_wm_orders({
         quantity: take_quantity,
         quantity_confirm: 0,
         uom: gi_item.uom || "CS",
-
-        // Source Info (Flat)
         from_stype_code: inv_record.stype_code,
         from_sbin_code: inv_record.sbin_code,
-
-        // Destination Info
         to_stype_code: "GIZ",
         to_sbin_code: target_bin.sbin_code,
-
-        // Stock Details (Flat)
         batch_code: inv_record.batch_code,
         manufacture_date: inv_record.manufacture_date,
         sled_bbd: inv_record.sled_bbd,
         pallet_config: inv_record.pallet_config,
         sutype: inv_record.sutype,
-
-        // Metadata
         ref_number: selected_gi.so_number || "",
         do_number: selected_gi.gi_number || "",
         wm_order_status: "Pending",
@@ -100,16 +94,6 @@ export function generate_gi_wm_orders({
       remaining_to_pick -= take_quantity;
       target_bin.current_capacity += take_quantity;
     }
-
-    // 7. Handle remaining shortage (Actual Insufficient Stock)
-    // if (remaining_to_pick > 0) {
-    //   wm_allocation_list.push({
-    //     item_code: gi_item.item_code,
-    //     item_desc: gi_item.item_desc,
-    //     quantity: remaining_to_pick,
-    //     remarks: "INSUFFICIENT STOCK",
-    //   });
-    // }
   });
 
   return wm_allocation_list;

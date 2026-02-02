@@ -3,17 +3,17 @@ import Date_Field from "assets/elements/Date_Field";
 import Text_Code_Field from "assets/elements/Text_Code_Field";
 import Text_Field from "assets/elements/Text_Field";
 import Textarea_Field from "assets/elements/Textarea_Field";
-import Select_Branch from "../../modals/select_hierarchy/Select_Branch";
 import Select_Plant from "../../modals/select_hierarchy/Select_Plant";
+import Select_Warehouse from "../../modals/select_hierarchy/Select_Warehouse";
 import Select_SLOC from "../../modals/select_hierarchy/Select_SLOC";
 import { get_description } from "assets/scripts/functions/get_description";
 
 const Shipping = ({ so_data }) => {
   const {
-    branch_list,
-    branch_h_list,
     plant_list,
     plant_h_list,
+    warehouse_list,
+    warehouse_h_list,
     sloc_list,
     set_selected_item_list,
     new_so_data,
@@ -27,22 +27,6 @@ const Shipping = ({ so_data }) => {
       {/* + Section 1 */}
       <div className="rounded-lg border border-sky-50/50 bg-sky-50/50 p-4 sm:p-6 dark:border-gray-800 dark:bg-gray-900 whitespace-nowrap">
         <div className="grid grid-cols-1 gap-5">
-          <div>
-            <Text_Code_Field
-              label="Branch"
-              code_width="150px"
-              show_search_button={true}
-              code_value={new_so_data.branch_code}
-              text_value={get_description(
-                new_so_data.branch_code,
-                branch_list,
-                "branch_code",
-                "branch_desc",
-              )}
-              on_click={() => set_display_modal("select_branch")}
-              disabled
-            />
-          </div>
           <div>
             <Text_Code_Field
               label="Plant"
@@ -61,9 +45,25 @@ const Shipping = ({ so_data }) => {
           </div>
           <div>
             <Text_Code_Field
+              label="Warehouse"
+              code_width="150px"
+              show_search_button={!!new_so_data.plant_code}
+              code_value={new_so_data.warehouse_code}
+              text_value={get_description(
+                new_so_data.warehouse_code,
+                warehouse_list,
+                "warehouse_code",
+                "warehouse_desc",
+              )}
+              on_click={() => set_display_modal("select_warehouse")}
+              disabled
+            />
+          </div>
+          <div>
+            <Text_Code_Field
               label="SLOC"
               code_width="150px"
-              show_search_button={true}
+              show_search_button={!!new_so_data.warehouse_code}
               code_value={new_so_data.sloc_code}
               text_value={get_description(
                 new_so_data.sloc_code,
@@ -126,24 +126,24 @@ const Shipping = ({ so_data }) => {
       </div>
       {/* - Section 3 */}
       {/* + Modals */}
-      <Select_Branch
-        is_open={display_modal === "select_branch"}
-        on_close={() => set_display_modal("")}
-        width="max-w-[1000px]"
-        height="max-h-[700px]"
-        branch_list={branch_list}
-        set_data={set_new_so_data}
-        set_selected_item_list={set_selected_item_list}
-      />
       <Select_Plant
         is_open={display_modal === "select_plant"}
         on_close={() => set_display_modal("")}
         width="max-w-[1000px]"
         height="max-h-[700px]"
-        selected_branch_code={new_so_data.branch_code}
-        branch_list={branch_list}
         plant_list={plant_list}
-        branch_h_list={branch_h_list}
+        set_data={set_new_so_data}
+        set_selected_item_list={set_selected_item_list}
+      />
+      <Select_Warehouse
+        is_open={display_modal === "select_warehouse"}
+        on_close={() => set_display_modal("")}
+        width="max-w-[1000px]"
+        height="max-h-[700px]"
+        selected_plant_code={new_so_data.plant_code}
+        plant_list={plant_list}
+        warehouse_list={warehouse_list}
+        plant_h_list={plant_h_list}
         set_data={set_new_so_data}
         set_selected_item_list={set_selected_item_list}
       />
@@ -152,10 +152,10 @@ const Shipping = ({ so_data }) => {
         on_close={() => set_display_modal("")}
         width="max-w-[1000px]"
         height="max-h-[700px]"
-        selected_plant_code={new_so_data.plant_code}
-        plant_list={plant_list}
+        selected_warehouse_code={new_so_data.warehouse_code}
+        warehouse_list={warehouse_list}
         sloc_list={sloc_list}
-        plant_h_list={plant_h_list}
+        warehouse_h_list={warehouse_h_list}
         set_data={set_new_so_data}
         set_selected_item_list={set_selected_item_list}
       />

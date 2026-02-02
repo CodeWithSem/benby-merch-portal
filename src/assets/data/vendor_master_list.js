@@ -1,7 +1,7 @@
 export const vendor_master_list = [
   {
     id: 1,
-    vendor_code: "VE-00001",
+    vendor_code: "V00001",
     vendor_desc: "Vendor A",
     creation_date: "12-05-2025",
     created_by: "DEV-001",

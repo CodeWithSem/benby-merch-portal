@@ -10,6 +10,7 @@ import {
   PackageMinus,
   Settings,
   Calculator,
+  FileCode,
 } from "lucide-react";
 import delphys_logo from "../../../assets/images/delphys-sidebar-logo.png";
 import { useToast } from "./Toast_Provider";
@@ -41,6 +42,13 @@ const Sidebar = ({
       type: "link",
       name: "Dashboard",
       icon: <Home size={18} />,
+    },
+    {
+      key: "Excel Conversion",
+      module_code: "EC",
+      type: "link",
+      name: "Excel Conversion",
+      icon: <FileCode size={18} />,
     },
     {
       key: "User Management",

@@ -104,9 +104,9 @@ const WM_Items = ({ new_wmo_data }) => {
                   key={item.lpn_no || index}
                   className={`text-xs cursor-pointer ${
                     selected_row_id === index
-                      ? "bg-sky-50"
+                      ? `${item.remarks === "NO AVAILABLE BIN" ? "bg-red-50" : "bg-sky-50"}`
                       : "hover:bg-gray-50/50"
-                  }`}
+                  } ${item.remarks === "NO AVAILABLE BIN" ? "bg-red-50 hover:bg-red-50" : ""}`}
                   onClick={() => set_selected_row_id(index)}
                 >
                   <td className="px-5 py-4 border-r">{index + 1}</td>

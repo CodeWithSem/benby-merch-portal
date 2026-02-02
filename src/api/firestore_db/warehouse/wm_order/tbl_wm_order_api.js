@@ -92,7 +92,7 @@ export const api_create_wm_order = async (
 
     const q_code = query(
       tbl_wm_order_ref,
-      where("ref_number", "==", new_data.ref_number),
+      where("do_number", "==", new_data.do_number),
     );
 
     const snap_code = await getDocs(q_code);
@@ -101,7 +101,7 @@ export const api_create_wm_order = async (
       show_toast({
         type: "danger",
         title: "Error",
-        message: `A WM order for ${new_data.ref_number} already exists.`,
+        message: `A WM order for ${new_data.do_number} already exists.`,
         icon: <CircleX size={21} className="text-red-500" />,
       });
       return {

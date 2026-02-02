@@ -17,6 +17,7 @@ const GR_Items = ({
   const [display_item_modal, set_display_item_modal] = useState("");
 
   const handle_select_receive_item = (item) => {
+    console.log(item);
     set_selected_receive_item(item);
     set_display_item_modal("select_batch");
   };
@@ -33,10 +34,10 @@ const GR_Items = ({
               selected_batches.length === 1
                 ? selected_batches[0].batch_code
                 : selected_batches.length > 1
-                ? "Multiple Batches"
-                : "",
+                  ? "Multiple Batches"
+                  : "",
           }
-        : item
+        : item,
     );
 
     set_selected_po_data({
@@ -69,6 +70,9 @@ const GR_Items = ({
                 <tr className="border-b border-t text-xs">
                   <th className="px-5 py-4 font-semibold border-r">No.</th>
                   <th className="px-5 py-4 font-semibold border-r">
+                    Item Code
+                  </th>
+                  <th className="px-5 py-4 font-semibold border-r">
                     Item Description
                   </th>
                   <th className="px-5 py-4 font-semibold border-r">
@@ -99,6 +103,9 @@ const GR_Items = ({
                     >
                       <td className="px-5 py-4 text-gray-500 border-r">
                         {index + 1}
+                      </td>
+                      <td className="px-5 py-4 font-medium text-gray-800 whitespace-normal break-words border-r">
+                        {item.item_code}
                       </td>
                       <td className="px-5 py-4 font-medium text-gray-800 whitespace-normal break-words border-r">
                         {item.item_desc}

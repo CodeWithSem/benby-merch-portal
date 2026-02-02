@@ -39,6 +39,8 @@ import {
   api_update_sales_order,
 } from "api/firestore_db/outbound/sales_order/tbl_sales_order_api";
 import Confirm_Modal from "assets/elements/modals/Confirm_Modal";
+import { warehouse_list } from "assets/data/warehouse_list";
+import { warehouse_h_list } from "assets/data/warehouse_h_list";
 
 const Edit_SO = ({ set_page, active_user, so_data }) => {
   const {
@@ -363,10 +365,10 @@ const Edit_SO = ({ set_page, active_user, so_data }) => {
                 {active_tab === "shipping" && (
                   <Shipping
                     so_data={{
-                      branch_list,
-                      branch_h_list,
                       plant_list,
                       plant_h_list,
+                      warehouse_list,
+                      warehouse_h_list,
                       sloc_list,
                       set_selected_item_list,
                       edit_so_data,

@@ -12,6 +12,8 @@ import {
   api_update_wm_order_status,
 } from "api/firestore_db/warehouse/wm_order/tbl_wm_order_api";
 import Confirm_Modal from "assets/elements/modals/Confirm_Modal";
+import { api_bulk_create_inventory_master_rtdb } from "api/real_time_db/warehouse/inventory_master/tbl_inventory_master_api_rtdb";
+import { api_update_gr_sbin_capacities_rtdb } from "api/real_time_db/warehouse/storage_bin/tbl_sbin_master_api_rtdb";
 
 const Post_View_WMO_GR = ({
   set_page,
@@ -35,11 +37,6 @@ const Post_View_WMO_GR = ({
       );
 
       if (firestore_res.success) {
-        set_wm_order_list((prev) =>
-          prev.map((item) =>
-            item.id === firestore_res.data.id ? firestore_res.data : item,
-          ),
-        );
         const rtdb_success = await api_post_wm_orders_rtdb(
           view_wmo_data.process_type,
           view_wmo_data.wm_allocation_list,
@@ -53,8 +50,32 @@ const Post_View_WMO_GR = ({
         );
 
         if (rtdb_success) {
-          close_confirm_modal();
-          set_page("main");
+          const inventory_res = await api_bulk_create_inventory_master_rtdb(
+            view_wmo_data.wm_allocation_list,
+            {
+              wmo_number: view_wmo_data.wmo_number,
+              ref_number: view_wmo_data.ref_number,
+              do_number: view_wmo_data.do_number,
+            },
+            active_user,
+          );
+
+          if (inventory_res.success) {
+            // 4. UPDATE BIN CAPACITIES (Math for PSA01 -qty and GIZ01 +qty)
+            const bin_update_res = await api_update_gr_sbin_capacities_rtdb(
+              view_wmo_data.wm_allocation_list,
+            );
+
+            if (bin_update_res.success) {
+              set_wm_order_list((prev) =>
+                prev.map((item) =>
+                  item.id === firestore_res.data.id ? firestore_res.data : item,
+                ),
+              );
+              close_confirm_modal();
+              set_page("main");
+            }
+          }
         }
       }
     } catch (error) {
