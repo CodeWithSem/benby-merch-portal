@@ -20,19 +20,18 @@ const Post_View_GR = ({
       ...view_gr_data,
       gr_status: "Posted",
     };
-
     try {
       set_post_loading(true);
       const response = await api_post_goods_receipt(
         final_gr_data,
         active_user?.username,
-        show_toast
+        show_toast,
       );
       if (response.success) {
         set_gr_list((prev) =>
           prev.map((item) =>
-            item.id === response.data.id ? response.data : item
-          )
+            item.id === response.data.id ? response.data : item,
+          ),
         );
         handle_go_back();
       }

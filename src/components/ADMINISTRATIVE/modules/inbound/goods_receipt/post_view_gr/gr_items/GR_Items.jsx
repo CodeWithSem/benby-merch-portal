@@ -48,7 +48,7 @@ const GR_Items = ({ view_gr_data, for_posting }) => {
                     Received Qty
                   </th>
                   <th className="px-5 py-4 font-semibold border-r">Left Qty</th>
-                  <th className="px-5 py-4 font-semibold border-r">Batch</th>
+                  <th className="px-5 py-4 font-semibold">Batch</th>
                   {/* <th className="px-5 py-4 font-semibold"></th> */}
                 </tr>
               </thead>
@@ -97,7 +97,7 @@ const GR_Items = ({ view_gr_data, for_posting }) => {
                         <td className="px-5 py-4 text-gray-600 border-r">
                           {item.quantity_left}
                         </td>
-                        <td className="px-5 py-4 text-gray-600 border-r">
+                        <td className="px-5 py-4 text-gray-600">
                           {item.batch}
                         </td>
                       </tr>

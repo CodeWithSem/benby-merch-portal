@@ -7,6 +7,7 @@ import { get_description } from "assets/scripts/functions/get_description";
 import { warehouse_list } from "assets/data/warehouse_list";
 import { stype_list } from "assets/data/stype_list";
 import SBIN_Details from "./sbin_details/SBIN_Details";
+import { item_master_list } from "assets/data/item_master_list";
 
 const View_SBIN = ({ set_page, view_sbin_data }) => {
   const [active_tab, set_active_tab] = useState("sbin_details");
@@ -113,20 +114,49 @@ const View_SBIN = ({ set_page, view_sbin_data }) => {
                   disabled
                 />
               </div>
-              <Text_Field
-                label="Storage Bin Code"
-                type={"text"}
-                placeholder={"Enter code"}
-                value={view_sbin_data.sbin_code} //--> sbin_code
-                disabled
-              />
-              <Text_Field
-                label="Storage Bin Description"
-                type={"text"}
-                placeholder={"Enter description"}
-                value={view_sbin_data.sbin_desc} //--> sbin_desc
-                disabled
-              />
+              <div>
+                <Text_Field
+                  label="Storage Bin Code"
+                  type={"text"}
+                  placeholder={"Enter code"}
+                  value={view_sbin_data.sbin_code} //--> sbin_code
+                  disabled
+                />
+              </div>
+              <div>
+                <Text_Field
+                  label="Storage Bin Description"
+                  type={"text"}
+                  placeholder={"Enter description"}
+                  value={view_sbin_data.sbin_desc} //--> sbin_desc
+                  disabled
+                />
+              </div>
+              <div>
+                <Text_Code_Field
+                  label="Current Item"
+                  code_width="150px"
+                  show_search_button={false}
+                  code_value={view_sbin_data.current_item}
+                  text_value={get_description(
+                    view_sbin_data.current_item,
+                    item_master_list,
+                    "item_code",
+                    "item_desc",
+                  )}
+                  bg_dis_color="bg-slate-50"
+                  text_dis_color="text-slate-500"
+                  disabled
+                />
+              </div>
+              <div>
+                <Text_Field
+                  label="Current Batch"
+                  type={"text"}
+                  value={view_sbin_data.current_batch}
+                  disabled
+                />
+              </div>
             </div>
           </div>
           {/* - Section 1 */}

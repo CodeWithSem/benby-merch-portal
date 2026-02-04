@@ -12,6 +12,7 @@ import {
   Trash2,
   FileDigit,
   Upload,
+  OctagonMinus,
 } from "lucide-react";
 import { useToast } from "../../../layout/Toast_Provider";
 import Icon_Field from "assets/elements/Icon_Field";
@@ -35,6 +36,7 @@ import View_SBIN from "./view_sbin/View_SBIN";
 import Delete_SBIN from "./delete/Delete_SBIN";
 import {
   api_get_sbin_master_rtdb,
+  api_reset_sbin_rtdb,
   api_truncate_sbin_rtdb,
 } from "api/real_time_db/warehouse/storage_bin/tbl_sbin_master_api_rtdb";
 import Upload_SBIN from "./upload/Upload_SBIN";
@@ -103,8 +105,18 @@ const Storage_Bin = () => {
     set_truncate_loading(false);
   };
 
-  const handle_set_incremental_id = () => {
-    set_display_modal("set_incremental_id");
+  const handle_reset = async (sbin_code) => {
+    try {
+      if (
+        window.confirm(
+          `Are you sure you want to completely clear Bin ${sbin_code}?`,
+        )
+      ) {
+        await api_reset_sbin_rtdb(sbin_code, show_toast);
+      }
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   // + Client-Side Filtering
@@ -450,6 +462,17 @@ const Storage_Bin = () => {
                                         variant="danger"
                                         tooltip="Delete Record"
                                         on_click={() => handle_delete_sbin(row)}
+                                      />
+                                    </div>
+                                  )}
+                                  {active_user?.category === "DEV" && (
+                                    <div className="relative group flex jusity-center items-center ml-4">
+                                      <Button_Action
+                                        class_name="mb-[1px]"
+                                        icon={OctagonMinus}
+                                        variant="danger"
+                                        tooltip="Reset"
+                                        on_click={() => handle_reset(row.id)}
                                       />
                                     </div>
                                   )}

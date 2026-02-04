@@ -135,7 +135,8 @@ const Create_PO = ({
         ...role,
         approval_status: "Pending",
       })),
-      po_status: "Pending",
+      po_status: "Approved", // FOR TESTING
+      // po_status: "Pending",
     };
 
     try {

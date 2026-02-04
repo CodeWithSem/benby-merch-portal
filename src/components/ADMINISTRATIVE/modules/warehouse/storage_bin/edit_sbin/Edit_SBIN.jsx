@@ -275,18 +275,26 @@ const Edit_SBIN = ({
               />
               <div>
                 <Text_Code_Field
-                  label="Item"
+                  label="Current Item"
                   code_width="150px"
                   show_search_button={false}
-                  code_value={edit_sbin_data.item_code}
+                  code_value={edit_sbin_data.current_item}
                   text_value={get_description(
-                    edit_sbin_data.item_code,
+                    edit_sbin_data.current_item,
                     item_master_list,
                     "item_code",
                     "item_desc",
                   )}
                   bg_dis_color="bg-slate-50"
                   text_dis_color="text-slate-500"
+                  disabled
+                />
+              </div>
+              <div>
+                <Text_Field
+                  label="Current Batch"
+                  type={"text"}
+                  value={edit_sbin_data.current_batch}
                   disabled
                 />
               </div>

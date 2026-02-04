@@ -61,8 +61,6 @@ const Select_Batch = ({
   useEffect(() => {
     let data = [...batch_list];
 
-    console.log("DATAAAA");
-    console.log(data);
     if (selected_receive_item?.id) {
       data = data.filter((d) => d.item_sort_id === selected_receive_item.id);
     }

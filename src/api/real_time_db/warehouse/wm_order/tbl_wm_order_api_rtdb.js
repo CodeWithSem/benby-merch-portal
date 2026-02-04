@@ -20,7 +20,7 @@ export const api_post_wm_orders_rtdb = async (
 
       const record_ref = ref(
         realtime_db,
-        `${get_realtime_path(TABLES.WM_ORDER)}/${process_type === "Goods Receipt" ? "GR" : "GI"}/${row.lpn_no}`,
+        `${get_realtime_path(TABLES.WM_TRANSACTION)}/${process_type === "Goods Receipt" ? "GR" : "GI"}/${row.lpn_no}`,
       );
 
       const payload = {
@@ -87,12 +87,12 @@ export const api_unpost_wm_orders_rtdb = async (
     }
 
     const updates = {};
-    const wm_base_path = get_realtime_path(TABLES.WM_ORDER);
+    const wm_base_path = get_realtime_path(TABLES.WM_TRANSACTION);
     const inv_base_path = get_realtime_path(TABLES.INVENTORY_MASTER);
     const path_suffix = process_type === "Goods Receipt" ? "GR" : "GI";
 
     wm_allocation_list.forEach((row) => {
-      // 1. Remove from WM_ORDER branch
+      // 1. Remove from WM_TRANSACTION branch
       if (row.lpn_no) {
         const wm_path = `${wm_base_path}/${path_suffix}/${row.lpn_no}`;
         updates[wm_path] = null;
@@ -127,11 +127,11 @@ export const api_unpost_wm_orders_rtdb = async (
 };
 
 export const api_get_wm_orders_rtdb_listener = (process_type, callback) => {
-  // Determine path: .../WM_ORDER/GR or .../WM_ORDER/GI
+  // Determine path: .../WM_TRANSACTION/GR or .../WM_TRANSACTION/GI
   const path_suffix = process_type === "Goods Receipt" ? "GR" : "GI";
   const record_ref = ref(
     realtime_db,
-    `${get_realtime_path(TABLES.WM_ORDER)}/${path_suffix}`,
+    `${get_realtime_path(TABLES.WM_TRANSACTION)}/${path_suffix}`,
   );
 
   // Set up the listener
@@ -169,7 +169,7 @@ export const api_update_wm_order_item_rtdb = async (
     const path_suffix = process_type === "Goods Receipt" ? "GR" : "GI";
     const record_ref = ref(
       realtime_db,
-      `${get_realtime_path(TABLES.WM_ORDER)}/${path_suffix}/${lpn_no}`,
+      `${get_realtime_path(TABLES.WM_TRANSACTION)}/${path_suffix}/${lpn_no}`,
     );
 
     // updates param should be an object: { quantity_confirm: X, transfer_order_status: '...' }

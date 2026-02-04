@@ -181,9 +181,9 @@ const PO_Items = ({
           {/* - Header */}
           {/* + Table */}
           <div className="max-w-full overflow-x-auto custom-scrollbar">
-            <table className="min-w-full text-left text-sm text-gray-700 dark:border-gray-800">
+            <table className="min-w-full text-left text-xs text-gray-700 dark:border-gray-800">
               <thead className="bg-gray-50 dark:bg-gray-900">
-                <tr className="border-b border-t border-gray-100 whitespace-nowrap dark:border-gray-800 text-sm">
+                <tr className="border-b border-t border-gray-100 whitespace-nowrap dark:border-gray-800">
                   <th className="px-5 py-4 font-semibold whitespace-nowrap text-gray-700 dark:text-gray-400">
                     No.
                   </th>
@@ -226,7 +226,7 @@ const PO_Items = ({
                       onDragStart={() => handle_drag_start(index)}
                       onDragOver={handle_drag_over}
                       onDrop={() => handle_drop(index)}
-                      className="text-sm hover:bg-gray-50/50"
+                      className="hover:bg-gray-50/50"
                     >
                       <td className="px-5 py-4 whitespace-nowrap text-gray-500 dark:text-gray-400">
                         {index + 1}

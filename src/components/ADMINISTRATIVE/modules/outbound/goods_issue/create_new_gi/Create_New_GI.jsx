@@ -36,6 +36,9 @@ const Create_New_GI = ({
         so_number,
         so_type_code: so_type,
         creation_date: so_creation_date,
+        plant_code,
+        warehouse_code,
+        sloc_code,
         selected_item_list,
       } = selected_so_data;
 
@@ -77,6 +80,9 @@ const Create_New_GI = ({
         so_number,
         so_type,
         so_creation_date,
+        plant_code,
+        warehouse_code,
+        sloc_code,
         issued_item_list, // Changed from received_item_list
         gi_status: "Approved", // FOR TESTING
         // gi_status: "Pending",

@@ -22,6 +22,7 @@ const Post_View_WMO_GI = ({
   view_wmo_data,
   for_posting,
   set_wm_order_list,
+  sbin_list,
 }) => {
   const [is_confirm_modal_open, set_is_confirm_modal_open] = useState(false);
   const [post_loading, set_post_loading] = useState(false);
@@ -66,6 +67,7 @@ const Post_View_WMO_GI = ({
             // 4. UPDATE BIN CAPACITIES (Math for PSA01 -qty and GIZ01 +qty)
             const bin_update_res = await api_update_gi_sbin_capacities_rtdb(
               view_wmo_data.wm_allocation_list,
+              sbin_list,
             );
 
             if (bin_update_res.success) {

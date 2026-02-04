@@ -21,6 +21,8 @@ import { item_master_list } from "assets/data/item_master_list";
 import { api_get_inventory_master_rtdb } from "api/real_time_db/warehouse/inventory_master/tbl_inventory_master_api_rtdb";
 import Spinner from "assets/elements/Spinner";
 import Button_Action from "assets/elements/Button_Action";
+import { warehouse_list } from "assets/data/warehouse_list";
+import Select_Generic from "assets/elements/modals/Select_Generic";
 
 const Inventory_Master = () => {
   const { show_toast } = useToast();
@@ -34,11 +36,29 @@ const Inventory_Master = () => {
   const [sort_order, set_sort_order] = useState("asc");
   const [search_query, set_search_query] = useState("");
   const [debounced_query, set_debounced_query] = useState("");
+  const [display_modal, set_display_modal] = useState("");
+  const [inventory_filter, set_inventory_filter] = useState({});
+
+  const select_modal_configs = [
+    {
+      key: "select_warehouse",
+      label: "Warehouse",
+      show_creation_date: true,
+      width: "max-w-[800px]",
+      list: warehouse_list,
+      column: ["Warehouse"],
+      code: ["warehouse_code"],
+      desc: ["warehouse_desc"],
+      lookup: [warehouse_list],
+      target: ["warehouse_code"],
+    },
+  ];
 
   // Columns change based on view_mode
   const columns = useMemo(() => {
     const base = [
       { key: "index", label: "No.", sortable: false },
+      { key: "warehouse_code", label: "Warehouse", sortable: true },
       { key: "item_code", label: "Item Code", sortable: true },
       { key: "item_desc", label: "Item Description", sortable: true },
       { key: "quantity_on_hand", label: "Quantity", sortable: true },
@@ -95,16 +115,27 @@ const Inventory_Master = () => {
       ),
     }));
 
+    // NEW: Filter by selected warehouse from inventory_filter
+    if (inventory_filter.warehouse_code) {
+      temp = temp.filter(
+        (item) => item.warehouse_code === inventory_filter.warehouse_code,
+      );
+    }
+
     // 2. Aggregate logic for "Per Item"
     if (view_mode === "item") {
       const aggregated = {};
 
       temp.forEach((item) => {
-        const { item_code, item_desc, quantity_on_hand, uom } = item;
+        const { item_code, item_desc, quantity_on_hand, uom, warehouse_code } =
+          item;
 
-        if (!aggregated[item_code]) {
+        const group_key = `${warehouse_code}_${item_code}`;
+
+        if (!aggregated[group_key]) {
           // Create a new object containing ONLY these specific fields
-          aggregated[item_code] = {
+          aggregated[group_key] = {
+            warehouse_code,
             item_code,
             item_desc,
             quantity_on_hand: Number(quantity_on_hand),
@@ -112,7 +143,7 @@ const Inventory_Master = () => {
           };
         } else {
           // Sum the quantity for the existing entry
-          aggregated[item_code].quantity_on_hand += Number(quantity_on_hand);
+          aggregated[group_key].quantity_on_hand += Number(quantity_on_hand);
         }
       });
 
@@ -143,7 +174,15 @@ const Inventory_Master = () => {
     });
 
     return temp;
-  }, [inv_item_list, view_mode, debounced_query, sort_by, sort_order, columns]);
+  }, [
+    inv_item_list,
+    view_mode,
+    debounced_query,
+    sort_by,
+    sort_order,
+    columns,
+    inventory_filter,
+  ]);
 
   const total_pages = Math.max(
     1,
@@ -231,6 +270,16 @@ const Inventory_Master = () => {
               label="Warehouse"
               code_width="150px"
               show_search_button={true}
+              has_clear_button={inventory_filter.warehouse_code}
+              on_clear={() => set_inventory_filter({})}
+              code_value={inventory_filter.warehouse_code}
+              text_value={get_description(
+                inventory_filter.warehouse_code,
+                warehouse_list,
+                "warehouse_code",
+                "warehouse_desc",
+              )}
+              on_click={() => set_display_modal("select_warehouse")}
               disabled
             />
           </div>
@@ -268,7 +317,7 @@ const Inventory_Master = () => {
                       on_change={(e) => set_search_query(e.target.value)}
                     />
                   </div>
-                  <div className="relative">
+                  {/* <div className="relative">
                     <Button
                       variant="white"
                       width="w-[100px]"
@@ -277,7 +326,7 @@ const Inventory_Master = () => {
                     >
                       Filter
                     </Button>
-                  </div>
+                  </div> */}
                 </div>
               </div>
 
@@ -391,6 +440,24 @@ const Inventory_Master = () => {
           </div>
         </div>
       </div>
+      {select_modal_configs.map((cfg) => (
+        <Select_Generic
+          key={cfg.key}
+          is_open={display_modal === cfg.key}
+          on_close={() => set_display_modal("")}
+          width={cfg.width}
+          height="max-h-[1280px]"
+          modal_label={cfg.label}
+          show_creation_date={cfg.show_creation_date}
+          column_names={cfg.column}
+          source_list={cfg.list}
+          source_code={cfg.code}
+          source_desc={cfg.desc}
+          lookup_lists={cfg.lookup}
+          target_field={cfg.target}
+          set_data={set_inventory_filter}
+        />
+      ))}
     </React.Fragment>
   );
 };

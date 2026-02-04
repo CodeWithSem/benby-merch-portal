@@ -61,8 +61,8 @@ export const api_create_inventory_master_rtdb = async (data, active_user) => {
       reference_wmo: data.wmo_number,
       reference_po: data.ref_number,
       reference_do: data.do_number,
-      confirm_by: active_user?.username || "SYSTEM",
-      confirm_date: format_date_1(get_date_now()),
+      posted_by: active_user?.username || "SYSTEM",
+      posted_date: format_date_1(get_date_now()),
     };
 
     await set(record_ref, payload);
@@ -73,9 +73,6 @@ export const api_create_inventory_master_rtdb = async (data, active_user) => {
   }
 };
 
-/**
- * Creates multiple flat inventory records in one atomic request
- */
 export const api_bulk_create_inventory_master_rtdb = async (
   wm_allocation_list,
   meta,
@@ -91,37 +88,66 @@ export const api_bulk_create_inventory_master_rtdb = async (
     const timestamp = format_date_1(get_date_now());
     const username = active_user?.username || "SYSTEM";
 
-    wm_allocation_list.forEach((item) => {
-      if (!item.to_sbin_code) return;
+    // 1. Fetch current state of all bins to check for existing stock
+    const dbRef = ref(realtime_db, base_path);
+    const snapshot = await get(dbRef);
+    const currentInventory = snapshot.val() || {};
 
-      const payload = {
-        id: item.to_sbin_code,
-        lpn_no: item.lpn_no,
-        inventory_status: "Active",
-        // Location (Flat)
-        sbin_code: item.to_sbin_code,
-        stype_code: item.to_stype_code,
-        // Product (Flat)
-        item_code: item.item_code,
-        quantity_on_hand: item.quantity,
-        uom: item.uom,
-        pallet_config: item.pallet_config,
-        sutype: item.sutype,
-        // Tracking (Flat)
-        batch_code: item.batch_code,
-        manufacture_date: item.manufacture_date,
-        sled_bbd: item.sled_bbd,
-        // Audit (Flat)
-        reference_wmo: meta.wmo_number,
-        reference_po: meta.ref_number,
-        reference_do: meta.do_number,
-        confirm_by: username,
-        confirm_date: timestamp,
-      };
+    for (const item of wm_allocation_list) {
+      if (!item.to_sbin_code) continue;
 
-      updates[`${base_path}/${item.to_sbin_code}`] = payload;
-    });
+      const binCode = item.to_sbin_code;
+      const existingBinData = currentInventory[binCode];
 
+      if (existingBinData) {
+        // 2. VALIDATION: Check if the Item and Batch match
+        const isSameItem = existingBinData.item_code === item.item_code;
+        const isSameBatch = existingBinData.batch_code === item.batch_code;
+
+        if (!isSameItem || !isSameBatch) {
+          // If they don't match, we stop the process for this item to prevent mixing
+          throw new Error(
+            `Validation Failed: Bin ${binCode} already contains a different Item/Batch. ` +
+              `Existing: ${existingBinData.item_code} (Batch: ${existingBinData.batch_code})`,
+          );
+        }
+
+        // 3. Logic for EXISTING matching bin: Update Quantity & Audit
+        updates[`${base_path}/${binCode}/quantity_on_hand`] = increment(
+          item.quantity,
+        );
+        updates[`${base_path}/${binCode}/posted_by`] = username;
+        updates[`${base_path}/${binCode}/posted_date`] = timestamp;
+        updates[`${base_path}/${binCode}/reference_wmo`] = meta.wmo_number;
+      } else {
+        // 4. Logic for EMPTY bin: Create fresh record
+        updates[`${base_path}/${binCode}`] = {
+          id: binCode,
+          lpn_no: item.lpn_no,
+          inventory_status: "Active",
+          plant_code: item.plant_code,
+          warehouse_code: item.warehouse_code,
+          sloc_code: item.sloc_code,
+          sbin_code: binCode,
+          stype_code: item.to_stype_code,
+          item_code: item.item_code,
+          quantity_on_hand: item.quantity, // New entry, standard set
+          uom: item.uom,
+          pallet_config: item.pallet_config,
+          sutype: item.sutype,
+          batch_code: item.batch_code,
+          manufacture_date: item.manufacture_date,
+          sled_bbd: item.sled_bbd,
+          reference_wmo: meta.wmo_number,
+          reference_po: meta.ref_number,
+          reference_do: meta.do_number,
+          posted_by: username,
+          posted_date: format_date_1(get_date_now()),
+        };
+      }
+    }
+
+    // 5. Execute all updates as a single atomic transaction
     await update(ref(realtime_db), updates);
     return { success: true };
   } catch (error) {
@@ -180,12 +206,14 @@ export const api_bulk_transfer_inventory_master_rtdb = async (
             reference_wmo: meta.wmo_number,
             reference_po: meta.ref_number,
             reference_do: meta.do_number,
-            confirm_by: username,
-            confirm_date: timestamp,
+            posted_by: username,
+            posted_date: format_date_1(get_date_now()),
           };
         } else {
           // If bin already has items, just increment the quantity
           updates[`${dest_path}/quantity_on_hand`] = increment(qty);
+          updates[`${dest_path}/posted_by`] = username;
+          updates[`${dest_path}/posted_date`] = format_date_1(get_date_now());
         }
       }
     }

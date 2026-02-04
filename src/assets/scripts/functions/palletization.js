@@ -75,6 +75,7 @@ export function generate_gr_pallets({ selected_do, item_master_list }) {
           manufacture_date: batch.manufacture_date,
           sled_bbd: batch.sled_bbd,
           plant_code: batch.plant_code,
+          warehouse_code: batch.warehouse_code,
           sloc_code: batch.sloc_code,
           uom: "CS",
         });
@@ -85,13 +86,19 @@ export function generate_gr_pallets({ selected_do, item_master_list }) {
   return pallets;
 }
 
-export function allocate_lpn_to_bins({ pallets, item_master_list, sbin_list }) {
+export function allocate_lpn_to_bins({
+  selected_do,
+  pallets,
+  item_master_list,
+  sbin_list,
+}) {
+  const do_warehouse = selected_do?.warehouse_code;
   // 1. Setup Virtual Bin tracking
   let virtual_bins = sbin_list.map((bin) => ({
     ...bin,
     current_capacity: bin.bin_capacity || 0,
-    // NEW: Track which item is currently assigned to this bin
-    occupied_by: null,
+    occupied_by_item: bin.current_item || null, // Read existing Item Lock
+    occupied_by_batch: bin.current_batch || null, // Read existing Batch Lock
   }));
 
   const source_bin = virtual_bins.find(
@@ -117,20 +124,28 @@ export function allocate_lpn_to_bins({ pallets, item_master_list, sbin_list }) {
 
     const dest_stype = item.wm1_stock_dest_code;
 
-    // 3. Find Suitable Destination Bin with "Same Item Only" rule
+    // 3. Find Suitable Destination Bin
     const target_bin = virtual_bins.find((b) => {
+      const is_correct_warehouse = b.warehouse_code === do_warehouse;
       const is_correct_type = b.stype_code === dest_stype;
       const is_available = b.status === "Available";
       const has_capacity =
         b.max_bin_capacity - b.current_capacity >= pallet.quantity;
 
-      // NEW LOGIC:
-      // Bin must either be empty (occupied_by === null)
-      // OR already holding the same item (occupied_by === pallet.item_code)
-      const is_not_mixed =
-        b.occupied_by === null || b.occupied_by === pallet.item_code;
+      // UPDATED LOGIC:
+      // Bin must be empty OR (same item AND same batch)
+      const is_same_batch =
+        b.occupied_by_item === null ||
+        (b.occupied_by_item === pallet.item_code &&
+          b.occupied_by_batch === pallet.batch_code);
 
-      return is_correct_type && is_available && has_capacity && is_not_mixed;
+      return (
+        is_correct_warehouse &&
+        is_correct_type &&
+        is_available &&
+        has_capacity &&
+        is_same_batch
+      );
     });
 
     if (target_bin) {
@@ -144,18 +159,14 @@ export function allocate_lpn_to_bins({ pallets, item_master_list, sbin_list }) {
 
       // 4. Update Virtual Bin state
       target_bin.current_capacity += pallet.quantity;
-      // Lock this bin to this specific item code
-      target_bin.occupied_by = pallet.item_code;
+      // Lock this bin to this specific item AND batch
+      target_bin.occupied_by_item = pallet.item_code;
+      target_bin.occupied_by_batch = pallet.batch_code;
     } else {
       allocations.push({
         item_code: pallet.item_code,
         item_desc: pallet.item_desc,
         quantity: pallet.quantity,
-        // ...pallet,
-        // from_stype_code: "GRZ",
-        // from_sbin_code: source_bin?.sbin_code || "GRZ01",
-        // to_stype_code: dest_stype,
-        // to_sbin_code: null,
         remarks: "NO AVAILABLE BIN",
       });
     }
@@ -164,7 +175,7 @@ export function allocate_lpn_to_bins({ pallets, item_master_list, sbin_list }) {
   return allocations;
 }
 
-export function generate_wm_orders({
+export function generate_gr_wm_orders({
   selected_do,
   item_master_list,
   sbin_list,
@@ -174,6 +185,7 @@ export function generate_wm_orders({
 
   // 2️⃣ Allocate pallets to storage bins (1 LPN = 1 bin)
   const wm_allocation_list = allocate_lpn_to_bins({
+    selected_do,
     pallets,
     item_master_list,
     sbin_list,

@@ -68,12 +68,6 @@ const WM_Items = ({ new_wmo_data }) => {
                 <th className="px-5 py-4 font-semibold border-r">
                   WM Order UoM
                 </th>
-                <th className="px-5 py-4 font-semibold border-r">
-                  Confirmed Qty
-                </th>
-                <th className="px-5 py-4 font-semibold border-r">
-                  Confirmed UoM
-                </th>
                 <th className="px-5 py-4 font-semibold border-r">Batch</th>
                 <th className="px-5 py-4 font-semibold border-r">
                   Source Storage Bin
@@ -113,10 +107,6 @@ const WM_Items = ({ new_wmo_data }) => {
                   <td className="px-5 py-4 border-r">{item.item_code}</td>
                   <td className="px-5 py-4 border-r">{item.item_desc}</td>
                   <td className="px-5 py-4 border-r">{item.quantity}</td>
-                  <td className="px-5 py-4 border-r">{item.uom}</td>
-                  <td className="px-5 py-4 border-r">
-                    {item.quantity_confirmed}
-                  </td>
                   <td className="px-5 py-4 border-r">{item.uom}</td>
                   <td className="px-5 py-4 border-r">{item.batch_code}</td>
                   <td className="px-5 py-4 border-r">{item.from_sbin_code}</td>

@@ -721,7 +721,7 @@ const Purchase_Order = () => {
                                         on_click={() => handle_view_po(row)}
                                       />
                                     </div>
-                                    {row.po_status === "Pending" && (
+                                    {row.po_status === "Approved" && (
                                       <div className="relative group flex jusity-center items-center">
                                         <Button_Action
                                           icon={FileInput}

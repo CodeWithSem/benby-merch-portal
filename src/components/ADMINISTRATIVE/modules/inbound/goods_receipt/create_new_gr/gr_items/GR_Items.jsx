@@ -17,7 +17,6 @@ const GR_Items = ({
   const [display_item_modal, set_display_item_modal] = useState("");
 
   const handle_select_receive_item = (item) => {
-    console.log(item);
     set_selected_receive_item(item);
     set_display_item_modal("select_batch");
   };

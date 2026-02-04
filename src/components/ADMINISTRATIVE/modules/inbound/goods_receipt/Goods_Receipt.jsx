@@ -213,7 +213,6 @@ const Goods_Receipt = () => {
   const handle_get_batch_master_list = async () => {
     const response = await api_get_batch_master_list();
     if (response.success) {
-      console.log(response.data);
       set_batch_list(response.data);
     } else {
       console.error(response.message);

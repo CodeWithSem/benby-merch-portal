@@ -30,7 +30,7 @@ const Shipping = ({ so_data }) => {
                 "plant_desc",
               )}
               bg_dis_color="bg-slate-50"
-              text_dis_color="text-slate-50"
+              text_dis_color="text-slate-500"
               disabled
             />
           </div>
@@ -47,7 +47,7 @@ const Shipping = ({ so_data }) => {
                 "warehouse_desc",
               )}
               bg_dis_color="bg-slate-50"
-              text_dis_color="text-slate-50"
+              text_dis_color="text-slate-500"
               disabled
             />
           </div>
@@ -64,7 +64,7 @@ const Shipping = ({ so_data }) => {
                 "sloc_desc",
               )}
               bg_dis_color="bg-slate-50"
-              text_dis_color="text-slate-50"
+              text_dis_color="text-slate-500"
               disabled
             />
           </div>

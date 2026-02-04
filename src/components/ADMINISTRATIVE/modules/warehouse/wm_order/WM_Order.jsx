@@ -97,7 +97,6 @@ const WM_Order = () => {
       if (error) {
         console.error("Failed to fetch bins:", error);
       } else {
-        console.log(data);
         set_sbin_list(data);
       }
       // set_loading_list(false);
@@ -106,7 +105,7 @@ const WM_Order = () => {
     return () => unsubscribe();
   };
   // - Get Storage Bin
-  // + Get Storage Bin
+  // + Get Inventory
   const handle_get_inventory_master_list = async () => {
     const unsubscribe = api_get_inventory_master_rtdb((data, error) => {
       if (error) {
@@ -114,11 +113,11 @@ const WM_Order = () => {
       } else {
         set_inventory_master_list(data || []);
       }
-      set_loading(false);
+      // set_loading(false);
     });
     return () => unsubscribe();
   };
-  // - Get Storage Bin
+  // - Get Inventory
   useEffect(() => {
     handle_get_sbin_list();
     handle_get_inventory_master_list();
@@ -826,6 +825,7 @@ const WM_Order = () => {
           view_wmo_data={view_wmo_data}
           for_posting={for_posting}
           set_wm_order_list={set_wm_order_list}
+          sbin_list={sbin_list}
         />
       )}
       {/* - Pages */}

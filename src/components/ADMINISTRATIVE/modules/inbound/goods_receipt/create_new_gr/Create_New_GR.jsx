@@ -33,6 +33,9 @@ const Create_New_GR = ({
         po_number,
         po_type_code: po_type,
         creation_date: po_creation_date,
+        plant_code,
+        warehouse_code,
+        sloc_code,
         selected_item_list,
       } = selected_po_data;
 
@@ -70,6 +73,9 @@ const Create_New_GR = ({
         po_number,
         po_type,
         po_creation_date,
+        plant_code,
+        warehouse_code,
+        sloc_code,
         received_item_list,
         gr_status: "Approved", // FOR TESTING
         // gr_status: "Pending",

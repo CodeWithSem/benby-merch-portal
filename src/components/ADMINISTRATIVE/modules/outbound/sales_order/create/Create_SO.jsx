@@ -97,11 +97,10 @@ const Create_SO = ({ set_page, active_user, so_data }) => {
     const final_so_data = {
       ...new_so_data,
       selected_item_list: items_with_tracking,
-      so_status: "Posted", // FOR TESTING
+      so_status: "Approved", // FOR TESTING
       // so_status: "Pending",
     };
 
-    console.log(final_so_data);
     try {
       set_create_loading(true);
       const response = await api_create_sales_order(

@@ -103,6 +103,8 @@ export const api_create_sbin_rtdb = async (new_data, user, show_toast) => {
       id: new_data.sbin_code, // Ensuring the ID inside the object matches the key
       bin_capacity: 0,
       status: "Available",
+      current_item: "",
+      current_batch: "",
       creation_date: format_date_1(get_date_now()),
       created_by: user || "N/A",
     };
@@ -317,6 +319,57 @@ export const api_truncate_sbin_rtdb = async (show_toast) => {
   }
 };
 // - Truncate
+// + Reset Bin
+export const api_reset_sbin_rtdb = async (sbin_code, show_toast) => {
+  try {
+    if (!sbin_code) throw new Error("Bin code is required");
+
+    const sbin_path = get_realtime_path(TABLES.STORAGE_BIN_MASTER);
+    const doc_ref = ref(realtime_db, `${sbin_path}/${sbin_code}`);
+
+    // Define the reset values
+    const reset_data = {
+      bin_capacity: 0,
+      current_item: "",
+      current_batch: "",
+      status: "Available", // Resetting to available as it's now empty
+    };
+
+    // Update only the specific fields
+    await update(doc_ref, reset_data);
+
+    if (show_toast) {
+      show_toast({
+        type: "success",
+        title: "Reset Successfully",
+        message: `${sbin_code} has been reset.`,
+        icon: <CheckCircle2 size={21} className="text-green-500" />,
+      });
+    }
+
+    return {
+      success: true,
+      message: `Bin ${sbin_code} has been reset.`,
+    };
+  } catch (error) {
+    console.error("Error resetting bin: ", error);
+
+    if (show_toast) {
+      show_toast({
+        type: "danger",
+        title: "Reset Failed",
+        message: "Something went wrong while resetting the bin.",
+        icon: <CircleX size={21} className="text-red-500" />,
+      });
+    }
+
+    return {
+      success: false,
+      message: error.message || "Failed to reset bin",
+    };
+  }
+};
+// - Reset Bin
 // + Bulk Push
 export const api_bulk_push_sbin_master_rtdb = async (sbin_list) => {
   try {
@@ -410,11 +463,17 @@ export const api_update_gr_sbin_capacities_rtdb = async (allocation_list) => {
     allocation_list.forEach((item) => {
       const qty = Number(item.quantity);
 
-      // We only update the Destination Bin (Rack/Storage)
-      // GRZ01 is the virtual entry point, so we focus on the bin receiving the stock
       if (item.to_sbin_code) {
-        const dest_path = `${base_path}/${item.to_sbin_code}/bin_capacity`;
-        updates[dest_path] = increment(qty);
+        const bin_path = `${base_path}/${item.to_sbin_code}`;
+
+        // 1. Update the numeric capacity
+        updates[`${bin_path}/bin_capacity`] = increment(qty);
+
+        // 2. Set the "Lock" - These will overwrite with the current item/batch
+        // Since all pallets in one allocation for one bin MUST be the same batch,
+        // it is safe to set these repeatedly in the loop or once.
+        updates[`${bin_path}/current_item`] = item.item_code;
+        updates[`${bin_path}/current_batch`] = item.batch_code;
       }
     });
 
@@ -422,19 +481,19 @@ export const api_update_gr_sbin_capacities_rtdb = async (allocation_list) => {
 
     return {
       success: true,
-      message: "Storage bin capacities updated for GR successfully",
+      message: "Storage bin state updated (Capacity + Batch Lock) successfully",
     };
   } catch (error) {
     console.error("Error updating GR bin capacities: ", error);
-    return {
-      success: false,
-      message: error.message || "Failed to update bin capacities",
-    };
+    return { success: false, message: error.message };
   }
 };
 // _ Transfer Bin Capacity (GR)
 // + Transfer Bin Capacity (GI)
-export const api_update_gi_sbin_capacities_rtdb = async (allocation_list) => {
+export const api_update_gi_sbin_capacities_rtdb = async (
+  allocation_list,
+  sbin_list,
+) => {
   try {
     if (!Array.isArray(allocation_list) || allocation_list.length === 0) {
       return { success: false, message: "No allocation data provided" };
@@ -446,32 +505,43 @@ export const api_update_gi_sbin_capacities_rtdb = async (allocation_list) => {
     allocation_list.forEach((item) => {
       const qty = Number(item.quantity);
 
-      // 1. Update Source Bin (Subtracting capacity)
+      // 1. Update Source Bin (The bin we are picking FROM)
       if (item.from_sbin_code) {
-        const source_path = `${base_path}/${item.from_sbin_code}/bin_capacity`;
-        updates[source_path] = increment(-qty);
+        const bin_path = `${base_path}/${item.from_sbin_code}`;
+
+        // Find the bin in the master list to check its current state
+        const current_bin_data = sbin_list.find(
+          (b) => b.sbin_code === item.from_sbin_code,
+        );
+        const current_qty = current_bin_data?.bin_capacity || 0;
+
+        // Subtract capacity
+        updates[`${bin_path}/bin_capacity`] = increment(-qty);
+
+        // RESET LOGIC: If the resulting capacity will be 0, wipe the locks
+        if (current_qty - qty <= 0) {
+          updates[`${bin_path}/current_item`] = null;
+          updates[`${bin_path}/current_batch`] = null;
+        }
       }
 
-      // 2. Update Destination Bin (Adding capacity)
+      // 2. Update Destination Bin (The bin we are moving TO)
       if (item.to_sbin_code) {
-        const dest_path = `${base_path}/${item.to_sbin_code}/bin_capacity`;
-        updates[dest_path] = increment(qty);
+        const bin_path = `${base_path}/${item.to_sbin_code}`;
+        updates[`${bin_path}/bin_capacity`] = increment(qty);
+
+        // Ensure the destination bin gets the "lock" of the item being moved
+        updates[`${bin_path}/current_item`] = item.item_code;
+        updates[`${bin_path}/current_batch`] = item.batch_code;
       }
     });
 
-    // Execute all updates at once
     await update(ref(realtime_db), updates);
 
-    return {
-      success: true,
-      message: "Storage bin capacities updated successfully",
-    };
+    return { success: true, message: "Storage bin state synchronized" };
   } catch (error) {
     console.error("Error updating bin capacities: ", error);
-    return {
-      success: false,
-      message: error.message || "Failed to update bin capacities",
-    };
+    return { success: false, message: error.message };
   }
 };
 // - Transfer Bin Capacity (GI)

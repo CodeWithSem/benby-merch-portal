@@ -60,7 +60,7 @@ const Text_Code_Field = ({
 
   const button_wrapper_class = `flex-shrink-0 p-1`; // Prevent shrinking, preserve spacing
   const button_class = `inline-flex items-center justify-center px-2 h-full bg-sky-600 text-white hover:bg-sky-700 transition-colors rounded-[5px] outline-none`;
-  const clear_button_class = `inline-flex items-center justify-center px-2 h-full text-red-500 bg-red-100 hover:bg-red-200 transition-colors rounded-[5px] outline-none`;
+  const clear_button_class = `inline-flex items-center justify-center px-2 h-full text-gray-500 bg-gray-100 hover:bg-gray-200 transition-colors rounded-[5px] outline-none`;
 
   return (
     <label className="block">

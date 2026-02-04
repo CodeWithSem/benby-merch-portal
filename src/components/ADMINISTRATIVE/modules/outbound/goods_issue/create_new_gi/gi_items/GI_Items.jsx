@@ -20,16 +20,24 @@ const GI_Items = ({
   // 2. Aggregate On-Hand Quantity by Item Code (Excluding GIZ)
   const on_hand_lookup = useMemo(() => {
     const totals = {};
+    const target_warehouse = selected_so_data?.warehouse_code;
+    if (!target_warehouse) return totals;
+
     inv_item_list.forEach((entry) => {
-      // FIX: Only add to total if the storage type is NOT 'GIZ'
-      if (entry.stype_code !== "GIZ") {
+      // 1. Must match the Sales Order Warehouse
+      // 2. Storage type must NOT be 'GIZ' (Goods Issue Zone/Pending)
+      if (
+        entry.warehouse_code === target_warehouse &&
+        entry.stype_code !== "GIZ"
+      ) {
         const code = entry.item_code;
         const qty = Number(entry.quantity_on_hand) || 0;
         totals[code] = (totals[code] || 0) + qty;
       }
     });
+
     return totals;
-  }, [inv_item_list]);
+  }, [inv_item_list, selected_so_data?.warehouse_code]);
 
   const handle_open_quantity_input = (item) => {
     set_target_item(item);
