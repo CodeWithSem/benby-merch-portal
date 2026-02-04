@@ -9,6 +9,8 @@ export function generate_gi_wm_orders({
 }) {
   if (!selected_gi?.issued_item_list) return [];
 
+  const target_warehouse = selected_gi?.warehouse_code;
+
   const wm_allocation_list = [];
 
   // 1. Setup Virtual Inventory (track stock being taken)
@@ -33,6 +35,7 @@ export function generate_gi_wm_orders({
     const available_stock = virtual_inventory
       .filter(
         (inv) =>
+          inv.warehouse_code === target_warehouse &&
           inv.item_code === gi_item.item_code &&
           inv.quantity_on_hand > 0 &&
           inv.inventory_status === "Active" &&
@@ -93,6 +96,15 @@ export function generate_gi_wm_orders({
       inv_record.quantity_on_hand -= take_quantity;
       remaining_to_pick -= take_quantity;
       target_bin.current_capacity += take_quantity;
+    }
+
+    if (remaining_to_pick > 0) {
+      wm_allocation_list.push({
+        item_code: gi_item.item_code,
+        item_desc: gi_item.item_desc,
+        quantity: remaining_to_pick,
+        remarks: "INSUFFICIENT STOCK",
+      });
     }
   });
 

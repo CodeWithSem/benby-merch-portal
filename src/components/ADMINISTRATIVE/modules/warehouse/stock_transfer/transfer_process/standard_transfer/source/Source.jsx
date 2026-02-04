@@ -56,7 +56,7 @@ const Source = ({ selected_items, set_selected_items }) => {
 
   // + Client-Side Filtering
   const [filtered_source_item_list, set_filtered_source_item_list] = useState(
-    []
+    [],
   );
   const [loading, set_loading] = useState(false);
   const [select_option, set_select_option] = useState(5);
@@ -84,7 +84,7 @@ const Source = ({ selected_items, set_selected_items }) => {
           if (col.key === "actions") return false;
           const val = u[col.key];
           return val?.toString().toLowerCase().includes(q);
-        })
+        }),
       );
     }
 
@@ -122,9 +122,9 @@ const Source = ({ selected_items, set_selected_items }) => {
               ?.toString()
               .toLowerCase()
               .includes(debounced_query.toLowerCase());
-          })
+          }),
         ).length
-      : source_item_list.length) / select_option
+      : source_item_list.length) / select_option,
   );
 
   const handle_sort = (column) => {
@@ -300,7 +300,7 @@ const Source = ({ selected_items, set_selected_items }) => {
                                 box_size={20}
                                 icon_size={12}
                                 checked={selected_items.some(
-                                  (item) => item.id === row.id
+                                  (item) => item.id === row.id,
                                 )}
                                 on_change={(e) => {
                                   if (e.target.checked) {
@@ -310,7 +310,7 @@ const Source = ({ selected_items, set_selected_items }) => {
                                     ]);
                                   } else {
                                     set_selected_items((prev) =>
-                                      prev.filter((item) => item.id !== row.id)
+                                      prev.filter((item) => item.id !== row.id),
                                     );
                                   }
                                 }}

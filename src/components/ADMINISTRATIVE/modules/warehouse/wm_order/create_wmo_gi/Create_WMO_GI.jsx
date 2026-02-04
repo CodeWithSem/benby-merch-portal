@@ -21,17 +21,22 @@ const Create_WMO_GI = ({
 
   const handle_create_wmo = async () => {
     try {
-      const has_bin_error = new_wmo_data.wm_allocation_list?.some(
-        (item) => item.remarks === "NO AVAILABLE BIN",
+      const error_item = new_wmo_data.wm_allocation_list?.find(
+        (item) => item.remarks,
       );
 
-      if (has_bin_error) {
+      if (error_item) {
+        const is_bin_error = error_item.remarks === "NO AVAILABLE BIN";
+
         show_toast({
           type: "danger",
           title: "Invalid",
-          message: "Some items have no available bins.",
+          message: is_bin_error
+            ? "Some items have no available bins."
+            : "You have insufficient stock.",
           icon: <CircleX size={21} className="text-red-500" />,
         });
+
         set_is_confirm_modal_open(false);
         return;
       }
