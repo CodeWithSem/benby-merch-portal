@@ -10,11 +10,12 @@ import { get_description } from "assets/scripts/functions/get_description";
 import { format_date_1, get_date_now } from "assets/scripts/format";
 import Pillspin_Source from "./pillspin_transfer/source/Pillspin_Source";
 import G2_Destination from "./pillspin_transfer/destination/G2_Destination";
+import Plant_To_Plant from "./plant_to_plant/Plant_To_Plant";
 
 const Transfer_Process = ({ set_page }) => {
   const [display_modal, set_display_modal] = useState("");
   const [transfer_post_data, set_transfer_post_data] = useState([]);
-  const [selected_items, set_selected_items] = useState([]);
+  const [selected_item_list, set_selected_item_list] = useState([]);
   const handle_save_transfer = () => {
     const transfer_data = {
       batch_code: "ITM-00001_B1",
@@ -33,7 +34,7 @@ const Transfer_Process = ({ set_page }) => {
       transfer_order_status: "Pending",
       uom: "CS",
     };
-    console.log(selected_items);
+    console.log(selected_item_list);
   };
 
   const select_modal_configs = [
@@ -132,57 +133,12 @@ const Transfer_Process = ({ set_page }) => {
         </div>
         {/* + Section 1 */}
         {transfer_post_data.movement_type_code === "TP01" && (
-          <React.Fragment>
-            <div>
-              <Source
-                selected_items={selected_items}
-                set_selected_items={set_selected_items}
-                set_page={set_page}
-              />
-            </div>
-            {/* - Section 1 */}
-            {/* + Section 2 */}
-            <div className="my-5 w-full flex justify-center items-center text-sky-600">
-              <ChevronsDown size={42} />
-            </div>
-            {/* - Section 2 */}
-            {/* + Section 3 */}
-            <div>
-              <Destination
-                selected_items={selected_items}
-                set_selected_items={set_selected_items}
-                set_page={set_page}
-              />
-            </div>
-            {/* - Section 3 */}
-          </React.Fragment>
-        )}
-        {transfer_post_data.movement_type_code === "TP02" && (
-          <React.Fragment>
-            <div>
-              <Pillspin_Source
-                selected_items={selected_items}
-                set_selected_items={set_selected_items}
-                set_page={set_page}
-              />
-            </div>
-            {/* - Section 1 */}
-            {/* + Section 2 */}
-            <div className="my-5 w-full flex justify-center items-center text-sky-600">
-              <ChevronsDown size={42} />
-            </div>
-            {/* - Section 2 */}
-            {/* + Section 3 */}
-            <div>
-              <G2_Destination
-                selected_items={selected_items}
-                set_selected_items={set_selected_items}
-                handle_save_transfer={handle_save_transfer}
-                set_page={set_page}
-              />
-            </div>
-            {/* - Section 3 */}
-          </React.Fragment>
+          <Plant_To_Plant
+            transfer_data={{
+              selected_item_list,
+              set_selected_item_list,
+            }}
+          />
         )}
       </div>
       {/* + Modals */}

@@ -10,6 +10,9 @@ import {
   SlidersHorizontal,
   MapPin,
   Package,
+  Trash,
+  Edit,
+  Trash2,
 } from "lucide-react";
 import Button from "assets/elements/Button";
 import Icon_Field from "assets/elements/Icon_Field";
@@ -18,18 +21,27 @@ import Text_Code_Field from "assets/elements/Text_Code_Field";
 import Pagination from "assets/elements/Pagination";
 import { get_description } from "assets/scripts/functions/get_description";
 import { item_master_list } from "assets/data/item_master_list";
-import { api_get_inventory_master_rtdb } from "api/real_time_db/warehouse/inventory_master/tbl_inventory_master_api_rtdb";
+import {
+  api_delete_inventory_rtdb,
+  api_get_inventory_master_rtdb,
+  api_truncate_inventory_rtdb,
+} from "api/real_time_db/warehouse/inventory_master/tbl_inventory_master_api_rtdb";
 import Spinner from "assets/elements/Spinner";
 import Button_Action from "assets/elements/Button_Action";
 import { warehouse_list } from "assets/data/warehouse_list";
 import Select_Generic from "assets/elements/modals/Select_Generic";
+import { Use_App } from "context/app_context";
+import Edit_Inventory from "./edit/Edit_Inventory";
+import { sloc_list } from "assets/data/sloc_list";
 
 const Inventory_Master = () => {
+  const { active_user } = Use_App();
   const { show_toast } = useToast();
   const [show_filter, set_show_filter] = useState(false);
   const [view_mode, set_view_mode] = useState("bin"); // "bin" or "item"
   const [inv_item_list, set_inv_item_list] = useState([]);
   const [loading, set_loading] = useState(false);
+  const [truncate_loading, set_truncate_loading] = useState(false);
   const [show_entries, set_show_entries] = useState(5);
   const [current_page, set_current_page] = useState(1);
   const [sort_by, set_sort_by] = useState("id");
@@ -38,6 +50,8 @@ const Inventory_Master = () => {
   const [debounced_query, set_debounced_query] = useState("");
   const [display_modal, set_display_modal] = useState("");
   const [inventory_filter, set_inventory_filter] = useState({});
+
+  const [edit_inv_data, set_edit_inv_data] = useState({});
 
   const select_modal_configs = [
     {
@@ -52,13 +66,27 @@ const Inventory_Master = () => {
       lookup: [warehouse_list],
       target: ["warehouse_code"],
     },
+    {
+      key: "select_sloc",
+      label: "Storage Location",
+      show_creation_date: true,
+      width: "max-w-[800px]",
+      list: sloc_list,
+      column: ["Storage Location"],
+      code: ["sloc_code"],
+      desc: ["sloc_desc"],
+      lookup: [sloc_list],
+      target: ["sloc_code"],
+    },
   ];
 
   // Columns change based on view_mode
   const columns = useMemo(() => {
     const base = [
       { key: "index", label: "No.", sortable: false },
+      { key: "plant_code", label: "Plant", sortable: true },
       { key: "warehouse_code", label: "Warehouse", sortable: true },
+      { key: "sloc_code", label: "SLOC", sortable: true },
       { key: "item_code", label: "Item Code", sortable: true },
       { key: "item_desc", label: "Item Description", sortable: true },
       { key: "quantity_on_hand", label: "Quantity", sortable: true },
@@ -122,27 +150,44 @@ const Inventory_Master = () => {
       );
     }
 
+    if (inventory_filter.sloc_code) {
+      temp = temp.filter(
+        (item) => item.sloc_code === inventory_filter.sloc_code,
+      );
+    }
+
     // 2. Aggregate logic for "Per Item"
     if (view_mode === "item") {
       const aggregated = {};
 
       temp.forEach((item) => {
-        const { item_code, item_desc, quantity_on_hand, uom, warehouse_code } =
-          item;
+        // 1. Destructure plant_code and sloc_code
+        const {
+          plant_code,
+          warehouse_code,
+          sloc_code,
+          item_code,
+          item_desc,
+          quantity_on_hand,
+          uom,
+        } = item;
 
-        const group_key = `${warehouse_code}_${item_code}`;
+        // 2. Update group_key to include plant and sloc
+        // This ensures that if the same item exists in two different SLOCs,
+        // they stay as separate rows in "Per Item" view.
+        const group_key = `${plant_code}_${warehouse_code}_${sloc_code}_${item_code}`;
 
         if (!aggregated[group_key]) {
-          // Create a new object containing ONLY these specific fields
           aggregated[group_key] = {
+            plant_code, // Included
             warehouse_code,
+            sloc_code, // Included
             item_code,
             item_desc,
             quantity_on_hand: Number(quantity_on_hand),
             uom,
           };
         } else {
-          // Sum the quantity for the existing entry
           aggregated[group_key].quantity_on_hand += Number(quantity_on_hand);
         }
       });
@@ -207,6 +252,32 @@ const Inventory_Master = () => {
     console.log(row);
   };
 
+  const handle_edit = (row) => {
+    set_edit_inv_data(row);
+    set_display_modal("edit");
+  };
+
+  const handle_delete = async (sbin_code) => {
+    try {
+      if (window.confirm(`Are you sure you want to Delete ${sbin_code}?`)) {
+        await api_delete_inventory_rtdb(sbin_code, show_toast);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handle_truncate = async () => {
+    try {
+      set_truncate_loading(true);
+      await api_truncate_inventory_rtdb(show_toast);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      set_truncate_loading(false);
+    }
+  };
+
   return (
     <React.Fragment>
       <div className="w-full">
@@ -230,58 +301,101 @@ const Inventory_Master = () => {
         <div className="w-full bg-white rounded-lg border">
           <div className="flex flex-wrap items-center justify-between gap-3 p-5">
             <h1 className="text-lg">Inventory Master</h1>
-
             {/* START: YOUR REQUESTED DESIGN */}
-            <div className="flex bg-gray-100 p-1 rounded-lg border">
-              <button
-                onClick={() => {
-                  set_view_mode("bin");
-                  set_current_page(1);
-                  set_sort_by("sbin_code");
-                }}
-                className={`flex items-center gap-2 px-4 py-1.5 text-xs rounded-md transition-all outline-none ${
-                  view_mode === "bin"
-                    ? "bg-white shadow-sm text-sky-600"
-                    : "text-gray-500 hover:text-gray-700"
-                }`}
-              >
-                <MapPin size={14} /> Per Bin
-              </button>
-              <button
-                onClick={() => {
-                  set_view_mode("item");
-                  set_current_page(1);
-                  set_sort_by("item_code");
-                }}
-                className={`flex items-center gap-2 px-4 py-1.5 text-xs rounded-md transition-all outline-none ${
-                  view_mode === "item"
-                    ? "bg-white shadow-sm text-sky-600"
-                    : "text-gray-500 hover:text-gray-700"
-                }`}
-              >
-                <Package size={14} /> Per Item
-              </button>
-            </div>
-            {/* END: YOUR REQUESTED DESIGN */}
-          </div>
-
-          <div className="p-5 sm:p-6 border-t">
-            <Text_Code_Field
-              label="Warehouse"
-              code_width="150px"
-              show_search_button={true}
-              has_clear_button={inventory_filter.warehouse_code}
-              on_clear={() => set_inventory_filter({})}
-              code_value={inventory_filter.warehouse_code}
-              text_value={get_description(
-                inventory_filter.warehouse_code,
-                warehouse_list,
-                "warehouse_code",
-                "warehouse_desc",
+            <div className="flex items-center justify-between gap-3">
+              {active_user?.category === "DEV" && (
+                <Button
+                  variant="danger"
+                  icon={Trash2}
+                  icon_position="left"
+                  width="w-[110px]"
+                  loading={truncate_loading}
+                  on_click={handle_truncate}
+                >
+                  Truncate
+                </Button>
               )}
-              on_click={() => set_display_modal("select_warehouse")}
-              disabled
-            />
+              <div className="flex bg-gray-100 p-1 rounded-lg border">
+                <button
+                  onClick={() => {
+                    set_view_mode("bin");
+                    set_current_page(1);
+                    set_sort_by("sbin_code");
+                  }}
+                  className={`flex items-center gap-2 px-4 py-1.5 text-xs rounded-md transition-all outline-none ${
+                    view_mode === "bin"
+                      ? "bg-white shadow-sm text-sky-600"
+                      : "text-gray-500 hover:text-gray-700"
+                  }`}
+                >
+                  <MapPin size={14} /> Per Bin
+                </button>
+                <button
+                  onClick={() => {
+                    set_view_mode("item");
+                    set_current_page(1);
+                    set_sort_by("item_code");
+                  }}
+                  className={`flex items-center gap-2 px-4 py-1.5 text-xs rounded-md transition-all outline-none ${
+                    view_mode === "item"
+                      ? "bg-white shadow-sm text-sky-600"
+                      : "text-gray-500 hover:text-gray-700"
+                  }`}
+                >
+                  <Package size={14} /> Per Item
+                </button>
+              </div>
+            </div>
+          </div>
+          <div className="p-5 sm:p-6 border-t">
+            <div className="grid grid-cols-1 gap-5">
+              <div>
+                <Text_Code_Field
+                  label="Warehouse"
+                  code_width="150px"
+                  show_search_button={true}
+                  has_clear_button={inventory_filter.warehouse_code}
+                  on_clear={() =>
+                    set_inventory_filter((prev) => ({
+                      ...prev,
+                      warehouse_code: "",
+                    }))
+                  }
+                  code_value={inventory_filter.warehouse_code}
+                  text_value={get_description(
+                    inventory_filter.warehouse_code,
+                    warehouse_list,
+                    "warehouse_code",
+                    "warehouse_desc",
+                  )}
+                  on_click={() => set_display_modal("select_warehouse")}
+                  disabled
+                />
+              </div>
+              <div>
+                <Text_Code_Field
+                  label="Storage Location"
+                  code_width="150px"
+                  show_search_button={true}
+                  has_clear_button={inventory_filter.sloc_code}
+                  on_clear={() =>
+                    set_inventory_filter((prev) => ({
+                      ...prev,
+                      sloc_code: "",
+                    }))
+                  }
+                  code_value={inventory_filter.sloc_code}
+                  text_value={get_description(
+                    inventory_filter.sloc_code,
+                    sloc_list,
+                    "sloc_code",
+                    "sloc_desc",
+                  )}
+                  on_click={() => set_display_modal("select_sloc")}
+                  disabled
+                />
+              </div>
+            </div>
           </div>
 
           <div className="p-5 sm:p-6 border-t">
@@ -393,6 +507,26 @@ const Inventory_Master = () => {
                                     on_click={() => handle_view(row)}
                                   />
                                 </div>
+                                {active_user?.category === "DEV" && (
+                                  <div className="relative group flex jusity-center items-center">
+                                    <Button_Action
+                                      icon={Edit}
+                                      tooltip="Edit Record"
+                                      on_click={() => handle_edit(row)}
+                                    />
+                                  </div>
+                                )}
+                                {active_user?.category === "DEV" && (
+                                  <div className="relative group flex jusity-center items-center">
+                                    <Button_Action
+                                      class_name="mb-[1px]"
+                                      icon={Trash}
+                                      variant="danger"
+                                      tooltip="Delete"
+                                      on_click={() => handle_delete(row.id)}
+                                    />
+                                  </div>
+                                )}
                               </div>
                             );
                           }
@@ -458,6 +592,16 @@ const Inventory_Master = () => {
           set_data={set_inventory_filter}
         />
       ))}
+      <Edit_Inventory
+        is_open={display_modal === "edit"}
+        on_close={() => set_display_modal("")}
+        width="max-w-[1000px]"
+        height="max-h-[700px]"
+        active_user={active_user}
+        show_toast={show_toast}
+        edit_inv_data={edit_inv_data}
+        set_edit_inv_data={set_edit_inv_data}
+      />
     </React.Fragment>
   );
 };

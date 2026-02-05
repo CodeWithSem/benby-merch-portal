@@ -8,6 +8,8 @@ import { warehouse_list } from "assets/data/warehouse_list";
 import { stype_list } from "assets/data/stype_list";
 import SBIN_Details from "./sbin_details/SBIN_Details";
 import { item_master_list } from "assets/data/item_master_list";
+import { plant_list } from "assets/data/plant_list";
+import { sloc_list } from "assets/data/sloc_list";
 
 const View_SBIN = ({ set_page, view_sbin_data }) => {
   const [active_tab, set_active_tab] = useState("sbin_details");
@@ -82,6 +84,23 @@ const View_SBIN = ({ set_page, view_sbin_data }) => {
             <div className="grid grid-cols-1 gap-5">
               <div>
                 <Text_Code_Field
+                  label="Plant"
+                  code_width="150px"
+                  show_search_button={false}
+                  code_value={view_sbin_data.plant_code}
+                  text_value={get_description(
+                    view_sbin_data.plant_code,
+                    plant_list,
+                    "plant_code",
+                    "plant_desc",
+                  )}
+                  bg_dis_color="bg-slate-50"
+                  text_dis_color="text-slate-500"
+                  disabled
+                />
+              </div>
+              <div>
+                <Text_Code_Field
                   label="Warehouse"
                   code_width="150px"
                   show_search_button={false}
@@ -91,6 +110,23 @@ const View_SBIN = ({ set_page, view_sbin_data }) => {
                     warehouse_list,
                     "warehouse_code",
                     "warehouse_desc",
+                  )}
+                  bg_dis_color="bg-slate-50"
+                  text_dis_color="text-slate-500"
+                  disabled
+                />
+              </div>
+              <div>
+                <Text_Code_Field
+                  label="Storage Location"
+                  code_width="150px"
+                  show_search_button={false}
+                  code_value={view_sbin_data.sloc_code}
+                  text_value={get_description(
+                    view_sbin_data.sloc_code,
+                    sloc_list,
+                    "sloc_code",
+                    "sloc_desc",
                   )}
                   bg_dis_color="bg-slate-50"
                   text_dis_color="text-slate-500"

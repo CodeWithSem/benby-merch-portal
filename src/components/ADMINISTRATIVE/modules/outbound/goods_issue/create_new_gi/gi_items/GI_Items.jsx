@@ -20,14 +20,18 @@ const GI_Items = ({
   // 2. Aggregate On-Hand Quantity by Item Code (Excluding GIZ)
   const on_hand_lookup = useMemo(() => {
     const totals = {};
+    const target_plant = selected_so_data?.plant_code;
     const target_warehouse = selected_so_data?.warehouse_code;
+    const target_sloc = selected_so_data?.sloc_code;
     if (!target_warehouse) return totals;
 
     inv_item_list.forEach((entry) => {
       // 1. Must match the Sales Order Warehouse
       // 2. Storage type must NOT be 'GIZ' (Goods Issue Zone/Pending)
       if (
+        entry.plant_code === target_plant &&
         entry.warehouse_code === target_warehouse &&
+        entry.sloc_code === target_sloc &&
         entry.stype_code !== "GIZ"
       ) {
         const code = entry.item_code;
@@ -37,7 +41,12 @@ const GI_Items = ({
     });
 
     return totals;
-  }, [inv_item_list, selected_so_data?.warehouse_code]);
+  }, [
+    inv_item_list,
+    selected_so_data?.plant_code,
+    selected_so_data?.warehouse_code,
+    selected_so_data?.sloc_code,
+  ]);
 
   const handle_open_quantity_input = (item) => {
     set_target_item(item);

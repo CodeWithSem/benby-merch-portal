@@ -106,7 +106,7 @@ export const api_create_wm_order = async (
       });
       return {
         success: false,
-        message: `Duplicate ${reference_field} found.`,
+        message: `Duplicate ${new_data.do_number} found.`,
         status: "number_duplicate",
       };
     }

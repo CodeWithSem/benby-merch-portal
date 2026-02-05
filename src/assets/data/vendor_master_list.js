@@ -3,11 +3,11 @@ export const vendor_master_list = [
     id: 1,
     vendor_code: "V00001",
     vendor_desc: "Vendor A",
-    creation_date: "12-05-2025",
+    creation_date: "MM-DD-YYYY",
     created_by: "DEV-001",
-    change_date: "12-05-2025",
+    change_date: "MM-DD-YYYY",
     change_by: "DEV-001",
-
+    // Address
     ad_city_code: "MAL",
     ad_country_code: "PH",
     ad_district_code: "LD",
@@ -20,6 +20,7 @@ export const vendor_master_list = [
     ad_street: "5 J. Dela Cruz st. Longos",
     ad_telephone: "123-4567",
     ad_trans_zone_code: "TR-Z-0001",
+    // Account
     ac_contact_fax: "N/A",
     ac_contact_mobile: "N/A",
     ac_contact_name: "Juan Dela Cruz",
@@ -31,15 +32,15 @@ export const vendor_master_list = [
     ac_taxation_code: "T2",
     ac_vendor_block: false,
     ac_vat_reg_number: "VAT-000-000",
-
-    aci_company_code: "COM-001",
+    // Accounting Information
+    aci_company_code: "COM001",
     aci_credit_limit: "5000",
     aci_credit_term_code: "T120",
     aci_currency: "PHP",
     aci_payment_method_code: "OB",
     aci_payment_term_code: "T120",
-    aci_purc_group_code: "P-GRP-001",
-    aci_purc_org_code: "P-ORG-001",
+    aci_purc_group_code: "PGRP001",
+    aci_purc_org_code: "PORG001",
     aci_tax_liable: true,
   },
 ];

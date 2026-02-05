@@ -520,8 +520,8 @@ export const api_update_gi_sbin_capacities_rtdb = async (
 
         // RESET LOGIC: If the resulting capacity will be 0, wipe the locks
         if (current_qty - qty <= 0) {
-          updates[`${bin_path}/current_item`] = null;
-          updates[`${bin_path}/current_batch`] = null;
+          updates[`${bin_path}/current_item`] = "";
+          updates[`${bin_path}/current_batch`] = "";
         }
       }
 

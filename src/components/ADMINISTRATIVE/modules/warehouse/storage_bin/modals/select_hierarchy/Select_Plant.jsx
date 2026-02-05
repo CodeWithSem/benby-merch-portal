@@ -5,62 +5,62 @@ import Checkbox_Field from "assets/elements/Checkbox_Field";
 import Button from "assets/elements/Button";
 import Pagination_Modal from "assets/elements/Pagination_Modal";
 
-const Select_SLOC = ({
+const Select_Plant = ({
   is_open,
   on_close,
   width = "max-w-[700px]",
-  height = "h-[500px]",
+  height = "max-h-[500px]",
+  plant_list,
+  set_data,
 }) => {
-  const [sloc_list, set_sloc_list] = useState([
-    {
-      id: 1,
-      sloc_code: "SLOC-001",
-      sloc_desc: "SLOC Description 1",
-      creation_date: "MM-DD-YYYY",
-    },
-  ]);
-
   // + Client-Side Filtering
-  const [filtered_sloc_list, set_filtered_sloc_list] = useState([]);
+  const [filtered_plant_list, set_filtered_plant_list] = useState([]);
   const [current_page, set_current_page] = useState(1);
   const [rows_per_page, set_rows_per_page] = useState(5);
   const [search_query, set_search_query] = useState("");
-  const [selected_sloc, set_selected_sloc] = useState(null);
+  const [selected_plant, set_selected_plant] = useState(null);
 
   useEffect(() => {
-    let data = [...sloc_list];
+    let data = [...plant_list];
 
     if (search_query.trim() !== "") {
       const q = search_query.toLowerCase();
       data = data.filter(
         (data) =>
-          data.sloc_code.toLowerCase().includes(q) ||
-          data.sloc_desc.toLowerCase().includes(q)
+          data.plant_code.toLowerCase().includes(q) ||
+          data.plant_desc.toLowerCase().includes(q),
       );
     }
 
     const start_idx = (current_page - 1) * rows_per_page;
     const end_idx = start_idx + rows_per_page;
-    set_filtered_sloc_list(data.slice(start_idx, end_idx));
-  }, [sloc_list, search_query, current_page, rows_per_page]);
+    set_filtered_plant_list(data.slice(start_idx, end_idx));
+  }, [plant_list, search_query, current_page, rows_per_page]);
 
   const total_pages = Math.ceil(
-    sloc_list.filter(
+    plant_list.filter(
       (data) =>
-        data.sloc_code.toLowerCase().includes(search_query.toLowerCase()) ||
-        data.sloc_desc.toLowerCase().includes(search_query.toLowerCase())
-    ).length / rows_per_page
+        data.plant_code.toLowerCase().includes(search_query.toLowerCase()) ||
+        data.plant_desc.toLowerCase().includes(search_query.toLowerCase()),
+    ).length / rows_per_page,
   );
 
   const handle_page_change = (page) => set_current_page(page);
   // - Client-Side Filtering
 
-  const handle_select_sloc = () => {
-    if (!selected_sloc) {
-      alert("Please select a sloc before proceeding.");
+  const handle_select_plant = () => {
+    if (!selected_plant) {
+      alert("Please select a plant before proceeding.");
       return;
     }
-    alert(`Selected: ${selected_sloc.description}`);
+    set_data((prev) => ({
+      ...prev,
+      plant_code: selected_plant.plant_code,
+      warehouse_code: "",
+      sloc_code: "",
+    }));
+    set_selected_plant(null);
+    on_close();
   };
 
   // RETURN ORIGIN
@@ -70,6 +70,7 @@ const Select_SLOC = ({
         {/* + Blur */}
         <div className="absolute inset-0 bg-black/50 backdrop-blur-sm z-[98]"></div>
         {/* - Blur */}
+
         {/* + Modal Content */}
         <div
           className={`relative bg-white rounded-lg shadow-xl ${width} w-full py-7 m-5 z-[99]`}
@@ -80,9 +81,11 @@ const Select_SLOC = ({
           >
             <X size={20} />
           </button>
+          {/* + Modal Label */}
           <div className="text-lg md:text-xl font-bold mb-5 px-7">
-            SLOC Selection
+            Plant Selection
           </div>
+          {/* - Modal Label */}
           {/* + Modal Body */}
           <div className={`w-full overflow-y-auto ${height} scrollbar-custom`}>
             <div className="overflow-hidden border border-gray-200 bg-white pt-4">
@@ -108,7 +111,7 @@ const Select_SLOC = ({
                     <tr className="font-semibold text-xs">
                       <th className="px-6 py-3 w-[80px]"></th>
                       <th className="px-6 py-3 text-gray-500 text-left">
-                        SLOC
+                        Plant
                       </th>
                       <th className="px-6 py-3 text-gray-500 text-left">
                         Creation Date
@@ -117,7 +120,7 @@ const Select_SLOC = ({
                   </thead>
 
                   <tbody className="divide-y divide-gray-100">
-                    {filtered_sloc_list.length === 0 ? (
+                    {filtered_plant_list.length === 0 ? (
                       <tr>
                         <td
                           colSpan={3}
@@ -127,13 +130,13 @@ const Select_SLOC = ({
                         </td>
                       </tr>
                     ) : (
-                      filtered_sloc_list.map((data) => (
+                      filtered_plant_list.map((data) => (
                         <tr
                           key={data.id}
                           className={`hover:bg-sky-50/50 cursor-pointer text-[12px] ${
-                            selected_sloc?.id === data.id ? "bg-sky-50" : ""
+                            selected_plant?.id === data.id ? "bg-sky-50" : ""
                           }`}
-                          onClick={() => set_selected_sloc(data)}
+                          onClick={() => set_selected_plant(data)}
                         >
                           <td className="px-5 py-4 sm:px-6 text-center">
                             <div className="flex justify-center items-center">
@@ -141,18 +144,18 @@ const Select_SLOC = ({
                                 name="check"
                                 box_size={18}
                                 icon_size={12}
-                                checked={selected_sloc?.id === data.id}
-                                on_change={() => set_selected_sloc(data)}
+                                checked={selected_plant?.id === data.id}
+                                on_change={() => set_selected_plant(data)}
                               />
                             </div>
                           </td>
                           <td className="px-5 py-4 sm:px-6">
                             <div className="block font-medium text-gray-800">
-                              <span className="block text-gray-500 text-[12px]">
-                                {data.sloc_code}
+                              <span className="block text-gray-500 text-[10px]">
+                                {data.plant_code}
                               </span>
-                              <span className="block text-gray-800 text-sm">
-                                {data.sloc_desc}
+                              <span className="block text-gray-800 text-[13px]">
+                                {data.plant_desc}
                               </span>
                             </div>
                           </td>
@@ -169,7 +172,6 @@ const Select_SLOC = ({
             </div>
           </div>
           {/* - Modal Body */}
-
           {/* + Modal Footer */}
           <div className="flex flex-col items-center sm:flex-row sm:justify-between gap-3 mt-5 px-7">
             {/* + Pagination */}
@@ -187,9 +189,9 @@ const Select_SLOC = ({
             <div className="flex justify-center sm:justify-end gap-2 w-full">
               <Button
                 variant="primary"
-                on_click={handle_select_sloc}
+                on_click={handle_select_plant}
                 class_name="w-full md:w-[100px]"
-                disabled={!selected_sloc}
+                disabled={!selected_plant}
               >
                 Proceed
               </Button>
@@ -210,4 +212,4 @@ const Select_SLOC = ({
   ) : null;
 };
 
-export default Select_SLOC;
+export default Select_Plant;

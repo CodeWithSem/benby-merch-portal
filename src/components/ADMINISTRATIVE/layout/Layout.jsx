@@ -201,12 +201,12 @@ const Layout = () => {
         <div className="fixed inset-0 flex items-center justify-center z-[100]">
           <div className="absolute inset-0 bg-black/50 backdrop-blur-sm z-[101]"></div>
           <div
-            className={`relative bg-white rounded-lg shadow-xl max-w-[500px] w-full p-10 m-5 z-[102]`}
+            className={`relative bg-white rounded-lg shadow-xl max-w-[400px] w-full p-10 m-5 z-[102]`}
           >
             <div className="w-full flex justify-center items-center text-lg md:text-xl font-bold mb-4">
               Confirm Logout
             </div>
-            <p className="w-full text-center text-sm leading-6 text-gray-500 dark:text-gray-400 py-4">
+            <p className="w-full text-center text-sm leading-6 text-gray-500 py-4">
               Are you sure you want to logout?
             </p>
             <div className="flex justify-center gap-2 mt-4">

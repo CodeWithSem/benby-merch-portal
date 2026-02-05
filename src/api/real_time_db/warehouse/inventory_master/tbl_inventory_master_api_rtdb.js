@@ -1,7 +1,16 @@
-import { get, increment, onValue, ref, set, update } from "firebase/database";
+import {
+  get,
+  increment,
+  onValue,
+  ref,
+  remove,
+  set,
+  update,
+} from "firebase/database";
 import { realtime_db } from "assets/scripts/firebase";
 import { get_realtime_path, TABLES } from "../../../db_path_contant";
 import { format_date_1, get_date_now } from "assets/scripts/format";
+import { CheckCircle2, CircleX } from "lucide-react";
 
 export const api_get_inventory_master_rtdb = (callback) => {
   const inventory_ref = ref(
@@ -9,16 +18,13 @@ export const api_get_inventory_master_rtdb = (callback) => {
     get_realtime_path(TABLES.INVENTORY_MASTER),
   );
 
-  // onValue returns an unsubscribe function
   return onValue(
     inventory_ref,
     (snapshot) => {
       const data = snapshot.val();
       if (data) {
-        // Convert the Firebase object into an array
         const list = Object.keys(data).map((key) => ({
           ...data[key],
-          // Ensure id is present even if not in the payload
           id: data[key].id || key,
         }));
         callback(list);
@@ -43,7 +49,7 @@ export const api_create_inventory_master_rtdb = async (data, active_user) => {
     const payload = {
       id: data.to_sbin_code,
       lpn_no: data.lpn_no,
-      inventory_status: "Active",
+      // inventory_status: "Active",
       // Location (Flat)
       sbin_code: data.to_sbin_code,
       stype_code: data.to_stype_code,
@@ -51,7 +57,7 @@ export const api_create_inventory_master_rtdb = async (data, active_user) => {
       item_code: data.item_code,
       quantity_on_hand: data.quantity,
       uom: data.uom,
-      pallet_config: data.pallet_config,
+      // pallet_config: data.pallet_config,
       sutype: data.sutype,
       // Tracking (Flat)
       batch_code: data.batch_code,
@@ -124,7 +130,7 @@ export const api_bulk_create_inventory_master_rtdb = async (
         updates[`${base_path}/${binCode}`] = {
           id: binCode,
           lpn_no: item.lpn_no,
-          inventory_status: "Active",
+          // inventory_status: "Active",
           plant_code: item.plant_code,
           warehouse_code: item.warehouse_code,
           sloc_code: item.sloc_code,
@@ -133,7 +139,7 @@ export const api_bulk_create_inventory_master_rtdb = async (
           item_code: item.item_code,
           quantity_on_hand: item.quantity, // New entry, standard set
           uom: item.uom,
-          pallet_config: item.pallet_config,
+          // pallet_config: item.pallet_config,
           sutype: item.sutype,
           batch_code: item.batch_code,
           manufacture_date: item.manufacture_date,
@@ -171,21 +177,34 @@ export const api_bulk_transfer_inventory_master_rtdb = async (
     const timestamp = format_date_1(get_date_now());
     const username = active_user?.username || "SYSTEM";
 
+    // We fetch the current snapshot to determine if the source will be empty after transfer
+    const dbRef = ref(realtime_db, base_path);
+    const snapshot = await get(dbRef);
+    const currentInventory = snapshot.val() || {};
+
     for (const item of wm_allocation_list) {
       const qty = Number(item.quantity);
 
       // 1. DECREASE FROM SOURCE
       if (item.from_sbin_code) {
         const source_path = `${base_path}/${item.from_sbin_code}`;
-        updates[`${source_path}/quantity_on_hand`] = increment(-qty);
+        const existingSource = currentInventory[item.from_sbin_code];
+
+        if (existingSource) {
+          const currentQty = Number(existingSource.quantity_on_hand || 0);
+
+          if (currentQty <= qty) {
+            // REMOVE PATH: Setting to null deletes the node in RTDB
+            updates[source_path] = null;
+          } else {
+            updates[`${source_path}/quantity_on_hand`] = increment(-qty);
+          }
+        }
       }
 
       // 2. INCREASE AT DESTINATION
       if (item.to_sbin_code) {
         const dest_path = `${base_path}/${item.to_sbin_code}`;
-
-        // We need to check if the destination record exists to set metadata
-        // If it doesn't exist, we provide the full payload template
         const dest_snap = await get(ref(realtime_db, dest_path));
 
         if (!dest_snap.exists()) {
@@ -193,10 +212,13 @@ export const api_bulk_transfer_inventory_master_rtdb = async (
             id: item.to_sbin_code,
             lpn_no: item.lpn_no,
             inventory_status: "Active",
+            plant_code: item.plant_code,
+            warehouse_code: item.warehouse_code,
+            sloc_code: item.sloc_code,
             sbin_code: item.to_sbin_code,
             stype_code: item.to_stype_code,
             item_code: item.item_code,
-            quantity_on_hand: qty, // First time entry
+            quantity_on_hand: qty,
             uom: item.uom,
             pallet_config: item.pallet_config,
             sutype: item.sutype,
@@ -207,13 +229,12 @@ export const api_bulk_transfer_inventory_master_rtdb = async (
             reference_po: meta.ref_number,
             reference_do: meta.do_number,
             posted_by: username,
-            posted_date: format_date_1(get_date_now()),
+            posted_date: timestamp,
           };
         } else {
-          // If bin already has items, just increment the quantity
           updates[`${dest_path}/quantity_on_hand`] = increment(qty);
           updates[`${dest_path}/posted_by`] = username;
-          updates[`${dest_path}/posted_date`] = format_date_1(get_date_now());
+          updates[`${dest_path}/posted_date`] = timestamp;
         }
       }
     }
@@ -225,3 +246,128 @@ export const api_bulk_transfer_inventory_master_rtdb = async (
     return { success: false, message: error.message };
   }
 };
+
+// + Update
+export const api_update_inventory_rtdb = async (data, user, show_toast) => {
+  try {
+    if (!data.id)
+      throw new Error("Inventory ID (sbin_code) is required for update.");
+
+    const base_path = get_realtime_path(TABLES.INVENTORY_MASTER);
+    const record_ref = ref(realtime_db, `${base_path}/${data.id}`);
+
+    // Prepare the payload with audit trailing
+    const payload = {
+      ...data, // Spreads existing changes (e.g., inventory_status, quantity_on_hand)
+      change_by: user || "SYSTEM",
+      change_date: format_date_1(get_date_now()),
+    };
+
+    // Use update() to modify only the specified fields
+    await update(record_ref, payload);
+
+    show_toast({
+      type: "success",
+      title: "Updated Successfully",
+      message: `The record has been updated.`,
+      icon: <CheckCircle2 size={21} className="text-green-500" />,
+    });
+
+    return {
+      success: true,
+      message: "Inventory updated successfully",
+    };
+  } catch (error) {
+    console.error("Inventory Update Error:", error);
+    show_toast({
+      type: "danger",
+      title: "Error",
+      message: "Something went wrong. Please try again.",
+      icon: <CircleX size={21} className="text-red-500" />,
+    });
+    return {
+      success: false,
+      message: error.message || "Failed to update inventory",
+    };
+  }
+};
+// - Update
+
+// + Delete
+export const api_delete_inventory_rtdb = async (id, show_toast) => {
+  try {
+    // 1. Point to the specific record using the sbin_code (id)
+    const inv_path = get_realtime_path(TABLES.INVENTORY_MASTER);
+    const doc_ref = ref(realtime_db, `${inv_path}/${id}`);
+
+    // 2. Remove the node from RTDB
+    await remove(doc_ref);
+
+    // 3. Success Notification
+    if (show_toast) {
+      show_toast({
+        type: "success",
+        title: "Deleted Successfully",
+        message: `The record has been removed.`,
+        icon: <CheckCircle2 size={21} className="text-green-500" />,
+      });
+    }
+
+    return {
+      success: true,
+      message: "Record deleted successfully.",
+    };
+  } catch (error) {
+    console.error("Error deleting data from RTDB: ", error);
+
+    if (show_toast) {
+      show_toast({
+        type: "danger",
+        title: "Delete Failed",
+        message: "Something went wrong. Please try again.",
+        icon: <CircleX size={21} className="text-red-500" />,
+      });
+    }
+
+    return {
+      success: false,
+      message: error.message || "Failed to delete data",
+    };
+  }
+};
+// - Delete
+
+// + Truncate
+export const api_truncate_inventory_rtdb = async (show_toast) => {
+  try {
+    const inv_path = get_realtime_path(TABLES.INVENTORY_MASTER);
+    const tbl_sbin_ref = ref(realtime_db, inv_path);
+
+    await remove(tbl_sbin_ref);
+
+    show_toast({
+      type: "success",
+      title: "Truncated Successfully",
+      message: "You have deleted all records.",
+      icon: <CheckCircle2 size={21} className="text-green-500" />,
+    });
+
+    return {
+      success: true,
+      message: "Table has been cleared successfully",
+    };
+  } catch (error) {
+    console.error("Error truncating RTDB: ", error);
+    show_toast({
+      type: "danger",
+      title: "Error",
+      message: "Something went wrong. Please try again.",
+      icon: <CircleX size={21} className="text-red-500" />,
+    });
+    return {
+      success: false,
+      message: error.message || "Failed to truncate the table",
+    };
+  }
+};
+// - Truncate

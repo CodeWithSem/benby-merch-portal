@@ -8,15 +8,14 @@ import Text_Field from "assets/elements/Text_Field";
 import { get_description } from "assets/scripts/functions/get_description";
 import { handle_text_change_function } from "assets/scripts/functions/input_functions";
 import { validate_required_fields } from "assets/scripts/functions/validate_fields";
-import {
-  api_create_sbin,
-  api_update_sbin,
-} from "api/firestore_db/warehouse/storage_bin/tbl_storage_bin_api";
-import { stype_list, warehouse_list } from "../SBIN_DATA_MAP";
 import Select_Generic from "assets/elements/modals/Select_Generic";
 import SBIN_Details from "./sbin_details/SBIN_Details";
 import { api_update_sbin_rtdb } from "api/real_time_db/warehouse/storage_bin/tbl_sbin_master_api_rtdb";
 import { item_master_list } from "assets/data/item_master_list";
+import { plant_list } from "assets/data/plant_list";
+import { warehouse_list } from "assets/data/warehouse_list";
+import { sloc_list } from "assets/data/sloc_list";
+import { stype_list } from "assets/data/stype_list";
 
 const Edit_SBIN = ({
   set_page,
@@ -227,6 +226,23 @@ const Edit_SBIN = ({
             <div className="grid grid-cols-1 gap-5">
               <div>
                 <Text_Code_Field
+                  label="Plant"
+                  code_width="150px"
+                  show_search_button={false}
+                  code_value={edit_sbin_data.plant_code}
+                  text_value={get_description(
+                    edit_sbin_data.plant_code,
+                    plant_list,
+                    "plant_code",
+                    "plant_desc",
+                  )}
+                  bg_dis_color="bg-slate-50"
+                  text_dis_color="text-slate-500"
+                  disabled
+                />
+              </div>
+              <div>
+                <Text_Code_Field
                   label="Warehouse"
                   code_width="150px"
                   show_search_button={false}
@@ -236,6 +252,23 @@ const Edit_SBIN = ({
                     warehouse_list,
                     "warehouse_code",
                     "warehouse_desc",
+                  )}
+                  bg_dis_color="bg-slate-50"
+                  text_dis_color="text-slate-500"
+                  disabled
+                />
+              </div>
+              <div>
+                <Text_Code_Field
+                  label="Storage Location"
+                  code_width="150px"
+                  show_search_button={false}
+                  code_value={edit_sbin_data.sloc_code}
+                  text_value={get_description(
+                    edit_sbin_data.sloc_code,
+                    sloc_list,
+                    "sloc_code",
+                    "sloc_desc",
                   )}
                   bg_dis_color="bg-slate-50"
                   text_dis_color="text-slate-500"

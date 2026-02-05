@@ -130,7 +130,7 @@ const SBIN_Details = ({
                 label="Total Bin Capacity"
                 type={"number"}
                 placeholder="0"
-                value={edit_sbin_data.bin_capacity} //--> bin_capacity
+                value={edit_sbin_data.bin_capacity}
                 on_change={handle_text_change("bin_capacity", "number")}
               />
             </div>

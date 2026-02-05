@@ -13,6 +13,13 @@ import { stype_list } from "assets/data/stype_list";
 import Select_Generic from "assets/elements/modals/Select_Generic";
 import SBIN_Details from "./sbin_details/SBIN_Details";
 import { api_create_sbin_rtdb } from "api/real_time_db/warehouse/storage_bin/tbl_sbin_master_api_rtdb";
+import { sloc_list } from "assets/data/sloc_list";
+import { plant_list } from "assets/data/plant_list";
+import { plant_h_list } from "assets/data/plant_h_list";
+import { warehouse_h_list } from "assets/data/warehouse_h_list";
+import Select_Plant from "../modals/select_hierarchy/Select_Plant";
+import Select_Warehouse from "../modals/select_hierarchy/Select_Warehouse";
+import Select_SLOC from "../modals/select_hierarchy/Select_SLOC";
 
 const Create_New_SBIN = ({
   set_page,
@@ -248,6 +255,54 @@ const Create_New_SBIN = ({
             <div className="grid grid-cols-1 gap-5">
               <div>
                 <Text_Code_Field
+                  label="Plant"
+                  code_width="150px"
+                  show_search_button={true}
+                  code_value={new_sbin_data.plant_code}
+                  text_value={get_description(
+                    new_sbin_data.plant_code,
+                    plant_list,
+                    "plant_code",
+                    "plant_desc",
+                  )}
+                  on_click={() => set_display_modal("select_plant")}
+                  disabled
+                />
+              </div>
+              <div>
+                <Text_Code_Field
+                  label="Warehouse"
+                  code_width="150px"
+                  show_search_button={!!new_sbin_data.plant_code}
+                  code_value={new_sbin_data.warehouse_code}
+                  text_value={get_description(
+                    new_sbin_data.warehouse_code,
+                    warehouse_list,
+                    "warehouse_code",
+                    "warehouse_desc",
+                  )}
+                  on_click={() => set_display_modal("select_warehouse")}
+                  disabled
+                />
+              </div>
+              <div>
+                <Text_Code_Field
+                  label="Storage Location"
+                  code_width="150px"
+                  show_search_button={!!new_sbin_data.warehouse_code}
+                  code_value={new_sbin_data.sloc_code}
+                  text_value={get_description(
+                    new_sbin_data.sloc_code,
+                    sloc_list,
+                    "sloc_code",
+                    "sloc_desc",
+                  )}
+                  on_click={() => set_display_modal("select_sloc")}
+                  disabled
+                />
+              </div>
+              {/* <div>
+                <Text_Code_Field
                   label="Warehouse"
                   code_width="150px"
                   show_search_button={true}
@@ -261,7 +316,7 @@ const Create_New_SBIN = ({
                   on_click={() => set_display_modal("select_warehouse")}
                   disabled
                 />
-              </div>
+              </div> */}
               <div>
                 <Text_Code_Field
                   label="Storage Type"
@@ -375,24 +430,23 @@ const Create_New_SBIN = ({
           // on_after_select={cfg.on_after_select}
         />
       ))}
-      {/* <Select_Branch
-        is_open={display_modal === "select_branch"}
-        on_close={() => set_display_modal("")}
-        width="max-w-[1000px]"
-        height="max-h-[700px]"
-        branch_list={branch_list}
-        set_data={set_new_sbin_data}
-        // set_selected_item_list={set_selected_item_list}
-      />
       <Select_Plant
         is_open={display_modal === "select_plant"}
         on_close={() => set_display_modal("")}
         width="max-w-[1000px]"
         height="max-h-[700px]"
-        selected_branch_code={new_sbin_data.branch_code}
-        branch_list={branch_list}
         plant_list={plant_list}
-        branch_h_list={branch_h_list}
+        set_data={set_new_sbin_data}
+      />
+      <Select_Warehouse
+        is_open={display_modal === "select_warehouse"}
+        on_close={() => set_display_modal("")}
+        width="max-w-[1000px]"
+        height="max-h-[700px]"
+        selected_plant_code={new_sbin_data.plant_code}
+        plant_list={plant_list}
+        warehouse_list={warehouse_list}
+        plant_h_list={plant_h_list}
         set_data={set_new_sbin_data}
       />
       <Select_SLOC
@@ -400,20 +454,12 @@ const Create_New_SBIN = ({
         on_close={() => set_display_modal("")}
         width="max-w-[1000px]"
         height="max-h-[700px]"
-        selected_plant_code={new_sbin_data.plant_code}
-        plant_list={plant_list}
+        selected_warehouse_code={new_sbin_data.warehouse_code}
+        warehouse_list={warehouse_list}
         sloc_list={sloc_list}
-        plant_h_list={plant_h_list}
+        warehouse_h_list={warehouse_h_list}
         set_data={set_new_sbin_data}
       />
-      <Select_Item
-        is_open={display_modal === "select_item"}
-        on_close={() => set_display_modal("")}
-        branch_code={new_sbin_data.branch_code}
-        plant_code={new_sbin_data.plant_code}
-        sloc_code={new_sbin_data.sloc_code}
-        set_data={set_new_sbin_data}
-      /> */}
       {is_confirm_modal_open && <Confirm_Modal />}
       {/* - Modals */}
     </React.Fragment>

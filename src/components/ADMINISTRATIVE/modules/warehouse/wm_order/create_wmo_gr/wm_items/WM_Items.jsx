@@ -84,10 +84,10 @@ const WM_Items = ({ new_wmo_data }) => {
                 <th className="px-5 py-4 font-semibold border-r">
                   Storage Unit Type
                 </th>
-                <th className="px-5 py-4 font-semibold border-r">
+                {/* <th className="px-5 py-4 font-semibold border-r">
                   WM Order Status
                 </th>
-                <th className="px-5 py-4 font-semibold border-r">TO Status</th>
+                <th className="px-5 py-4 font-semibold border-r">TO Status</th> */}
                 <th className="px-5 py-4 font-semibold">Remarks</th>
                 {/* <th className="px-5 py-4 font-semibold"></th> */}
               </tr>
@@ -114,10 +114,10 @@ const WM_Items = ({ new_wmo_data }) => {
                   <td className="px-5 py-4 border-r">{item.to_sbin_code}</td>
                   <td className="px-5 py-4 border-r">{item.to_stype_code}</td>
                   <td className="px-5 py-4 border-r">{item.sutype}</td>
-                  <td className="px-5 py-4 border-r">{item.wm_order_status}</td>
+                  {/* <td className="px-5 py-4 border-r">{item.wm_order_status}</td>
                   <td className="px-5 py-4 border-r">
                     {item.transfer_order_status}
-                  </td>
+                  </td> */}
                   <td className="px-5 py-4">{item.remarks}</td>
                   {/* <td className="px-5 py-2 text-gray-600">
                     <Button

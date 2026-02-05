@@ -27,7 +27,7 @@ const Sign_Up = ({ set_page }) => {
         username, // email or username (if same)
         first_name,
         last_name,
-        category
+        category,
       );
 
       show_toast({

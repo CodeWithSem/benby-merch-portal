@@ -9,7 +9,9 @@ export function generate_gi_wm_orders({
 }) {
   if (!selected_gi?.issued_item_list) return [];
 
+  const target_plant = selected_gi?.plant_code;
   const target_warehouse = selected_gi?.warehouse_code;
+  const target_sloc = selected_gi?.sloc_code;
 
   const wm_allocation_list = [];
 
@@ -35,7 +37,9 @@ export function generate_gi_wm_orders({
     const available_stock = virtual_inventory
       .filter(
         (inv) =>
+          inv.plant_code === target_plant &&
           inv.warehouse_code === target_warehouse &&
+          inv.sloc_code === target_sloc &&
           inv.item_code === gi_item.item_code &&
           inv.quantity_on_hand > 0 &&
           inv.inventory_status === "Active" &&
@@ -72,6 +76,9 @@ export function generate_gi_wm_orders({
       wm_allocation_list.push({
         wmo_number: selected_gi.wmo_number || "",
         lpn_no: inv_record.lpn_no,
+        plant_code: target_plant,
+        warehouse_code: target_warehouse,
+        sloc_code: target_sloc,
         item_code: gi_item.item_code,
         item_desc: gi_item.item_desc,
         quantity: take_quantity,

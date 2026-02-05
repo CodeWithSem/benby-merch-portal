@@ -92,7 +92,9 @@ export function allocate_lpn_to_bins({
   item_master_list,
   sbin_list,
 }) {
-  const do_warehouse = selected_do?.warehouse_code;
+  const target_plant = selected_do?.plant_code;
+  const target_warehouse = selected_do?.warehouse_code;
+  const target_sloc = selected_do?.sloc_code;
   // 1. Setup Virtual Bin tracking
   let virtual_bins = sbin_list.map((bin) => ({
     ...bin,
@@ -126,7 +128,9 @@ export function allocate_lpn_to_bins({
 
     // 3. Find Suitable Destination Bin
     const target_bin = virtual_bins.find((b) => {
-      const is_correct_warehouse = b.warehouse_code === do_warehouse;
+      const is_correct_plant = b.plant_code === target_plant;
+      const is_correct_warehouse = b.warehouse_code === target_warehouse;
+      const is_correct_sloc = b.sloc_code === target_sloc;
       const is_correct_type = b.stype_code === dest_stype;
       const is_available = b.status === "Available";
       const has_capacity =
@@ -140,7 +144,9 @@ export function allocate_lpn_to_bins({
           b.occupied_by_batch === pallet.batch_code);
 
       return (
+        is_correct_plant &&
         is_correct_warehouse &&
+        is_correct_sloc &&
         is_correct_type &&
         is_available &&
         has_capacity &&
