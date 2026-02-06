@@ -11,4 +11,10 @@ export const plant_h_list = [
     warehouse_code: "WH02",
     creation_date: "MM-DD-YYYY",
   },
+  {
+    id: 3,
+    plant_code: "PL01",
+    warehouse_code: "WH03",
+    creation_date: "MM-DD-YYYY",
+  },
 ];

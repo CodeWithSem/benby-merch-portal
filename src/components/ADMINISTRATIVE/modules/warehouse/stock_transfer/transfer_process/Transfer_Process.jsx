@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Source from "./standard_transfer/source/Source";
 import Destination from "./standard_transfer/destination/Destination";
 import { ChevronLeft, ChevronsDown } from "lucide-react";
@@ -11,31 +11,33 @@ import { format_date_1, get_date_now } from "assets/scripts/format";
 import Pillspin_Source from "./pillspin_transfer/source/Pillspin_Source";
 import G2_Destination from "./pillspin_transfer/destination/G2_Destination";
 import Plant_To_Plant from "./plant_to_plant/Plant_To_Plant";
+import { api_get_sbin_master_rtdb } from "api/real_time_db/warehouse/storage_bin/tbl_sbin_master_api_rtdb";
 
 const Transfer_Process = ({ set_page }) => {
   const [display_modal, set_display_modal] = useState("");
   const [transfer_post_data, set_transfer_post_data] = useState([]);
   const [selected_item_list, set_selected_item_list] = useState([]);
-  const handle_save_transfer = () => {
-    const transfer_data = {
-      batch_code: "ITM-00001_B1",
-      confirm_date: "",
-      from_sbin_code: "GRZ-01",
-      from_stype_code: "GRZ",
-      item_code: "ITM-00001",
-      manufacture_date: "12-01-2025",
-      pallet_config: "12x4",
-      quantity: 48,
-      quantity_confirm: 48,
-      sled_bbd: "12-01-2028",
-      sutype: "IP",
-      to_sbin_code: "SS-01",
-      to_stype_code: "SS",
-      transfer_order_status: "Pending",
-      uom: "CS",
-    };
-    console.log(selected_item_list);
+  const [sbin_list, set_sbin_list] = useState([]);
+  const [loading_list, set_loading_list] = useState(false);
+  const [new_transfer_post_data, set_new_transfer_post_data] = useState({});
+
+  const handle_get_sbin_list = async () => {
+    set_loading_list(true);
+    const unsubscribe = api_get_sbin_master_rtdb((data, error) => {
+      if (error) {
+        console.error("Failed to fetch bins:", error);
+      } else {
+        set_sbin_list(data);
+      }
+      set_loading_list(false);
+    });
+
+    return () => unsubscribe();
   };
+
+  useEffect(() => {
+    handle_get_sbin_list();
+  }, []);
 
   const select_modal_configs = [
     {
@@ -135,8 +137,11 @@ const Transfer_Process = ({ set_page }) => {
         {transfer_post_data.movement_type_code === "TP01" && (
           <Plant_To_Plant
             transfer_data={{
+              sbin_list,
               selected_item_list,
               set_selected_item_list,
+              new_transfer_post_data,
+              set_new_transfer_post_data,
             }}
           />
         )}

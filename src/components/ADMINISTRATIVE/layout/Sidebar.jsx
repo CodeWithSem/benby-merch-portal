@@ -227,16 +227,6 @@ const Sidebar = ({
     );
   };
 
-  const handle_sign_out = () => {
-    localStorage.removeItem("active_user");
-    show_toast({
-      type: "success",
-      title: "Signed Out",
-      message: "You have been logged out successfully",
-    });
-    set_page("login");
-  };
-
   useEffect(() => {
     const handle_click_outside = (event) => {
       Object.keys(dropdown_refs.current).forEach((key) => {
@@ -253,6 +243,29 @@ const Sidebar = ({
     return () =>
       document.removeEventListener("mousedown", handle_click_outside);
   }, []);
+
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      // Check for Ctrl + I (event.key is case-insensitive, but usually 'i')
+      if (event.ctrlKey && event.key.toLowerCase() === "i") {
+        event.preventDefault(); // Prevent default browser behavior (like opening italics or info)
+
+        const parentKey = "Warehouse";
+        const subItemName = "Inventory Master";
+
+        // Update the active item state
+        set_active_item(`${parentKey}-${subItemName}`);
+
+        // Optional: If you want the sidebar to automatically expand the dropdown too
+        set_open_dropdowns((prev) => ({ ...prev, [parentKey]: true }));
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    // Clean up the event listener on component unmount
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [set_active_item, show_toast]); // Dependencies
 
   return (
     <React.Fragment>

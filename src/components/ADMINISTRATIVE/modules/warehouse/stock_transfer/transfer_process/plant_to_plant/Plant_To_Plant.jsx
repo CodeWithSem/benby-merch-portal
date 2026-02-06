@@ -1,6 +1,7 @@
 import React from "react";
 import { ChevronsDown } from "lucide-react";
 import Source from "./source/Source";
+import Destination from "./destination/Destination";
 
 const Plant_To_Plant = ({ transfer_data }) => {
   return (
@@ -20,6 +21,7 @@ const Plant_To_Plant = ({ transfer_data }) => {
       </div>
       {/* + Destination */}
       <div>
+        <Destination transfer_data={transfer_data} />
         {/* <G2_Destination
                 selected_items={selected_items}
                 set_selected_items={set_selected_items}

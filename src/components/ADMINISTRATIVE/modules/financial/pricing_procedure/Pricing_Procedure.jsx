@@ -32,6 +32,7 @@ import { Get_TBL_INCREMENTAL_ID } from "api/real_time_db/incremental";
 import Set_Increment_ID from "assets/elements/modals/Set_Increment_ID";
 import Create_Price_Proc from "./create/Create_Price_Proc";
 import Edit_Price_Proc from "./edit/Edit_Price_Proc";
+import View_Price_Proc from "./view/View_Price_Proc";
 
 // /* MOCK API */
 // const api_get_price_proc_list = async () => ({
@@ -260,6 +261,7 @@ const Pricing_Procedure = () => {
 
   const handle_view = (row) => {
     set_view_data(row);
+    set_price_element_list(row.price_element_list);
     set_page("view");
   };
   const handle_delete = (row) => {
@@ -491,7 +493,7 @@ const Pricing_Procedure = () => {
                                     <Button_Action
                                       icon={View}
                                       tooltip="View Record"
-                                      on_click={() => handle_view_pricing(row)}
+                                      on_click={() => handle_view(row)}
                                     />
                                   </div>
                                   <div className="relative group flex jusity-center items-center">
@@ -581,6 +583,14 @@ const Pricing_Procedure = () => {
           price_element_list={price_element_list}
           set_price_element_list={set_price_element_list}
           set_price_proc_list={set_price_proc_list}
+        />
+      )}
+
+      {page === "view" && (
+        <View_Price_Proc
+          set_page={set_page}
+          view_price_proc_data={view_data}
+          price_element_list={price_element_list}
         />
       )}
 

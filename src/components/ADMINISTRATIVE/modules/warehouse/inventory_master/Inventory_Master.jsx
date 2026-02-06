@@ -33,6 +33,7 @@ import Select_Generic from "assets/elements/modals/Select_Generic";
 import { Use_App } from "context/app_context";
 import Edit_Inventory from "./edit/Edit_Inventory";
 import { sloc_list } from "assets/data/sloc_list";
+import { plant_list } from "assets/data/plant_list";
 
 const Inventory_Master = () => {
   const { active_user } = Use_App();
@@ -54,6 +55,18 @@ const Inventory_Master = () => {
   const [edit_inv_data, set_edit_inv_data] = useState({});
 
   const select_modal_configs = [
+    {
+      key: "select_plant",
+      label: "Warehouse",
+      show_creation_date: true,
+      width: "max-w-[800px]",
+      list: plant_list,
+      column: ["Plant"],
+      code: ["plant_code"],
+      desc: ["plant_desc"],
+      lookup: [plant_list],
+      target: ["plant_code"],
+    },
     {
       key: "select_warehouse",
       label: "Warehouse",
@@ -143,7 +156,12 @@ const Inventory_Master = () => {
       ),
     }));
 
-    // NEW: Filter by selected warehouse from inventory_filter
+    if (inventory_filter.plant_code) {
+      temp = temp.filter(
+        (item) => item.plant_code === inventory_filter.plant_code,
+      );
+    }
+
     if (inventory_filter.warehouse_code) {
       temp = temp.filter(
         (item) => item.warehouse_code === inventory_filter.warehouse_code,
@@ -349,6 +367,29 @@ const Inventory_Master = () => {
           </div>
           <div className="p-5 sm:p-6 border-t">
             <div className="grid grid-cols-1 gap-5">
+              <div>
+                <Text_Code_Field
+                  label="Plant"
+                  code_width="150px"
+                  show_search_button={true}
+                  has_clear_button={inventory_filter.plant_code}
+                  on_clear={() =>
+                    set_inventory_filter((prev) => ({
+                      ...prev,
+                      plant_code: "",
+                    }))
+                  }
+                  code_value={inventory_filter.plant_code}
+                  text_value={get_description(
+                    inventory_filter.plant_code,
+                    plant_list,
+                    "plant_code",
+                    "plant_desc",
+                  )}
+                  on_click={() => set_display_modal("select_plant")}
+                  disabled
+                />
+              </div>
               <div>
                 <Text_Code_Field
                   label="Warehouse"
