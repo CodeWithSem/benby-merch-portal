@@ -19,155 +19,58 @@ import Pagination from "assets/elements/Pagination";
 import Transfer_Process from "./transfer_process/Transfer_Process";
 import View_Transfer from "./view_transfer/View_Transfer";
 import Button_Action from "assets/elements/Button_Action";
+import { client_side_filter } from "assets/scripts/functions/client_side_filter";
 
 const Stock_Transfer = () => {
-  const { show_toast } = useToast();
   const [show_filter, set_show_filter] = useState(false);
   const [page, set_page] = useState("main");
-  const today = format_date_1(new Date());
-  const [start_date, set_start_date] = useState(today);
-  const [end_date, set_end_date] = useState(today);
-  const [show_load_data_button, set_show_load_data_button] = useState(false);
+  const [loading_list, set_loading_list] = useState(false);
+  const now = new Date();
+  const first_day_of_month = new Date(now.getFullYear(), now.getMonth(), 1);
+  const last_day_of_month = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+  const start = format_date_1(first_day_of_month);
+  const end = format_date_1(last_day_of_month);
+  const [start_date, set_start_date] = useState(start);
+  const [end_date, set_end_date] = useState(end);
+
+  const [current_id, set_current_id] = useState(0);
+  const [new_to_data, set_new_to_data] = useState({});
+  const [edit_data, set_edit_data] = useState({});
+  const [view_data, set_view_data] = useState({});
+  const [delete_data, set_delete_data] = useState({});
 
   const columns = [
-    { key: "id", label: "ID", sortable: true },
-    { key: "from_branch_code", label: "From Branch", sortable: true },
-    { key: "to_branch_code", label: "To Branch", sortable: true },
-    { key: "transfer_date", label: "Transfer Date", sortable: true },
-    { key: "status", label: "Status", sortable: true },
-    { key: "created_by", label: "Created By", sortable: true },
-    { key: "approved_by", label: "Approved By", sortable: true },
-    { key: "receive_by", label: "Received By", sortable: true },
+    { key: "index", label: "No.", sortable: false },
+    { key: "to_number", label: "TO Number", sortable: true },
+    { key: "movement_type_code", label: "Movement Type", sortable: true },
+    { key: "creation_date", label: "Creation Date", sortable: true },
+    { key: "to_status", label: "Status", sortable: true },
     { key: "actions", label: "", sortable: false },
   ];
 
-  const [stock_transfer_list, set_stock_transfer_list] = useState([
+  const [to_list, set_to_list] = useState([
     {
       id: 1,
-      from_branch_code: "BR001",
-      to_branch_code: "BR002",
-      transfer_date: "MM-DD-YYYY",
-      status: "In Transit",
-      created_by: "John Doe",
-      approved_by: "",
-      receive_by: "",
-    },
-    {
-      id: 2,
-      from_branch_code: "BR003",
-      to_branch_code: "BR005",
-      transfer_date: "MM-DD-YYYY",
-      status: "Approved",
-      created_by: "Jane Smith",
-      approved_by: "Michael Reyes",
-      receive_by: "",
-    },
-    {
-      id: 3,
-      from_branch_code: "BR002",
-      to_branch_code: "BR004",
-      transfer_date: "MM-DD-YYYY",
-      status: "Received",
-      created_by: "Alex Cruz",
-      approved_by: "Sarah Lim",
-      receive_by: "Paul Santos",
-    },
-    {
-      id: 4,
-      from_branch_code: "BR001",
-      to_branch_code: "BR003",
-      transfer_date: "MM-DD-YYYY",
-      status: "Cancelled",
-      created_by: "Maria Dela Cruz",
-      approved_by: "",
-      receive_by: "",
+      to_number: "TO-000000001",
+      movement_type_code: "TP01",
+      creation_date: "MM-DD-YYYY",
+      to_status: "Approved",
     },
   ]);
 
-  // + Client-Side Filtering
-  const [filtered_stock_transfer_list, set_filtered_stock_transfer_list] =
-    useState([]);
-  const [loading, set_loading] = useState(false);
-  const [select_option, set_select_option] = useState(5);
-  const [current_page, set_current_page] = useState(1);
-  const [sort_by, set_sort_by] = useState("timestamp");
-  const [sort_order, set_sort_order] = useState("asc");
-  const [search_query, set_search_query] = useState("");
-  const [debounced_query, set_debounced_query] = useState("");
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      set_debounced_query(search_query);
-      set_current_page(1);
-    }, 300);
-    return () => clearTimeout(timer);
-  }, [search_query]);
-
-  useEffect(() => {
-    let temp = [...stock_transfer_list];
-
-    if (debounced_query.trim() !== "") {
-      const q = debounced_query.toLowerCase();
-      temp = temp.filter((u) =>
-        columns.some((col) => {
-          if (col.key === "actions") return false;
-          const val = u[col.key];
-          return val?.toString().toLowerCase().includes(q);
-        })
-      );
-    }
-
-    temp.sort((a, b) => {
-      const val_a = a[sort_by];
-      const val_b = b[sort_by];
-
-      if (val_a == null) return 1;
-      if (val_b == null) return -1;
-
-      if (val_a < val_b) return sort_order === "asc" ? -1 : 1;
-      if (val_a > val_b) return sort_order === "asc" ? 1 : -1;
-      return 0;
-    });
-
-    const start_idx = (current_page - 1) * select_option;
-    const end_idx = start_idx + select_option;
-    set_filtered_stock_transfer_list(temp.slice(start_idx, end_idx));
-  }, [
-    stock_transfer_list,
-    debounced_query,
+  const {
+    search_query,
+    set_search_query,
+    current_page,
+    set_current_page,
+    select_entries,
+    set_select_entries,
     sort_by,
     sort_order,
-    current_page,
-    select_option,
-  ]);
-
-  const total_pages = Math.ceil(
-    (debounced_query
-      ? stock_transfer_list.filter((u) =>
-          columns.some((col) => {
-            if (col.key === "actions") return false;
-            const val = u[col.key];
-            return val
-              ?.toString()
-              .toLowerCase()
-              .includes(debounced_query.toLowerCase());
-          })
-        ).length
-      : stock_transfer_list.length) / select_option
-  );
-
-  const handle_sort = (column) => {
-    if (sort_by === column)
-      set_sort_order(sort_order === "asc" ? "desc" : "asc");
-    else {
-      set_sort_by(column);
-      set_sort_order("asc");
-    }
-    set_current_page(1);
-  };
-
-  const handle_page_change = (page) => set_current_page(page);
-  // - Client-Side Filtering
+    handle_sort,
+    filtered_data,
+    total_pages,
+  } = client_side_filter(to_list, columns);
 
   const handle_transfer_process = () => {
     set_page("transfer_process");
@@ -175,21 +78,17 @@ const Stock_Transfer = () => {
 
   const handle_change_start_date = (value) => {
     set_start_date(format_date_1(value));
-    set_show_load_data_button(true);
   };
 
   const handle_change_end_date = (value) => {
     set_end_date(format_date_1(value));
-    set_show_load_data_button(true);
   };
 
   const handle_view_transfer = () => {
     set_page("view_transfer");
   };
 
-  const handle_load_data = () => {
-    set_show_load_data_button(false);
-  };
+  const handle_load_data = () => {};
 
   // RETURN ORIGIN
   return (
@@ -254,16 +153,14 @@ const Stock_Transfer = () => {
                     on_change={(e) => handle_change_end_date(e.target.value)}
                     placeholder="Select Date"
                   />
-                  {show_load_data_button && (
-                    <Button
-                      variant="primary"
-                      icon={Database}
-                      icon_position="left"
-                      on_click={handle_load_data}
-                    >
-                      Load Data
-                    </Button>
-                  )}
+                  <Button
+                    variant="primary"
+                    icon={Database}
+                    icon_position="left"
+                    on_click={handle_load_data}
+                  >
+                    Load Data
+                  </Button>
                 </div>
               </div>
               <div className="p-5 sm:p-6 border-t">
@@ -274,9 +171,9 @@ const Stock_Transfer = () => {
                       <div className="w-[90px]">
                         <Select_Field
                           name="option"
-                          value={select_option}
+                          value={select_entries}
                           on_change={(e) => {
-                            set_select_option(Number(e.target.value));
+                            set_select_entries(Number(e.target.value));
                             set_current_page(1);
                           }}
                           options={[
@@ -355,11 +252,11 @@ const Stock_Transfer = () => {
 
                   {/* Table */}
                   <div className="overflow-x-auto">
-                    {loading ? (
+                    {loading_list ? (
                       <div className="p-6 text-center text-gray-500 text-sm">
                         Loading...
                       </div>
-                    ) : filtered_stock_transfer_list.length === 0 ? (
+                    ) : filtered_data.length === 0 ? (
                       <div className="p-6 text-center text-gray-500 text-sm">
                         No data found
                       </div>
@@ -411,28 +308,10 @@ const Stock_Transfer = () => {
                           </tr>
                         </thead>
                         <tbody className="bg-white">
-                          {filtered_stock_transfer_list.map((row, idx) => {
+                          {filtered_data.map((row, idx) => {
                             const render_cell = (col, row) => {
                               const value = row[col.key];
-                              if (col.key === "status") {
-                                return (
-                                  <span
-                                    className={`inline-flex items-center justify-center gap-1 rounded-full px-3 py-0.5 text-xs font-medium ${
-                                      {
-                                        Draft: "bg-yellow-100 text-yellow-600",
-                                        Approved: "bg-green-100 text-green-500",
-                                        "In Transit":
-                                          "bg-yellow-100 text-yellow-600",
-                                        Received: "bg-green-100 text-green-500",
-                                        Cancelled: "bg-red-100 text-red-500",
-                                      }[row.status] ||
-                                      "bg-gray-100 text-gray-500"
-                                    }`}
-                                  >
-                                    {row.status}
-                                  </span>
-                                );
-                              }
+
                               if (col.key === "actions") {
                                 return (
                                   <div className="flex gap-2">
@@ -451,6 +330,7 @@ const Stock_Transfer = () => {
 
                               return value;
                             };
+
                             return (
                               <tr key={idx} className="hover:bg-gray-50">
                                 {columns.map((col, i) => (
@@ -478,7 +358,7 @@ const Stock_Transfer = () => {
                     <Pagination
                       current_page={current_page}
                       total_pages={total_pages}
-                      on_page_change={handle_page_change}
+                      on_page_change={set_current_page}
                       variant="compact"
                     />
                   )}

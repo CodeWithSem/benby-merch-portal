@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from "react";
-import { Package, Search, X } from "lucide-react";
+import { CircleX, Package, Search, X } from "lucide-react";
 import Button from "assets/elements/Button";
 import Icon_Field from "assets/elements/Icon_Field";
 import Checkbox_Field from "assets/elements/Checkbox_Field";
@@ -9,6 +9,7 @@ import { use_scroll_lock } from "assets/scripts/functions/use_scroll_lock";
 import { client_side_filter } from "assets/scripts/functions/client_side_filter";
 import Pagination_Modal from "assets/elements/Pagination_Modal";
 import Text_Field from "assets/elements/Text_Field";
+import { useToast } from "../../../../../layout/Toast_Provider";
 
 const Select_SBIN = ({
   is_open,
@@ -18,8 +19,11 @@ const Select_SBIN = ({
   sbin_list,
   new_transfer_post_data,
   selected_row,
+  selected_item_list,
+  set_selected_item_list,
 }) => {
   use_scroll_lock(is_open);
+  const { show_toast } = useToast();
 
   // 1. Define columns for the filter hook (matches your table headers)
   const columns = [
@@ -32,6 +36,16 @@ const Select_SBIN = ({
   const [transfer_qty, set_transfer_qty] = useState("");
 
   const valid_sbin_list = useMemo(() => {
+    // Existing: Get bins already assigned as destinations
+    const assigned_bin_codes = selected_item_list
+      .map((item) => item.to_sbin_code)
+      .filter((code) => code !== undefined && code !== null && code !== "");
+
+    // NEW: Get all bin codes that are currently acting as SOURCES in the list
+    const assigned_source_codes = selected_item_list
+      .map((item) => item.from_sbin_code)
+      .filter((code) => code !== undefined && code !== null && code !== "");
+
     return sbin_list.filter((bin) => {
       // 1. MUST match the destination filters (Plant, Warehouse, Sloc)
       const match_filter =
@@ -53,16 +67,29 @@ const Select_SBIN = ({
         bin.current_item === selected_row?.current_item &&
         bin.current_batch === selected_row?.current_batch;
 
-      const is_not_same_bin = // to be continue
-        bin.current_item === selected_row?.current_item &&
-        bin.current_batch === selected_row?.current_batch;
+      const is_not_same_bin = bin.sbin_code !== selected_row?.sbin_code;
+
+      const is_not_already_assigned =
+        !assigned_bin_codes.includes(bin.sbin_code) ||
+        bin.sbin_code === selected_row?.to_sbin_code;
+
+      // NEW: Logic to ensure the bin is not present in the source list (from_sbin_code)
+      const is_not_a_source_in_list = !assigned_source_codes.includes(
+        bin.sbin_code,
+      );
 
       // COMBINED LOGIC:
-      // It must match location AND have space...
-      // AND it must be either totally empty OR match the item/batch.
-      return match_filter && has_space && (is_empty || content_matches);
+      return (
+        match_filter &&
+        has_space &&
+        is_not_same_bin &&
+        is_not_already_assigned &&
+        is_not_a_source_in_list && // Added new validation here
+        (is_empty || content_matches)
+      );
     });
-  }, [sbin_list, new_transfer_post_data, selected_row]);
+    // Added selected_item_list to dependencies to ensure the filter refreshes when the list changes
+  }, [sbin_list, new_transfer_post_data, selected_row, selected_item_list]);
 
   // 2. Use the reusable filter hook
   const {
@@ -75,7 +102,72 @@ const Select_SBIN = ({
   } = client_side_filter(valid_sbin_list, columns);
 
   const handle_close = () => {
+    set_transfer_qty("");
+    set_selected_sbin(null);
     on_close();
+  };
+
+  const handle_proceed = () => {
+    const qty = Number(transfer_qty);
+    const current_bin_qty = Number(selected_sbin.bin_capacity || 0);
+    const max_cap = Number(selected_sbin.max_bin_capacity);
+    const source_stock = Number(selected_row?.bin_capacity || 0);
+
+    // 1. Validation: Source Stock Check (NEW)
+    if (qty > source_stock) {
+      show_toast({
+        type: "danger",
+        title: "Transfer failed",
+        message: `Transfer quantity (${qty}) exceeds Stock Quantity (${source_stock}).`,
+        icon: <CircleX size={21} className="text-red-500" />,
+      });
+      return;
+    }
+
+    // 2. Validation: Destination Capacity Check
+    if (qty + current_bin_qty > max_cap) {
+      show_toast({
+        type: "danger",
+        title: "Transfer failed",
+        message: `Total quantity (${qty + current_bin_qty}) exceeds Destination Max Capacity (${max_cap}).`,
+        icon: <CircleX size={21} className="text-red-500" />,
+      });
+
+      return;
+    }
+
+    if (qty <= 0) {
+      show_toast({
+        type: "danger",
+        title: "Transfer failed",
+        message: `Please enter a valid quantity.`,
+        icon: <CircleX size={21} className="text-red-500" />,
+      });
+
+      return;
+    }
+
+    // 3. Update the selected_item_list
+    set_selected_item_list((prev) =>
+      prev.map((item) => {
+        // Identity check using item, batch, and source bin
+        if (
+          item.current_item === selected_row.current_item &&
+          item.current_batch === selected_row.current_batch &&
+          item.from_sbin_code === selected_row.from_sbin_code
+        ) {
+          return {
+            ...item,
+            to_sbin_code: selected_sbin.sbin_code,
+            to_stype_code: selected_sbin.stype_code,
+            quantity_transfer: qty,
+          };
+        }
+        return item;
+      }),
+    );
+
+    handle_close();
   };
 
   return is_open ? (
@@ -109,9 +201,7 @@ const Select_SBIN = ({
                       <span className="sm:hidden">
                         <Package size={16} />
                       </span>
-                      Item Details {new_transfer_post_data?.to_plant_code}{" "}
-                      {new_transfer_post_data?.to_warehouse_code}{" "}
-                      {new_transfer_post_data?.to_sloc_code}
+                      Item Details (Source Storage Bin)
                     </div>
                     <div className="col-span-4">
                       <p className="text-[10px] uppercase tracking-wider text-sky-600 font-bold">
@@ -150,7 +240,7 @@ const Select_SBIN = ({
                       <p className="text-[10px] uppercase tracking-wider text-sky-600 font-bold">
                         Stock Quantity
                       </p>
-                      <p className="text-xs font-bold text-gray-700">
+                      <p className="text-xs font-bold text-sky-600">
                         {selected_row?.bin_capacity}{" "}
                         <span className="text-[10px] font-normal text-gray-500 uppercase">
                           {selected_row?.uom}
@@ -184,7 +274,10 @@ const Select_SBIN = ({
                       <tr className="font-semibold text-xs">
                         <th className="px-6 py-3 w-[80px]"></th>
                         <th className="px-6 py-3 text-gray-500 text-left">
-                          Storage Bin
+                          Storage Code
+                        </th>
+                        <th className="px-6 py-3 text-gray-500 text-left">
+                          Description
                         </th>
                         <th className="px-6 py-3 text-gray-500 text-left">
                           Capacity
@@ -198,8 +291,8 @@ const Select_SBIN = ({
                       {filtered_data.length === 0 ? (
                         <tr>
                           <td
-                            colSpan={4}
-                            className="text-center py-6 text-gray-500 text-sm"
+                            colSpan={5}
+                            className="text-center py-4 text-gray-500 text-sm"
                           >
                             No data found
                           </td>
@@ -223,14 +316,10 @@ const Select_SBIN = ({
                               </div>
                             </td>
                             <td className="px-5 py-4 sm:px-6">
-                              <div className="block font-medium text-gray-800">
-                                <span className="block text-gray-500 text-[10px]">
-                                  {data.sbin_code}
-                                </span>
-                                <span className="block text-gray-800 text-[13px]">
-                                  {data.sbin_desc}
-                                </span>
-                              </div>
+                              {data.sbin_code}
+                            </td>
+                            <td className="px-5 py-4 sm:px-6">
+                              {data.sbin_desc}
                             </td>
                             <td className="px-6 py-3 text-gray-700 tracking-wide">
                               {data.bin_capacity} / {data.max_bin_capacity}
@@ -243,10 +332,15 @@ const Select_SBIN = ({
                                     label=""
                                     placeholder={"0"}
                                     type={"number"}
+                                    int_only={true}
                                     value={transfer_qty}
-                                    on_change={(e) =>
-                                      set_transfer_qty(e.target.value)
-                                    }
+                                    on_change={(e) => {
+                                      const val = e.target.value;
+                                      // Only update state if the value is not negative
+                                      if (Number(val) >= 0 || val === "") {
+                                        set_transfer_qty(val);
+                                      }
+                                    }}
                                   />
                                 </div>
                               )}
@@ -278,7 +372,10 @@ const Select_SBIN = ({
               <Button
                 variant="primary"
                 class_name="w-full md:w-[100px]"
-                disabled={!selected_sbin}
+                on_click={handle_proceed}
+                disabled={
+                  !selected_sbin || transfer_qty === "" || transfer_qty === "0"
+                }
               >
                 Proceed
               </Button>

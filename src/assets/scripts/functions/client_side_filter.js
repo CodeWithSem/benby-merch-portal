@@ -14,7 +14,7 @@ export const client_side_filter = (initial_data, columns, options = {}) => {
   const [sort_by, set_sort_by] = useState(default_sort_by);
   const [sort_order, set_sort_order] = useState(default_sort_order);
 
-  // Handle Debouncing Search
+  // Handle Debouncing Search to prevent lag during typing
   useEffect(() => {
     const timer = setTimeout(() => {
       set_debounced_query(search_query);
@@ -23,25 +23,32 @@ export const client_side_filter = (initial_data, columns, options = {}) => {
     return () => clearTimeout(timer);
   }, [search_query]);
 
-  // The "Engine": Filter -> Sort -> Paginate
+  // The "Engine": Filter -> Sort -> Paginate -> Index
   const { filtered_data, total_pages } = useMemo(() => {
     let temp = [...initial_data];
 
-    // 1. Filter
+    // 1. Filter Logic
     if (debounced_query.trim() !== "") {
       const q = debounced_query.toLowerCase();
       temp = temp.filter((item) =>
         columns.some((col) => {
-          if (col.key === "checkbox" || col.key === "actions") return false;
+          // Skip columns that don't contain searchable data
+          if (
+            col.key === "checkbox" ||
+            col.key === "actions" ||
+            col.key === "arrow"
+          )
+            return false;
           return item[col.key]?.toString().toLowerCase().includes(q);
         }),
       );
     }
 
-    // 2. Sort
+    // 2. Sort Logic
     temp.sort((a, b) => {
       const val_a = a[sort_by];
       const val_b = b[sort_by];
+
       if (val_a == null) return 1;
       if (val_b == null) return -1;
 
@@ -53,12 +60,18 @@ export const client_side_filter = (initial_data, columns, options = {}) => {
           : 0;
     });
 
-    // 3. Paginate
+    // 3. Paginate Logic
     const total = Math.ceil(temp.length / select_entries);
     const start_idx = (current_page - 1) * select_entries;
     const paginated = temp.slice(start_idx, start_idx + select_entries);
 
-    return { filtered_data: paginated, total_pages: total };
+    // 4. Indexing Logic (Global continuity across pages)
+    const indexed_data = paginated.map((item, i) => ({
+      ...item,
+      index: start_idx + i + 1,
+    }));
+
+    return { filtered_data: indexed_data, total_pages: total };
   }, [
     initial_data,
     debounced_query,

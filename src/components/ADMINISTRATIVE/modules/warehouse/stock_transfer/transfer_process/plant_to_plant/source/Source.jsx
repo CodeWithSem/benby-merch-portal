@@ -25,8 +25,8 @@ const Source = ({ transfer_data }) => {
     sbin_list,
     selected_item_list,
     set_selected_item_list,
-    new_transfer_post_data,
-    set_new_transfer_post_data,
+    new_to_data,
+    set_new_to_data,
   } = transfer_data;
   const [loading, set_loading] = useState(false);
   const [display_modal, set_display_modal] = useState("");
@@ -47,12 +47,10 @@ const Source = ({ transfer_data }) => {
         const has_item =
           bin.current_item && bin.current_item.toString().trim() !== "";
         const has_capacity = Number(bin.bin_capacity) > 0;
-        const matches_plant =
-          bin.plant_code === new_transfer_post_data?.from_plant_code;
+        const matches_plant = bin.plant_code === new_to_data?.from_plant_code;
         const matches_warehouse =
-          bin.warehouse_code === new_transfer_post_data?.from_warehouse_code;
-        const matches_sloc =
-          bin.sloc_code === new_transfer_post_data?.from_sloc_code;
+          bin.warehouse_code === new_to_data?.from_warehouse_code;
+        const matches_sloc = bin.sloc_code === new_to_data?.from_sloc_code;
 
         return (
           has_item &&
@@ -71,7 +69,7 @@ const Source = ({ transfer_data }) => {
           "item_desc",
         ),
       }));
-  }, [sbin_list, new_transfer_post_data]);
+  }, [sbin_list, new_to_data]);
 
   const {
     search_query,
@@ -155,9 +153,9 @@ const Source = ({ transfer_data }) => {
                 label="Plant"
                 code_width="150px"
                 show_search_button={true}
-                code_value={new_transfer_post_data?.from_plant_code}
+                code_value={new_to_data?.from_plant_code}
                 text_value={get_description(
-                  new_transfer_post_data.from_plant_code,
+                  new_to_data.from_plant_code,
                   plant_list,
                   "plant_code",
                   "plant_desc",
@@ -170,10 +168,10 @@ const Source = ({ transfer_data }) => {
               <Text_Code_Field
                 label="Warehouse"
                 code_width="150px"
-                show_search_button={!!new_transfer_post_data?.from_plant_code}
-                code_value={new_transfer_post_data?.from_warehouse_code}
+                show_search_button={!!new_to_data?.from_plant_code}
+                code_value={new_to_data?.from_warehouse_code}
                 text_value={get_description(
-                  new_transfer_post_data.from_warehouse_code,
+                  new_to_data.from_warehouse_code,
                   warehouse_list,
                   "warehouse_code",
                   "warehouse_desc",
@@ -186,12 +184,10 @@ const Source = ({ transfer_data }) => {
               <Text_Code_Field
                 label="Storage Location"
                 code_width="150px"
-                show_search_button={
-                  !!new_transfer_post_data?.from_warehouse_code
-                }
-                code_value={new_transfer_post_data?.from_sloc_code}
+                show_search_button={!!new_to_data?.from_warehouse_code}
+                code_value={new_to_data?.from_sloc_code}
                 text_value={get_description(
-                  new_transfer_post_data.from_sloc_code,
+                  new_to_data.from_sloc_code,
                   sloc_list,
                   "sloc_code",
                   "sloc_desc",
@@ -242,7 +238,7 @@ const Source = ({ transfer_data }) => {
                   Loading...
                 </div>
               ) : filtered_data.length === 0 ? (
-                <div className="p-6 text-center text-gray-500 text-sm">
+                <div className="p-6 text-center text-gray-400 text-sm">
                   No data found
                 </div>
               ) : (
@@ -323,7 +319,7 @@ const Source = ({ transfer_data }) => {
         width="max-w-[1000px]"
         height="max-h-[700px]"
         plant_list={plant_list}
-        set_data={set_new_transfer_post_data}
+        set_data={set_new_to_data}
         is_source={true}
         transfer_process="TP01"
       />
@@ -332,11 +328,11 @@ const Source = ({ transfer_data }) => {
         on_close={() => set_display_modal("")}
         width="max-w-[1000px]"
         height="max-h-[700px]"
-        selected_plant_code={new_transfer_post_data.from_plant_code}
+        selected_plant_code={new_to_data.from_plant_code}
         plant_list={plant_list}
         warehouse_list={warehouse_list}
         plant_h_list={plant_h_list}
-        set_data={set_new_transfer_post_data}
+        set_data={set_new_to_data}
         is_source={true}
         transfer_process="TP01"
       />
@@ -345,11 +341,11 @@ const Source = ({ transfer_data }) => {
         on_close={() => set_display_modal("")}
         width="max-w-[1000px]"
         height="max-h-[700px]"
-        selected_warehouse_code={new_transfer_post_data.from_warehouse_code}
+        selected_warehouse_code={new_to_data.from_warehouse_code}
         warehouse_list={warehouse_list}
         sloc_list={sloc_list}
         warehouse_h_list={warehouse_h_list}
-        set_data={set_new_transfer_post_data}
+        set_data={set_new_to_data}
         is_source={true}
         transfer_process="TP01"
       />

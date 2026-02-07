@@ -12,6 +12,7 @@ import Pillspin_Source from "./pillspin_transfer/source/Pillspin_Source";
 import G2_Destination from "./pillspin_transfer/destination/G2_Destination";
 import Plant_To_Plant from "./plant_to_plant/Plant_To_Plant";
 import { api_get_sbin_master_rtdb } from "api/real_time_db/warehouse/storage_bin/tbl_sbin_master_api_rtdb";
+import Text_Field from "assets/elements/Text_Field";
 
 const Transfer_Process = ({ set_page }) => {
   const [display_modal, set_display_modal] = useState("");
@@ -19,7 +20,6 @@ const Transfer_Process = ({ set_page }) => {
   const [selected_item_list, set_selected_item_list] = useState([]);
   const [sbin_list, set_sbin_list] = useState([]);
   const [loading_list, set_loading_list] = useState(false);
-  const [new_transfer_post_data, set_new_transfer_post_data] = useState({});
 
   const handle_get_sbin_list = async () => {
     set_loading_list(true);
@@ -116,20 +116,30 @@ const Transfer_Process = ({ set_page }) => {
           {/* - Header */}
           <div className="p-5 sm:p-6 border-t">
             <div className="grid grid-cols-1 gap-5">
-              <Text_Code_Field
-                label="Movement Type"
-                code_width="150px"
-                show_search_button={true}
-                code_value={transfer_post_data.movement_type_code}
-                text_value={get_description(
-                  transfer_post_data.movement_type_code,
-                  movement_type_list,
-                  "movement_type_code",
-                  "movement_type_desc",
-                )}
-                on_click={() => set_display_modal("select_movement_type")}
-                disabled
-              />
+              <div>
+                <Text_Field
+                  label="TO Number"
+                  type={"text"}
+                  value={transfer_post_data?.to_number}
+                  disabled
+                />
+              </div>
+              <div>
+                <Text_Code_Field
+                  label="Movement Type"
+                  code_width="150px"
+                  show_search_button={true}
+                  code_value={transfer_post_data.movement_type_code}
+                  text_value={get_description(
+                    transfer_post_data.movement_type_code,
+                    movement_type_list,
+                    "movement_type_code",
+                    "movement_type_desc",
+                  )}
+                  on_click={() => set_display_modal("select_movement_type")}
+                  disabled
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -140,8 +150,9 @@ const Transfer_Process = ({ set_page }) => {
               sbin_list,
               selected_item_list,
               set_selected_item_list,
-              new_transfer_post_data,
-              set_new_transfer_post_data,
+              new_to_data,
+              set_new_to_data,
+              handle_go_back,
             }}
           />
         )}

@@ -4,6 +4,7 @@ import Icon_Field from "assets/elements/Icon_Field";
 import Checkbox_Field from "assets/elements/Checkbox_Field";
 import Button from "assets/elements/Button";
 import Pagination_Modal from "assets/elements/Pagination_Modal";
+import { use_scroll_lock } from "assets/scripts/functions/use_scroll_lock";
 
 const Select_Generic = ({
   is_open,
@@ -21,6 +22,7 @@ const Select_Generic = ({
   set_data,
   on_after_select = null,
 }) => {
+  use_scroll_lock(is_open);
   const code_fields = Array.isArray(source_code) ? source_code : [source_code];
   const desc_fields = Array.isArray(source_desc) ? source_desc : [source_desc];
 

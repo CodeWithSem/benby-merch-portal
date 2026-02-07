@@ -1,5 +1,14 @@
-import React, { useState } from "react";
-import { Search, RefreshCw, MapPin, Archive } from "lucide-react";
+import React, { useMemo, useState } from "react";
+import {
+  Search,
+  RefreshCw,
+  MapPin,
+  Archive,
+  CircleX,
+  ChevronRight,
+  ChevronsRight,
+  ArrowLeftRight,
+} from "lucide-react";
 
 // Elements
 import Button from "assets/elements/Button";
@@ -18,15 +27,19 @@ import { sloc_list } from "assets/data/sloc_list";
 import { plant_h_list } from "assets/data/plant_h_list";
 import { warehouse_h_list } from "assets/data/warehouse_h_list";
 import Select_SBIN from "../../modals/Select_SBIN";
+import { useToast } from "../../../../../../layout/Toast_Provider";
 
 const Destination = ({ transfer_data }) => {
   const {
     sbin_list,
     selected_item_list,
     set_selected_item_list,
-    new_transfer_post_data,
-    set_new_transfer_post_data,
+    new_to_data,
+    set_new_to_data,
+    handle_go_back,
   } = transfer_data;
+
+  const { show_toast } = useToast();
 
   const [display_modal, set_display_modal] = useState("");
   const [select_entries, set_select_entries] = useState(10);
@@ -36,55 +49,60 @@ const Destination = ({ transfer_data }) => {
   const columns = [
     { key: "current_item", label: "Item Code" },
     { key: "item_desc", label: "Description" },
-    { key: "bin_capacity", label: "Stock Qty" },
     // { key: "plant_code", label: "From Plant" },
     // { key: "warehouse_code", label: "From WH" },
     // { key: "sloc_code", label: "From SLOC" },
-    { key: "from_sbin_code", label: "From Bin" },
-    { key: "from_stype_code", label: "From Type" },
-    { key: "to_sbin_code", label: "To Bin" },
-    { key: "to_stype_code", label: "To Type" },
+    { key: "from_sbin_code", label: "From Storage Bin" },
+    { key: "from_stype_code", label: "From Storage Type" },
+    { key: "bin_capacity", label: "Stock Qty" },
+    { key: "arrow", label: "" },
+    { key: "to_sbin_code", label: "To Storage Bin" },
+    { key: "to_stype_code", label: "To Storage Type" },
     { key: "quantity_transfer", label: "Qty to Transfer" },
-    { key: "action", label: "" }, // Moved Action to the end
+    { key: "action", label: "" },
   ];
 
   const handle_open_bin_modal = (row) => {
-    // This will open your specific bin selection modal
-    set_selected_row(row);
-    set_display_modal("select_sbin");
+    const invalid_destination =
+      !new_to_data?.to_plant_code ||
+      !new_to_data?.to_warehouse_code ||
+      !new_to_data?.to_sloc_code;
+    if (invalid_destination) {
+      show_toast({
+        type: "danger",
+        title: "Invalid",
+        message: "Please fill up the fields for destination.",
+        icon: <CircleX size={21} className="text-red-500" />,
+      });
+    } else {
+      set_selected_row(row);
+      set_display_modal("select_sbin");
+    }
   };
 
   const render_cell = (col, row) => {
     if (col.key === "to_sbin_code") {
-      return (
-        <span
-          className={
-            row.to_sbin_code
-              ? "text-blue-600 font-bold"
-              : "text-gray-400 italic"
-          }
-        >
-          {row.to_sbin_code || "-"}
-        </span>
-      );
+      return <span>{row.to_sbin_code || "-"}</span>;
     }
 
     if (col.key === "to_stype_code") {
       return <span>{row.to_stype_code || "-"}</span>;
     }
 
+    if (col.key === "quantity_transfer") {
+      return <span>{row.quantity_transfer || "-"}</span>;
+    }
+
+    if (col.key === "arrow") {
+      return (
+        <div className="flex justify-center items-center text-sky-600">
+          <ChevronsRight size={18} />
+        </div>
+      );
+    }
+
     if (col.key === "action") {
       return (
-        // <Button
-        //   label="Select Bin"
-        //   variant="blue"
-        //   icon={MapPin}
-        //   icon_position="left"
-        //   size="tight"
-        //   className="text-[10px] px-3 py-1.5"
-        //   on_click={()
-        //  => handle_open_bin_modal(row)}
-        // />
         <Button
           variant="primary"
           size="sm"
@@ -100,6 +118,21 @@ const Destination = ({ transfer_data }) => {
     return row[col.key];
   };
 
+  const is_transfer_disabled = useMemo(() => {
+    if (selected_item_list.length === 0) return true;
+
+    // Returns true if at least one item has no destination bin assigned
+    return selected_item_list.some((item) => !item.to_sbin_code);
+  }, [selected_item_list]);
+
+  const handle_transfer = () => {
+    const final_data = {
+      ...new_to_data,
+      selected_item_list,
+    };
+  };
+
+  // RETURN ORIGIN
   return (
     <React.Fragment>
       <div className="mt-5 w-full bg-white rounded-lg border">
@@ -115,9 +148,9 @@ const Destination = ({ transfer_data }) => {
                 label="Plant"
                 code_width="150px"
                 show_search_button={true}
-                code_value={new_transfer_post_data?.to_plant_code}
+                code_value={new_to_data?.to_plant_code}
                 text_value={get_description(
-                  new_transfer_post_data.to_plant_code,
+                  new_to_data.to_plant_code,
                   plant_list,
                   "plant_code",
                   "plant_desc",
@@ -130,10 +163,10 @@ const Destination = ({ transfer_data }) => {
               <Text_Code_Field
                 label="Warehouse"
                 code_width="150px"
-                show_search_button={!!new_transfer_post_data?.to_plant_code}
-                code_value={new_transfer_post_data?.to_warehouse_code}
+                show_search_button={!!new_to_data?.to_plant_code}
+                code_value={new_to_data?.to_warehouse_code}
                 text_value={get_description(
-                  new_transfer_post_data.to_warehouse_code,
+                  new_to_data.to_warehouse_code,
                   warehouse_list,
                   "warehouse_code",
                   "warehouse_desc",
@@ -146,10 +179,10 @@ const Destination = ({ transfer_data }) => {
               <Text_Code_Field
                 label="Storage Location"
                 code_width="150px"
-                show_search_button={!!new_transfer_post_data?.to_warehouse_code}
-                code_value={new_transfer_post_data?.to_sloc_code}
+                show_search_button={!!new_to_data?.to_warehouse_code}
+                code_value={new_to_data?.to_sloc_code}
                 text_value={get_description(
-                  new_transfer_post_data.to_sloc_code,
+                  new_to_data.to_sloc_code,
                   sloc_list,
                   "sloc_code",
                   "sloc_desc",
@@ -196,8 +229,8 @@ const Destination = ({ transfer_data }) => {
             </div>
             <div className="overflow-x-auto">
               {selected_item_list.length === 0 ? (
-                <div className="p-10 text-center text-gray-400 text-sm italic">
-                  No items selected from source.
+                <div className="p-6 text-center text-gray-400 text-sm">
+                  No data selected from source
                 </div>
               ) : (
                 <table className="min-w-full whitespace-nowrap">
@@ -239,6 +272,24 @@ const Destination = ({ transfer_data }) => {
             </div>
           </div>
         </div>
+        <div className="p-4 sm:p-8 border-t">
+          <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
+            <Button
+              variant="primary"
+              size="lg"
+              // width="w-[100px]"
+              icon={ArrowLeftRight}
+              icon_position="left"
+              on_click={handle_transfer}
+              disabled={is_transfer_disabled}
+            >
+              Transfer
+            </Button>
+            <Button variant="white" size="lg" on_click={handle_go_back}>
+              Cancel
+            </Button>
+          </div>
+        </div>
       </div>
 
       {/* Modals for Destination Hierarchy */}
@@ -248,7 +299,7 @@ const Destination = ({ transfer_data }) => {
         width="max-w-[1000px]"
         height="max-h-[700px]"
         plant_list={plant_list}
-        set_data={set_new_transfer_post_data}
+        set_data={set_new_to_data}
         is_source={false}
         transfer_process="TP01"
       />
@@ -257,11 +308,11 @@ const Destination = ({ transfer_data }) => {
         on_close={() => set_display_modal("")}
         width="max-w-[1000px]"
         height="max-h-[700px]"
-        selected_plant_code={new_transfer_post_data.to_plant_code}
+        selected_plant_code={new_to_data.to_plant_code}
         plant_list={plant_list}
         warehouse_list={warehouse_list}
         plant_h_list={plant_h_list}
-        set_data={set_new_transfer_post_data}
+        set_data={set_new_to_data}
         is_source={false}
         transfer_process="TP01"
       />
@@ -270,11 +321,11 @@ const Destination = ({ transfer_data }) => {
         on_close={() => set_display_modal("")}
         width="max-w-[1000px]"
         height="max-h-[700px]"
-        selected_warehouse_code={new_transfer_post_data.to_warehouse_code}
+        selected_warehouse_code={new_to_data.to_warehouse_code}
         warehouse_list={warehouse_list}
         sloc_list={sloc_list}
         warehouse_h_list={warehouse_h_list}
-        set_data={set_new_transfer_post_data}
+        set_data={set_new_to_data}
         is_source={false}
         transfer_process="TP01"
       />
@@ -283,10 +334,12 @@ const Destination = ({ transfer_data }) => {
         is_open={display_modal === "select_sbin"}
         on_close={() => set_display_modal("")}
         width="max-w-[1000px]"
-        height="max-h-[400px]"
+        height="max-h-[500px]"
         sbin_list={sbin_list}
-        new_transfer_post_data={new_transfer_post_data}
+        new_to_data={new_to_data}
         selected_row={selected_row}
+        selected_item_list={selected_item_list}
+        set_selected_item_list={set_selected_item_list}
       />
     </React.Fragment>
   );
