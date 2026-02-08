@@ -119,7 +119,8 @@ export const api_create_wm_order = async (
       process_type, // Ensure process_type is saved in the record
       creation_date: format_date_1(get_date_now()),
       creation_date_sort: format_date_sort(get_date_now()),
-      wmo_status: "Pending",
+      wmo_status: "Approved", // FOR TESTING
+      //  wmo_status: "Pending",
       created_by: user || "N/A",
     };
 

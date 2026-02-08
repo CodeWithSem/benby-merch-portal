@@ -79,8 +79,8 @@ const Select_Generic = ({
 
   const handle_page_change = (page) => set_current_page(page);
 
-  const handle_select = () => {
-    if (!selected_item) {
+  const confirm_selection = (item) => {
+    if (!item) {
       alert(`Please select a ${modal_label.toLowerCase()} before proceeding.`);
       return;
     }
@@ -90,21 +90,24 @@ const Select_Generic = ({
       if (Array.isArray(target_field)) {
         target_field.forEach((t, idx) => {
           const src = code_fields[idx];
-          updated[t] = selected_item[src];
+          updated[t] = item[src];
         });
       } else {
-        updated[target_field] = selected_item[code_fields[0]];
+        updated[target_field] = item[code_fields[0]];
       }
       return updated;
     });
 
-    // ➜ RUN OPTIONAL CALLBACK
     if (typeof on_after_select === "function") {
-      on_after_select(selected_item);
+      on_after_select(item);
     }
 
     handle_close();
   };
+
+  const handle_select = () => confirm_selection(selected_item);
+
+  const handle_double_click = (item) => confirm_selection(item);
 
   const handle_close = () => {
     set_selected_item(null);
@@ -185,6 +188,7 @@ const Select_Generic = ({
                           selected_item?.id === data.id ? "bg-sky-50" : ""
                         }`}
                         onClick={() => set_selected_item(data)}
+                        onDoubleClick={() => handle_double_click(data)}
                       >
                         <td className="px-5 py-4 sm:px-6 text-center">
                           <Checkbox_Field

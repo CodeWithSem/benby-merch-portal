@@ -26,7 +26,7 @@ export const api_get_sub_module_access_list = async () => {
   try {
     const tbl_sub_module_access_ref = collection(
       firestore_db,
-      ...get_firestore_path(TABLES.SUB_MODULE_ACCESS)
+      ...get_firestore_path(TABLES.SUB_MODULE_ACCESS),
     );
 
     const query_snapshot = await getDocs(tbl_sub_module_access_ref);
@@ -58,12 +58,12 @@ export const api_get_sub_module_access_list = async () => {
 export const api_create_sub_module_access = async (
   new_data,
   user,
-  show_toast
+  show_toast,
 ) => {
   try {
     const tbl_sub_module_access_ref = collection(
       firestore_db,
-      ...get_firestore_path(TABLES.SUB_MODULE_ACCESS)
+      ...get_firestore_path(TABLES.SUB_MODULE_ACCESS),
     );
 
     // ---------------------------------------------
@@ -71,7 +71,7 @@ export const api_create_sub_module_access = async (
     // ---------------------------------------------
     const q_code = query(
       tbl_sub_module_access_ref,
-      where("sub_module_access_code", "==", new_data.sub_module_access_code)
+      where("sub_module_access_code", "==", new_data.sub_module_access_code),
     );
     const snap_code = await getDocs(q_code);
 
@@ -94,7 +94,7 @@ export const api_create_sub_module_access = async (
     // ---------------------------------------------
     const q_desc = query(
       tbl_sub_module_access_ref,
-      where("sub_module_access_desc", "==", new_data.sub_module_access_desc)
+      where("sub_module_access_desc", "==", new_data.sub_module_access_desc),
     );
     const snap_desc = await getDocs(q_desc);
 
@@ -162,7 +162,7 @@ export const api_update_sub_module_access_increment = async (id) => {
   try {
     const tbl_sub_module_access_incre_ref = ref(
       realtime_db,
-      get_incremental_path(TABLES.SUB_MODULE_ACCESS)
+      get_incremental_path(TABLES.SUB_MODULE_ACCESS),
     );
 
     await set(tbl_sub_module_access_incre_ref, new_id);
@@ -185,7 +185,7 @@ export const api_update_sub_module_access_increment = async (id) => {
 export const api_update_sub_module_access = async (
   edit_data,
   user,
-  show_toast
+  show_toast,
 ) => {
   try {
     // ---------------------------------------------------
@@ -207,7 +207,7 @@ export const api_update_sub_module_access = async (
     // ---------------------------------------------------
     const q_desc = query(
       tbl_sub_module_access_ref,
-      where("sub_module_access_desc", "==", edit_data.sub_module_access_desc)
+      where("sub_module_access_desc", "==", edit_data.sub_module_access_desc),
     );
 
     const desc_snap = await getDocs(q_desc);
@@ -288,7 +288,7 @@ export const api_bulk_upload_sub_module_access = async (upload_data_list) => {
     const batch = writeBatch(firestore_db);
     const tbl_sub_module_access_ref = collection(
       firestore_db,
-      ...get_firestore_path(TABLES.SUB_MODULE_ACCESS)
+      ...get_firestore_path(TABLES.SUB_MODULE_ACCESS),
     );
 
     upload_data_list.forEach((item) => {
@@ -323,7 +323,7 @@ export const api_delete_sub_module_access = async (id) => {
   try {
     const tbl_sub_module_access_ref = collection(
       firestore_db,
-      ...get_firestore_path(TABLES.SUB_MODULE_ACCESS)
+      ...get_firestore_path(TABLES.SUB_MODULE_ACCESS),
     );
 
     const doc_ref = doc(tbl_sub_module_access_ref, String(id));
@@ -349,13 +349,13 @@ export const api_truncate_sub_module_access = async () => {
   try {
     const tbl_sub_module_access_ref = collection(
       firestore_db,
-      ...get_firestore_path(TABLES.SUB_MODULE_ACCESS)
+      ...get_firestore_path(TABLES.SUB_MODULE_ACCESS),
     );
 
     const snapshot = await getDocs(tbl_sub_module_access_ref);
 
     const delete_promises = snapshot.docs.map((document) =>
-      deleteDoc(doc(tbl_sub_module_access_ref, document.id))
+      deleteDoc(doc(tbl_sub_module_access_ref, document.id)),
     );
 
     await Promise.all(delete_promises);
@@ -379,7 +379,7 @@ export const api_reset_sub_module_access_increment = async () => {
   try {
     const tbl_sub_module_access_incre_ref = ref(
       realtime_db,
-      get_incremental_path(TABLES.SUB_MODULE_ACCESS)
+      get_incremental_path(TABLES.SUB_MODULE_ACCESS),
     );
 
     await set(tbl_sub_module_access_incre_ref, 1);
@@ -410,7 +410,7 @@ export const api_set_sub_module_access_increment = async (new_id) => {
   try {
     const tbl_sub_module_access_incre_ref = ref(
       realtime_db,
-      get_incremental_path(TABLES.SUB_MODULE_ACCESS)
+      get_incremental_path(TABLES.SUB_MODULE_ACCESS),
     );
 
     await set(tbl_sub_module_access_incre_ref, new_id);

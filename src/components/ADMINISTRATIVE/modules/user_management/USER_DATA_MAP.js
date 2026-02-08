@@ -110,4 +110,16 @@ export const user_role_list = [
     user_role_desc: "RMPM Supervisor",
     creation_date: "MM-DD-YYYY",
   },
+  {
+    id: 16,
+    user_role_code: "RMCOOR",
+    user_role_desc: "RM Coordinator",
+    creation_date: "MM-DD-YYYY",
+  },
+  {
+    id: 17,
+    user_role_code: "PMCOOR",
+    user_role_desc: "PM Coordinator",
+    creation_date: "MM-DD-YYYY",
+  },
 ];

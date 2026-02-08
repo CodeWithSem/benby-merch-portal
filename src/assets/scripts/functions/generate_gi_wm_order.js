@@ -92,11 +92,10 @@ export function generate_gi_wm_orders({
         manufacture_date: inv_record.manufacture_date,
         sled_bbd: inv_record.sled_bbd,
         pallet_config: inv_record.pallet_config,
-        sutype: inv_record.sutype,
+        sutype: inv_record.sutype || "IP",
         ref_number: selected_gi.so_number || "",
         do_number: selected_gi.gi_number || "",
-        wm_order_status: "Pending",
-        transfer_order_status: "Pending",
+        status: "Pending",
       });
 
       // 6. Update virtual trackers

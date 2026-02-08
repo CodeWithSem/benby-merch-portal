@@ -5,62 +5,152 @@ import Checkbox_Field from "assets/elements/Checkbox_Field";
 import Button from "assets/elements/Button";
 import Pagination_Modal from "assets/elements/Pagination_Modal";
 
-const Select_Branch = ({
+const Select_Warehouse = ({
   is_open,
   on_close,
   width = "max-w-[700px]",
   height = "h-[500px]",
+  selected_plant_code,
+  plant_list,
+  warehouse_list,
+  plant_h_list,
+  set_data,
+  is_source,
+  transfer_process,
 }) => {
-  const [branch_list, set_branch_list] = useState([
-    {
-      id: 1,
-      branch_code: "BR-001",
-      branch_desc: "Branch Description 1",
-      creation_date: "MM-DD-YYYY",
-    },
-  ]);
-
   // + Client-Side Filtering
-  const [filtered_branch_list, set_filtered_branch_list] = useState([]);
+  const [filtered_plant_h_list, set_filtered_plant_h_list] = useState([]);
   const [current_page, set_current_page] = useState(1);
   const [rows_per_page, set_rows_per_page] = useState(5);
   const [search_query, set_search_query] = useState("");
-  const [selected_branch, set_selected_branch] = useState(null);
+  const [selected_plant_h, set_selected_plant_h] = useState(null);
+
+  const lookup_columns = [
+    {
+      code_key: "plant_code",
+      list: plant_list,
+      desc_key: "plant_desc",
+    },
+    {
+      code_key: "warehouse_code",
+      list: warehouse_list,
+      desc_key: "warehouse_desc",
+    },
+  ];
+
+  const apply_lookups = (data, lookup_columns) => {
+    return data.map((row) => {
+      const updated = { ...row };
+
+      lookup_columns.forEach(({ code_key, list, desc_key }) => {
+        const code_value = row[code_key];
+        const match = list.find((item) => item[code_key] === code_value);
+
+        updated[desc_key] = match ? match[desc_key] : "";
+      });
+
+      return updated;
+    });
+  };
+
+  const get_searchable_fields = (lookup_columns) => {
+    const fields = [];
+
+    lookup_columns.forEach(({ code_key, desc_key }) => {
+      fields.push(code_key);
+      fields.push(desc_key);
+    });
+
+    return fields;
+  };
 
   useEffect(() => {
-    let data = [...branch_list];
+    // 1. Start with plant_h_list
+    let data = apply_lookups(plant_h_list, lookup_columns);
 
+    // 2. Filter by selected_plant_code
+    if (selected_plant_code) {
+      data = data.filter((row) => row.plant_code === selected_plant_code);
+    }
+
+    // 3. Searchable fields
+    const search_fields = get_searchable_fields(lookup_columns);
+
+    // 4. Perform search
     if (search_query.trim() !== "") {
       const q = search_query.toLowerCase();
-      data = data.filter(
-        (data) =>
-          data.branch_code.toLowerCase().includes(q) ||
-          data.branch_desc.toLowerCase().includes(q)
+
+      data = data.filter((row) =>
+        search_fields.some((field) =>
+          row[field]?.toString().toLowerCase().includes(q),
+        ),
       );
     }
 
+    // 4. Pagination
     const start_idx = (current_page - 1) * rows_per_page;
     const end_idx = start_idx + rows_per_page;
-    set_filtered_branch_list(data.slice(start_idx, end_idx));
-  }, [branch_list, search_query, current_page, rows_per_page]);
 
-  const total_pages = Math.ceil(
-    branch_list.filter(
-      (data) =>
-        data.branch_code.toLowerCase().includes(search_query.toLowerCase()) ||
-        data.branch_desc.toLowerCase().includes(search_query.toLowerCase())
-    ).length / rows_per_page
-  );
+    set_filtered_plant_h_list(data.slice(start_idx, end_idx));
+  }, [
+    plant_h_list,
+    selected_plant_code,
+    search_query,
+    current_page,
+    rows_per_page,
+  ]);
+
+  // 1. Apply lookup to plant_h_list
+  const lookup_applied_list = apply_lookups(plant_h_list, lookup_columns);
+
+  // 2. Generate searchable fields
+  const search_fields = get_searchable_fields(lookup_columns);
+
+  // 3. Filter count based on search
+  const filtered_count = lookup_applied_list.filter((row) => {
+    const q = search_query.toLowerCase();
+
+    return search_fields.some((field) =>
+      row[field]?.toString().toLowerCase().includes(q),
+    );
+  }).length;
+
+  // 4. Calculate total pages
+  const total_pages = Math.ceil(filtered_count / rows_per_page);
 
   const handle_page_change = (page) => set_current_page(page);
   // - Client-Side Filtering
 
-  const handle_select_branch = () => {
-    if (!selected_branch) {
-      alert("Please select a branch before proceeding.");
+  const handle_select_plant = (selected_plant_h) => {
+    if (!selected_plant_h) {
+      alert("Please select a data before proceeding.");
       return;
     }
-    alert(`Selected: ${selected_branch.description}`);
+
+    if (is_source) {
+      if (transfer_process === "TP01") {
+        set_data((prev) => ({
+          ...prev,
+          from_warehouse_code: selected_plant_h.warehouse_code,
+          from_sloc_code: "",
+        }));
+      }
+    } else {
+      if (transfer_process === "TP01") {
+        set_data((prev) => ({
+          ...prev,
+          to_warehouse_code: selected_plant_h.warehouse_code,
+          to_sloc_code: "",
+        }));
+      }
+    }
+
+    handle_close();
+  };
+
+  const handle_close = () => {
+    set_selected_plant_h(null);
+    on_close();
   };
 
   // RETURN ORIGIN
@@ -70,19 +160,22 @@ const Select_Branch = ({
         {/* + Blur */}
         <div className="absolute inset-0 bg-black/50 backdrop-blur-sm z-[98]"></div>
         {/* - Blur */}
+
         {/* + Modal Content */}
         <div
           className={`relative bg-white rounded-lg shadow-xl ${width} w-full py-7 m-5 z-[99]`}
         >
           <button
             className="absolute top-5 right-5 p-2 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-400 hover:text-gray-500"
-            onClick={on_close}
+            onClick={handle_close}
           >
             <X size={20} />
           </button>
+          {/* + Modal Label */}
           <div className="text-lg md:text-xl font-bold mb-5 px-7">
-            Branch Selection
+            Warehouse Selection
           </div>
+          {/* - Modal Label */}
           {/* + Modal Body */}
           <div className={`w-full overflow-y-auto ${height} scrollbar-custom`}>
             <div className="overflow-hidden border border-gray-200 bg-white pt-4">
@@ -108,7 +201,7 @@ const Select_Branch = ({
                     <tr className="font-semibold text-xs">
                       <th className="px-6 py-3 w-[80px]"></th>
                       <th className="px-6 py-3 text-gray-500 text-left">
-                        Branch
+                        Warehouse
                       </th>
                       <th className="px-6 py-3 text-gray-500 text-left">
                         Creation Date
@@ -117,7 +210,7 @@ const Select_Branch = ({
                   </thead>
 
                   <tbody className="divide-y divide-gray-100">
-                    {filtered_branch_list.length === 0 ? (
+                    {filtered_plant_h_list.length === 0 ? (
                       <tr>
                         <td
                           colSpan={3}
@@ -127,13 +220,14 @@ const Select_Branch = ({
                         </td>
                       </tr>
                     ) : (
-                      filtered_branch_list.map((data) => (
+                      filtered_plant_h_list.map((data) => (
                         <tr
                           key={data.id}
                           className={`hover:bg-sky-50/50 cursor-pointer text-[12px] ${
-                            selected_branch?.id === data.id ? "bg-sky-50" : ""
+                            selected_plant_h?.id === data.id ? "bg-sky-50" : ""
                           }`}
-                          onClick={() => set_selected_branch(data)}
+                          onClick={() => set_selected_plant_h(data)}
+                          onDoubleClick={() => handle_select_plant(data)}
                         >
                           <td className="px-5 py-4 sm:px-6 text-center">
                             <div className="flex justify-center items-center">
@@ -141,18 +235,18 @@ const Select_Branch = ({
                                 name="check"
                                 box_size={18}
                                 icon_size={12}
-                                checked={selected_branch?.id === data.id}
-                                on_change={() => set_selected_branch(data)}
+                                checked={selected_plant_h?.id === data.id}
+                                on_change={() => set_selected_plant_h(data)}
                               />
                             </div>
                           </td>
                           <td className="px-5 py-4 sm:px-6">
                             <div className="block font-medium text-gray-800">
-                              <span className="block text-gray-500 text-[12px]">
-                                {data.branch_code}
+                              <span className="block text-gray-500 text-[10px]">
+                                {data.warehouse_code}
                               </span>
-                              <span className="block text-gray-800 text-sm">
-                                {data.branch_desc}
+                              <span className="block text-gray-800 text-[13px]">
+                                {data.warehouse_desc}
                               </span>
                             </div>
                           </td>
@@ -169,7 +263,6 @@ const Select_Branch = ({
             </div>
           </div>
           {/* - Modal Body */}
-
           {/* + Modal Footer */}
           <div className="flex flex-col items-center sm:flex-row sm:justify-between gap-3 mt-5 px-7">
             {/* + Pagination */}
@@ -187,15 +280,15 @@ const Select_Branch = ({
             <div className="flex justify-center sm:justify-end gap-2 w-full">
               <Button
                 variant="primary"
-                on_click={handle_select_branch}
+                on_click={() => handle_select_plant(selected_plant_h)}
                 class_name="w-full md:w-[100px]"
-                disabled={!selected_branch}
+                disabled={!selected_plant_h}
               >
                 Proceed
               </Button>
               <Button
                 variant="white"
-                on_click={on_close}
+                on_click={handle_close}
                 class_name="w-full md:w-[100px]"
               >
                 Close
@@ -210,4 +303,4 @@ const Select_Branch = ({
   ) : null;
 };
 
-export default Select_Branch;
+export default Select_Warehouse;

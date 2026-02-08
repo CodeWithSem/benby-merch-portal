@@ -52,6 +52,7 @@ import { Use_App } from "context/app_context";
 import Set_Increment_ID from "assets/elements/modals/Set_Increment_ID";
 import Spinner from "assets/elements/Spinner";
 import { get_description } from "assets/scripts/functions/get_description";
+import Status_Badge from "assets/elements/Status_Badge";
 
 const Sales_Order = () => {
   const { active_user } = Use_App();
@@ -665,28 +666,9 @@ const Sales_Order = () => {
                               }
 
                               if (col.key === "so_status") {
-                                const so_status_class = {
-                                  Draft: "bg-gray-100 text-gray-500",
-                                  Pending: "bg-yellow-100 text-yellow-500",
-                                  "Partially Issued":
-                                    "bg-yellow-100 text-yellow-500",
-                                  Posted: "bg-green-100 text-green-500",
-                                  Approved: "bg-green-100 text-green-500",
-                                  "Fully Issued": "bg-green-100 text-green-500",
-                                  Rejected: "bg-red-100 text-red-500",
-                                };
-
-                                return (
-                                  <span
-                                    className={`inline-flex items-center justify-center gap-1 rounded-full px-3 py-0.5 text-xs font-medium ${
-                                      so_status_class[row.so_status] ||
-                                      "bg-gray-100 text-gray-500"
-                                    }`}
-                                  >
-                                    {row.so_status}
-                                  </span>
-                                );
+                                return <Status_Badge status={row.so_status} />;
                               }
+
                               if (col.key === "actions") {
                                 return (
                                   <div className="flex gap-2">

@@ -9,17 +9,12 @@ const Select_Plant = ({
   is_open,
   on_close,
   width = "max-w-[700px]",
-  height = "h-[500px]",
+  height = "max-h-[500px]",
+  plant_list,
+  set_data,
+  is_source,
+  transfer_process,
 }) => {
-  const [plant_list, set_plant_list] = useState([
-    {
-      id: 1,
-      plant_code: "PL-001",
-      plant_desc: "Plant Description 1",
-      creation_date: "MM-DD-YYYY",
-    },
-  ]);
-
   // + Client-Side Filtering
   const [filtered_plant_list, set_filtered_plant_list] = useState([]);
   const [current_page, set_current_page] = useState(1);
@@ -35,7 +30,7 @@ const Select_Plant = ({
       data = data.filter(
         (data) =>
           data.plant_code.toLowerCase().includes(q) ||
-          data.plant_desc.toLowerCase().includes(q)
+          data.plant_desc.toLowerCase().includes(q),
       );
     }
 
@@ -48,19 +43,44 @@ const Select_Plant = ({
     plant_list.filter(
       (data) =>
         data.plant_code.toLowerCase().includes(search_query.toLowerCase()) ||
-        data.plant_desc.toLowerCase().includes(search_query.toLowerCase())
-    ).length / rows_per_page
+        data.plant_desc.toLowerCase().includes(search_query.toLowerCase()),
+    ).length / rows_per_page,
   );
 
   const handle_page_change = (page) => set_current_page(page);
   // - Client-Side Filtering
 
-  const handle_select_plant = () => {
+  const handle_select_plant = (selected_plant) => {
     if (!selected_plant) {
       alert("Please select a plant before proceeding.");
       return;
     }
-    alert(`Selected: ${selected_plant.description}`);
+    if (is_source) {
+      if (transfer_process === "TP01") {
+        set_data((prev) => ({
+          ...prev,
+          from_plant_code: selected_plant.plant_code,
+          from_warehouse_code: "",
+          from_sloc_code: "",
+        }));
+      }
+    } else {
+      if (transfer_process === "TP01") {
+        set_data((prev) => ({
+          ...prev,
+          to_plant_code: selected_plant.plant_code,
+          to_warehouse_code: "",
+          to_sloc_code: "",
+        }));
+      }
+    }
+
+    handle_close();
+  };
+
+  const handle_close = () => {
+    set_selected_plant(null);
+    on_close();
   };
 
   // RETURN ORIGIN
@@ -70,19 +90,22 @@ const Select_Plant = ({
         {/* + Blur */}
         <div className="absolute inset-0 bg-black/50 backdrop-blur-sm z-[98]"></div>
         {/* - Blur */}
+
         {/* + Modal Content */}
         <div
           className={`relative bg-white rounded-lg shadow-xl ${width} w-full py-7 m-5 z-[99]`}
         >
           <button
             className="absolute top-5 right-5 p-2 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-400 hover:text-gray-500"
-            onClick={on_close}
+            onClick={handle_close}
           >
             <X size={20} />
           </button>
+          {/* + Modal Label */}
           <div className="text-lg md:text-xl font-bold mb-5 px-7">
             Plant Selection
           </div>
+          {/* - Modal Label */}
           {/* + Modal Body */}
           <div className={`w-full overflow-y-auto ${height} scrollbar-custom`}>
             <div className="overflow-hidden border border-gray-200 bg-white pt-4">
@@ -134,6 +157,7 @@ const Select_Plant = ({
                             selected_plant?.id === data.id ? "bg-sky-50" : ""
                           }`}
                           onClick={() => set_selected_plant(data)}
+                          onDoubleClick={() => handle_select_plant(data)}
                         >
                           <td className="px-5 py-4 sm:px-6 text-center">
                             <div className="flex justify-center items-center">
@@ -148,10 +172,10 @@ const Select_Plant = ({
                           </td>
                           <td className="px-5 py-4 sm:px-6">
                             <div className="block font-medium text-gray-800">
-                              <span className="block text-gray-500 text-[12px]">
+                              <span className="block text-gray-500 text-[10px]">
                                 {data.plant_code}
                               </span>
-                              <span className="block text-gray-800 text-sm">
+                              <span className="block text-gray-800 text-[13px]">
                                 {data.plant_desc}
                               </span>
                             </div>
@@ -169,7 +193,6 @@ const Select_Plant = ({
             </div>
           </div>
           {/* - Modal Body */}
-
           {/* + Modal Footer */}
           <div className="flex flex-col items-center sm:flex-row sm:justify-between gap-3 mt-5 px-7">
             {/* + Pagination */}
@@ -187,7 +210,7 @@ const Select_Plant = ({
             <div className="flex justify-center sm:justify-end gap-2 w-full">
               <Button
                 variant="primary"
-                on_click={handle_select_plant}
+                on_click={() => handle_select_plant(selected_plant)}
                 class_name="w-full md:w-[100px]"
                 disabled={!selected_plant}
               >
@@ -195,7 +218,7 @@ const Select_Plant = ({
               </Button>
               <Button
                 variant="white"
-                on_click={on_close}
+                on_click={handle_close}
                 class_name="w-full md:w-[100px]"
               >
                 Close

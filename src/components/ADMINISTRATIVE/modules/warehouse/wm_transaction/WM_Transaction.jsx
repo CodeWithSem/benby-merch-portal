@@ -73,7 +73,7 @@ const WM_Transaction = () => {
     { key: "from_sbin_code", label: "Source", sortable: true },
     { key: "to_sbin_code", label: "Destination", sortable: true },
     { key: "quantity_confirm", label: "Confirmed Qty", sortable: true },
-    { key: "transfer_order_status", label: "Status", sortable: true },
+    { key: "status", label: "Status", sortable: true },
     { key: "actions", label: "", sortable: false },
   ];
   // - Columns
@@ -132,9 +132,7 @@ const WM_Transaction = () => {
     );
 
     if (active_statuses.length > 0) {
-      temp = temp.filter((data) =>
-        active_statuses.includes(data.transfer_order_status),
-      );
+      temp = temp.filter((data) => active_statuses.includes(data.status));
     }
 
     if (debounced_query.trim() !== "") {
@@ -223,7 +221,7 @@ const WM_Transaction = () => {
   //           return {
   //             ...item,
   //             quantity_confirm: data.quantity,
-  //             transfer_order_status: "Complete",
+  //             status: "Complete",
   //           };
   //         }
   //         return item;
@@ -237,7 +235,7 @@ const WM_Transaction = () => {
   //           return {
   //             ...item,
   //             quantity_confirm: 0,
-  //             transfer_order_status: "Pending",
+  //             status: "Pending",
   //           };
   //         }
   //         return item;
@@ -249,7 +247,7 @@ const WM_Transaction = () => {
     // 1. Update the WM Order Item to 'Complete'
     const wm_updates = {
       quantity_confirm: data.quantity,
-      transfer_order_status: "Complete",
+      status: "Complete",
       confirm_date: format_date_1(get_date_now()),
     };
 
@@ -271,7 +269,7 @@ const WM_Transaction = () => {
   const handle_wmo_revert = async (data) => {
     const updates = {
       quantity_confirm: 0,
-      transfer_order_status: "Pending",
+      status: "Pending",
       confirm_date: "",
     };
 
@@ -353,6 +351,7 @@ const WM_Transaction = () => {
                     options={[
                       { label: "Goods Receipt", value: "Goods Receipt" },
                       { label: "Goods Issue", value: "Goods Issue" },
+                      { label: "Stock Transfer", value: "Stock Transfer" },
                     ]}
                   />
                   {/* {show_load_data_button && (
@@ -541,8 +540,8 @@ const WM_Transaction = () => {
                                 );
                               }
 
-                              if (col.key === "transfer_order_status") {
-                                const transfer_order_status_classes = {
+                              if (col.key === "status") {
+                                const status_classes = {
                                   Pending: "bg-yellow-100 text-yellow-500",
                                   "Partially Received":
                                     "bg-yellow-100 text-yellow-500",
@@ -552,12 +551,11 @@ const WM_Transaction = () => {
                                 return (
                                   <span
                                     className={`inline-flex items-center justify-center gap-1 rounded-full px-3 py-0.5 text-xs font-medium ${
-                                      transfer_order_status_classes[
-                                        row.transfer_order_status
-                                      ] || "bg-gray-100 text-gray-500"
+                                      status_classes[row.status] ||
+                                      "bg-gray-100 text-gray-500"
                                     }`}
                                   >
-                                    {row.transfer_order_status}
+                                    {row.status}
                                   </span>
                                 );
                               }

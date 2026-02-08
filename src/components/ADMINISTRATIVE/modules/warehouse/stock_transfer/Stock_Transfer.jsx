@@ -1,5 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
-import { useToast } from "../../../layout/Toast_Provider";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { format_date_1 } from "assets/scripts/format";
 import {
   ArrowLeftRight,
@@ -10,21 +9,43 @@ import {
   RefreshCw,
   SlidersHorizontal,
   Database,
+  Trash2,
+  FileDigit,
+  FileInput,
 } from "lucide-react";
 import Button from "assets/elements/Button";
 import Icon_Field from "assets/elements/Icon_Field";
 import Select_Field from "assets/elements/Select_Field";
 import Date_Field from "assets/elements/Date_Field";
 import Pagination from "assets/elements/Pagination";
-import Transfer_Process from "./transfer_process/Transfer_Process";
+import Create_TO from "./create/Create_TO";
 import View_Transfer from "./view_transfer/View_Transfer";
 import Button_Action from "assets/elements/Button_Action";
 import { client_side_filter } from "assets/scripts/functions/client_side_filter";
+import { Get_TBL_INCREMENTAL_ID } from "api/real_time_db/incremental";
+import {
+  api_get_transfer_order_list_by_date,
+  api_set_transfer_order_increment,
+  api_truncate_transfer_order,
+} from "api/firestore_db/warehouse/stock_transfer/tbl_transfer_order_api";
+import { useToast } from "components/ADMINISTRATIVE/layout/Toast_Provider";
+import { Use_App } from "context/app_context";
+import Set_Increment_ID from "assets/elements/modals/Set_Increment_ID";
+import { get_description } from "assets/scripts/functions/get_description";
+import { movement_type_list } from "assets/data/movement_type_list";
+import Spinner from "assets/elements/Spinner";
+import Status_Badge from "assets/elements/Status_Badge";
+import Post_View_TO from "./post_view/Post_View_TO";
+import { api_get_sbin_master_rtdb } from "api/real_time_db/warehouse/storage_bin/tbl_sbin_master_api_rtdb";
 
 const Stock_Transfer = () => {
+  const { active_user } = Use_App();
+  const { show_toast } = useToast();
   const [show_filter, set_show_filter] = useState(false);
+  const [display_modal, set_display_modal] = useState("");
   const [page, set_page] = useState("main");
   const [loading_list, set_loading_list] = useState(false);
+  const [truncate_loading, set_truncate_loading] = useState(false);
   const now = new Date();
   const first_day_of_month = new Date(now.getFullYear(), now.getMonth(), 1);
   const last_day_of_month = new Date(now.getFullYear(), now.getMonth() + 1, 0);
@@ -32,31 +53,89 @@ const Stock_Transfer = () => {
   const end = format_date_1(last_day_of_month);
   const [start_date, set_start_date] = useState(start);
   const [end_date, set_end_date] = useState(end);
+  const [for_posting, set_for_posting] = useState(end);
 
   const [current_id, set_current_id] = useState(0);
   const [new_to_data, set_new_to_data] = useState({});
-  const [edit_data, set_edit_data] = useState({});
-  const [view_data, set_view_data] = useState({});
-  const [delete_data, set_delete_data] = useState({});
+  const [edit_to_data, set_edit_to_data] = useState({});
+  const [view_to_data, set_view_to_data] = useState({});
+  const [delete_to_data, set_delete_to_data] = useState({});
+
+  useEffect(() => {
+    Get_TBL_INCREMENTAL_ID("TBL_TRANSFER_ORDER", (value) => {
+      set_new_to_data((prev) => ({
+        ...prev,
+        id: value,
+        to_number: `TO-${String(value).padStart(9, "0")}`,
+      }));
+      set_current_id(value);
+    });
+  }, []);
+
+  const [sbin_list, set_sbin_list] = useState([]);
+  const [loading_sbin_list, set_loading_sbin_list] = useState(false);
+
+  const handle_get_sbin_list = async () => {
+    set_loading_sbin_list(true);
+    const unsubscribe = api_get_sbin_master_rtdb((data, error) => {
+      if (error) {
+        console.error("Failed to fetch bins:", error);
+      } else {
+        set_sbin_list(data);
+      }
+      set_loading_sbin_list(false);
+    });
+
+    return () => unsubscribe();
+  };
+
+  useEffect(() => {
+    handle_get_sbin_list();
+  }, []);
 
   const columns = [
     { key: "index", label: "No.", sortable: false },
     { key: "to_number", label: "TO Number", sortable: true },
     { key: "movement_type_code", label: "Movement Type", sortable: true },
+    { key: "movement_type_desc", label: "Description", sortable: true },
     { key: "creation_date", label: "Creation Date", sortable: true },
     { key: "to_status", label: "Status", sortable: true },
     { key: "actions", label: "", sortable: false },
   ];
 
-  const [to_list, set_to_list] = useState([
-    {
-      id: 1,
-      to_number: "TO-000000001",
-      movement_type_code: "TP01",
-      creation_date: "MM-DD-YYYY",
-      to_status: "Approved",
-    },
-  ]);
+  const [to_list, set_to_list] = useState([]);
+
+  const filtered_to_list = useMemo(() => {
+    return to_list.map((data) => ({
+      ...data,
+      movement_type_desc: get_description(
+        data.movement_type_code,
+        movement_type_list,
+        "movement_type_code",
+        "movement_type_desc",
+      ),
+    }));
+  }, [to_list]);
+
+  const handle_get_transfer_order_list = async () => {
+    set_loading_list(true);
+    const response = await api_get_transfer_order_list_by_date(
+      start_date,
+      end_date,
+      show_toast,
+    );
+    if (response.success) {
+      set_to_list(response.data);
+    } else {
+      console.error(response.message);
+    }
+    set_loading_list(false);
+    // set_show_load_data_button(false);
+  };
+
+  useEffect(() => {
+    handle_get_transfer_order_list();
+  }, []);
 
   const {
     search_query,
@@ -70,10 +149,39 @@ const Stock_Transfer = () => {
     handle_sort,
     filtered_data,
     total_pages,
-  } = client_side_filter(to_list, columns);
+  } = client_side_filter(filtered_to_list, columns);
 
-  const handle_transfer_process = () => {
-    set_page("transfer_process");
+  const handle_truncate = async () => {
+    try {
+      set_truncate_loading(true);
+      await api_truncate_transfer_order(show_toast);
+      handle_get_transfer_order_list();
+      set_display_modal("");
+    } catch (error) {
+      console.log(error);
+    } finally {
+      set_truncate_loading(false);
+    }
+  };
+
+  const handle_set_incremental_id = () => {
+    set_display_modal("set_incremental_id");
+  };
+
+  const handle_create = () => {
+    set_page("create");
+  };
+
+  const handle_view = (data) => {
+    set_for_posting(false);
+    set_view_to_data(data);
+    set_page("post_view");
+  };
+
+  const handle_post = (data) => {
+    set_for_posting(true);
+    set_view_to_data(data);
+    set_page("post_view");
   };
 
   const handle_change_start_date = (value) => {
@@ -87,8 +195,6 @@ const Stock_Transfer = () => {
   const handle_view_transfer = () => {
     set_page("view_transfer");
   };
-
-  const handle_load_data = () => {};
 
   // RETURN ORIGIN
   return (
@@ -127,11 +233,34 @@ const Stock_Transfer = () => {
               <div className="flex flex-wrap items-center justify-between gap-3 p-5">
                 <h1 className="text-lg">Stock Transfer</h1>
                 <div className="flex gap-2">
+                  {active_user?.category === "DEV" && (
+                    <Button
+                      variant="success"
+                      icon={FileDigit}
+                      icon_position="left"
+                      width="w-[110px]"
+                      on_click={handle_set_incremental_id}
+                    >
+                      Set ID
+                    </Button>
+                  )}
+                  {active_user?.category === "DEV" && (
+                    <Button
+                      variant="danger"
+                      icon={Trash2}
+                      icon_position="left"
+                      width="w-[110px]"
+                      loading={truncate_loading}
+                      on_click={handle_truncate}
+                    >
+                      Truncate
+                    </Button>
+                  )}
                   <Button
                     variant="primary"
                     icon={ArrowLeftRight}
                     icon_position="left"
-                    on_click={handle_transfer_process}
+                    on_click={handle_create}
                   >
                     Transfer
                   </Button>
@@ -157,7 +286,7 @@ const Stock_Transfer = () => {
                     variant="primary"
                     icon={Database}
                     icon_position="left"
-                    on_click={handle_load_data}
+                    on_click={handle_get_transfer_order_list}
                   >
                     Load Data
                   </Button>
@@ -188,7 +317,7 @@ const Stock_Transfer = () => {
                         variant="white"
                         icon={RefreshCw}
                         icon_position="left"
-                        //   on_click={() => load_data()}
+                        on_click={handle_get_transfer_order_list}
                       ></Button>
                     </div>
                     <div className="w-full mt-4 md:mt-0 md:w-[600px]">
@@ -253,8 +382,8 @@ const Stock_Transfer = () => {
                   {/* Table */}
                   <div className="overflow-x-auto">
                     {loading_list ? (
-                      <div className="p-6 text-center text-gray-500 text-sm">
-                        Loading...
+                      <div className="p-6 flex justify-center items-center text-gray-500 text-sm">
+                        <Spinner />
                       </div>
                     ) : filtered_data.length === 0 ? (
                       <div className="p-6 text-center text-gray-500 text-sm">
@@ -312,6 +441,10 @@ const Stock_Transfer = () => {
                             const render_cell = (col, row) => {
                               const value = row[col.key];
 
+                              if (col.key === "to_status") {
+                                return <Status_Badge status={row.to_status} />;
+                              }
+
                               if (col.key === "actions") {
                                 return (
                                   <div className="flex gap-2">
@@ -319,11 +452,18 @@ const Stock_Transfer = () => {
                                       <Button_Action
                                         icon={View}
                                         tooltip="View Record"
-                                        on_click={() =>
-                                          handle_view_transfer(row.id)
-                                        }
+                                        on_click={() => handle_view(row)}
                                       />
                                     </div>
+                                    {row.to_status === "Approved" && (
+                                      <div className="relative group flex jusity-center items-center">
+                                        <Button_Action
+                                          icon={FileInput}
+                                          tooltip="Post Record"
+                                          on_click={() => handle_post(row)}
+                                        />
+                                      </div>
+                                    )}
                                   </div>
                                 );
                               }
@@ -370,9 +510,40 @@ const Stock_Transfer = () => {
         </React.Fragment>
       )}
       {/* + Pages */}
-      {page === "transfer_process" && <Transfer_Process set_page={set_page} />}
-      {page === "view_transfer" && <View_Transfer set_page={set_page} />}
+      {page === "create" && (
+        <Create_TO
+          set_page={set_page}
+          new_data={{
+            active_user,
+            sbin_list,
+            new_to_data,
+            set_new_to_data,
+            set_to_list,
+          }}
+        />
+      )}
+      {page === "post_view" && (
+        <Post_View_TO
+          set_page={set_page}
+          view_data={{
+            active_user,
+            sbin_list,
+            view_to_data,
+            set_to_list,
+            for_posting,
+          }}
+        />
+      )}
       {/* - Pages */}
+      {/* + Modals */}
+      <Set_Increment_ID
+        is_open={display_modal === "set_incremental_id"}
+        on_close={() => set_display_modal("")}
+        show_toast={show_toast}
+        current_id={current_id}
+        api_set_increment_id={api_set_transfer_order_increment}
+      />
+      {/* - Modals */}
     </React.Fragment>
   );
 };

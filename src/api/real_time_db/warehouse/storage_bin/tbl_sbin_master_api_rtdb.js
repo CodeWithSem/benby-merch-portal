@@ -105,6 +105,7 @@ export const api_create_sbin_rtdb = async (new_data, user, show_toast) => {
       status: "Available",
       current_item: "",
       current_batch: "",
+      current_lpn_no: "",
       creation_date: format_date_1(get_date_now()),
       created_by: user || "N/A",
     };
@@ -332,6 +333,7 @@ export const api_reset_sbin_rtdb = async (sbin_code, show_toast) => {
       bin_capacity: 0,
       current_item: "",
       current_batch: "",
+      current_lpn_no: "",
       status: "Available", // Resetting to available as it's now empty
     };
 
@@ -474,6 +476,7 @@ export const api_update_gr_sbin_capacities_rtdb = async (allocation_list) => {
         // it is safe to set these repeatedly in the loop or once.
         updates[`${bin_path}/current_item`] = item.item_code;
         updates[`${bin_path}/current_batch`] = item.batch_code;
+        updates[`${bin_path}/current_lpn_no`] = item.lpn_no;
       }
     });
 
@@ -522,6 +525,7 @@ export const api_update_gi_sbin_capacities_rtdb = async (
         if (current_qty - qty <= 0) {
           updates[`${bin_path}/current_item`] = "";
           updates[`${bin_path}/current_batch`] = "";
+          updates[`${bin_path}/current_lpn_no`] = "";
         }
       }
 
@@ -533,6 +537,7 @@ export const api_update_gi_sbin_capacities_rtdb = async (
         // Ensure the destination bin gets the "lock" of the item being moved
         updates[`${bin_path}/current_item`] = item.item_code;
         updates[`${bin_path}/current_batch`] = item.batch_code;
+        updates[`${bin_path}/current_lpn_no`] = item.lpn_no;
       }
     });
 

@@ -10,8 +10,9 @@ import {
   UserCircle,
   X,
 } from "lucide-react";
-import profile_placeholder from "../../../assets/images/profile-1.png";
-import profile_2 from "../../../assets/images/profile-2.png";
+import profile_placeholder from "assets/images/megasoft-profile-logo.png";
+import dev_profile from "assets/images/profile-1.png";
+import profile_2 from "assets/images/profile-2.png";
 import { useToast } from "../layout/Toast_Provider";
 import { Use_App } from "../../../context/app_context";
 
@@ -126,7 +127,7 @@ const Header = ({
             <div className="relative" ref={notif_ref}>
               <button
                 onClick={toggle_notification_dropdown}
-                className="relative flex h-11 w-11 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700"
+                className="outline-none relative flex h-11 w-11 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700"
               >
                 <span className="absolute top-0.5 right-0 z-1 h-2 w-2 rounded-full bg-orange-400 flex">
                   <span className="absolute -z-1 inline-flex h-full w-full animate-ping rounded-full bg-orange-400 opacity-75"></span>
@@ -148,7 +149,7 @@ const Header = ({
                     </button>
                   </div>
                   <ul className="scrollbar-custom flex h-auto flex-col overflow-y-auto">
-                    {notifications.map((data) => (
+                    {/* {notifications.map((data) => (
                       <li key={data.id}>
                         <a className="flex gap-3 rounded-lg border-b border-gray-100 p-3 hover:bg-gray-100">
                           <span className="relative block h-10 w-10 rounded-full">
@@ -177,7 +178,7 @@ const Header = ({
                           </span>
                         </a>
                       </li>
-                    ))}
+                    ))} */}
                   </ul>
                 </div>
               )}
@@ -191,7 +192,11 @@ const Header = ({
               className="flex items-center text-gray-700 focus:outline-none"
             >
               <span className="mr-3 h-11 w-11 overflow-hidden rounded-full">
-                <img src={profile_placeholder} alt="Avatar" />
+                {active_user?.category === "DEV" ? (
+                  <img src={dev_profile} alt="Avatar" />
+                ) : (
+                  <img src={profile_placeholder} alt="Avatar" />
+                )}
               </span>
               <span className="text-sm mr-2 block font-medium">
                 {display_name}

@@ -697,7 +697,7 @@ const WM_Order = () => {
                                         on_click={() => handle_view_wmo(row)}
                                       />
                                     </div>
-                                    {row.wmo_status === "Pending" && (
+                                    {row.wmo_status === "Approved" && (
                                       <div className="relative group flex jusity-center items-center">
                                         <Button_Action
                                           icon={FileInput}

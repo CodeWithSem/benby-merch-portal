@@ -49,7 +49,7 @@ export const api_create_inventory_master_rtdb = async (data, active_user) => {
     const payload = {
       id: data.to_sbin_code,
       lpn_no: data.lpn_no,
-      // inventory_status: "Active",
+      inventory_status: "Active",
       // Location (Flat)
       sbin_code: data.to_sbin_code,
       stype_code: data.to_stype_code,
@@ -57,7 +57,7 @@ export const api_create_inventory_master_rtdb = async (data, active_user) => {
       item_code: data.item_code,
       quantity_on_hand: data.quantity,
       uom: data.uom,
-      // pallet_config: data.pallet_config,
+      pallet_config: data.pallet_config,
       sutype: data.sutype,
       // Tracking (Flat)
       batch_code: data.batch_code,
@@ -130,7 +130,7 @@ export const api_bulk_create_inventory_master_rtdb = async (
         updates[`${base_path}/${binCode}`] = {
           id: binCode,
           lpn_no: item.lpn_no,
-          // inventory_status: "Active",
+          inventory_status: "Active",
           plant_code: item.plant_code,
           warehouse_code: item.warehouse_code,
           sloc_code: item.sloc_code,
@@ -139,7 +139,7 @@ export const api_bulk_create_inventory_master_rtdb = async (
           item_code: item.item_code,
           quantity_on_hand: item.quantity, // New entry, standard set
           uom: item.uom,
-          // pallet_config: item.pallet_config,
+          pallet_config: item.pallet_config,
           sutype: item.sutype,
           batch_code: item.batch_code,
           manufacture_date: item.manufacture_date,

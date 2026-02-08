@@ -17,7 +17,7 @@ const Select_SBIN = ({
   width = "max-w-[700px]",
   height = "max-h-[500px]",
   sbin_list,
-  new_transfer_post_data,
+  new_to_data,
   selected_row,
   selected_item_list,
   set_selected_item_list,
@@ -49,9 +49,9 @@ const Select_SBIN = ({
     return sbin_list.filter((bin) => {
       // 1. MUST match the destination filters (Plant, Warehouse, Sloc)
       const match_filter =
-        bin.plant_code === new_transfer_post_data?.to_plant_code &&
-        bin.warehouse_code === new_transfer_post_data?.to_warehouse_code &&
-        bin.sloc_code === new_transfer_post_data?.to_sloc_code;
+        bin.plant_code === new_to_data?.to_plant_code &&
+        bin.warehouse_code === new_to_data?.to_warehouse_code &&
+        bin.sloc_code === new_to_data?.to_sloc_code;
 
       // 2. MUST have space (Not full)
       const has_space = Number(bin.bin_capacity) < Number(bin.max_bin_capacity);
@@ -89,7 +89,7 @@ const Select_SBIN = ({
       );
     });
     // Added selected_item_list to dependencies to ensure the filter refreshes when the list changes
-  }, [sbin_list, new_transfer_post_data, selected_row, selected_item_list]);
+  }, [sbin_list, new_to_data, selected_row, selected_item_list]);
 
   // 2. Use the reusable filter hook
   const {

@@ -33,8 +33,7 @@ export function palletize_item({
       sutype: wm2_pallet_load_1_sutype,
       quantity: pallet_quantity, // quantity in cases
       quantity_confirmed: 0,
-      wm_order_status: "Pending",
-      transfer_order_status: "Pending",
+      status: "Pending",
       pallet_config: wm2_pallet_config_1,
     });
 

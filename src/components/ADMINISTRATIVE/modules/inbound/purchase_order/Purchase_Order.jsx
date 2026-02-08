@@ -53,6 +53,7 @@ import {
   api_set_purchase_order_increment,
   api_truncate_purchase_order,
 } from "api/firestore_db/inbound/purchase_order/tbl_purchase_order_api";
+import Status_Badge from "assets/elements/Status_Badge";
 
 const Purchase_Order = () => {
   const { active_user } = Use_App();
@@ -688,28 +689,7 @@ const Purchase_Order = () => {
                                 );
                               }
                               if (col.key === "po_status") {
-                                const po_status_classes = {
-                                  Draft: "bg-gray-100 text-gray-500",
-                                  Pending: "bg-yellow-100 text-yellow-500",
-                                  "Partially Received":
-                                    "bg-yellow-100 text-yellow-500",
-                                  Posted: "bg-green-100 text-green-500",
-                                  Approved: "bg-green-100 text-green-500",
-                                  "Fully Received":
-                                    "bg-green-100 text-green-500",
-                                  Rejected: "bg-red-100 text-red-500",
-                                };
-
-                                return (
-                                  <span
-                                    className={`inline-flex items-center justify-center gap-1 rounded-full px-3 py-0.5 text-xs font-medium ${
-                                      po_status_classes[row.po_status] ||
-                                      "bg-gray-100 text-gray-500"
-                                    }`}
-                                  >
-                                    {row.po_status}
-                                  </span>
-                                );
+                                return <Status_Badge status={row.po_status} />;
                               }
                               if (col.key === "actions") {
                                 return (

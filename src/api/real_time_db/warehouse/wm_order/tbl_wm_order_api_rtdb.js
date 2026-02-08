@@ -50,8 +50,7 @@ export const api_post_wm_orders_rtdb = async (
         to_sbin_code: row.to_sbin_code,
 
         // 📊 Status
-        wm_order_status: "Posted",
-        transfer_order_status: row.transfer_order_status || "Pending",
+        status: "Pending",
 
         // 🧾 Dates
         manufacture_date: row.manufacture_date,
@@ -128,7 +127,12 @@ export const api_unpost_wm_orders_rtdb = async (
 
 export const api_get_wm_orders_rtdb_listener = (process_type, callback) => {
   // Determine path: .../WM_TRANSACTION/GR or .../WM_TRANSACTION/GI
-  const path_suffix = process_type === "Goods Receipt" ? "GR" : "GI";
+  const path_map = {
+    "Goods Receipt": "GR",
+    "Goods Issue": "GI",
+    "Stock Transfer": "TO", // Added suffix for Transfer Orders
+  };
+  const path_suffix = path_map[process_type] || "GI";
   const record_ref = ref(
     realtime_db,
     `${get_realtime_path(TABLES.WM_TRANSACTION)}/${path_suffix}`,

@@ -52,6 +52,8 @@ const Create_WMO_GI = ({
         do_creation_date: creation_date,
       };
 
+      console.log(clean_wmo_data);
+
       const response = await api_create_wm_order(
         clean_wmo_data.process_type,
         clean_wmo_data,

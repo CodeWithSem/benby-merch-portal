@@ -295,6 +295,7 @@ export const api_post_transfer_order = async (post_data, user, show_toast) => {
 
     const updated_post_data = {
       ...post_data,
+      to_status: "Posted",
       post_date: format_date_1(get_date_now()),
       post_by: user || "N/A",
     };

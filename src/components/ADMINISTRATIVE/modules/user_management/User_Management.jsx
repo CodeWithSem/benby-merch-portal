@@ -113,7 +113,7 @@ const User_Management = () => {
           if (col.key === "actions") return false;
           const val = u[col.key];
           return val?.toString().toLowerCase().includes(q);
-        })
+        }),
       );
     }
 
@@ -154,9 +154,9 @@ const User_Management = () => {
               ?.toString()
               .toLowerCase()
               .includes(debounced_query.toLowerCase());
-          })
+          }),
         ).length
-      : user_list.length) / show_entries
+      : user_list.length) / show_entries,
   );
 
   const handle_sort = (column) => {
