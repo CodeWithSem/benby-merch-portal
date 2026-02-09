@@ -48,7 +48,7 @@ const Select_Plant = ({
   const handle_page_change = (page) => set_current_page(page);
   // - Client-Side Filtering
 
-  const handle_select_plant = () => {
+  const handle_select_plant = (selected_plant) => {
     if (!selected_plant) {
       alert("Please select a plant before proceeding.");
       return;
@@ -59,6 +59,10 @@ const Select_Plant = ({
       warehouse_code: "",
       sloc_code: "",
     }));
+    handle_close();
+  };
+
+  const handle_close = () => {
     set_selected_plant(null);
     on_close();
   };
@@ -77,7 +81,7 @@ const Select_Plant = ({
         >
           <button
             className="absolute top-5 right-5 p-2 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-400 hover:text-gray-500"
-            onClick={on_close}
+            onClick={handle_close}
           >
             <X size={20} />
           </button>
@@ -137,6 +141,7 @@ const Select_Plant = ({
                             selected_plant?.id === data.id ? "bg-sky-50" : ""
                           }`}
                           onClick={() => set_selected_plant(data)}
+                          onDoubleClick={() => handle_select_plant(data)}
                         >
                           <td className="px-5 py-4 sm:px-6 text-center">
                             <div className="flex justify-center items-center">
@@ -189,7 +194,7 @@ const Select_Plant = ({
             <div className="flex justify-center sm:justify-end gap-2 w-full">
               <Button
                 variant="primary"
-                on_click={handle_select_plant}
+                on_click={() => handle_select_plant(selected_plant)}
                 class_name="w-full md:w-[100px]"
                 disabled={!selected_plant}
               >
@@ -197,7 +202,7 @@ const Select_Plant = ({
               </Button>
               <Button
                 variant="white"
-                on_click={on_close}
+                on_click={handle_close}
                 class_name="w-full md:w-[100px]"
               >
                 Close

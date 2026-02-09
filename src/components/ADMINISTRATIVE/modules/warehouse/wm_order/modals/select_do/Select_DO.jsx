@@ -1,20 +1,21 @@
 import React, { useEffect, useState } from "react";
 import { Database, Search, X } from "lucide-react";
-import Icon_Field from "assets/elements/Icon_Field";
-import Checkbox_Field from "assets/elements/Checkbox_Field";
-import Button from "assets/elements/Button";
-import Pagination_Modal from "assets/elements/Pagination_Modal";
-import Date_Field from "assets/elements/Date_Field";
-import Select_Field from "assets/elements/Select_Field"; // Added Import
-import { format_date_1 } from "assets/scripts/format";
-import { api_get_goods_receipt_list_by_date } from "api/firestore_db/inbound/goods_receipt/tbl_goods_receipt_api";
-// import { api_get_goods_issue_list_by_date } from "api/firestore_db/outbound/goods_issue/tbl_goods_issue_api";
-import Spinner from "assets/elements/Spinner";
-import { item_master_list } from "assets/data/item_master_list";
-import { generate_gr_wm_orders } from "assets/scripts/functions/palletization";
+
 import { api_get_goods_issue_list_by_date } from "api/firestore_db/outbound/goods_issue/tbl_goods_issue_api";
-// import { inventory_master_list } from "assets/data/inventory_master_list";
+import { api_get_goods_receipt_list_by_date } from "api/firestore_db/inbound/goods_receipt/tbl_goods_receipt_api";
+
+import { item_master_list } from "assets/data/item_master_list";
+import { format_date_1 } from "assets/scripts/format";
 import { generate_gi_wm_orders } from "assets/scripts/functions/generate_gi_wm_order";
+import { generate_gr_wm_orders } from "assets/scripts/functions/palletization";
+
+import Button from "assets/elements/Button";
+import Checkbox_Field from "assets/elements/Checkbox_Field";
+import Date_Field from "assets/elements/Date_Field";
+import Icon_Field from "assets/elements/Icon_Field";
+import Pagination_Modal from "assets/elements/Pagination_Modal";
+import Select_Field from "assets/elements/Select_Field";
+import Spinner from "assets/elements/Spinner";
 
 const Select_DO = ({
   is_open,
@@ -35,10 +36,7 @@ const Select_DO = ({
   const [loading_list, set_loading_list] = useState(false);
   const [selected_do, set_selected_do] = useState({});
   const [wm_order_list_data, set_wm_order_list_data] = useState([]);
-
-  // New State for Dynamic Process
   const [process_type, set_process_type] = useState("Goods Receipt");
-
   const [filtered_wm_order_list, set_filtered_wm_order_list] = useState([]);
   const [show_entries, set_show_entries] = useState(5);
   const [current_page, set_current_page] = useState(1);
@@ -47,6 +45,12 @@ const Select_DO = ({
   const [search_query, set_search_query] = useState("");
   const [debounced_query, set_debounced_query] = useState("");
   const [total_pages, set_total_pages] = useState(0);
+
+  const handle_change_do_start_date = (value) =>
+    set_do_start_date(format_date_1(value));
+
+  const handle_change_do_end_date = (value) =>
+    set_do_end_date(format_date_1(value));
 
   const handle_get_data_list = async () => {
     set_loading_list(true);
@@ -74,7 +78,7 @@ const Select_DO = ({
 
   useEffect(() => {
     handle_get_data_list();
-  }, [wm_order_list, process_type]); // Re-fetch if process type changes
+  }, [wm_order_list, process_type]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -85,7 +89,6 @@ const Select_DO = ({
   }, [search_query]);
 
   useEffect(() => {
-    // Filter by status depending on process type
     let temp = wm_order_list_data.filter((item) =>
       process_type === "Goods Receipt"
         ? item.gr_status === "Posted"
@@ -131,11 +134,11 @@ const Select_DO = ({
 
   const handle_page_change = (page) => set_current_page(page);
 
-  const handle_proceed = () => {
+  const handle_proceed = (selected_do) => {
     if (!selected_do) return;
 
     let wm_allocation_list = [];
-    // 1. Determine which allocation logic to run
+
     if (process_type === "Goods Receipt") {
       wm_allocation_list = generate_gr_wm_orders({
         selected_do,
@@ -143,15 +146,13 @@ const Select_DO = ({
         sbin_list,
       });
     } else if (process_type === "Goods Issue") {
-      // Call the new GI logic
       wm_allocation_list = generate_gi_wm_orders({
         selected_gi: selected_do,
-        inventory_master_list, // This is your source of truth for stock
+        inventory_master_list,
         sbin_list,
       });
     }
 
-    // 2. Set the data for the next page
     set_new_wmo_data((prev) => {
       const { id: doc_id, ...rest_doc } = selected_do;
       return {
@@ -162,7 +163,6 @@ const Select_DO = ({
       };
     });
 
-    // 3. Navigation
     switch (process_type) {
       case "Goods Receipt":
         set_page("wmo_gr_creation");
@@ -174,15 +174,13 @@ const Select_DO = ({
         break;
     }
 
+    handle_close();
+  };
+
+  const handle_close = () => {
     set_selected_do(null);
     on_close();
   };
-
-  const handle_change_do_start_date = (value) =>
-    set_do_start_date(format_date_1(value));
-  const handle_change_do_end_date = (value) =>
-    set_do_end_date(format_date_1(value));
-  const handle_load_data = () => handle_get_data_list();
 
   if (!is_open) return null;
 
@@ -194,7 +192,7 @@ const Select_DO = ({
       >
         <button
           className="absolute top-5 right-5 p-2 rounded-full bg-gray-100 hover:bg-gray-200"
-          onClick={on_close}
+          onClick={handle_close}
         >
           <X size={20} />
         </button>
@@ -205,7 +203,6 @@ const Select_DO = ({
 
         <div className={`w-full overflow-y-auto ${height} scrollbar-custom`}>
           <div className="overflow-hidden border border-gray-200 bg-white pt-4">
-            {/* UPDATED DATE & PROCESS FILTERS */}
             <div className="px-6 mb-5 grid grid-cols-1 gap-5 md:w-[800px] md:grid-cols-4">
               <Select_Field
                 label="Process Type"
@@ -238,14 +235,13 @@ const Select_DO = ({
                   width="w-[150px]"
                   icon_position="left"
                   loading={loading_list}
-                  on_click={handle_load_data}
+                  on_click={handle_get_data_list}
                 >
                   Load Data
                 </Button>
               </div>
             </div>
 
-            {/* Search */}
             <div className="flex flex-col gap-5 px-6 mb-4 sm:flex-row sm:items-center sm:justify-between">
               <div className="w-full">
                 <Icon_Field
@@ -259,7 +255,6 @@ const Select_DO = ({
               </div>
             </div>
 
-            {/* Table */}
             <div className="max-w-full overflow-x-auto custom-scrollbar">
               <table className="min-w-full whitespace-nowrap">
                 <thead className="border-gray-100 border-y bg-gray-50">
@@ -307,6 +302,7 @@ const Select_DO = ({
                           selected_do?.id === item.id ? "bg-sky-50" : ""
                         }`}
                         onClick={() => set_selected_do(item)}
+                        onDoubleClick={() => handle_proceed(item)}
                       >
                         <td className="px-5 py-4 sm:px-6 text-center">
                           <Checkbox_Field
@@ -341,7 +337,6 @@ const Select_DO = ({
           </div>
         </div>
 
-        {/* Footer */}
         <div className="flex flex-col items-center sm:flex-row sm:justify-between gap-3 mt-5 px-7">
           <div>
             {total_pages > 0 && (
@@ -355,7 +350,7 @@ const Select_DO = ({
           <div className="flex justify-center sm:justify-end gap-2 w-full">
             <Button
               variant="primary"
-              on_click={handle_proceed}
+              on_click={() => handle_proceed(selected_do)}
               class_name="w-full md:w-[100px]"
               disabled={!selected_do?.id}
             >
@@ -363,7 +358,7 @@ const Select_DO = ({
             </Button>
             <Button
               variant="white"
-              on_click={on_close}
+              on_click={handle_close}
               className="w-full md:w-[100px]"
             >
               Close

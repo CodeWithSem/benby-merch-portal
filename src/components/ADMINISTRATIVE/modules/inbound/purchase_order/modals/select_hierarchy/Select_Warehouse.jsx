@@ -120,7 +120,7 @@ const Select_Warehouse = ({
   const handle_page_change = (page) => set_current_page(page);
   // - Client-Side Filtering
 
-  const handle_select_plant = () => {
+  const handle_select = (selected_plant_h) => {
     if (!selected_plant_h) {
       alert("Please select a data before proceeding.");
       return;
@@ -131,6 +131,10 @@ const Select_Warehouse = ({
       sloc_code: "",
     }));
     set_selected_item_list([]);
+    handle_close();
+  };
+
+  const handle_close = () => {
     set_selected_plant_h(null);
     on_close();
   };
@@ -149,7 +153,7 @@ const Select_Warehouse = ({
         >
           <button
             className="absolute top-5 right-5 p-2 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-400 hover:text-gray-500"
-            onClick={on_close}
+            onClick={handle_close}
           >
             <X size={20} />
           </button>
@@ -209,6 +213,7 @@ const Select_Warehouse = ({
                             selected_plant_h?.id === data.id ? "bg-sky-50" : ""
                           }`}
                           onClick={() => set_selected_plant_h(data)}
+                          onDoubleClick={() => handle_select(data)}
                         >
                           <td className="px-5 py-4 sm:px-6 text-center">
                             <div className="flex justify-center items-center">
@@ -261,7 +266,7 @@ const Select_Warehouse = ({
             <div className="flex justify-center sm:justify-end gap-2 w-full">
               <Button
                 variant="primary"
-                on_click={handle_select_plant}
+                on_click={() => handle_select(selected_plant_h)}
                 class_name="w-full md:w-[100px]"
                 disabled={!selected_plant_h}
               >
@@ -269,7 +274,7 @@ const Select_Warehouse = ({
               </Button>
               <Button
                 variant="white"
-                on_click={on_close}
+                on_click={handle_close}
                 class_name="w-full md:w-[100px]"
               >
                 Close

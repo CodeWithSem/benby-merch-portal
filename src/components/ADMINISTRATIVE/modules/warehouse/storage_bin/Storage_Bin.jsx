@@ -27,12 +27,12 @@ import {
   api_set_sbin_increment,
   api_truncate_sbin,
 } from "api/firestore_db/warehouse/storage_bin/tbl_storage_bin_api";
-import Create_New_SBIN from "./create_new_sbin/Create_New_SBIN";
+import Create_SBIN from "./create/Create_SBIN";
 import Set_Increment_ID from "assets/elements/modals/Set_Increment_ID";
 import { api_set_sbtype_ind_increment } from "api/firestore_db/maintenance/warehouse/tbl_sbtype_ind_api";
 import { Get_TBL_INCREMENTAL_ID } from "api/real_time_db/incremental";
-import Edit_SBIN from "./edit_sbin/Edit_SBIN";
-import View_SBIN from "./view_sbin/View_SBIN";
+import Edit_SBIN from "./edit/Edit_SBIN";
+import View_SBIN from "./view/View_SBIN";
 import Delete_SBIN from "./delete/Delete_SBIN";
 import {
   api_get_sbin_master_rtdb,
@@ -524,7 +524,7 @@ const Storage_Bin = () => {
       )}
       {/* + Pages */}
       {page === "sbin_creation" && (
-        <Create_New_SBIN
+        <Create_SBIN
           set_page={set_page}
           active_user={active_user}
           show_toast={show_toast}

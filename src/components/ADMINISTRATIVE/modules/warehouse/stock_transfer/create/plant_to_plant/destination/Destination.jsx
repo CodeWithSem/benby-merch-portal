@@ -138,6 +138,8 @@ const Destination = ({ transfer_data }) => {
       to_status: "Approved", // FOR TESTING
       // so_status: "Pending",
     };
+
+    // console.log(final_to_data);
     try {
       set_create_loading(true);
       const response = await api_create_transfer_order(

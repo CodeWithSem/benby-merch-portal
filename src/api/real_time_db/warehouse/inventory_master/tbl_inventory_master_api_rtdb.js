@@ -137,7 +137,7 @@ export const api_bulk_create_inventory_master_rtdb = async (
           sbin_code: binCode,
           stype_code: item.to_stype_code,
           item_code: item.item_code,
-          quantity_on_hand: item.quantity, // New entry, standard set
+          quantity_on_hand: item.quantity,
           uom: item.uom,
           pallet_config: item.pallet_config,
           sutype: item.sutype,

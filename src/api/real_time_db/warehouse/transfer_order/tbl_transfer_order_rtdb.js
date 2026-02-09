@@ -58,7 +58,7 @@ export const api_post_transfer_order_rtdb = async (
 
         // Status
         process_type: "Stock Transfer",
-        to_status: "Pending",
+        status: "Pending",
 
         // Audit
         posted_by: active_user?.username || "SYSTEM",
@@ -189,6 +189,10 @@ export const api_update_to_sbin_capacities_rtdb = async (
           updates[`${bin_path}/current_item`] = "";
           updates[`${bin_path}/current_batch`] = "";
           updates[`${bin_path}/current_lpn_no`] = "";
+          updates[`${bin_path}/current_pallet_config`] = "";
+          updates[`${bin_path}/current_sutype`] = "";
+          updates[`${bin_path}/current_manufacture_date`] = "";
+          updates[`${bin_path}/current_sled_bbd`] = "";
         }
       }
 
@@ -199,12 +203,19 @@ export const api_update_to_sbin_capacities_rtdb = async (
         updates[`${bin_path}/current_item`] = item.current_item;
         updates[`${bin_path}/current_batch`] = item.current_batch;
         updates[`${bin_path}/current_lpn_no`] = item.current_lpn_no;
+        updates[`${bin_path}/current_pallet_config`] =
+          item.current_pallet_config;
+        updates[`${bin_path}/current_sutype`] = item.current_sutype;
+        updates[`${bin_path}/current_manufacture_date`] =
+          item.current_manufacture_date;
+        updates[`${bin_path}/current_sled_bbd`] = item.current_sled_bbd;
       }
     });
 
     await update(ref(realtime_db), updates);
     return { success: true };
   } catch (error) {
+    console.log(error);
     return { success: false, message: error.message };
   }
 };

@@ -170,7 +170,12 @@ export const api_update_wm_order_item_rtdb = async (
   updates,
 ) => {
   try {
-    const path_suffix = process_type === "Goods Receipt" ? "GR" : "GI";
+    const path_map = {
+      "Goods Receipt": "GR",
+      "Goods Issue": "GI",
+      "Stock Transfer": "TO",
+    };
+    const path_suffix = path_map[process_type] || "GI";
     const record_ref = ref(
       realtime_db,
       `${get_realtime_path(TABLES.WM_TRANSACTION)}/${path_suffix}/${lpn_no}`,

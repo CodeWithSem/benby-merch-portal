@@ -21,7 +21,7 @@ import Select_Plant from "../modals/select_hierarchy/Select_Plant";
 import Select_Warehouse from "../modals/select_hierarchy/Select_Warehouse";
 import Select_SLOC from "../modals/select_hierarchy/Select_SLOC";
 
-const Create_New_SBIN = ({
+const Create_SBIN = ({
   set_page,
   active_user,
   show_toast,
@@ -301,22 +301,6 @@ const Create_New_SBIN = ({
                   disabled
                 />
               </div>
-              {/* <div>
-                <Text_Code_Field
-                  label="Warehouse"
-                  code_width="150px"
-                  show_search_button={true}
-                  code_value={new_sbin_data.warehouse_code}
-                  text_value={get_description(
-                    new_sbin_data.warehouse_code,
-                    warehouse_list,
-                    "warehouse_code",
-                    "warehouse_desc",
-                  )}
-                  on_click={() => set_display_modal("select_warehouse")}
-                  disabled
-                />
-              </div> */}
               <div>
                 <Text_Code_Field
                   label="Storage Type"
@@ -466,4 +450,4 @@ const Create_New_SBIN = ({
   );
 };
 
-export default Create_New_SBIN;
+export default Create_SBIN;

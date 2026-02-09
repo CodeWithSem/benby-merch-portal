@@ -100,7 +100,7 @@ const Destination = ({ transfer_data }) => {
   };
 
   const handle_post = async () => {
-    console.log(view_to_data);
+    // console.log(view_to_data);
     set_post_loading(true);
     try {
       // 1. FIRESTORE: Update the master record status

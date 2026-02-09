@@ -339,6 +339,7 @@ const PO_Items = ({
                 disabled={
                   selected_item_data.item_code === "" ||
                   selected_item_data.unit_price === "" ||
+                  selected_item_data.unit_price === 0 ||
                   selected_item_data.quantity === ""
                 }
               >

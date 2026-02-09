@@ -12,6 +12,7 @@ const STATUS_MAP = {
   // Success / Completed
   Posted: "bg-green-100 text-green-500",
   Approved: "bg-green-100 text-green-500",
+  Complete: "bg-green-100 text-green-500",
   "Fully Received": "bg-green-100 text-green-500",
   "Fully Issued": "bg-green-100 text-green-500",
 

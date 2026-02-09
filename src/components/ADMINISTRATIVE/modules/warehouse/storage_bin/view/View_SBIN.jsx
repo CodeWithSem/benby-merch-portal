@@ -10,6 +10,7 @@ import SBIN_Details from "./sbin_details/SBIN_Details";
 import { item_master_list } from "assets/data/item_master_list";
 import { plant_list } from "assets/data/plant_list";
 import { sloc_list } from "assets/data/sloc_list";
+import Item_Details from "./sbin_details/Item_Details";
 
 const View_SBIN = ({ set_page, view_sbin_data }) => {
   const [active_tab, set_active_tab] = useState("sbin_details");
@@ -168,31 +169,6 @@ const View_SBIN = ({ set_page, view_sbin_data }) => {
                   disabled
                 />
               </div>
-              <div>
-                <Text_Code_Field
-                  label="Current Item"
-                  code_width="150px"
-                  show_search_button={false}
-                  code_value={view_sbin_data.current_item}
-                  text_value={get_description(
-                    view_sbin_data.current_item,
-                    item_master_list,
-                    "item_code",
-                    "item_desc",
-                  )}
-                  bg_dis_color="bg-slate-50"
-                  text_dis_color="text-slate-500"
-                  disabled
-                />
-              </div>
-              <div>
-                <Text_Field
-                  label="Current Batch"
-                  type={"text"}
-                  value={view_sbin_data.current_batch}
-                  disabled
-                />
-              </div>
             </div>
           </div>
           {/* - Section 1 */}
@@ -210,7 +186,17 @@ const View_SBIN = ({ set_page, view_sbin_data }) => {
                         : "bg-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
                     }`}
                   >
-                    Details
+                    Storage Details
+                  </button>
+                  <button
+                    onClick={() => set_active_tab("item_details")}
+                    className={`inline-flex items-center rounded-md px-5 py-2 text-sm font-medium transition-colors duration-200 ease-in-out outline-none whitespace-nowrap ${
+                      active_tab === "item_details"
+                        ? "bg-white text-gray-900 shadow-xs"
+                        : "bg-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                    }`}
+                  >
+                    Item Details
                   </button>
                 </nav>
               </div>
@@ -219,6 +205,9 @@ const View_SBIN = ({ set_page, view_sbin_data }) => {
               <div className="p-6">
                 {active_tab === "sbin_details" && (
                   <SBIN_Details view_sbin_data={view_sbin_data} />
+                )}
+                {active_tab === "item_details" && (
+                  <Item_Details view_sbin_data={view_sbin_data} />
                 )}
               </div>
               {/* - Tab Content */}

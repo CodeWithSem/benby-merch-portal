@@ -16,6 +16,7 @@ import { plant_list } from "assets/data/plant_list";
 import { warehouse_list } from "assets/data/warehouse_list";
 import { sloc_list } from "assets/data/sloc_list";
 import { stype_list } from "assets/data/stype_list";
+import Item_Details from "./sbin_details/Item_Details";
 
 const Edit_SBIN = ({
   set_page,
@@ -306,31 +307,6 @@ const Edit_SBIN = ({
                 value={edit_sbin_data.sbin_desc} //--> sbin_desc
                 on_change={handle_text_change("sbin_desc")}
               />
-              <div>
-                <Text_Code_Field
-                  label="Current Item"
-                  code_width="150px"
-                  show_search_button={false}
-                  code_value={edit_sbin_data.current_item}
-                  text_value={get_description(
-                    edit_sbin_data.current_item,
-                    item_master_list,
-                    "item_code",
-                    "item_desc",
-                  )}
-                  bg_dis_color="bg-slate-50"
-                  text_dis_color="text-slate-500"
-                  disabled
-                />
-              </div>
-              <div>
-                <Text_Field
-                  label="Current Batch"
-                  type={"text"}
-                  value={edit_sbin_data.current_batch}
-                  disabled
-                />
-              </div>
             </div>
           </div>
           {/* - Section 1 */}
@@ -348,7 +324,17 @@ const Edit_SBIN = ({
                         : "bg-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
                     }`}
                   >
-                    Details
+                    Storage Details
+                  </button>
+                  <button
+                    onClick={() => set_active_tab("item_details")}
+                    className={`inline-flex items-center rounded-md px-5 py-2 text-sm font-medium transition-colors duration-200 ease-in-out outline-none whitespace-nowrap ${
+                      active_tab === "item_details"
+                        ? "bg-white text-gray-900 shadow-xs"
+                        : "bg-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                    }`}
+                  >
+                    Item Details
                   </button>
                 </nav>
               </div>
@@ -362,6 +348,9 @@ const Edit_SBIN = ({
                     edit_sbin_data={edit_sbin_data}
                     set_edit_sbin_data={set_edit_sbin_data}
                   />
+                )}
+                {active_tab === "item_details" && (
+                  <Item_Details edit_sbin_data={edit_sbin_data} />
                 )}
               </div>
               {/* - Tab Content */}

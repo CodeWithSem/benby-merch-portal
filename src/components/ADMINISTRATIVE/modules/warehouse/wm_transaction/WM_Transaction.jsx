@@ -34,6 +34,8 @@ import {
 } from "api/real_time_db/warehouse/wm_order/tbl_wm_order_api_rtdb";
 import Button_Action from "assets/elements/Button_Action";
 import { api_create_inventory_master_rtdb } from "api/real_time_db/warehouse/inventory_master/tbl_inventory_master_api_rtdb";
+import Status_Badge from "assets/elements/Status_Badge";
+import { api_truncate_wm_transaction_rtdb } from "api/real_time_db/warehouse/wm_transaction/tbl_wm_transaction_api_rtdb";
 
 const WM_Transaction = () => {
   const { active_user } = Use_App();
@@ -45,37 +47,40 @@ const WM_Transaction = () => {
   const [for_posting, set_for_posting] = useState(false);
   const [loading_list, set_loading_list] = useState(false);
   const [truncate_loading, set_truncate_loading] = useState(false);
-  const now = new Date();
-  const first_day_of_month = new Date(now.getFullYear(), now.getMonth(), 1);
-  const last_day_of_month = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-  const start = format_date_1(first_day_of_month);
-  const end = format_date_1(last_day_of_month);
-  const [start_date, set_start_date] = useState(start);
-  const [end_date, set_end_date] = useState(end);
-  const [do_start_date, set_do_start_date] = useState(start);
-  const [do_end_date, set_do_end_date] = useState(end);
-  const [show_load_data_button, set_show_load_data_button] = useState(true);
-  const [selected_gr_data, set_selected_gr_data] = useState({});
   const [status_filters, set_status_filters] = useState({
     Pending: true,
     Complete: true,
   });
   const [process_type, set_process_type] = useState("Goods Receipt");
   // - Variables
-
   // + Columns
-  const columns = [
-    { key: "index", label: "No.", sortable: false },
-    { key: "wmo_number", label: "WM Order Number", sortable: true },
-    { key: "do_number", label: "DO Number", sortable: true },
-    { key: "ref_number", label: "Reference", sortable: true },
-    { key: "item_code", label: "Item Code", sortable: true },
-    { key: "from_sbin_code", label: "Source", sortable: true },
-    { key: "to_sbin_code", label: "Destination", sortable: true },
-    { key: "quantity_confirm", label: "Confirmed Qty", sortable: true },
-    { key: "status", label: "Status", sortable: true },
-    { key: "actions", label: "", sortable: false },
-  ];
+  const columns = React.useMemo(() => {
+    if (process_type === "Stock Transfer") {
+      return [
+        { key: "index", label: "No.", sortable: false },
+        { key: "to_number", label: "Transfer Order Number", sortable: true },
+        { key: "item_code", label: "Item Code", sortable: true },
+        { key: "from_sbin_code", label: "Source", sortable: true },
+        { key: "to_sbin_code", label: "Destination", sortable: true },
+        { key: "quantity_confirm", label: "Confirmed Qty", sortable: true },
+        { key: "status", label: "Status", sortable: true },
+        { key: "actions", label: "", sortable: false },
+      ];
+    }
+
+    return [
+      { key: "index", label: "No.", sortable: false },
+      { key: "wmo_number", label: "WM Order Number", sortable: true },
+      { key: "do_number", label: "DO Number", sortable: true },
+      { key: "ref_number", label: "Reference", sortable: true },
+      { key: "item_code", label: "Item Code", sortable: true },
+      { key: "from_sbin_code", label: "Source", sortable: true },
+      { key: "to_sbin_code", label: "Destination", sortable: true },
+      { key: "quantity_confirm", label: "Confirmed Qty", sortable: true },
+      { key: "status", label: "Status", sortable: true },
+      { key: "actions", label: "", sortable: false },
+    ];
+  }, [process_type]);
   // - Columns
 
   const [wm_order_list, set_wm_order_list] = useState([]);
@@ -244,7 +249,11 @@ const WM_Transaction = () => {
   //   };
 
   const handle_wmo_confirm = async (data) => {
-    // 1. Update the WM Order Item to 'Complete'
+    // 1. Determine the correct identifier based on process_type
+    // Goods Receipt/Issue uses lpn_no, Stock Transfer uses id
+    const identifier =
+      data.process_type === "Stock Transfer" ? data.id : data.lpn_no;
+
     const wm_updates = {
       quantity_confirm: data.quantity,
       status: "Complete",
@@ -253,7 +262,7 @@ const WM_Transaction = () => {
 
     const wm_res = await api_update_wm_order_item_rtdb(
       data.process_type,
-      data.lpn_no,
+      identifier, // Pass the dynamically chosen ID here
       wm_updates,
     );
 
@@ -261,12 +270,14 @@ const WM_Transaction = () => {
       show_toast?.({
         type: "success",
         title: "Confirmed",
-        message: `LPN: ${data.lpn_no} is confirmed.`,
+        message: `${data.process_type === "Stock Transfer" ? "TO" : "LPN"}: ${identifier} is confirmed.`,
       });
     }
   };
 
   const handle_wmo_revert = async (data) => {
+    const identifier =
+      data.process_type === "Stock Transfer" ? data.id : data.lpn_no;
     const updates = {
       quantity_confirm: 0,
       status: "Pending",
@@ -275,7 +286,7 @@ const WM_Transaction = () => {
 
     const wm_res = await api_update_wm_order_item_rtdb(
       data.process_type,
-      data.lpn_no,
+      identifier,
       updates,
     );
 
@@ -283,13 +294,24 @@ const WM_Transaction = () => {
       show_toast?.({
         type: "danger",
         title: "Unconfirmed",
-        message: `LPN: ${data.lpn_no} is unconfirmed.`,
+        message: `${data.process_type === "Stock Transfer" ? "TO" : "LPN"}: ${identifier} is unconfirmed.`,
       });
     }
   };
 
   const handle_load_data = () => {
     handle_get_wm_order_list(process_type);
+  };
+
+  const handle_truncate = async () => {
+    try {
+      set_truncate_loading(true);
+      await api_truncate_wm_transaction_rtdb(show_toast);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      set_truncate_loading(false);
+    }
   };
 
   // RETURN ORIGIN
@@ -327,6 +349,18 @@ const WM_Transaction = () => {
               <div className="flex flex-wrap items-center justify-between gap-3 p-5">
                 <h1 className="text-lg">WM Transaction</h1>
                 <div className="flex gap-2">
+                  {active_user?.category === "DEV" && (
+                    <Button
+                      variant="danger"
+                      icon={Trash2}
+                      icon_position="left"
+                      width="w-[110px]"
+                      loading={truncate_loading}
+                      on_click={handle_truncate}
+                    >
+                      Truncate
+                    </Button>
+                  )}
                   <Button
                     variant="success"
                     icon={FileText}
@@ -541,23 +575,7 @@ const WM_Transaction = () => {
                               }
 
                               if (col.key === "status") {
-                                const status_classes = {
-                                  Pending: "bg-yellow-100 text-yellow-500",
-                                  "Partially Received":
-                                    "bg-yellow-100 text-yellow-500",
-                                  Complete: "bg-green-100 text-green-500",
-                                };
-
-                                return (
-                                  <span
-                                    className={`inline-flex items-center justify-center gap-1 rounded-full px-3 py-0.5 text-xs font-medium ${
-                                      status_classes[row.status] ||
-                                      "bg-gray-100 text-gray-500"
-                                    }`}
-                                  >
-                                    {row.status}
-                                  </span>
-                                );
+                                return <Status_Badge status={row.status} />;
                               }
 
                               if (col.key === "actions") {

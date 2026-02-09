@@ -61,7 +61,6 @@ const Post_View_WMO_GR = ({
           );
 
           if (inventory_res.success) {
-            // 4. UPDATE BIN CAPACITIES (Math for PSA01 -qty and GIZ01 +qty)
             const bin_update_res = await api_update_gr_sbin_capacities_rtdb(
               view_wmo_data.wm_allocation_list,
             );

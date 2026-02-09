@@ -106,6 +106,10 @@ export const api_create_sbin_rtdb = async (new_data, user, show_toast) => {
       current_item: "",
       current_batch: "",
       current_lpn_no: "",
+      current_pallet_config: "",
+      current_sutype: "",
+      current_manufacture_date: "",
+      current_sled_bbd: "",
       creation_date: format_date_1(get_date_now()),
       created_by: user || "N/A",
     };
@@ -334,6 +338,10 @@ export const api_reset_sbin_rtdb = async (sbin_code, show_toast) => {
       current_item: "",
       current_batch: "",
       current_lpn_no: "",
+      current_pallet_config: "",
+      current_sutype: "",
+      current_manufacture_date: "",
+      current_sled_bbd: "",
       status: "Available", // Resetting to available as it's now empty
     };
 
@@ -470,13 +478,19 @@ export const api_update_gr_sbin_capacities_rtdb = async (allocation_list) => {
 
         // 1. Update the numeric capacity
         updates[`${bin_path}/bin_capacity`] = increment(qty);
-
-        // 2. Set the "Lock" - These will overwrite with the current item/batch
-        // Since all pallets in one allocation for one bin MUST be the same batch,
-        // it is safe to set these repeatedly in the loop or once.
         updates[`${bin_path}/current_item`] = item.item_code;
         updates[`${bin_path}/current_batch`] = item.batch_code;
         updates[`${bin_path}/current_lpn_no`] = item.lpn_no;
+        updates[`${bin_path}/current_pallet_config`] = item.pallet_config;
+        updates[`${bin_path}/current_sutype`] = item.sutype;
+        updates[`${bin_path}/current_manufacture_date`] = item.manufacture_date;
+        updates[`${bin_path}/current_sled_bbd`] = item.sled_bbd;
+
+        // pallet_config: item.pallet_config,
+        // sutype: item.sutype,
+        // batch_code: item.batch_code,
+        // manufacture_date: item.manufacture_date,
+        // sled_bbd: item.sled_bbd,
       }
     });
 
@@ -526,6 +540,10 @@ export const api_update_gi_sbin_capacities_rtdb = async (
           updates[`${bin_path}/current_item`] = "";
           updates[`${bin_path}/current_batch`] = "";
           updates[`${bin_path}/current_lpn_no`] = "";
+          updates[`${bin_path}/current_pallet_config`] = "";
+          updates[`${bin_path}/current_sutype`] = "";
+          updates[`${bin_path}/current_manufacture_date`] = "";
+          updates[`${bin_path}/current_sled_bbd`] = "";
         }
       }
 
@@ -538,6 +556,10 @@ export const api_update_gi_sbin_capacities_rtdb = async (
         updates[`${bin_path}/current_item`] = item.item_code;
         updates[`${bin_path}/current_batch`] = item.batch_code;
         updates[`${bin_path}/current_lpn_no`] = item.lpn_no;
+        updates[`${bin_path}/current_pallet_config`] = item.pallet_config;
+        updates[`${bin_path}/current_sutype`] = item.sutype;
+        updates[`${bin_path}/current_manufacture_date`] = item.manufacture_date;
+        updates[`${bin_path}/current_sled_bbd`] = item.sled_bbd;
       }
     });
 
