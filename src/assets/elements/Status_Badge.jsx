@@ -10,6 +10,7 @@ const STATUS_MAP = {
   "Partially Issued": "bg-yellow-100 text-yellow-500",
 
   // Success / Completed
+  1: "bg-green-100 text-green-500",
   Posted: "bg-green-100 text-green-500",
   Approved: "bg-green-100 text-green-500",
   Complete: "bg-green-100 text-green-500",
@@ -20,6 +21,7 @@ const STATUS_MAP = {
   Rejected: "bg-red-100 text-red-500",
   Cancelled: "bg-red-100 text-red-500",
   Reversed: "bg-red-100 text-red-500",
+  0: "bg-red-100 text-red-500",
 };
 
 const Status_Badge = ({ status }) => {

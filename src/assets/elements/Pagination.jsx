@@ -76,13 +76,13 @@ const Pagination = ({
                 onClick={() => on_page_change(page)}
                 className={`min-w-9 h-8 rounded-md text-sm px-2 outline-none ${
                   current_page === page
-                    ? "bg-sky-100 text-sky-600"
+                    ? "bg-green-100 text-green-600"
                     : "text-gray-700 hover:bg-gray-100"
                 }`}
               >
                 {page}
               </button>
-            )
+            ),
           )}
         </div>
 
@@ -137,13 +137,13 @@ const Pagination = ({
               onClick={() => on_page_change(page)}
               className={`min-w-9 h-8 rounded-md text-sm px-2 outline-none ${
                 current_page === page
-                  ? "bg-sky-100 text-sky-600"
+                  ? "bg-green-100 text-green-600"
                   : "text-gray-700 hover:bg-gray-100"
               }`}
             >
               {page}
             </button>
-          )
+          ),
         )}
       </div>
 

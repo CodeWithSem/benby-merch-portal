@@ -49,7 +49,7 @@ const Button = ({
 
   const variant_classes = {
     primary:
-      "bg-sky-600 text-white border border-sky-600 hover:bg-sky-700 focus:ring-sky-500 disabled:bg-sky-300/50 disabled:border-sky-200/50 disabled:cursor-not-allowed",
+      "bg-green-600 text-white border border-green-600 hover:bg-green-700 focus:ring-green-500 disabled:bg-green-300/50 disabled:border-green-200/50 disabled:cursor-not-allowed",
     secondary:
       "bg-gray-100 text-gray-700 hover:bg-gray-200 focus:ring-gray-300 disabled:bg-gray-50 disabled:text-gray-400/50 disabled:cursor-not-allowed",
     success:

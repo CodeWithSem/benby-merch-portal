@@ -5,6 +5,7 @@ const Icon_Field = ({
   name,
   value,
   on_change,
+  on_key_down,
   placeholder = "",
   disabled = false,
   required = false,
@@ -37,8 +38,8 @@ const Icon_Field = ({
     icon_position === "left"
       ? "pl-10 pr-3"
       : icon_position === "right"
-      ? "pr-10 pl-3"
-      : "px-3";
+        ? "pr-10 pl-3"
+        : "px-3";
 
   return (
     <label className="block">
@@ -53,6 +54,7 @@ const Icon_Field = ({
           name={name}
           value={value}
           onChange={on_change}
+          onKeyDown={on_key_down}
           placeholder={placeholder}
           disabled={disabled}
           required={required}

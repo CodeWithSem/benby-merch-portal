@@ -19,7 +19,7 @@ export const api_get_user_master_list = async () => {
   try {
     const tbl_user_master_ref = collection(
       firestore_db,
-      ...get_firestore_path(TABLES.AUTHENTICATION)
+      ...get_firestore_path(TABLES.AUTHENTICATION),
     );
 
     const query_snapshot = await getDocs(tbl_user_master_ref);
@@ -57,14 +57,14 @@ export const register_user = async (
   category,
   role,
   created_by,
-  show_toast
+  show_toast,
 ) => {
   try {
     const users_ref = collection(
       firestore_db,
-      "DB1_ERP_SYSTEM",
+      "DB1_BENBY_MERCH",
       "TBL_AUTHENTICATION",
-      "DATA"
+      "DATA",
     );
 
     const q = query(users_ref, where("username", "==", username));
@@ -123,9 +123,9 @@ export const login_user = async (username, password) => {
   try {
     const users_ref = collection(
       firestore_db,
-      "DB1_ERP_SYSTEM",
+      "DB1_BENBY_MERCH",
       "TBL_AUTHENTICATION",
-      "DATA"
+      "DATA",
     );
 
     const q = query(users_ref, where("username", "==", username));
@@ -159,7 +159,7 @@ export const api_update_user = async (
   user_id,
   { first_name, last_name, email, username, category, role },
   updated_by,
-  show_toast
+  show_toast,
 ) => {
   try {
     if (!user_id) {
@@ -168,9 +168,9 @@ export const api_update_user = async (
 
     const users_ref = collection(
       firestore_db,
-      "DB1_ERP_SYSTEM",
+      "DB1_BENBY_MERCH",
       "TBL_AUTHENTICATION",
-      "DATA"
+      "DATA",
     );
 
     // 🔒 Check username uniqueness (exclude current user)
@@ -202,10 +202,10 @@ export const api_update_user = async (
 
     const user_doc_ref = doc(
       firestore_db,
-      "DB1_ERP_SYSTEM",
+      "DB1_BENBY_MERCH",
       "TBL_AUTHENTICATION",
       "DATA",
-      user_id
+      user_id,
     );
 
     await updateDoc(user_doc_ref, update_payload);
@@ -234,7 +234,7 @@ export const api_update_user_module_access = async (
   user_id,
   { module_access, sub_module_access },
   updated_by,
-  show_toast
+  show_toast,
 ) => {
   try {
     if (!user_id) {
@@ -247,10 +247,10 @@ export const api_update_user_module_access = async (
 
     const user_doc_ref = doc(
       firestore_db,
-      "DB1_ERP_SYSTEM",
+      "DB1_BENBY_MERCH",
       "TBL_AUTHENTICATION",
       "DATA",
-      user_id
+      user_id,
     );
 
     const update_payload = {
@@ -297,13 +297,13 @@ export const api_truncate_user_master = async (show_toast) => {
   try {
     const tbl_user_master_ref = collection(
       firestore_db,
-      ...get_firestore_path(TABLES.AUTHENTICATION)
+      ...get_firestore_path(TABLES.AUTHENTICATION),
     );
 
     const snapshot = await getDocs(tbl_user_master_ref);
 
     const delete_promises = snapshot.docs.map((document) =>
-      deleteDoc(doc(tbl_user_master_ref, document.id))
+      deleteDoc(doc(tbl_user_master_ref, document.id)),
     );
 
     await Promise.all(delete_promises);

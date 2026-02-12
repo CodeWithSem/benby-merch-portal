@@ -1,6 +1,15 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Home, LogOut, ChevronDown, User, FileCode } from "lucide-react";
-import delphys_logo from "../../../assets/images/delphys-sidebar-logo.png";
+import {
+  Home,
+  LogOut,
+  ChevronDown,
+  User,
+  FileCode,
+  Database,
+  Server,
+  Settings,
+} from "lucide-react";
+import delphys_logo from "../../../assets/images/benby-logo.png";
 import { useToast } from "./Toast_Provider";
 import { Use_App } from "../../../context/app_context";
 
@@ -45,18 +54,40 @@ const Sidebar = ({
       name: "User Management",
       icon: <User size={18} />,
     },
-    // {
-    //   key: "Production",
-    //   module_code: "PR",
-    //   type: "dropdown",
-    //   name: "Production",
-    //   icon: <Pickaxe size={18} />,
-    //   sub_items: [
-    //     { name: "Production Plan", sub_module_code: "PR1" },
-    //     { name: "Progress", sub_module_code: "PR2" },
-    //     { name: "Reports", sub_module_code: "PR3" },
-    //   ],
-    // },
+    {
+      key: "Cloud Management",
+      module_code: "CM",
+      type: "dropdown",
+      name: "Cloud Management",
+      icon: <Database size={18} />,
+      sub_items: [
+        { name: "MCP", sub_module_code: "CM1" },
+        { name: "OSA", sub_module_code: "CM2" },
+        { name: "Merch Deployment", sub_module_code: "CM3" },
+        { name: "Execution Planner", sub_module_code: "CM4" },
+        { name: "Trade Rental", sub_module_code: "CM5" },
+        { name: "Audit Survey", sub_module_code: "CM6" },
+        { name: "Return to Vendor", sub_module_code: "CM7" },
+        { name: "Price Survey", sub_module_code: "CM8" },
+        { name: "Share of Shelf", sub_module_code: "CM9" },
+        { name: "NERM Inventory", sub_module_code: "CM10" },
+      ],
+    },
+    {
+      key: "Maintenance",
+      module_code: "MT",
+      type: "dropdown",
+      name: "Maintenance",
+      icon: <Settings size={18} />,
+      sub_items: [
+        { name: "MCL", sub_module_code: "MT1" },
+        { name: "Store Master", sub_module_code: "MT2" },
+        { name: "TDS Database", sub_module_code: "MT3" },
+        { name: "TDS Tagging", sub_module_code: "MT4" },
+        { name: "SKU Brand", sub_module_code: "MT5" },
+        { name: "Geo Tagging", sub_module_code: "MT6" },
+      ],
+    },
   ];
 
   const filtered_sidebar_items = sidebar_items.filter((item) => {
@@ -94,7 +125,7 @@ const Sidebar = ({
                   onClick={() => handle_subitem_click(key, item.name)}
                   className={`block px-4 py-2 text-sm whitespace-nowrap ${
                     is_active
-                      ? "bg-sky-100 text-sky-600"
+                      ? "bg-green-100 text-green-600"
                       : "text-gray-600 hover:bg-gray-100"
                   }`}
                 >
@@ -124,7 +155,7 @@ const Sidebar = ({
               onClick={() => handle_subitem_click(key, item.name)}
               className={`text-sm py-1 px-2 rounded transition-all duration-200 whitespace-nowrap ${
                 is_active
-                  ? "bg-sky-100 text-sky-600"
+                  ? "bg-green-100 text-green-600"
                   : "text-gray-600 hover:bg-gray-100"
               }`}
             >
@@ -206,7 +237,7 @@ const Sidebar = ({
                 <img src={delphys_logo} alt="Logo" />
               </div>
               <div className="ml-3 flex-1 text-gray-700 font-bold text-[20px] whitespace-nowrap">
-                Delphys 7
+                Merch Portal
               </div>
             </div>
           ))}
@@ -223,7 +254,7 @@ const Sidebar = ({
                     is_desktop && is_collapsed ? "justify-center p-3" : "p-3"
                   } ${
                     is_active
-                      ? "bg-sky-100 text-sky-600"
+                      ? "bg-green-100 text-green-600"
                       : "hover:bg-gray-100 text-gray-600"
                   }`}
                 >
@@ -263,7 +294,7 @@ const Sidebar = ({
                     is_desktop && is_collapsed ? "justify-center p-3" : "p-3"
                   } ${
                     is_parent_active
-                      ? "bg-sky-100 text-sky-600"
+                      ? "bg-green-100 text-green-600"
                       : "hover:bg-gray-100 text-gray-600"
                   }`}
                 >

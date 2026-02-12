@@ -7,6 +7,8 @@ import User_Management from "../modules/user_management/User_Management";
 import { useToast } from "./Toast_Provider";
 import { Use_App } from "../../../context/app_context";
 import Button from "assets/elements/Button";
+import MCP from "../modules/cloud_management/mcp/MCP";
+import { LogOut, X } from "lucide-react";
 
 const Layout = () => {
   const { set_page } = Use_App();
@@ -56,6 +58,8 @@ const Layout = () => {
         return <Excel_Conversion />;
       case "User Management":
         return <User_Management />;
+      case "Cloud Management-MCP":
+        return <MCP />;
     }
   };
 
@@ -72,34 +76,60 @@ const Layout = () => {
   const Confirm_Logout = () => {
     return (
       <React.Fragment>
-        <div className="fixed inset-0 flex items-center justify-center z-[100]">
-          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm z-[101]"></div>
+        <div className="fixed inset-0 flex items-center justify-center z-[100] p-4">
+          {/* Backdrop with improved blur */}
           <div
-            className={`relative bg-white rounded-lg shadow-xl max-w-[400px] w-full p-10 m-5 z-[102]`}
-          >
-            <div className="w-full flex justify-center items-center text-lg md:text-xl font-bold mb-4">
-              Confirm Logout
+            className="absolute inset-0 bg-slate-900/60 backdrop-blur-md z-[101]"
+            onClick={() => set_is_confirm_logout_open(false)}
+          ></div>
+
+          {/* Modal Card */}
+          <div className="relative bg-white rounded-2xl shadow-2xl max-w-[420px] w-full overflow-hidden z-[102] transform transition-all">
+            {/* Header Accent / Close Button */}
+            <div className="flex justify-end p-4 absolute right-0 top-0">
+              <button
+                onClick={() => set_is_confirm_logout_open(false)}
+                className="p-1 rounded-full hover:bg-slate-100 text-slate-400 transition-colors"
+              >
+                <X size={20} />
+              </button>
             </div>
-            <p className="w-full text-center text-sm leading-6 text-gray-500 py-4">
-              Are you sure you want to logout?
-            </p>
-            <div className="flex justify-center gap-2 mt-4">
-              <Button
-                width="w-[100px]"
-                variant="primary"
-                on_click={handle_sign_out}
-              >
-                Yes
-              </Button>
-              <Button
-                width="w-[100px]"
-                variant="white"
-                on_click={() => {
-                  set_is_confirm_logout_open(false);
-                }}
-              >
-                No
-              </Button>
+
+            <div className="p-8 pt-10">
+              {/* Warning Icon */}
+              <div className="mx-auto w-16 h-16 bg-green-50 rounded-full flex items-center justify-center mb-6">
+                <LogOut className="text-green-500 mr-1" size={32} />
+              </div>
+
+              {/* Text Content */}
+              <div className="text-center mb-8">
+                <h3 className="text-xl font-bold text-slate-800 mb-2">
+                  Sign Out?
+                </h3>
+                <p className="text-sm leading-relaxed text-slate-500 px-2">
+                  Are you sure you want to logout your account?
+                </p>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex flex-col sm:flex-row gap-3">
+                <Button
+                  width="w-full"
+                  variant="primary"
+                  class_name="py-3 rounded-xl"
+                  on_click={handle_sign_out}
+                >
+                  Yes, Log out
+                </Button>
+                <Button
+                  width="w-full"
+                  variant="white"
+                  class_name="py-3 rounded-xl"
+                  on_click={() => set_is_confirm_logout_open(false)}
+                >
+                  Cancel
+                </Button>
+              </div>
             </div>
           </div>
         </div>

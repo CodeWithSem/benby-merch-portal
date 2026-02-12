@@ -1,6 +1,6 @@
 const Spinner = ({ variant = "primary", size = 5 }) => {
   const colorClasses = {
-    primary: "text-sky-600",
+    primary: "text-green-600",
     success: "text-green-600",
     danger: "text-red-600",
   };

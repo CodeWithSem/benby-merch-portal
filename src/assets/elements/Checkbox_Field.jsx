@@ -31,7 +31,7 @@ const Checkbox_Field = ({
         className={`flex items-center justify-center border rounded select-none transition-colors duration-200 outline-none
           ${
             checked
-              ? "bg-sky-600 border-sky-600"
+              ? "bg-green-600 border-green-600"
               : "bg-white border-gray-300 hover:border-gray-400"
           }
          ${disabled ? "cursor-not-allowed" : "cursor-pointer"}
