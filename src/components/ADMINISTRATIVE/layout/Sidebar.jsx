@@ -261,7 +261,9 @@ const Sidebar = ({
                   {item.icon}
                   <span
                     className={`ml-3 absolute left-[30px] text-sm transition-opacity duration-300 whitespace-nowrap ${
-                      is_desktop && is_collapsed ? "opacity-0" : "opacity-100"
+                      is_desktop && is_collapsed
+                        ? "opacity-0 pointer-events-none"
+                        : "opacity-100"
                     }`}
                   >
                     {item.name}
@@ -301,7 +303,9 @@ const Sidebar = ({
                   {item.icon}
                   <span
                     className={`ml-3 absolute left-[30px] text-sm transition-opacity duration-300 whitespace-nowrap ${
-                      is_desktop && is_collapsed ? "opacity-0" : "opacity-100"
+                      is_desktop && is_collapsed
+                        ? "opacity-0 pointer-events-none"
+                        : "opacity-100"
                     }`}
                   >
                     {item.name}

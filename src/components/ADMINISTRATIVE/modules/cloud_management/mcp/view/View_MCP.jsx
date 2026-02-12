@@ -7,14 +7,13 @@ import { use_scroll_lock } from "assets/scripts/functions/use_scroll_lock";
 const View_MCP = ({
   is_open,
   on_close,
-  width = "max-w-[500px]", // Narrower width looks better for single column
+  width = "max-w-[500px]",
   view_data = {},
 }) => {
   use_scroll_lock(is_open);
 
   if (!is_open) return null;
 
-  // List of fields to display based on your MCP keys
   const display_fields = [
     { label: "MCP ID", key: "a1_ID" },
     { label: "TDS Name", key: "a2_TDSName" },
@@ -62,7 +61,7 @@ const View_MCP = ({
           {/* Header */}
           <div className="px-6 py-5 border-b bg-white flex justify-between items-center sticky top-0 z-10">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-sky-50 text-sky-600 rounded-lg flex items-center justify-center">
+              <div className="w-10 h-10 bg-green-50 text-green-600 rounded-lg flex items-center justify-center">
                 <View size={20} />
               </div>
               <h2 className="text-lg font-bold text-slate-800">View MCP</h2>
@@ -78,10 +77,10 @@ const View_MCP = ({
           {/* Body - Single Column */}
           <div className="p-6 overflow-y-auto max-h-[70vh] custom-scrollbar bg-slate-50/30">
             <div className="bg-white border rounded-xl p-6 shadow-sm space-y-5">
-              <div className="flex items-center gap-2 mb-2 text-sky-600">
+              <div className="flex items-center gap-2 mb-2 text-green-600">
                 <Info size={16} />
                 <span className="text-xs font-bold uppercase tracking-wider">
-                  Information
+                  MCP INFORMATION
                 </span>
               </div>
 

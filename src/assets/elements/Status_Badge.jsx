@@ -24,13 +24,13 @@ const STATUS_MAP = {
   0: "bg-red-100 text-red-500",
 };
 
-const Status_Badge = ({ status }) => {
+const Status_Badge = ({ status, class_name }) => {
   // Fallback to gray if the status doesn't exist in our map
   const colorClass = STATUS_MAP[status] || "bg-gray-100 text-gray-500";
 
   return (
     <span
-      className={`inline-flex items-center justify-center gap-1 rounded-full px-3 py-0.5 text-xs font-medium whitespace-nowrap ${colorClass}`}
+      className={`inline-flex items-center justify-center gap-1 rounded-full px-3 py-0.5 text-xs font-medium whitespace-nowrap ${colorClass} ${class_name}`}
     >
       {status}
     </span>

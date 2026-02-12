@@ -20,10 +20,10 @@ const Confirm_Modal = ({
 
   return (
     <React.Fragment>
-      <div className="fixed inset-0 flex items-center justify-center z-[100]">
-        <div className="absolute inset-0 bg-black/50 backdrop-blur-sm z-[101]"></div>
+      <div className="fixed inset-0 flex items-center justify-center z-[200]">
+        <div className="absolute inset-0 bg-black/50 backdrop-blur-sm z-[201]"></div>
 
-        <div className="relative bg-white rounded-lg shadow-xl max-w-[500px] w-full p-10 m-5 z-[102]">
+        <div className="relative bg-white rounded-lg shadow-xl max-w-[500px] w-full p-10 m-5 z-[202]">
           <div className="w-full flex justify-center items-center text-lg md:text-xl font-bold mb-4">
             {title}
           </div>
