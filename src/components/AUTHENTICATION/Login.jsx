@@ -26,14 +26,8 @@ const Login = () => {
       // Store user data in localStorage
       set_active_user(user);
 
-      // Redirect to Dashboard by updating parent state
-      if (user.category === "PROD") {
-        set_page("production");
-      } else {
-        // 🔥 FORCE dashboard state
-        localStorage.setItem("active_item", "Dashboard");
-        set_page("dashboard");
-      }
+      localStorage.setItem("active_item", "Dashboard");
+      set_page("dashboard");
 
       show_toast({
         type: "success",

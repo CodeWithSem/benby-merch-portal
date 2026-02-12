@@ -1,17 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import {
-  Home,
-  LogOut,
-  ChevronDown,
-  Warehouse,
-  User,
-  Pickaxe,
-  PackagePlus,
-  PackageMinus,
-  Settings,
-  Calculator,
-  FileCode,
-} from "lucide-react";
+import { Home, LogOut, ChevronDown, User, FileCode } from "lucide-react";
 import delphys_logo from "../../../assets/images/delphys-sidebar-logo.png";
 import { useToast } from "./Toast_Provider";
 import { Use_App } from "../../../context/app_context";
@@ -57,97 +45,18 @@ const Sidebar = ({
       name: "User Management",
       icon: <User size={18} />,
     },
-    {
-      key: "Production",
-      module_code: "PR",
-      type: "dropdown",
-      name: "Production",
-      icon: <Pickaxe size={18} />,
-      sub_items: [
-        { name: "Production Plan", sub_module_code: "PR1" },
-        { name: "Progress", sub_module_code: "PR2" },
-        { name: "Reports", sub_module_code: "PR3" },
-      ],
-    },
-    {
-      key: "Inbound",
-      module_code: "IN",
-      type: "dropdown",
-      name: "Inbound",
-      icon: <PackagePlus size={18} />,
-      sub_items: [
-        { name: "Purchase Order", sub_module_code: "IN1" },
-        { name: "Goods Receipt", sub_module_code: "IN2" },
-        { name: "Batch", sub_module_code: "IN3" },
-        { name: "Vendor", sub_module_code: "IN4" },
-      ],
-    },
-    {
-      key: "Outbound",
-      module_code: "OUT",
-      type: "dropdown",
-      name: "Outbound",
-      icon: <PackageMinus size={18} />,
-      sub_items: [
-        { name: "Sales Order", sub_module_code: "OUT1" },
-        { name: "Goods Issue", sub_module_code: "OUT2" },
-        { name: "Shipment", sub_module_code: "OUT3" },
-        { name: "Customer", sub_module_code: "OUT4" },
-        { name: "Truck", sub_module_code: "OUT5" },
-      ],
-    },
-    {
-      key: "Warehouse",
-      module_code: "WH",
-      type: "dropdown",
-      name: "Warehouse",
-      icon: <Warehouse size={18} />,
-      sub_items: [
-        { name: "WM Order", sub_module_code: "WH1" },
-        { name: "WM Transaction", sub_module_code: "WH2" },
-        { name: "Stock Transfer", sub_module_code: "WH3" },
-        { name: "Storage Bin", sub_module_code: "WH4" },
-        { name: "Inventory Master", sub_module_code: "WH5" },
-        { name: "Item Master", sub_module_code: "WH6" },
-      ],
-    },
-    {
-      key: "Financial",
-      module_code: "FN",
-      type: "dropdown",
-      name: "Financial",
-      icon: <Calculator size={18} />,
-      sub_items: [
-        { name: "Pricing Condition", sub_module_code: "FN1" },
-        { name: "Discount Condition", sub_module_code: "FN2" },
-        { name: "Pricing Procedure", sub_module_code: "FN3" },
-      ],
-    },
-    {
-      key: "Maintenance",
-      module_code: "MT",
-      type: "dropdown",
-      name: "Maintenance",
-      icon: <Settings size={18} />,
-      sub_items: [
-        { name: "General Structure", sub_module_code: "MT1" },
-        { name: "Financial", sub_module_code: "MT2" },
-        { name: "Item", sub_module_code: "MT3" },
-        { name: "Distribution", sub_module_code: "MT4" },
-        { name: "Vendor", sub_module_code: "MT5" },
-        { name: "Customer", sub_module_code: "MT6" },
-        { name: "Warehouse", sub_module_code: "MT7" },
-        { name: "Purchase Order", sub_module_code: "MT8" },
-        { name: "Sales Order", sub_module_code: "MT9" },
-        { name: "Pricing", sub_module_code: "MT10" },
-        { name: "Batch", sub_module_code: "MT11" },
-        { name: "Personnel", sub_module_code: "MT12" },
-        { name: "Truck", sub_module_code: "MT13" },
-        { name: "Shipment", sub_module_code: "MT14" },
-        { name: "User", sub_module_code: "MT15" },
-        { name: "Data Assignment", sub_module_code: "MT16" },
-      ],
-    },
+    // {
+    //   key: "Production",
+    //   module_code: "PR",
+    //   type: "dropdown",
+    //   name: "Production",
+    //   icon: <Pickaxe size={18} />,
+    //   sub_items: [
+    //     { name: "Production Plan", sub_module_code: "PR1" },
+    //     { name: "Progress", sub_module_code: "PR2" },
+    //     { name: "Reports", sub_module_code: "PR3" },
+    //   ],
+    // },
   ];
 
   const filtered_sidebar_items = sidebar_items.filter((item) => {

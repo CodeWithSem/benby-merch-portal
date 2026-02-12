@@ -2,53 +2,11 @@ import React, { useState, useEffect } from "react";
 import Sidebar from "./Sidebar";
 import Header from "./Header";
 import Dashboard from "../modules/dashboard/Dashboard";
-import Form_Elements from "assets/templates/pages/forms/form_elements/Form_Elements";
-import Purchase_Order from "../modules/inbound/purchase_order/Purchase_Order";
-import Tabs from "assets/templates/pages/ui_elements/tabs/Tabs";
-import Create_Invoice from "assets/templates/pages/templates/create_invoice/Create_Invoice";
-import Basic_Tables from "assets/templates/pages/tables/basic_tables/Basic_Tables";
-import Data_Tables from "assets/templates/pages/tables/data_tables/Data_Tables";
-import Goods_Receipt from "../modules/inbound/goods_receipt/Goods_Receipt";
-import Batch from "../modules/inbound/batch/Batch";
-import Input_Fields from "components/TEMPLATES/input_fields/Input_Fields";
-import Stock_Transfer from "../modules/warehouse/stock_transfer/Stock_Transfer";
-import Inventory_Master from "../modules/warehouse/inventory_master/Inventory_Master";
-import Item_Master from "../modules/warehouse/item_master/Item_Master";
-import General_Structure from "../modules/maintenance/general_structure/General_Structure";
-import Financial from "../modules/maintenance/financial/Financial";
-import Vendor_Maint from "../modules/maintenance/vendor/Vendor_Maint";
-import Purchase_Order_Maint from "../modules/maintenance/purchase_order/Purchase_Order_Maint";
-import Sales_Order from "../modules/outbound/sales_order/Sales_Order";
-import Goods_Issue from "../modules/outbound/goods_issue/Goods_Issue";
-import Shipment from "../modules/outbound/shipment/Shipment";
-import Customer from "../modules/outbound/customer/Customer";
-import Truck from "../modules/outbound/truck/Truck";
-import Data_Assignment from "../modules/maintenance/data_assignment/Data_Assignment";
-import Vendor from "../modules/inbound/vendor/Vendor";
-import Item from "../modules/maintenance/item/Item";
-import Warehouse_Maint from "../modules/maintenance/warehouse/Warehouse_Maint";
-import Distribution from "../modules/maintenance/distribution/Distribution";
-import Customer_Maint from "../modules/maintenance/customer/Customer_Maint";
-import Sales_Order_Maint from "../modules/maintenance/sales_order/Sales_Order_Maint";
-import Pricing_Maint from "../modules/maintenance/pricing/Pricing_Maint";
-import Batch_Maint from "../modules/maintenance/batch/Batch_Maint";
-import Personnel_Maint from "../modules/maintenance/personnel/Personnel_Maint";
-import Truck_Maint from "../modules/maintenance/truck/Truck_Maint";
-import Shipment_Maint from "../modules/maintenance/shipment/Shipment_Maint";
-import User_Maint from "../modules/maintenance/user/User_Maint";
-import User_Management from "../modules/user_management/User_Management";
-import WM_Order from "../modules/warehouse/wm_order/WM_Order";
-import Storage_Bin from "../modules/warehouse/storage_bin/Storage_Bin";
-import Production_Plan from "../modules/production/production_plan/Production_Plan";
-import Progress from "../modules/production/progress/Progress";
-import { useToast } from "./Toast_Provider";
-import Button from "assets/elements/Button";
-import { Use_App } from "../../../context/app_context";
-import Pricing_Condition from "../modules/financial/pricing_condition/Pricing_Condition";
-import Discount_Condition from "../modules/financial/discount_condition/Discount_Condition";
-import Pricing_Procedure from "../modules/financial/pricing_procedure/Pricing_Procedure";
-import WM_Transaction from "../modules/warehouse/wm_transaction/WM_Transaction";
 import Excel_Conversion from "../modules/excel_conversion/Excel_Conversion";
+import User_Management from "../modules/user_management/User_Management";
+import { useToast } from "./Toast_Provider";
+import { Use_App } from "../../../context/app_context";
+import Button from "assets/elements/Button";
 
 const Layout = () => {
   const { set_page } = Use_App();
@@ -98,90 +56,6 @@ const Layout = () => {
         return <Excel_Conversion />;
       case "User Management":
         return <User_Management />;
-      case "Inbound-Purchase Order":
-        return <Purchase_Order />;
-      case "Inbound-Goods Receipt":
-        return <Goods_Receipt />;
-      case "Inbound-Batch":
-        return <Batch />;
-      case "Inbound-Vendor":
-        return <Vendor />;
-      case "Outbound-Sales Order":
-        return <Sales_Order />;
-      case "Outbound-Goods Issue":
-        return <Goods_Issue />;
-      case "Outbound-Shipment":
-        return <Shipment />;
-      case "Outbound-Customer":
-        return <Customer />;
-      case "Outbound-Truck":
-        return <Truck />;
-      case "Warehouse-WM Order":
-        return <WM_Order />;
-      case "Warehouse-WM Transaction":
-        return <WM_Transaction />;
-      case "Warehouse-Stock Transfer":
-        return <Stock_Transfer />;
-      case "Warehouse-Storage Bin":
-        return <Storage_Bin />;
-      case "Warehouse-Inventory Master":
-        return <Inventory_Master />;
-      case "Warehouse-Item Master":
-        return <Item_Master />;
-      case "Financial-Pricing Condition":
-        return <Pricing_Condition />;
-      case "Financial-Discount Condition":
-        return <Discount_Condition />;
-      case "Financial-Pricing Procedure":
-        return <Pricing_Procedure />;
-      case "Maintenance-General Structure":
-        return <General_Structure />;
-      case "Maintenance-Financial":
-        return <Financial />;
-      case "Maintenance-Item":
-        return <Item />;
-      case "Maintenance-Distribution":
-        return <Distribution />;
-      case "Maintenance-Vendor":
-        return <Vendor_Maint />;
-      case "Maintenance-Customer":
-        return <Customer_Maint />;
-      case "Maintenance-Warehouse":
-        return <Warehouse_Maint />;
-      case "Maintenance-Purchase Order":
-        return <Purchase_Order_Maint />;
-      case "Maintenance-Sales Order":
-        return <Sales_Order_Maint />;
-      case "Maintenance-Pricing":
-        return <Pricing_Maint />;
-      case "Maintenance-Batch":
-        return <Batch_Maint />;
-      case "Maintenance-Personnel":
-        return <Personnel_Maint />;
-      case "Maintenance-Truck":
-        return <Truck_Maint />;
-      case "Maintenance-Shipment":
-        return <Shipment_Maint />;
-      case "Maintenance-User":
-        return <User_Maint />;
-      case "Maintenance-Data Assignment":
-        return <Data_Assignment />;
-      case "Production-Production Plan":
-        return <Production_Plan />;
-      case "Production-Progress":
-        return <Progress />;
-      case "Templates-Form Elements":
-        return <Form_Elements />;
-      case "Templates-Tabs":
-        return <Tabs />;
-      case "Templates-Create Invoice":
-        return <Create_Invoice />;
-      case "Templates-Basic Tables":
-        return <Basic_Tables />;
-      case "Templates-Data Tables":
-        return <Data_Tables />;
-      case "Templates-Input Fields":
-        return <Input_Fields />;
     }
   };
 
