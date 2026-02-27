@@ -8,6 +8,7 @@ import {
   Database,
   Server,
   Settings,
+  ClipboardList,
 } from "lucide-react";
 import delphys_logo from "../../../assets/images/benby-logo.png";
 import { useToast } from "./Toast_Provider";
@@ -72,6 +73,14 @@ const Sidebar = ({
         { name: "Share of Shelf", sub_module_code: "CM9" },
         { name: "NERM Inventory", sub_module_code: "CM10" },
       ],
+    },
+    {
+      key: "Data History",
+      module_code: "CM",
+      type: "dropdown",
+      name: "Data History",
+      icon: <ClipboardList size={18} />,
+      sub_items: [{ name: "EP History", sub_module_code: "DH1" }],
     },
     {
       key: "Maintenance",

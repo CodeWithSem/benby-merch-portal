@@ -11,92 +11,75 @@ import {
   Trash,
   Edit,
   SlidersHorizontal,
-  ChevronRight,
+  CheckCircle2,
+  CircleX,
+  FileDown,
+  Calendar,
 } from "lucide-react";
 
-import { Use_App } from "context/app_context";
-import { useToast } from "components/ADMINISTRATIVE/layout/Toast_Provider";
-import { get_mcp_list_by_tds } from "api/real_time_db/cloud_management/mcp/tbl_mcp_list_api_rtdb";
-import { client_side_filter } from "assets/scripts/functions/client_side_filter";
-
+// Elements
 import Button from "assets/elements/Button";
-import Button_Action from "assets/elements/Button_Action";
 import Icon_Field from "assets/elements/Icon_Field";
 import Select_Field from "assets/elements/Select_Field";
-import Checkbox_Field from "assets/elements/Checkbox_Field";
 import Pagination from "assets/elements/Pagination";
+import Checkbox_Field from "assets/elements/Checkbox_Field";
+import { client_side_filter } from "assets/scripts/functions/client_side_filter";
 import Spinner from "assets/elements/Spinner";
+import { realtime_db } from "assets/scripts/firebase";
+import { get, ref } from "firebase/database";
 import Status_Badge from "assets/elements/Status_Badge";
 
-import View_MCP from "./view/View_MCP";
-import Edit_MCP from "./edit/Edit_MCP";
-import Upload_MCP from "./upload/Upload_MCP";
+import Button_Action from "assets/elements/Button_Action";
+import { Use_App } from "context/app_context";
+import { useToast } from "components/ADMINISTRATIVE/layout/Toast_Provider";
+import {
+  get_ep_history_list_by_date,
+  get_ep_history_list_by_tds,
+} from "api/real_time_db/data_history/ep_history/tbl_ep_history_api";
+import { export_excel_service } from "assets/scripts/functions/export_excel_service";
+// import View_MCP from "./view/View_MCP";
+// import Edit_MCP from "./edit/Edit_MCP";
+// import Upload_MCP from "./upload/Upload_MCP";
 
-const MCP = () => {
+const EP_History = () => {
   const { active_user } = Use_App();
   const { show_toast } = useToast();
   const [page, set_page] = useState("main");
   const [loading, set_loading] = useState(false);
   const [display_modal, set_display_modal] = useState("");
+  const [search_mode, set_search_mode] = useState("code"); // "code" or "date"
   const [input_tds_code, set_input_tds_code] = useState("");
+  const [input_date, set_input_date] = useState(""); // For the date search
   const [show_filter, set_show_filter] = useState(false);
   const [selected_id, set_selected_id] = useState(null);
   const [view_data, set_view_data] = useState({});
   const [edit_data, set_edit_data] = useState({});
 
   const columns = [
-    { key: "index", label: "No.", sortable: false },
-    { key: "a1_ID", label: "MCP ID", sortable: true },
-    { key: "b4_TDSCode", label: "TDS CODE", sortable: true },
-    { key: "a2_TDSName", label: "TDS NAME", sortable: true },
-    { key: "a3_SoldCode", label: "SOLD CODE", sortable: true },
-    { key: "a4_SoldName", label: "SOLD NAME", sortable: true, hidden: true },
-    { key: "a5_Chain", label: "CHAIN", sortable: true },
+    { key: "index", label: "NO.", sortable: false },
+    { key: "a1_ID", label: "EP ID", sortable: true },
+    { key: "a3_TDSCode", label: "TDS CODE", sortable: true },
+    { key: "a2_Dateupdated", label: "DATE", sortable: true },
+    { key: "a4_Time", label: "TIME", sortable: true },
+    { key: "a5_Implemented", label: "IMPLEMENTED", sortable: true },
+    { key: "a6_CorrectLocation", label: "CORRECT LOCATION", sortable: true },
+    { key: "a7_CorrectPlanogram", label: "CORRECT PLANOGRAM", sortable: true },
+    { key: "a8_WithPicture", label: "WITH PICTURE", sortable: true },
     {
-      key: "a6_TDSCategory",
-      label: "TDS CATEGORY",
+      key: "b1_ImplementedRemarks",
+      label: "IMPLEMENTED REMARKS",
       sortable: true,
-      hidden: true,
-    },
-    { key: "a8_Week", label: "WEEK", sortable: true, hidden: true },
-    { key: "a9_PlanVisit", label: "PLAN VISIT", sortable: true, hidden: true },
-    { key: "b3_ActualDateVisited", label: "ACTUAL DATE VISIT", sortable: true },
-    { key: "b9_RangeFrom", label: "RANGE FROM", sortable: true, hidden: true },
-    { key: "c1_RangeTo", label: "RANGE TO", sortable: true, hidden: true },
-    {
-      key: "b1_Dateuploaded",
-      label: "DATE UPLOADED",
-      sortable: true,
-      hidden: true,
     },
     {
-      key: "b2_UploadedBy",
-      label: "UPLOADED BY",
+      key: "b2_CorrectLocationRemarks",
+      label: "CORRECT LOCATION REMARKS",
       sortable: true,
-      hidden: true,
     },
-    { key: "b5_Frequency", label: "FREQUENCY", sortable: true, hidden: true },
-    { key: "b6_Period", label: "PERIOD", sortable: true, hidden: true },
-    { key: "b7_Manager", label: "MANAGER", sortable: true, hidden: true },
     {
-      key: "c2_SoldToStreet",
-      label: "SOLD TO STREET",
+      key: "b3_CorrectPlanogramRemarks",
+      label: "CORRECT PLANOGRAM REMARKS",
       sortable: true,
-      hidden: true,
     },
-    { key: "c3_City", label: "CITY", sortable: true, hidden: true },
-    { key: "c4_Area", label: "AREA", sortable: true, hidden: true },
-    { key: "c5_Region", label: "REGION", sortable: true, hidden: true },
-    {
-      key: "c6_StoreClass",
-      label: "STORE CLASS",
-      sortable: true,
-      hidden: true,
-    },
-    { key: "c7_Channel", label: "CHANNEL", sortable: true, hidden: true },
-    { key: "z2_osa_status", label: "OSA", sortable: true },
-    { key: "z1_md_status", label: "MD", sortable: true },
-    { key: "z3_ep_status", label: "EP", sortable: true },
     { key: "actions", label: "", sortable: false },
   ];
 
@@ -114,23 +97,28 @@ const MCP = () => {
     );
   };
 
-  const [mcp_list, set_mcp_list] = useState([]);
+  const [ep_history_list, set_ep_history_list] = useState([]);
 
-  const handle_get_mcp_list = async () => {
-    const trimmed_code = input_tds_code.trim();
-
-    if (!trimmed_code) {
-      alert("Please enter a TDS Code.");
-      return;
-    }
-
+  const handle_get_ep_history_list = async () => {
+    set_loading(true);
     try {
-      set_loading(true);
-      const response = await get_mcp_list_by_tds(trimmed_code);
-      set_mcp_list(response);
+      let results = [];
+
+      if (search_mode === "code") {
+        // Call the TDS Code function we made earlier
+        results = await get_ep_history_list_by_tds(input_tds_code);
+      } else {
+        // Logic for Date search
+        // Note: If your input_date is YYYY-MM-DD but DB is DD/MM/YYYY,
+        // you'll need a small formatter here:
+
+        results = await get_ep_history_list_by_date(input_date);
+      }
+
+      set_ep_history_list(results);
       set_current_page(1);
     } catch (error) {
-      console.error("Fetch error:", error);
+      console.error("Fetch failed", error);
     } finally {
       set_loading(false);
     }
@@ -148,19 +136,49 @@ const MCP = () => {
     handle_sort,
     filtered_data,
     total_pages,
-  } = client_side_filter(mcp_list, columns);
+  } = client_side_filter(ep_history_list, columns);
+
+  const handle_export_excel = () => {
+    const result = export_excel_service(ep_history_list, columns, {
+      filename_prefix: `EP_HISTORY`,
+      sheet_name: "EP History",
+    });
+
+    if (result.success) {
+      show_toast({
+        type: "success",
+        title: "Export Successfully",
+        message: "The data has been exported.",
+        icon: <CheckCircle2 size={21} className="text-green-500" />,
+      });
+    } else {
+      show_toast({
+        type: "danger",
+        title: "Error",
+        message: "Something went wrong. Please try again.",
+        icon: <CircleX size={21} className="text-red-500" />,
+      });
+    }
+  };
 
   const render_cell = (col, row) => {
     const value = row[col.key];
 
-    if (col.key === "z2_osa_status") {
-      return <Status_Badge status={row.z2_osa_status} class_name={"w-full"} />;
+    if (col.key === "a5_Implemented") {
+      return <Status_Badge status={row.a5_Implemented} class_name={"w-full"} />;
     }
-    if (col.key === "z1_md_status") {
-      return <Status_Badge status={row.z1_md_status} class_name={"w-full"} />;
+    if (col.key === "a6_CorrectLocation") {
+      return (
+        <Status_Badge status={row.a6_CorrectLocation} class_name={"w-full"} />
+      );
     }
-    if (col.key === "z3_ep_status") {
-      return <Status_Badge status={row.z3_ep_status} class_name={"w-full"} />;
+    if (col.key === "a7_CorrectPlanogram") {
+      return (
+        <Status_Badge status={row.a7_CorrectPlanogram} class_name={"w-full"} />
+      );
+    }
+    if (col.key === "a8_WithPicture") {
+      return <Status_Badge status={row.a8_WithPicture} class_name={"w-full"} />;
     }
 
     if (col.key === "actions") {
@@ -231,18 +249,14 @@ const MCP = () => {
                     </a>
                   </li>
                   <li className="flex items-center gap-1.5 text-sm text-gray-500">
-                    <span>
-                      <ChevronRight size={14} />
-                    </span>
+                    <span>/</span>
                     <a className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-green-500 cursor-pointer">
                       Cloud Management
                     </a>
                   </li>
                   <li className="flex items-center gap-1.5 text-sm text-gray-500">
-                    <span>
-                      <ChevronRight size={14} />
-                    </span>
-                    <span className="text-gray-800">MCP</span>
+                    <span>/</span>
+                    <span className="text-gray-800">EP History</span>
                   </li>
                 </ol>
               </nav>
@@ -251,7 +265,7 @@ const MCP = () => {
             <div className="w-full bg-white rounded-lg border">
               {/* + Header */}
               <div className="flex flex-wrap items-center justify-between gap-3 p-5">
-                <h1 className="text-lg">MCP</h1>
+                <h1 className="text-lg">EP History</h1>
                 <div className="flex gap-2">
                   {/* {active_user?.category === "DEV" && (
                     <Button
@@ -278,38 +292,73 @@ const MCP = () => {
                   )} */}
                   <Button
                     variant="primary"
-                    icon={HardDriveUpload}
+                    icon={FileDown}
                     icon_position="left"
-                    on_click={() => set_page("upload_mcp")}
+                    on_click={handle_export_excel}
                   >
-                    Upload from Database
+                    Export as Excel
                   </Button>
                 </div>
               </div>
               {/* - Header */}
               {/* + Section 1 */}
               <div className="p-5 sm:p-6 border-t">
-                <div className="w-full flex items-center gap-2">
-                  <div className="w-full">
-                    <Icon_Field
-                      placeholder="Enter TDS Code (e.g. TDS-001)"
-                      icon={User}
-                      icon_position="left"
-                      value={input_tds_code}
-                      on_change={(e) => set_input_tds_code(e.target.value)}
-                      on_key_down={(e) =>
-                        e.key === "Enter" && handle_get_mcp_list()
-                      }
-                    />
-                  </div>
-                  <div className="relative">
-                    <Button
-                      variant="primary"
-                      width="w-[140px]"
-                      on_click={handle_get_mcp_list}
+                <div className="flex flex-col gap-3">
+                  {/* Mode Switcher */}
+                  <div className="flex gap-2 mb-2">
+                    <button
+                      onClick={() => set_search_mode("code")}
+                      className={`px-3 py-1 text-xs rounded-full border outline-none 
+                        ${search_mode === "code" ? "bg-green-100 border-green-600 text-green-600" : "bg-gray-50 border-gray-200 text-gray-500"}`}
                     >
-                      Load Data
-                    </Button>
+                      Search by TDS Code
+                    </button>
+                    <button
+                      onClick={() => set_search_mode("date")}
+                      className={`px-3 py-1 text-xs rounded-full border outline-none 
+                        ${search_mode === "date" ? "bg-green-100 border-green-600 text-green-600" : "bg-gray-50 border-gray-200 text-gray-500"}`}
+                    >
+                      Search by Date
+                    </button>
+                  </div>
+
+                  <div className="w-full flex items-center gap-2">
+                    <div className="w-full">
+                      {search_mode === "code" ? (
+                        <Icon_Field
+                          placeholder="Enter TDS Code"
+                          icon={User}
+                          icon_position="left"
+                          value={input_tds_code}
+                          on_change={(e) => set_input_tds_code(e.target.value)}
+                          on_key_down={(e) =>
+                            e.key === "Enter" && handle_get_ep_history_list()
+                          }
+                        />
+                      ) : (
+                        <Icon_Field
+                          type="date" // Use HTML5 date picker if Icon_Field supports 'type'
+                          placeholder="Enter Date"
+                          icon={Calendar} // Ensure you import 'Calendar' from your icon library
+                          icon_position="left"
+                          value={input_date}
+                          on_change={(e) => set_input_date(e.target.value)}
+                          on_key_down={(e) =>
+                            e.key === "Enter" && handle_get_ep_history_list()
+                          }
+                        />
+                      )}
+                    </div>
+                    <div className="relative">
+                      <Button
+                        variant="primary"
+                        width="w-[140px]"
+                        loading={loading}
+                        on_click={handle_get_ep_history_list}
+                      >
+                        Load Data
+                      </Button>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -339,7 +388,7 @@ const MCP = () => {
                         variant="white"
                         icon={RefreshCw}
                         icon_position="left"
-                        on_click={handle_get_mcp_list}
+                        on_click={handle_get_ep_history_list}
                       />
                     </div>
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-center md:w-[600px]">
@@ -504,17 +553,17 @@ const MCP = () => {
         </React.Fragment>
       )}
       {/* + Pages */}
-      {page === "upload_mcp" && <Upload_MCP set_page={set_page} />}
+      {/* {page === "upload_mcp" && <Upload_MCP set_page={set_page} />} */}
       {/* - Pages */}
       {/* + Modals */}
-      <View_MCP
+      {/* <View_MCP
         is_open={display_modal === "view_mcp"}
         on_close={() => set_display_modal("")}
         width="max-w-[1000px]"
         height="max-h-[700px]"
         show_toast={show_toast}
         view_data={view_data}
-        set_mcp_list={set_mcp_list}
+        set_ep_history_list={set_ep_history_list}
       />
       <Edit_MCP
         is_open={display_modal === "edit_mcp"}
@@ -522,12 +571,12 @@ const MCP = () => {
         width="max-w-[1000px]"
         // height="max-h-[700px]"
         edit_data={edit_data}
-        set_mcp_list={set_mcp_list}
+        set_ep_history_list={set_ep_history_list}
         show_toast={show_toast}
-      />
+      /> */}
       {/* - Modals */}
     </React.Fragment>
   );
 };
 
-export default MCP;
+export default EP_History;

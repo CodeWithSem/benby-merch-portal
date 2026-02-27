@@ -16,7 +16,7 @@ import {
 
 import { Use_App } from "context/app_context";
 import { useToast } from "components/ADMINISTRATIVE/layout/Toast_Provider";
-import { get_mcp_list_by_tds } from "api/real_time_db/cloud_management/mcp/tbl_mcp_list_api_rtdb";
+// import { get_aud_surv_by_tds } from "api/real_time_db/cloud_management/mcp/tbl_aud_surv_api_rtdb";
 import { client_side_filter } from "assets/scripts/functions/client_side_filter";
 
 import Button from "assets/elements/Button";
@@ -27,12 +27,12 @@ import Checkbox_Field from "assets/elements/Checkbox_Field";
 import Pagination from "assets/elements/Pagination";
 import Spinner from "assets/elements/Spinner";
 import Status_Badge from "assets/elements/Status_Badge";
+import Upload_AS from "./upload/Upload_AS";
 
-import View_MCP from "./view/View_MCP";
-import Edit_MCP from "./edit/Edit_MCP";
-import Upload_MCP from "./upload/Upload_MCP";
+// import View_MCP from "./view/View_MCP";
+// import Edit_MCP from "./edit/Edit_MCP";
 
-const MCP = () => {
+const Audit_Survey = () => {
   const { active_user } = Use_App();
   const { show_toast } = useToast();
   const [page, set_page] = useState("main");
@@ -49,54 +49,6 @@ const MCP = () => {
     { key: "a1_ID", label: "MCP ID", sortable: true },
     { key: "b4_TDSCode", label: "TDS CODE", sortable: true },
     { key: "a2_TDSName", label: "TDS NAME", sortable: true },
-    { key: "a3_SoldCode", label: "SOLD CODE", sortable: true },
-    { key: "a4_SoldName", label: "SOLD NAME", sortable: true, hidden: true },
-    { key: "a5_Chain", label: "CHAIN", sortable: true },
-    {
-      key: "a6_TDSCategory",
-      label: "TDS CATEGORY",
-      sortable: true,
-      hidden: true,
-    },
-    { key: "a8_Week", label: "WEEK", sortable: true, hidden: true },
-    { key: "a9_PlanVisit", label: "PLAN VISIT", sortable: true, hidden: true },
-    { key: "b3_ActualDateVisited", label: "ACTUAL DATE VISIT", sortable: true },
-    { key: "b9_RangeFrom", label: "RANGE FROM", sortable: true, hidden: true },
-    { key: "c1_RangeTo", label: "RANGE TO", sortable: true, hidden: true },
-    {
-      key: "b1_Dateuploaded",
-      label: "DATE UPLOADED",
-      sortable: true,
-      hidden: true,
-    },
-    {
-      key: "b2_UploadedBy",
-      label: "UPLOADED BY",
-      sortable: true,
-      hidden: true,
-    },
-    { key: "b5_Frequency", label: "FREQUENCY", sortable: true, hidden: true },
-    { key: "b6_Period", label: "PERIOD", sortable: true, hidden: true },
-    { key: "b7_Manager", label: "MANAGER", sortable: true, hidden: true },
-    {
-      key: "c2_SoldToStreet",
-      label: "SOLD TO STREET",
-      sortable: true,
-      hidden: true,
-    },
-    { key: "c3_City", label: "CITY", sortable: true, hidden: true },
-    { key: "c4_Area", label: "AREA", sortable: true, hidden: true },
-    { key: "c5_Region", label: "REGION", sortable: true, hidden: true },
-    {
-      key: "c6_StoreClass",
-      label: "STORE CLASS",
-      sortable: true,
-      hidden: true,
-    },
-    { key: "c7_Channel", label: "CHANNEL", sortable: true, hidden: true },
-    { key: "z2_osa_status", label: "OSA", sortable: true },
-    { key: "z1_md_status", label: "MD", sortable: true },
-    { key: "z3_ep_status", label: "EP", sortable: true },
     { key: "actions", label: "", sortable: false },
   ];
 
@@ -114,9 +66,9 @@ const MCP = () => {
     );
   };
 
-  const [mcp_list, set_mcp_list] = useState([]);
+  const [aud_surv, set_aud_surv] = useState([]);
 
-  const handle_get_mcp_list = async () => {
+  const handle_get_aud_surv = async () => {
     const trimmed_code = input_tds_code.trim();
 
     if (!trimmed_code) {
@@ -126,8 +78,8 @@ const MCP = () => {
 
     try {
       set_loading(true);
-      const response = await get_mcp_list_by_tds(trimmed_code);
-      set_mcp_list(response);
+      //   const response = await get_aud_surv_by_tds(trimmed_code);
+      set_aud_surv(response);
       set_current_page(1);
     } catch (error) {
       console.error("Fetch error:", error);
@@ -148,7 +100,7 @@ const MCP = () => {
     handle_sort,
     filtered_data,
     total_pages,
-  } = client_side_filter(mcp_list, columns);
+  } = client_side_filter(aud_surv, columns);
 
   const render_cell = (col, row) => {
     const value = row[col.key];
@@ -242,7 +194,7 @@ const MCP = () => {
                     <span>
                       <ChevronRight size={14} />
                     </span>
-                    <span className="text-gray-800">MCP</span>
+                    <span className="text-gray-800">Audit Survey</span>
                   </li>
                 </ol>
               </nav>
@@ -251,7 +203,7 @@ const MCP = () => {
             <div className="w-full bg-white rounded-lg border">
               {/* + Header */}
               <div className="flex flex-wrap items-center justify-between gap-3 p-5">
-                <h1 className="text-lg">MCP</h1>
+                <h1 className="text-lg">Audit Survey</h1>
                 <div className="flex gap-2">
                   {/* {active_user?.category === "DEV" && (
                     <Button
@@ -280,7 +232,7 @@ const MCP = () => {
                     variant="primary"
                     icon={HardDriveUpload}
                     icon_position="left"
-                    on_click={() => set_page("upload_mcp")}
+                    on_click={() => set_page("upload")}
                   >
                     Upload from Database
                   </Button>
@@ -298,7 +250,7 @@ const MCP = () => {
                       value={input_tds_code}
                       on_change={(e) => set_input_tds_code(e.target.value)}
                       on_key_down={(e) =>
-                        e.key === "Enter" && handle_get_mcp_list()
+                        e.key === "Enter" && handle_get_aud_surv()
                       }
                     />
                   </div>
@@ -306,7 +258,7 @@ const MCP = () => {
                     <Button
                       variant="primary"
                       width="w-[140px]"
-                      on_click={handle_get_mcp_list}
+                      on_click={handle_get_aud_surv}
                     >
                       Load Data
                     </Button>
@@ -339,7 +291,7 @@ const MCP = () => {
                         variant="white"
                         icon={RefreshCw}
                         icon_position="left"
-                        on_click={handle_get_mcp_list}
+                        on_click={handle_get_aud_surv}
                       />
                     </div>
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-center md:w-[600px]">
@@ -504,17 +456,17 @@ const MCP = () => {
         </React.Fragment>
       )}
       {/* + Pages */}
-      {page === "upload_mcp" && <Upload_MCP set_page={set_page} />}
+      {page === "upload" && <Upload_AS set_page={set_page} />}
       {/* - Pages */}
       {/* + Modals */}
-      <View_MCP
+      {/* <View_MCP
         is_open={display_modal === "view_mcp"}
         on_close={() => set_display_modal("")}
         width="max-w-[1000px]"
         height="max-h-[700px]"
         show_toast={show_toast}
         view_data={view_data}
-        set_mcp_list={set_mcp_list}
+        set_aud_surv={set_aud_surv}
       />
       <Edit_MCP
         is_open={display_modal === "edit_mcp"}
@@ -522,12 +474,12 @@ const MCP = () => {
         width="max-w-[1000px]"
         // height="max-h-[700px]"
         edit_data={edit_data}
-        set_mcp_list={set_mcp_list}
+        set_aud_surv={set_aud_surv}
         show_toast={show_toast}
-      />
+      /> */}
       {/* - Modals */}
     </React.Fragment>
   );
 };
 
-export default MCP;
+export default Audit_Survey;

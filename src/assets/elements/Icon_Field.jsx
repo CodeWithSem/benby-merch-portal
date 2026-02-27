@@ -27,7 +27,7 @@ const Icon_Field = ({
     ${
       error_message
         ? "focus:border-pink-500 focus:ring-pink-500"
-        : "focus:border-sky-500 focus:ring-sky-500"
+        : "focus:border-green-500 focus:ring-green-500"
     }
     focus:outline-none
     transition-colors duration-200

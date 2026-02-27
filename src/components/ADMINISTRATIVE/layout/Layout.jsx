@@ -9,6 +9,8 @@ import { Use_App } from "../../../context/app_context";
 import Button from "assets/elements/Button";
 import MCP from "../modules/cloud_management/mcp/MCP";
 import { LogOut, X } from "lucide-react";
+import EP_History from "../modules/data_history/ep_history/EP_History";
+import Audit_Survey from "../modules/cloud_management/audit_survey/Audit_Survey";
 
 const Layout = () => {
   const { set_page } = Use_App();
@@ -60,6 +62,10 @@ const Layout = () => {
         return <User_Management />;
       case "Cloud Management-MCP":
         return <MCP />;
+      case "Cloud Management-Audit Survey":
+        return <Audit_Survey />;
+      case "Data History-EP History":
+        return <EP_History />;
     }
   };
 

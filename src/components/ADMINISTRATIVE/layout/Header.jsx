@@ -195,7 +195,7 @@ const Header = ({
                 {active_user?.category === "DEV" ? (
                   <img src={dev_profile} alt="Avatar" />
                 ) : (
-                  <img src={profile_placeholder} alt="Avatar" />
+                  <img src={dev_profile} alt="Avatar" />
                 )}
               </span>
               <span className="text-sm mr-2 block font-medium">
