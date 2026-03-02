@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   Search,
   ChevronDown,
@@ -11,76 +11,50 @@ import {
   Trash,
   Edit,
   SlidersHorizontal,
+  ChevronRight,
+  Trash2,
   CheckCircle2,
   CircleX,
-  FileDown,
-  Calendar,
 } from "lucide-react";
 
-// Elements
-import Button from "assets/elements/Button";
-import Icon_Field from "assets/elements/Icon_Field";
-import Select_Field from "assets/elements/Select_Field";
-import Pagination from "assets/elements/Pagination";
-import Checkbox_Field from "assets/elements/Checkbox_Field";
-import { client_side_filter } from "assets/scripts/functions/client_side_filter";
-import Spinner from "assets/elements/Spinner";
-import { realtime_db } from "assets/scripts/firebase";
-import { get, ref } from "firebase/database";
-import Status_Badge from "assets/elements/Status_Badge";
-
-import Button_Action from "assets/elements/Button_Action";
 import { Use_App } from "context/app_context";
 import { useToast } from "components/ADMINISTRATIVE/layout/Toast_Provider";
+
+import { client_side_filter } from "assets/scripts/functions/client_side_filter";
+
+import Button from "assets/elements/Button";
+import Button_Action from "assets/elements/Button_Action";
+import Icon_Field from "assets/elements/Icon_Field";
+import Select_Field from "assets/elements/Select_Field";
+import Checkbox_Field from "assets/elements/Checkbox_Field";
+import Pagination from "assets/elements/Pagination";
+import Spinner from "assets/elements/Spinner";
+import Status_Badge from "assets/elements/Status_Badge";
+import Upload_OSA_NC from "./upload/Upload_OSA_NC";
 import {
-  get_ep_history_list_by_date,
-  get_ep_history_list_by_tds,
-} from "api/real_time_db/data_history/ep_history_api";
-import { export_excel_service } from "assets/scripts/functions/export_excel_service";
+  get_all_osa_nc_list,
+  truncate_osa_nc,
+} from "api/real_time_db/maintenance/osa_nc/osa_nc_api";
+import Confirm_Modal from "assets/elements/modals/Confirm_Modal";
+
 // import View_MCP from "./view/View_MCP";
 // import Edit_MCP from "./edit/Edit_MCP";
-// import Upload_MCP from "./upload/Upload_MCP";
+// import Truncate_MCP from "./delete/Truncate_MCP";
 
-const EP_History = () => {
+const OSA_NC = () => {
   const { active_user } = Use_App();
   const { show_toast } = useToast();
   const [page, set_page] = useState("main");
   const [loading, set_loading] = useState(false);
   const [display_modal, set_display_modal] = useState("");
-  const [search_mode, set_search_mode] = useState("code"); // "code" or "date"
   const [input_tds_code, set_input_tds_code] = useState("");
-  const [input_date, set_input_date] = useState(""); // For the date search
+  const [is_truncate_loading, set_is_truncate_loading] = useState(false);
   const [show_filter, set_show_filter] = useState(false);
-  const [selected_id, set_selected_id] = useState(null);
-  const [view_data, set_view_data] = useState({});
-  const [edit_data, set_edit_data] = useState({});
-
+  const [truncate_progress, set_truncate_progress] = useState(0);
   const columns = [
     { key: "index", label: "NO.", sortable: false },
-    { key: "a1_ID", label: "EP ID", sortable: true },
-    { key: "a3_TDSCode", label: "TDS CODE", sortable: true },
-    { key: "a2_Dateupdated", label: "DATE", sortable: true },
-    { key: "a4_Time", label: "TIME", sortable: true },
-    { key: "a5_Implemented", label: "IMPLEMENTED", sortable: true },
-    { key: "a6_CorrectLocation", label: "CORRECT LOCATION", sortable: true },
-    { key: "a7_CorrectPlanogram", label: "CORRECT PLANOGRAM", sortable: true },
-    { key: "a8_WithPicture", label: "WITH PICTURE", sortable: true },
-    {
-      key: "b1_ImplementedRemarks",
-      label: "IMPLEMENTED REMARKS",
-      sortable: true,
-    },
-    {
-      key: "b2_CorrectLocationRemarks",
-      label: "CORRECT LOCATION REMARKS",
-      sortable: true,
-    },
-    {
-      key: "b3_CorrectPlanogramRemarks",
-      label: "CORRECT PLANOGRAM REMARKS",
-      sortable: true,
-    },
-    { key: "actions", label: "", sortable: false },
+    { key: "a2_Storecode", label: "STORE CODE", sortable: true },
+    { key: "a1_Matcode", label: "SKU CODE", sortable: true },
   ];
 
   const [visible_columns, set_visible_columns] = useState(
@@ -97,34 +71,24 @@ const EP_History = () => {
     );
   };
 
-  const [ep_history_list, set_ep_history_list] = useState([]);
+  const [osa_nc_list, set_osa_nc_list] = useState([]);
 
-  const handle_get_ep_history_list = async () => {
-    set_loading(true);
+  const handle_get_osa_nc_list = async () => {
     try {
-      let results = [];
-      if (search_mode === "code") {
-        if (!input_tds_code) {
-          alert("Please enter a TDS code.");
-          return;
-        }
-        results = await get_ep_history_list_by_tds(input_tds_code);
-      } else {
-        if (!input_date) {
-          alert("Please enter a date.");
-          return;
-        }
-        results = await get_ep_history_list_by_date(input_date);
-      }
-
-      set_ep_history_list(results);
+      set_loading(true);
+      const response = await get_all_osa_nc_list();
+      set_osa_nc_list(response);
       set_current_page(1);
     } catch (error) {
-      console.error("Fetch failed", error);
+      console.error("Fetch error:", error);
     } finally {
       set_loading(false);
     }
   };
+
+  useEffect(() => {
+    handle_get_osa_nc_list();
+  }, []);
 
   const {
     search_query,
@@ -138,104 +102,48 @@ const EP_History = () => {
     handle_sort,
     filtered_data,
     total_pages,
-  } = client_side_filter(ep_history_list, columns);
-
-  const handle_export_excel = () => {
-    if (!ep_history_list || ep_history_list.length === 0) {
-      alert("There is no data to export");
-      return;
-    }
-    const result = export_excel_service(ep_history_list, columns, {
-      filename_prefix: `EP_HISTORY`,
-      sheet_name: "EP History",
-    });
-
-    if (result.success) {
-      show_toast({
-        type: "success",
-        title: "Export Successfully",
-        message: "The data has been exported.",
-        icon: <CheckCircle2 size={21} className="text-green-500" />,
-      });
-    } else {
-      show_toast({
-        type: "danger",
-        title: "Error",
-        message: "Something went wrong. Please try again.",
-        icon: <CircleX size={21} className="text-red-500" />,
-      });
-    }
-  };
+  } = client_side_filter(osa_nc_list, columns);
 
   const render_cell = (col, row) => {
     const value = row[col.key];
-
-    if (col.key === "a5_Implemented") {
-      return <Status_Badge status={row.a5_Implemented} class_name={"w-full"} />;
-    }
-    if (col.key === "a6_CorrectLocation") {
-      return (
-        <Status_Badge status={row.a6_CorrectLocation} class_name={"w-full"} />
-      );
-    }
-    if (col.key === "a7_CorrectPlanogram") {
-      return (
-        <Status_Badge status={row.a7_CorrectPlanogram} class_name={"w-full"} />
-      );
-    }
-    if (col.key === "a8_WithPicture") {
-      return <Status_Badge status={row.a8_WithPicture} class_name={"w-full"} />;
-    }
-
-    if (col.key === "actions") {
-      return (
-        <div className="flex gap-2">
-          <div className="relative group flex jusity-center items-center">
-            <Button_Action
-              icon={View}
-              tooltip="View Record"
-              on_click={() => handle_view(row)}
-            />
-          </div>
-          <div className="relative group flex jusity-center items-center">
-            <Button_Action
-              icon={Edit}
-              tooltip="Edit Record"
-              on_click={() => handle_edit(row)}
-            />
-          </div>
-          {active_user?.category === "DEV" && (
-            <div className="relative group flex jusity-center items-center">
-              <Button_Action
-                class_name="mb-[1px]"
-                icon={Trash}
-                variant="danger"
-                tooltip="Delete Record"
-              />
-            </div>
-          )}
-        </div>
-      );
-    }
+    // if (col.key === "z_nerm_status") {
+    //   return <Status_Badge status={row.z_nerm_status} class_name={"w-full"} />;
+    // }
 
     return value;
   };
 
-  const handle_view = (data) => {
-    const { index, ...data_without_index } = data;
-    console.log("Clean Data (No Index):", data_without_index);
-    set_view_data(data_without_index);
-    set_display_modal("view_mcp");
+  const handle_truncate = async () => {
+    try {
+      set_is_truncate_loading(true);
+      set_truncate_progress(0); // Reset progress
 
-    // Use data_without_index for your logic
-  };
-  const handle_edit = (data) => {
-    const { index, ...data_without_index } = data;
-    console.log("Clean Data (No Index):", data_without_index);
-    set_edit_data(data_without_index);
-    set_display_modal("edit_mcp");
+      const result = await truncate_osa_nc((progress) => {
+        set_truncate_progress(progress); // Update progress state
+      });
 
-    // Use data_without_index for your logic
+      if (result.success) {
+        show_toast({
+          type: "success",
+          title: "Deletion Success",
+          message: "The record has been deleted.",
+          icon: <CheckCircle2 size={21} className="text-green-500" />,
+        });
+        set_osa_nc_list([]);
+        set_display_modal("");
+      }
+    } catch (error) {
+      show_toast({
+        type: "danger",
+        title: "Error",
+        message: "Something went wrong while updating.",
+        icon: <CircleX size={21} className="text-red-500" />,
+      });
+      show_toast("Failed to truncate database", "error");
+    } finally {
+      set_is_truncate_loading(false);
+      setTimeout(() => set_truncate_progress(0), 500);
+    }
   };
 
   // RETURN ORIGIN
@@ -245,7 +153,7 @@ const EP_History = () => {
         <React.Fragment>
           <div className="w-full">
             <div className="flex flex-wrap items-center justify-between gap-3 py-5">
-              <h1 className="text-xl">Data History</h1>
+              <h1 className="text-xl">Maintenance</h1>
               {/* + Breadcrumbs */}
               <nav>
                 <ol className="flex flex-wrap items-center gap-1.5">
@@ -255,14 +163,18 @@ const EP_History = () => {
                     </a>
                   </li>
                   <li className="flex items-center gap-1.5 text-sm text-gray-500">
-                    <span>/</span>
+                    <span>
+                      <ChevronRight size={14} />
+                    </span>
                     <a className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-green-500 cursor-pointer">
-                      Data History
+                      Maintenance
                     </a>
                   </li>
                   <li className="flex items-center gap-1.5 text-sm text-gray-500">
-                    <span>/</span>
-                    <span className="text-gray-800">Execution Planner</span>
+                    <span>
+                      <ChevronRight size={14} />
+                    </span>
+                    <span className="text-gray-800">OSA Not Carried</span>
                   </li>
                 </ol>
               </nav>
@@ -271,104 +183,31 @@ const EP_History = () => {
             <div className="w-full bg-white rounded-lg border">
               {/* + Header */}
               <div className="flex flex-wrap items-center justify-between gap-3 p-5">
-                <h1 className="text-lg">Execution Planner</h1>
+                <h1 className="text-lg">OSA Not Carried</h1>
                 <div className="flex gap-2">
-                  {/* {active_user?.category === "DEV" && (
-                    <Button
-                      variant="success"
-                      icon={FileDigit}
-                      icon_position="left"
-                      width="w-[110px]"
-                      on_click={handle_set_incremental_id}
-                    >
-                      Set ID
-                    </Button>
-                  )}
                   {active_user?.category === "DEV" && (
                     <Button
                       variant="danger"
                       icon={Trash2}
                       icon_position="left"
                       width="w-[110px]"
-                      loading={truncate_loading}
-                      on_click={handle_truncate}
+                      loading={is_truncate_loading}
+                      on_click={() => set_display_modal("truncate")}
                     >
                       Truncate
                     </Button>
-                  )} */}
+                  )}
                   <Button
                     variant="primary"
-                    icon={FileDown}
+                    icon={HardDriveUpload}
                     icon_position="left"
-                    on_click={handle_export_excel}
+                    on_click={() => set_page("upload_mcp")}
                   >
-                    Export as Excel
+                    Upload from Database
                   </Button>
                 </div>
               </div>
               {/* - Header */}
-              {/* + Section 1 */}
-              <div className="p-5 sm:p-6 border-t">
-                <div className="flex flex-col gap-3">
-                  {/* Mode Switcher */}
-                  <div className="flex gap-2 mb-2">
-                    <button
-                      onClick={() => set_search_mode("code")}
-                      className={`px-3 py-1 text-xs rounded-full border outline-none 
-                        ${search_mode === "code" ? "bg-green-100 border-green-600 text-green-600" : "bg-gray-50 border-gray-200 text-gray-500"}`}
-                    >
-                      Search by TDS Code
-                    </button>
-                    <button
-                      onClick={() => set_search_mode("date")}
-                      className={`px-3 py-1 text-xs rounded-full border outline-none 
-                        ${search_mode === "date" ? "bg-green-100 border-green-600 text-green-600" : "bg-gray-50 border-gray-200 text-gray-500"}`}
-                    >
-                      Search by Date
-                    </button>
-                  </div>
-
-                  <div className="w-full flex items-center gap-2">
-                    <div className="w-full">
-                      {search_mode === "code" ? (
-                        <Icon_Field
-                          placeholder="Enter TDS Code"
-                          icon={User}
-                          icon_position="left"
-                          value={input_tds_code}
-                          on_change={(e) => set_input_tds_code(e.target.value)}
-                          on_key_down={(e) =>
-                            e.key === "Enter" && handle_get_ep_history_list()
-                          }
-                        />
-                      ) : (
-                        <Icon_Field
-                          type="date" // Use HTML5 date picker if Icon_Field supports 'type'
-                          placeholder="Enter Date"
-                          icon={Calendar} // Ensure you import 'Calendar' from your icon library
-                          icon_position="left"
-                          value={input_date}
-                          on_change={(e) => set_input_date(e.target.value)}
-                          on_key_down={(e) =>
-                            e.key === "Enter" && handle_get_ep_history_list()
-                          }
-                        />
-                      )}
-                    </div>
-                    <div className="relative">
-                      <Button
-                        variant="primary"
-                        width="w-[140px]"
-                        loading={loading}
-                        on_click={handle_get_ep_history_list}
-                      >
-                        Load Data
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              {/* - Section 1 */}
               {/* + Section 2 */}
               <div className="p-5 sm:p-6 border-t">
                 <div className="w-full border rounded-lg">
@@ -394,7 +233,7 @@ const EP_History = () => {
                         variant="white"
                         icon={RefreshCw}
                         icon_position="left"
-                        on_click={handle_get_ep_history_list}
+                        on_click={handle_get_osa_nc_list}
                       />
                     </div>
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-center md:w-[600px]">
@@ -520,8 +359,7 @@ const EP_History = () => {
                             return (
                               <tr
                                 key={idx}
-                                onClick={() => set_selected_id(row.a1_ID)}
-                                className={`transition-colors ${selected_id === row.a1_ID ? "bg-green-100/40 hover:bg-green-100/60" : "hover:bg-gray-50"}`}
+                                className={`transition-colors hover:bg-gray-50`}
                               >
                                 {active_columns.map((col, i) => (
                                   <td
@@ -559,30 +397,62 @@ const EP_History = () => {
         </React.Fragment>
       )}
       {/* + Pages */}
-      {/* {page === "upload_mcp" && <Upload_MCP set_page={set_page} />} */}
+      {page === "upload_mcp" && <Upload_OSA_NC set_page={set_page} />}
       {/* - Pages */}
-      {/* + Modals */}
-      {/* <View_MCP
-        is_open={display_modal === "view_mcp"}
-        on_close={() => set_display_modal("")}
-        width="max-w-[1000px]"
-        height="max-h-[700px]"
-        show_toast={show_toast}
-        view_data={view_data}
-        set_ep_history_list={set_ep_history_list}
+
+      {/* + Truncate Progress Modal */}
+      {is_truncate_loading && (
+        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-[10000] flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6">
+            <div className="flex flex-col items-center text-center">
+              {/* Changed BG and Color to Red */}
+              <div className="mb-4 p-3 bg-red-50 rounded-full">
+                <Trash2 size={32} className="text-red-600 animate-bounce" />
+              </div>
+
+              {/* Updated Title and Description */}
+              <h3 className="text-lg font-semibold text-slate-800">
+                Deleting Cloud Data
+              </h3>
+              <p className="text-sm text-slate-500 mb-6">
+                Removing ALL records from Firebase...
+              </p>
+
+              {/* Progress Bar (Changed to Red) */}
+              <div className="w-full bg-slate-100 rounded-full h-2.5 mb-2 overflow-hidden">
+                <div
+                  className="bg-red-600 h-full transition-all duration-300 ease-out"
+                  style={{ width: `${truncate_progress}%` }}
+                ></div>
+              </div>
+
+              {/* Updated Progress Texts */}
+              <div className="flex justify-between w-full mb-6">
+                <span className="text-xs font-medium text-slate-400">
+                  Deleting...
+                </span>
+                {/* Changed Color to Red */}
+                <span className="text-xs font-bold text-red-600">
+                  {truncate_progress}%
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* - Truncate Progress Modal */}
+      <Confirm_Modal
+        is_open={display_modal === "truncate"}
+        title="Confirm Truncate"
+        description_1="Are you sure you want to delete all OSA Not Carried data?"
+        description_2="This action will permanently delete records from the cloud database."
+        description_3="This cannot be undone. Do you wish to proceed?"
+        confirm_variant="danger" // Assuming your Button supports danger (red)
+        on_confirm={handle_truncate}
+        on_cancel={() => set_display_modal("")}
       />
-      <Edit_MCP
-        is_open={display_modal === "edit_mcp"}
-        on_close={() => set_display_modal("")}
-        width="max-w-[1000px]"
-        // height="max-h-[700px]"
-        edit_data={edit_data}
-        set_ep_history_list={set_ep_history_list}
-        show_toast={show_toast}
-      /> */}
-      {/* - Modals */}
     </React.Fragment>
   );
 };
 
-export default EP_History;
+export default OSA_NC;

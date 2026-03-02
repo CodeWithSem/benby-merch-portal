@@ -11,6 +11,13 @@ import MCP from "../modules/cloud_management/mcp/MCP";
 import { LogOut, X } from "lucide-react";
 import EP_History from "../modules/data_history/ep_history/EP_History";
 import Audit_Survey from "../modules/cloud_management/audit_survey/Audit_Survey";
+import AS_History from "../modules/data_history/audit_survey_history/AS_History";
+import SOS from "../modules/cloud_management/share_of_shelf/SOS";
+import SOS_History from "../modules/data_history/sos_history/SOS_History";
+import Price_Survey from "../modules/cloud_management/price_survey/Price_Survey";
+import Price_Surv_History from "../modules/data_history/price_survey_history/Price_Surv_History";
+import RTV_History from "../modules/data_history/rtv_history/RTV_History";
+import OSA_NC from "../modules/maintenance/osa_nc/OSA_NC";
 
 const Layout = () => {
   const { set_page } = Use_App();
@@ -64,8 +71,22 @@ const Layout = () => {
         return <MCP />;
       case "Cloud Management-Audit Survey":
         return <Audit_Survey />;
-      case "Data History-EP History":
+      case "Cloud Management-Share of Shelf":
+        return <SOS />;
+      case "Cloud Management-Price Survey":
+        return <Price_Survey />;
+      case "Data History-Execution Planner":
         return <EP_History />;
+      case "Data History-Audit Survey":
+        return <AS_History />;
+      case "Data History-Share of Shelf":
+        return <SOS_History />;
+      case "Data History-Price Survey":
+        return <Price_Surv_History />;
+      case "Data History-Return to Vendor":
+        return <RTV_History />;
+      case "Maintenance-OSA Not Carried":
+        return <OSA_NC />;
     }
   };
 
@@ -178,4 +199,161 @@ const Layout = () => {
   );
 };
 
+const training_survey_data = [
+  {
+    iD: "1",
+    code: "PMEHO01",
+    storecode: "512173",
+    survey: "Benby Product Familiarization ",
+    module: "PRE DEPLOYMENT",
+    rowNo: "1",
+    answer: "",
+    dateUpload: "2/26/2026 12:00:00 AM",
+    uploadedBy: "110828",
+  },
+  {
+    iD: "2",
+    code: "PMEHO01",
+    storecode: "512173",
+    survey: "Importance of Complete Price or Shelf Tag",
+    module: "PRE DEPLOYMENT",
+    rowNo: "2",
+    answer: "",
+    dateUpload: "2/26/2026 12:00:00 AM",
+    uploadedBy: "110828",
+  },
+  {
+    iD: "3",
+    code: "PMEHO01",
+    storecode: "512173",
+    survey: "Freshness / FEFO (First Expiry First Out)",
+    module: "PRE DEPLOYMENT",
+    rowNo: "3",
+    answer: "",
+    dateUpload: "2/26/2026 12:00:00 AM",
+    uploadedBy: "110828",
+  },
+  {
+    iD: "4",
+    code: "PMEHO01",
+    storecode: "512173",
+    survey: "Accurate Near Ex / Inventory Report",
+    module: "PRE DEPLOYMENT",
+    rowNo: "4",
+    answer: "",
+    dateUpload: "2/26/2026 12:00:00 AM",
+    uploadedBy: "110828",
+  },
+  {
+    iD: "5",
+    code: "PMEHO01",
+    storecode: "512173",
+    survey: "BENBY PRODUCT FAMILIARIZATION",
+    module: "NEW DISERS EVALUATION",
+    rowNo: "1",
+    answer: "",
+    dateUpload: "2/26/2026 12:00:00 AM",
+    uploadedBy: "110828",
+  },
+  {
+    iD: "6",
+    code: "PMEHO01",
+    storecode: "512173",
+    survey: "KPI (MAHUSAY)",
+    module: "NEW DISERS EVALUATION",
+    rowNo: "2",
+    answer: "",
+    dateUpload: "2/26/2026 12:00:00 AM",
+    uploadedBy: "110828",
+  },
+  {
+    iD: "7",
+    code: "PMEHO01",
+    storecode: "512173",
+    survey: "ORDER OF REFILLING (MASSARAPP)",
+    module: "NEW DISERS EVALUATION",
+    rowNo: "3",
+    answer: "",
+    dateUpload: "2/26/2026 12:00:00 AM",
+    uploadedBy: "110828",
+  },
+  {
+    iD: "8",
+    code: "PMEHO01",
+    storecode: "512173",
+    survey: "BENBY STANDARD (ASTIG)",
+    module: "NEW DISERS EVALUATION",
+    rowNo: "4",
+    answer: "",
+    dateUpload: "2/26/2026 12:00:00 AM",
+    uploadedBy: "110828",
+  },
+  {
+    iD: "9",
+    code: "PMEHO01",
+    storecode: "512173",
+    survey: "PLANOGRAM & MCL",
+    module: "NEW DISERS EVALUATION",
+    rowNo: "5",
+    answer: "",
+    dateUpload: "2/26/2026 12:00:00 AM",
+    uploadedBy: "110828",
+  },
+  {
+    iD: "10",
+    code: "PMEHO01",
+    storecode: "512173",
+    survey: "MAX CAPPING FOR MCL SKUs",
+    module: "TRADE FINDINGS AUDIT",
+    rowNo: "1",
+    answer: "",
+    dateUpload: "2/26/2026 12:00:00 AM",
+    uploadedBy: "110828",
+  },
+  {
+    iD: "11",
+    code: "PMEHO01",
+    storecode: "512173",
+    survey: "ALL DISPLAY AREAS - CLEAN & NO BO",
+    module: "TRADE FINDINGS AUDIT",
+    rowNo: "2",
+    answer: "",
+    dateUpload: "2/26/2026 12:00:00 AM",
+    uploadedBy: "110828",
+  },
+  {
+    iD: "12",
+    code: "PMEHO01",
+    storecode: "512173",
+    survey: "FEFO EXECUTED FOR ALL BENBY BRANDS",
+    module: "TRADE FINDINGS AUDIT",
+    rowNo: "3",
+    answer: "",
+    dateUpload: "2/26/2026 12:00:00 AM",
+    uploadedBy: "110828",
+  },
+  {
+    iD: "13",
+    code: "PMEHO01",
+    storecode: "512173",
+    survey:
+      "PLANOGRAM EXECUTION FOCUS BRAND OF THE MONTH?-   (TOP TO BOTTOM DISPLAY OR IN DIAMOND AREA)",
+    module: "TRADE FINDINGS AUDIT",
+    rowNo: "4",
+    answer: "",
+    dateUpload: "2/26/2026 12:00:00 AM",
+    uploadedBy: "110828",
+  },
+  {
+    iD: "14",
+    code: "PMEHO01",
+    storecode: "512173",
+    survey: "ALL DISPLAYS AREAS COMPLETE WITH PRICE & PROMO TAGS",
+    module: "TRADE FINDINGS AUDIT",
+    rowNo: "5",
+    answer: "",
+    dateUpload: "2/26/2026 12:00:00 AM",
+    uploadedBy: "110828",
+  },
+];
 export default Layout;

@@ -21,7 +21,7 @@ import Spinner from "assets/elements/Spinner";
 import { useToast } from "components/ADMINISTRATIVE/layout/Toast_Provider";
 import { format_date_1, get_date_now } from "assets/scripts/format";
 import axios from "axios";
-import { push_audit_survey_to_cloud } from "api/real_time_db/cloud_management/audit_survey/tbl_audit_survey_api";
+import { push_audit_survey_to_cloud } from "api/real_time_db/cloud_management/audit_survey_api";
 
 const Upload_AS = ({ set_page }) => {
   const { show_toast } = useToast();
@@ -100,7 +100,6 @@ const Upload_AS = ({ set_page }) => {
           ...item,
           index: index + 1,
         }));
-        // console.log(formatted_data[0]);
         set_upload_as_list(formatted_data);
         show_toast({
           type: "success",

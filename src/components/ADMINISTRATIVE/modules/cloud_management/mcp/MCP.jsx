@@ -12,11 +12,15 @@ import {
   Edit,
   SlidersHorizontal,
   ChevronRight,
+  Trash2,
 } from "lucide-react";
 
 import { Use_App } from "context/app_context";
 import { useToast } from "components/ADMINISTRATIVE/layout/Toast_Provider";
-import { get_mcp_list_by_tds } from "api/real_time_db/cloud_management/mcp/tbl_mcp_list_api_rtdb";
+import {
+  get_mcp_list_by_tds,
+  truncate_mcp,
+} from "api/real_time_db/cloud_management/mcp_api";
 import { client_side_filter } from "assets/scripts/functions/client_side_filter";
 
 import Button from "assets/elements/Button";
@@ -31,6 +35,7 @@ import Status_Badge from "assets/elements/Status_Badge";
 import View_MCP from "./view/View_MCP";
 import Edit_MCP from "./edit/Edit_MCP";
 import Upload_MCP from "./upload/Upload_MCP";
+import Truncate_MCP from "./delete/Truncate_MCP";
 
 const MCP = () => {
   const { active_user } = Use_App();
@@ -39,6 +44,7 @@ const MCP = () => {
   const [loading, set_loading] = useState(false);
   const [display_modal, set_display_modal] = useState("");
   const [input_tds_code, set_input_tds_code] = useState("");
+  const [is_truncate_loading, set_is_truncate_loading] = useState(false);
   const [show_filter, set_show_filter] = useState(false);
   const [selected_id, set_selected_id] = useState(null);
   const [view_data, set_view_data] = useState({});
@@ -94,10 +100,16 @@ const MCP = () => {
       hidden: true,
     },
     { key: "c7_Channel", label: "CHANNEL", sortable: true, hidden: true },
-    { key: "z2_osa_status", label: "OSA", sortable: true },
-    { key: "z1_md_status", label: "MD", sortable: true },
-    { key: "z3_ep_status", label: "EP", sortable: true },
-    { key: "actions", label: "", sortable: false },
+    { key: "z_osa_status", label: "OSA", sortable: true },
+    { key: "z_md_status", label: "MD", sortable: true },
+    { key: "z_ep_status", label: "EP", sortable: true },
+    { key: "z_tr_status", label: "TR", sortable: true },
+    { key: "z_as_status", label: "AS", sortable: true },
+    { key: "z_sos_status", label: "SOS", sortable: true },
+    { key: "z_ps_status", label: "PS", sortable: true },
+    { key: "z_rtv_status", label: "RTV", sortable: true },
+    { key: "z_nerm_status", label: "NERM", sortable: true },
+    // { key: "actions", label: "", sortable: false },
   ];
 
   const [visible_columns, set_visible_columns] = useState(
@@ -153,14 +165,32 @@ const MCP = () => {
   const render_cell = (col, row) => {
     const value = row[col.key];
 
-    if (col.key === "z2_osa_status") {
-      return <Status_Badge status={row.z2_osa_status} class_name={"w-full"} />;
+    if (col.key === "z_osa_status") {
+      return <Status_Badge status={row.z_osa_status} class_name={"w-full"} />;
     }
-    if (col.key === "z1_md_status") {
-      return <Status_Badge status={row.z1_md_status} class_name={"w-full"} />;
+    if (col.key === "z_md_status") {
+      return <Status_Badge status={row.z_md_status} class_name={"w-full"} />;
     }
-    if (col.key === "z3_ep_status") {
-      return <Status_Badge status={row.z3_ep_status} class_name={"w-full"} />;
+    if (col.key === "z_ep_status") {
+      return <Status_Badge status={row.z_ep_status} class_name={"w-full"} />;
+    }
+    if (col.key === "z_tr_status") {
+      return <Status_Badge status={row.z_tr_status} class_name={"w-full"} />;
+    }
+    if (col.key === "z_as_status") {
+      return <Status_Badge status={row.z_as_status} class_name={"w-full"} />;
+    }
+    if (col.key === "z_sos_status") {
+      return <Status_Badge status={row.z_sos_status} class_name={"w-full"} />;
+    }
+    if (col.key === "z_ps_status") {
+      return <Status_Badge status={row.z_ps_status} class_name={"w-full"} />;
+    }
+    if (col.key === "z_rtv_status") {
+      return <Status_Badge status={row.z_rtv_status} class_name={"w-full"} />;
+    }
+    if (col.key === "z_nerm_status") {
+      return <Status_Badge status={row.z_nerm_status} class_name={"w-full"} />;
     }
 
     if (col.key === "actions") {
@@ -214,6 +244,12 @@ const MCP = () => {
     // Use data_without_index for your logic
   };
 
+  const handle_truncate = async () => {
+    set_is_truncate_loading(true);
+    await truncate_mcp();
+    set_is_truncate_loading(false);
+  };
+
   // RETURN ORIGIN
   return (
     <React.Fragment>
@@ -253,29 +289,18 @@ const MCP = () => {
               <div className="flex flex-wrap items-center justify-between gap-3 p-5">
                 <h1 className="text-lg">MCP</h1>
                 <div className="flex gap-2">
-                  {/* {active_user?.category === "DEV" && (
-                    <Button
-                      variant="success"
-                      icon={FileDigit}
-                      icon_position="left"
-                      width="w-[110px]"
-                      on_click={handle_set_incremental_id}
-                    >
-                      Set ID
-                    </Button>
-                  )}
                   {active_user?.category === "DEV" && (
                     <Button
                       variant="danger"
                       icon={Trash2}
                       icon_position="left"
                       width="w-[110px]"
-                      loading={truncate_loading}
-                      on_click={handle_truncate}
+                      // loading={is_truncate_loading}
+                      on_click={() => set_display_modal("truncate_mcp")}
                     >
                       Truncate
                     </Button>
-                  )} */}
+                  )}
                   <Button
                     variant="primary"
                     icon={HardDriveUpload}
@@ -524,6 +549,11 @@ const MCP = () => {
         edit_data={edit_data}
         set_mcp_list={set_mcp_list}
         show_toast={show_toast}
+      />
+      <Truncate_MCP
+        isOpen={display_modal === "truncate_mcp"}
+        onClose={() => set_display_modal("")}
+        on_success={(res) => console.log("Deleted count:", res.deletedCount)}
       />
       {/* - Modals */}
     </React.Fragment>

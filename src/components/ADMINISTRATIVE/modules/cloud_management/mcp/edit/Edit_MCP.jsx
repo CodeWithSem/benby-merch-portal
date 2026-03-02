@@ -3,7 +3,7 @@ import { X, Save, Edit } from "lucide-react";
 import Text_Field from "assets/elements/Text_Field";
 import Button from "assets/elements/Button";
 import { use_scroll_lock } from "assets/scripts/functions/use_scroll_lock";
-import { update_mcp } from "api/real_time_db/cloud_management/mcp/tbl_mcp_list_api_rtdb";
+import { update_mcp } from "api/real_time_db/cloud_management/mcp_api";
 import Confirm_Modal from "assets/elements/modals/Confirm_Modal";
 
 const Edit_MCP = ({

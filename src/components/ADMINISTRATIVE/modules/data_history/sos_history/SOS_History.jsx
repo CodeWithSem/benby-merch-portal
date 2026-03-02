@@ -4,20 +4,15 @@ import {
   ChevronDown,
   ChevronUp,
   RefreshCw,
-  PlusCircle,
   User,
-  HardDriveUpload,
-  View,
-  Trash,
-  Edit,
   SlidersHorizontal,
   CheckCircle2,
   CircleX,
   FileDown,
   Calendar,
+  ChevronRight,
 } from "lucide-react";
 
-// Elements
 import Button from "assets/elements/Button";
 import Icon_Field from "assets/elements/Icon_Field";
 import Select_Field from "assets/elements/Select_Field";
@@ -25,23 +20,16 @@ import Pagination from "assets/elements/Pagination";
 import Checkbox_Field from "assets/elements/Checkbox_Field";
 import { client_side_filter } from "assets/scripts/functions/client_side_filter";
 import Spinner from "assets/elements/Spinner";
-import { realtime_db } from "assets/scripts/firebase";
-import { get, ref } from "firebase/database";
 import Status_Badge from "assets/elements/Status_Badge";
-
-import Button_Action from "assets/elements/Button_Action";
 import { Use_App } from "context/app_context";
 import { useToast } from "components/ADMINISTRATIVE/layout/Toast_Provider";
-import {
-  get_ep_history_list_by_date,
-  get_ep_history_list_by_tds,
-} from "api/real_time_db/data_history/ep_history_api";
 import { export_excel_service } from "assets/scripts/functions/export_excel_service";
-// import View_MCP from "./view/View_MCP";
-// import Edit_MCP from "./edit/Edit_MCP";
-// import Upload_MCP from "./upload/Upload_MCP";
+import {
+  get_sos_history_list_by_date,
+  get_sos_history_list_by_tds,
+} from "api/real_time_db/data_history/sos_history_api";
 
-const EP_History = () => {
+const SOS_History = () => {
   const { active_user } = Use_App();
   const { show_toast } = useToast();
   const [page, set_page] = useState("main");
@@ -52,35 +40,21 @@ const EP_History = () => {
   const [input_date, set_input_date] = useState(""); // For the date search
   const [show_filter, set_show_filter] = useState(false);
   const [selected_id, set_selected_id] = useState(null);
-  const [view_data, set_view_data] = useState({});
-  const [edit_data, set_edit_data] = useState({});
 
   const columns = [
     { key: "index", label: "NO.", sortable: false },
-    { key: "a1_ID", label: "EP ID", sortable: true },
-    { key: "a3_TDSCode", label: "TDS CODE", sortable: true },
-    { key: "a2_Dateupdated", label: "DATE", sortable: true },
-    { key: "a4_Time", label: "TIME", sortable: true },
-    { key: "a5_Implemented", label: "IMPLEMENTED", sortable: true },
-    { key: "a6_CorrectLocation", label: "CORRECT LOCATION", sortable: true },
-    { key: "a7_CorrectPlanogram", label: "CORRECT PLANOGRAM", sortable: true },
-    { key: "a8_WithPicture", label: "WITH PICTURE", sortable: true },
-    {
-      key: "b1_ImplementedRemarks",
-      label: "IMPLEMENTED REMARKS",
-      sortable: true,
-    },
-    {
-      key: "b2_CorrectLocationRemarks",
-      label: "CORRECT LOCATION REMARKS",
-      sortable: true,
-    },
-    {
-      key: "b3_CorrectPlanogramRemarks",
-      label: "CORRECT PLANOGRAM REMARKS",
-      sortable: true,
-    },
-    { key: "actions", label: "", sortable: false },
+    { key: "iD", label: "ID", sortable: true },
+    { key: "code", label: "TDS CODE", sortable: true },
+    { key: "storecode", label: "STORE CODE", sortable: true },
+    { key: "dateVist", label: "DATE VISIT", sortable: true },
+    { key: "brand", label: "BRAND", sortable: true },
+    { key: "category", label: "CATEGORY", sortable: true },
+    { key: "channel", label: "CHANNEL", sortable: true },
+    { key: "facingCount", label: "FACING COUNT", sortable: true },
+    { key: "remarks", label: "REMARKS", sortable: true },
+    { key: "audit_date", label: "AUDIT DATE", sortable: true },
+    { key: "dateUpload", label: "DATE UPLOAD", sortable: true, hidden: true },
+    { key: "uploadBy", label: "UPLOADED BY", sortable: true, hidden: true },
   ];
 
   const [visible_columns, set_visible_columns] = useState(
@@ -97,9 +71,9 @@ const EP_History = () => {
     );
   };
 
-  const [ep_history_list, set_ep_history_list] = useState([]);
+  const [sos_history_list, set_sos_history_list] = useState([]);
 
-  const handle_get_ep_history_list = async () => {
+  const handle_get_sos_history_list = async () => {
     set_loading(true);
     try {
       let results = [];
@@ -108,16 +82,15 @@ const EP_History = () => {
           alert("Please enter a TDS code.");
           return;
         }
-        results = await get_ep_history_list_by_tds(input_tds_code);
+        results = await get_sos_history_list_by_tds(input_tds_code);
       } else {
         if (!input_date) {
           alert("Please enter a date.");
           return;
         }
-        results = await get_ep_history_list_by_date(input_date);
+        results = await get_sos_history_list_by_date(input_date);
       }
-
-      set_ep_history_list(results);
+      set_sos_history_list(results);
       set_current_page(1);
     } catch (error) {
       console.error("Fetch failed", error);
@@ -138,16 +111,16 @@ const EP_History = () => {
     handle_sort,
     filtered_data,
     total_pages,
-  } = client_side_filter(ep_history_list, columns);
+  } = client_side_filter(sos_history_list, columns);
 
   const handle_export_excel = () => {
-    if (!ep_history_list || ep_history_list.length === 0) {
+    if (!sos_history_list || sos_history_list.length === 0) {
       alert("There is no data to export");
       return;
     }
-    const result = export_excel_service(ep_history_list, columns, {
-      filename_prefix: `EP_HISTORY`,
-      sheet_name: "EP History",
+    const result = export_excel_service(sos_history_list, columns, {
+      filename_prefix: `SOS_HISTORY`,
+      sheet_name: "Share of Shelf History",
     });
 
     if (result.success) {
@@ -164,78 +137,18 @@ const EP_History = () => {
         message: "Something went wrong. Please try again.",
         icon: <CircleX size={21} className="text-red-500" />,
       });
+      w;
     }
   };
 
   const render_cell = (col, row) => {
     const value = row[col.key];
 
-    if (col.key === "a5_Implemented") {
-      return <Status_Badge status={row.a5_Implemented} class_name={"w-full"} />;
-    }
-    if (col.key === "a6_CorrectLocation") {
-      return (
-        <Status_Badge status={row.a6_CorrectLocation} class_name={"w-full"} />
-      );
-    }
-    if (col.key === "a7_CorrectPlanogram") {
-      return (
-        <Status_Badge status={row.a7_CorrectPlanogram} class_name={"w-full"} />
-      );
-    }
-    if (col.key === "a8_WithPicture") {
-      return <Status_Badge status={row.a8_WithPicture} class_name={"w-full"} />;
-    }
-
-    if (col.key === "actions") {
-      return (
-        <div className="flex gap-2">
-          <div className="relative group flex jusity-center items-center">
-            <Button_Action
-              icon={View}
-              tooltip="View Record"
-              on_click={() => handle_view(row)}
-            />
-          </div>
-          <div className="relative group flex jusity-center items-center">
-            <Button_Action
-              icon={Edit}
-              tooltip="Edit Record"
-              on_click={() => handle_edit(row)}
-            />
-          </div>
-          {active_user?.category === "DEV" && (
-            <div className="relative group flex jusity-center items-center">
-              <Button_Action
-                class_name="mb-[1px]"
-                icon={Trash}
-                variant="danger"
-                tooltip="Delete Record"
-              />
-            </div>
-          )}
-        </div>
-      );
+    if (col.key === "answer") {
+      return <Status_Badge status={row.answer} class_name={"w-full"} />;
     }
 
     return value;
-  };
-
-  const handle_view = (data) => {
-    const { index, ...data_without_index } = data;
-    console.log("Clean Data (No Index):", data_without_index);
-    set_view_data(data_without_index);
-    set_display_modal("view_mcp");
-
-    // Use data_without_index for your logic
-  };
-  const handle_edit = (data) => {
-    const { index, ...data_without_index } = data;
-    console.log("Clean Data (No Index):", data_without_index);
-    set_edit_data(data_without_index);
-    set_display_modal("edit_mcp");
-
-    // Use data_without_index for your logic
   };
 
   // RETURN ORIGIN
@@ -244,9 +157,9 @@ const EP_History = () => {
       {page === "main" && (
         <React.Fragment>
           <div className="w-full">
+            {/* + BREADCRUMB */}
             <div className="flex flex-wrap items-center justify-between gap-3 py-5">
               <h1 className="text-xl">Data History</h1>
-              {/* + Breadcrumbs */}
               <nav>
                 <ol className="flex flex-wrap items-center gap-1.5">
                   <li>
@@ -255,47 +168,29 @@ const EP_History = () => {
                     </a>
                   </li>
                   <li className="flex items-center gap-1.5 text-sm text-gray-500">
-                    <span>/</span>
+                    <span>
+                      <ChevronRight size={14} />
+                    </span>
                     <a className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-green-500 cursor-pointer">
                       Data History
                     </a>
                   </li>
                   <li className="flex items-center gap-1.5 text-sm text-gray-500">
-                    <span>/</span>
-                    <span className="text-gray-800">Execution Planner</span>
+                    <span>
+                      <ChevronRight size={14} />
+                    </span>
+                    <span className="text-gray-800">Share of Shelf</span>
                   </li>
                 </ol>
               </nav>
-              {/* - Breadcrumbs */}
             </div>
+            {/* - BREADCRUMB */}
+            {/* + MAIN CONTAINER */}
             <div className="w-full bg-white rounded-lg border">
-              {/* + Header */}
+              {/* + HEADER */}
               <div className="flex flex-wrap items-center justify-between gap-3 p-5">
-                <h1 className="text-lg">Execution Planner</h1>
+                <h1 className="text-lg">Share of Shelf</h1>
                 <div className="flex gap-2">
-                  {/* {active_user?.category === "DEV" && (
-                    <Button
-                      variant="success"
-                      icon={FileDigit}
-                      icon_position="left"
-                      width="w-[110px]"
-                      on_click={handle_set_incremental_id}
-                    >
-                      Set ID
-                    </Button>
-                  )}
-                  {active_user?.category === "DEV" && (
-                    <Button
-                      variant="danger"
-                      icon={Trash2}
-                      icon_position="left"
-                      width="w-[110px]"
-                      loading={truncate_loading}
-                      on_click={handle_truncate}
-                    >
-                      Truncate
-                    </Button>
-                  )} */}
                   <Button
                     variant="primary"
                     icon={FileDown}
@@ -306,11 +201,10 @@ const EP_History = () => {
                   </Button>
                 </div>
               </div>
-              {/* - Header */}
-              {/* + Section 1 */}
+              {/* - HEADER */}
+              {/* + SECTION 1 */}
               <div className="p-5 sm:p-6 border-t">
                 <div className="flex flex-col gap-3">
-                  {/* Mode Switcher */}
                   <div className="flex gap-2 mb-2">
                     <button
                       onClick={() => set_search_mode("code")}
@@ -338,19 +232,18 @@ const EP_History = () => {
                           value={input_tds_code}
                           on_change={(e) => set_input_tds_code(e.target.value)}
                           on_key_down={(e) =>
-                            e.key === "Enter" && handle_get_ep_history_list()
+                            e.key === "Enter" && handle_get_sos_history_list()
                           }
                         />
                       ) : (
                         <Icon_Field
-                          type="date" // Use HTML5 date picker if Icon_Field supports 'type'
                           placeholder="Enter Date"
-                          icon={Calendar} // Ensure you import 'Calendar' from your icon library
+                          icon={Calendar}
                           icon_position="left"
                           value={input_date}
                           on_change={(e) => set_input_date(e.target.value)}
                           on_key_down={(e) =>
-                            e.key === "Enter" && handle_get_ep_history_list()
+                            e.key === "Enter" && handle_get_sos_history_list()
                           }
                         />
                       )}
@@ -360,7 +253,7 @@ const EP_History = () => {
                         variant="primary"
                         width="w-[140px]"
                         loading={loading}
-                        on_click={handle_get_ep_history_list}
+                        on_click={handle_get_sos_history_list}
                       >
                         Load Data
                       </Button>
@@ -368,8 +261,8 @@ const EP_History = () => {
                   </div>
                 </div>
               </div>
-              {/* - Section 1 */}
-              {/* + Section 2 */}
+              {/* - SECTION 1 */}
+              {/* + SECTION 2 */}
               <div className="p-5 sm:p-6 border-t">
                 <div className="w-full border rounded-lg">
                   <div className="w-full md:flex md:justify-between p-4 gap-4">
@@ -394,7 +287,7 @@ const EP_History = () => {
                         variant="white"
                         icon={RefreshCw}
                         icon_position="left"
-                        on_click={handle_get_ep_history_list}
+                        on_click={handle_get_sos_history_list}
                       />
                     </div>
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-center md:w-[600px]">
@@ -520,8 +413,8 @@ const EP_History = () => {
                             return (
                               <tr
                                 key={idx}
-                                onClick={() => set_selected_id(row.a1_ID)}
-                                className={`transition-colors ${selected_id === row.a1_ID ? "bg-green-100/40 hover:bg-green-100/60" : "hover:bg-gray-50"}`}
+                                onClick={() => set_selected_id(row.id)}
+                                className={`transition-colors ${selected_id === row.id ? "bg-green-100/40 hover:bg-green-100/60" : "hover:bg-gray-50"}`}
                               >
                                 {active_columns.map((col, i) => (
                                   <td
@@ -553,36 +446,14 @@ const EP_History = () => {
                   )}
                 </div>
               </div>
-              {/* - Section 2 */}
+              {/* - SECTION 2 */}
             </div>
+            {/* - MAIN CONTAINER */}
           </div>
         </React.Fragment>
       )}
-      {/* + Pages */}
-      {/* {page === "upload_mcp" && <Upload_MCP set_page={set_page} />} */}
-      {/* - Pages */}
-      {/* + Modals */}
-      {/* <View_MCP
-        is_open={display_modal === "view_mcp"}
-        on_close={() => set_display_modal("")}
-        width="max-w-[1000px]"
-        height="max-h-[700px]"
-        show_toast={show_toast}
-        view_data={view_data}
-        set_ep_history_list={set_ep_history_list}
-      />
-      <Edit_MCP
-        is_open={display_modal === "edit_mcp"}
-        on_close={() => set_display_modal("")}
-        width="max-w-[1000px]"
-        // height="max-h-[700px]"
-        edit_data={edit_data}
-        set_ep_history_list={set_ep_history_list}
-        show_toast={show_toast}
-      /> */}
-      {/* - Modals */}
     </React.Fragment>
   );
 };
 
-export default EP_History;
+export default SOS_History;

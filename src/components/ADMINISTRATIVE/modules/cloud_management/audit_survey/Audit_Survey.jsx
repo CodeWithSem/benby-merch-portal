@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   Search,
   ChevronDown,
@@ -28,6 +28,7 @@ import Pagination from "assets/elements/Pagination";
 import Spinner from "assets/elements/Spinner";
 import Status_Badge from "assets/elements/Status_Badge";
 import Upload_AS from "./upload/Upload_AS";
+import { get_audit_survey_by_tds } from "api/real_time_db/cloud_management/audit_survey_api";
 
 // import View_MCP from "./view/View_MCP";
 // import Edit_MCP from "./edit/Edit_MCP";
@@ -45,10 +46,13 @@ const Audit_Survey = () => {
   const [edit_data, set_edit_data] = useState({});
 
   const columns = [
-    { key: "index", label: "No.", sortable: false },
-    { key: "a1_ID", label: "MCP ID", sortable: true },
-    { key: "b4_TDSCode", label: "TDS CODE", sortable: true },
-    { key: "a2_TDSName", label: "TDS NAME", sortable: true },
+    { key: "index", label: "NO.", sortable: false },
+    { key: "store_code", label: "STORE CODE", sortable: true },
+    { key: "tds_code", label: "TDS CODE", sortable: true },
+    { key: "survey_id", label: "SURVEY ID", sortable: true },
+    { key: "survey_category", label: "CATEGORY", sortable: true },
+    { key: "date_uploaded", label: "DATE UPLOAD", sortable: true },
+    { key: "uploaded_by", label: "UPLOADED BY", sortable: true },
     { key: "actions", label: "", sortable: false },
   ];
 
@@ -75,10 +79,9 @@ const Audit_Survey = () => {
       alert("Please enter a TDS Code.");
       return;
     }
-
     try {
       set_loading(true);
-      //   const response = await get_aud_surv_by_tds(trimmed_code);
+      const response = await get_audit_survey_by_tds(trimmed_code);
       set_aud_surv(response);
       set_current_page(1);
     } catch (error) {
@@ -104,17 +107,6 @@ const Audit_Survey = () => {
 
   const render_cell = (col, row) => {
     const value = row[col.key];
-
-    if (col.key === "z2_osa_status") {
-      return <Status_Badge status={row.z2_osa_status} class_name={"w-full"} />;
-    }
-    if (col.key === "z1_md_status") {
-      return <Status_Badge status={row.z1_md_status} class_name={"w-full"} />;
-    }
-    if (col.key === "z3_ep_status") {
-      return <Status_Badge status={row.z3_ep_status} class_name={"w-full"} />;
-    }
-
     if (col.key === "actions") {
       return (
         <div className="flex gap-2">
@@ -259,6 +251,7 @@ const Audit_Survey = () => {
                       variant="primary"
                       width="w-[140px]"
                       on_click={handle_get_aud_surv}
+                      loading={loading}
                     >
                       Load Data
                     </Button>
@@ -417,8 +410,8 @@ const Audit_Survey = () => {
                             return (
                               <tr
                                 key={idx}
-                                onClick={() => set_selected_id(row.a1_ID)}
-                                className={`transition-colors ${selected_id === row.a1_ID ? "bg-green-100/40 hover:bg-green-100/60" : "hover:bg-gray-50"}`}
+                                onClick={() => set_selected_id(row.id)}
+                                className={`transition-colors ${selected_id === row.id ? "bg-green-100/40 hover:bg-green-100/60" : "hover:bg-gray-50"}`}
                               >
                                 {active_columns.map((col, i) => (
                                   <td

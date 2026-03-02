@@ -63,24 +63,30 @@ const Sidebar = ({
       icon: <Database size={18} />,
       sub_items: [
         { name: "MCP", sub_module_code: "CM1" },
-        { name: "OSA", sub_module_code: "CM2" },
-        { name: "Merch Deployment", sub_module_code: "CM3" },
-        { name: "Execution Planner", sub_module_code: "CM4" },
-        { name: "Trade Rental", sub_module_code: "CM5" },
+        // { name: "OSA", sub_module_code: "CM2" },
+        // { name: "Merch Deployment", sub_module_code: "CM3" },
+        // { name: "Execution Planner", sub_module_code: "CM4" },
+        // { name: "Trade Rental", sub_module_code: "CM5" },
         { name: "Audit Survey", sub_module_code: "CM6" },
-        { name: "Return to Vendor", sub_module_code: "CM7" },
+        // { name: "Return to Vendor", sub_module_code: "CM7" },
         { name: "Price Survey", sub_module_code: "CM8" },
         { name: "Share of Shelf", sub_module_code: "CM9" },
-        { name: "NERM Inventory", sub_module_code: "CM10" },
+        // { name: "NERM Inventory", sub_module_code: "CM10" },
       ],
     },
     {
       key: "Data History",
-      module_code: "CM",
+      module_code: "DH",
       type: "dropdown",
       name: "Data History",
       icon: <ClipboardList size={18} />,
-      sub_items: [{ name: "EP History", sub_module_code: "DH1" }],
+      sub_items: [
+        // { name: "Execution Planner", sub_module_code: "DH1" },
+        { name: "Audit Survey", sub_module_code: "DH2" },
+        { name: "Price Survey", sub_module_code: "DH3" },
+        { name: "Share of Shelf", sub_module_code: "DH4" },
+        { name: "Return to Vendor", sub_module_code: "DH5" },
+      ],
     },
     {
       key: "Maintenance",
@@ -91,10 +97,11 @@ const Sidebar = ({
       sub_items: [
         { name: "MCL", sub_module_code: "MT1" },
         { name: "Store Master", sub_module_code: "MT2" },
-        { name: "TDS Database", sub_module_code: "MT3" },
-        { name: "TDS Tagging", sub_module_code: "MT4" },
-        { name: "SKU Brand", sub_module_code: "MT5" },
-        { name: "Geo Tagging", sub_module_code: "MT6" },
+        { name: "OSA Not Carried", sub_module_code: "MT3" },
+        { name: "TDS Database", sub_module_code: "MT4" },
+        { name: "TDS Tagging", sub_module_code: "MT5" },
+        { name: "SKU Brand", sub_module_code: "MT6" },
+        { name: "Geo Tagging", sub_module_code: "MT7" },
       ],
     },
   ];
@@ -119,7 +126,7 @@ const Sidebar = ({
       return (
         open_dropdowns[key] && (
           <div
-            className={`absolute left-full top-0 ml-2 bg-white rounded border py-2 z-50 w-40 shadow-lg ${
+            className={`absolute left-full top-0 ml-2 bg-white rounded border py-2 z-50 w-[180px] shadow-lg ${
               key === "Maintenance"
                 ? "max-h-[305px] overflow-y-auto scrollbar-custom"
                 : ""
