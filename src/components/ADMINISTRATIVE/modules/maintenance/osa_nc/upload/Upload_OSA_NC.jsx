@@ -22,7 +22,7 @@ import Spinner from "assets/elements/Spinner";
 import { useToast } from "components/ADMINISTRATIVE/layout/Toast_Provider";
 import { format_date_1, get_date_now } from "assets/scripts/format";
 import axios from "axios";
-import { push_osa_nc_to_cloud } from "api/real_time_db/maintenance/osa_nc/osa_nc_api";
+import { push_osa_nc_to_cloud } from "api/real_time_db/maintenance/osa_nc_api";
 
 const Upload_OSA_NC = ({ set_page }) => {
   const { show_toast } = useToast();

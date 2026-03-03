@@ -1,6 +1,46 @@
 import { ref, get, update } from "firebase/database";
 import { realtime_db } from "assets/scripts/firebase";
 import { CheckCircle2, CircleX } from "lucide-react";
+import { format_date } from "assets/scripts/format";
+
+export const get_all_mcp_list = async () => {
+  try {
+    const path = `/DB_TEST/TBL_MCP/DATA`;
+    const snapshot = await get(ref(realtime_db, path));
+
+    const all_data = snapshot.val();
+
+    // 1. Check if the root DATA node exists
+    if (!all_data) return [];
+
+    const flat_list = [];
+
+    // 2. First Loop: Iterate through each TDS Code (e.g., AMA-004)
+    Object.keys(all_data).forEach((tds_code) => {
+      const stores_in_tds = all_data[tds_code];
+
+      // 3. Second Loop: Iterate through each Store Code (e.g., 833362)
+      if (stores_in_tds && typeof stores_in_tds === "object") {
+        Object.keys(stores_in_tds).forEach((store_code) => {
+          const store_details = stores_in_tds[store_code];
+
+          // 4. Push the combined object to our final list
+          flat_list.push({
+            ...store_details,
+            // We add these keys explicitly in case they aren't inside the object
+            store_code: store_code,
+            tds_code_key: tds_code,
+          });
+        });
+      }
+    });
+
+    return flat_list;
+  } catch (error) {
+    console.error("Error in get_all_mcp_list:", error);
+    throw error;
+  }
+};
 
 export const get_mcp_list_by_tds = async (tds_code) => {
   if (!tds_code) throw new Error("TDS Code is required");
@@ -95,7 +135,7 @@ export const push_mcp_to_cloud = async (data, on_progress, signal) => {
         a6_TDSCategory: item.tDSCategory || "",
         a7_Supervisor: item.supervisor || "",
         a8_Week: item.week || "",
-        a9_PlanVisit: item.planVisit || "",
+        a9_PlanVisit: format_date(item.planVisit) || "",
         b1_Dateuploaded: item.dateuploaded || "",
         b2_UploadedBy: item.uploadedBy || "",
         b3_ActualDateVisited: item.actualDateVisited || "",
@@ -104,8 +144,8 @@ export const push_mcp_to_cloud = async (data, on_progress, signal) => {
         b6_Period: item.period || "",
         b7_Manager: item.manager || "",
         b8_login: item.login || "",
-        b9_RangeFrom: item.rangeFrom || "",
-        c1_RangeTo: item.rangeTo || "",
+        b9_RangeFrom: format_date(item.rangeFrom) || "",
+        c1_RangeTo: format_date(item.rangeTo) || "",
         c2_SoldToStreet: item.soldToStreet || "",
         c3_City: item.city || "",
         c4_Area: item.area || "",

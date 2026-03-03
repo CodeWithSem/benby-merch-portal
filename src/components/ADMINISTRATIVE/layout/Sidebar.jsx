@@ -23,7 +23,7 @@ const Sidebar = ({
   toggle_sidebar,
   set_is_confirm_logout_open,
 }) => {
-  const { set_page, active_user } = Use_App();
+  const { active_user } = Use_App();
   const { show_toast } = useToast();
   const [open_dropdowns, set_open_dropdowns] = useState({});
   const dropdown_refs = useRef({});
@@ -63,15 +63,14 @@ const Sidebar = ({
       icon: <Database size={18} />,
       sub_items: [
         { name: "MCP", sub_module_code: "CM1" },
-        // { name: "OSA", sub_module_code: "CM2" },
-        // { name: "Merch Deployment", sub_module_code: "CM3" },
-        // { name: "Execution Planner", sub_module_code: "CM4" },
-        // { name: "Trade Rental", sub_module_code: "CM5" },
-        { name: "Audit Survey", sub_module_code: "CM6" },
-        // { name: "Return to Vendor", sub_module_code: "CM7" },
-        { name: "Price Survey", sub_module_code: "CM8" },
-        { name: "Share of Shelf", sub_module_code: "CM9" },
-        // { name: "NERM Inventory", sub_module_code: "CM10" },
+        { name: "Merch Deployment", sub_module_code: "CM2" },
+        { name: "Execution Planner", sub_module_code: "CM3" },
+        { name: "Trade Rental", sub_module_code: "CM4" },
+        { name: "Audit Survey", sub_module_code: "CM5" },
+        { name: "Share of Shelf", sub_module_code: "CM6" },
+        { name: "Price Survey", sub_module_code: "CM7" },
+        // { name: "NERM Inventory", sub_module_code: "CM8" },
+        // { name: "Return to Vendor", sub_module_code: "CM8" },
       ],
     },
     {
@@ -81,11 +80,14 @@ const Sidebar = ({
       name: "Data History",
       icon: <ClipboardList size={18} />,
       sub_items: [
-        // { name: "Execution Planner", sub_module_code: "DH1" },
-        { name: "Audit Survey", sub_module_code: "DH2" },
-        { name: "Price Survey", sub_module_code: "DH3" },
-        { name: "Share of Shelf", sub_module_code: "DH4" },
-        { name: "Return to Vendor", sub_module_code: "DH5" },
+        { name: "OSA", sub_module_code: "DH1" },
+        { name: "Merch Deployment", sub_module_code: "DH2" },
+        { name: "Execution Planner", sub_module_code: "DH3" },
+        { name: "Trade Audit", sub_module_code: "DH4" },
+        { name: "Audit Survey", sub_module_code: "DH5" },
+        { name: "Price Survey", sub_module_code: "DH6" },
+        { name: "Share of Shelf", sub_module_code: "DH7" },
+        { name: "Return to Vendor", sub_module_code: "DH8" },
       ],
     },
     {
@@ -101,7 +103,7 @@ const Sidebar = ({
         { name: "TDS Database", sub_module_code: "MT4" },
         { name: "TDS Tagging", sub_module_code: "MT5" },
         { name: "SKU Brand", sub_module_code: "MT6" },
-        { name: "Geo Tagging", sub_module_code: "MT7" },
+        // { name: "Geo Tagging", sub_module_code: "MT7" },
       ],
     },
   ];

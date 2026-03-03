@@ -12,6 +12,8 @@ import {
   Edit,
   SlidersHorizontal,
   ChevronRight,
+  CheckCircle2,
+  Trash2,
 } from "lucide-react";
 
 import { Use_App } from "context/app_context";
@@ -28,7 +30,11 @@ import Pagination from "assets/elements/Pagination";
 import Spinner from "assets/elements/Spinner";
 import Status_Badge from "assets/elements/Status_Badge";
 import Upload_AS from "./upload/Upload_AS";
-import { get_audit_survey_by_tds } from "api/real_time_db/cloud_management/audit_survey_api";
+import {
+  get_all_audit_surveys,
+  get_audit_survey_by_tds,
+} from "api/real_time_db/cloud_management/audit_survey_api";
+import Truncate_AS from "./delete/Truncate_AS";
 
 // import View_MCP from "./view/View_MCP";
 // import Edit_MCP from "./edit/Edit_MCP";
@@ -53,7 +59,7 @@ const Audit_Survey = () => {
     { key: "survey_category", label: "CATEGORY", sortable: true },
     { key: "date_uploaded", label: "DATE UPLOAD", sortable: true },
     { key: "uploaded_by", label: "UPLOADED BY", sortable: true },
-    { key: "actions", label: "", sortable: false },
+    // { key: "actions", label: "", sortable: false },
   ];
 
   const [visible_columns, set_visible_columns] = useState(
@@ -72,16 +78,28 @@ const Audit_Survey = () => {
 
   const [aud_surv, set_aud_surv] = useState([]);
 
-  const handle_get_aud_surv = async () => {
-    const trimmed_code = input_tds_code.trim();
+  // const handle_get_aud_surv = async () => {
+  //   const trimmed_code = input_tds_code.trim();
 
-    if (!trimmed_code) {
-      alert("Please enter a TDS Code.");
-      return;
-    }
+  //   if (!trimmed_code) {
+  //     alert("Please enter a TDS Code.");
+  //     return;
+  //   }
+  //   try {
+  //     set_loading(true);
+  //     const response = await get_audit_survey_by_tds(trimmed_code);
+  //     set_aud_surv(response);
+  //     set_current_page(1);
+  //   } catch (error) {
+  //     console.error("Fetch error:", error);
+  //   } finally {
+  //     set_loading(false);
+  //   }
+  // };
+  const handle_get_aud_surv = async () => {
     try {
       set_loading(true);
-      const response = await get_audit_survey_by_tds(trimmed_code);
+      const response = await get_all_audit_surveys();
       set_aud_surv(response);
       set_current_page(1);
     } catch (error) {
@@ -90,6 +108,10 @@ const Audit_Survey = () => {
       set_loading(false);
     }
   };
+
+  useEffect(() => {
+    handle_get_aud_surv();
+  }, []);
 
   const {
     search_query,
@@ -197,29 +219,17 @@ const Audit_Survey = () => {
               <div className="flex flex-wrap items-center justify-between gap-3 p-5">
                 <h1 className="text-lg">Audit Survey</h1>
                 <div className="flex gap-2">
-                  {/* {active_user?.category === "DEV" && (
-                    <Button
-                      variant="success"
-                      icon={FileDigit}
-                      icon_position="left"
-                      width="w-[110px]"
-                      on_click={handle_set_incremental_id}
-                    >
-                      Set ID
-                    </Button>
-                  )}
                   {active_user?.category === "DEV" && (
                     <Button
                       variant="danger"
                       icon={Trash2}
                       icon_position="left"
                       width="w-[110px]"
-                      loading={truncate_loading}
-                      on_click={handle_truncate}
+                      on_click={() => set_display_modal("truncate_aud_surv")}
                     >
                       Truncate
                     </Button>
-                  )} */}
+                  )}
                   <Button
                     variant="primary"
                     icon={HardDriveUpload}
@@ -232,7 +242,7 @@ const Audit_Survey = () => {
               </div>
               {/* - Header */}
               {/* + Section 1 */}
-              <div className="p-5 sm:p-6 border-t">
+              {/* <div className="p-5 sm:p-6 border-t">
                 <div className="w-full flex items-center gap-2">
                   <div className="w-full">
                     <Icon_Field
@@ -257,7 +267,7 @@ const Audit_Survey = () => {
                     </Button>
                   </div>
                 </div>
-              </div>
+              </div> */}
               {/* - Section 1 */}
               {/* + Section 2 */}
               <div className="p-5 sm:p-6 border-t">
@@ -449,27 +459,27 @@ const Audit_Survey = () => {
         </React.Fragment>
       )}
       {/* + Pages */}
-      {page === "upload" && <Upload_AS set_page={set_page} />}
+      {page === "upload" && (
+        <Upload_AS
+          set_page={set_page}
+          on_success={() => handle_get_aud_surv()}
+        />
+      )}
       {/* - Pages */}
       {/* + Modals */}
-      {/* <View_MCP
-        is_open={display_modal === "view_mcp"}
-        on_close={() => set_display_modal("")}
-        width="max-w-[1000px]"
-        height="max-h-[700px]"
-        show_toast={show_toast}
-        view_data={view_data}
-        set_aud_surv={set_aud_surv}
+      <Truncate_AS
+        isOpen={display_modal === "truncate_aud_surv"}
+        onClose={() => set_display_modal("")}
+        on_success={() => {
+          show_toast({
+            type: "success",
+            title: "Deletion Success",
+            message: "Execution Planner data has been cleared.",
+            icon: <CheckCircle2 size={21} className="text-green-500" />,
+          });
+          handle_get_aud_surv();
+        }}
       />
-      <Edit_MCP
-        is_open={display_modal === "edit_mcp"}
-        on_close={() => set_display_modal("")}
-        width="max-w-[1000px]"
-        // height="max-h-[700px]"
-        edit_data={edit_data}
-        set_aud_surv={set_aud_surv}
-        show_toast={show_toast}
-      /> */}
       {/* - Modals */}
     </React.Fragment>
   );

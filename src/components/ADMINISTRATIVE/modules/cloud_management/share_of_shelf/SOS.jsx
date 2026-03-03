@@ -12,6 +12,8 @@ import {
   Edit,
   SlidersHorizontal,
   ChevronRight,
+  Trash2,
+  CheckCircle2,
 } from "lucide-react";
 
 import { Use_App } from "context/app_context";
@@ -28,7 +30,11 @@ import Pagination from "assets/elements/Pagination";
 import Spinner from "assets/elements/Spinner";
 import Status_Badge from "assets/elements/Status_Badge";
 import Upload_SOS from "./upload/Upload_SOS";
-import { get_sos_by_tds } from "api/real_time_db/cloud_management/sos_api";
+import {
+  get_all_sos,
+  get_sos_by_tds,
+} from "api/real_time_db/cloud_management/sos_api";
+import Truncate_SOS from "./delete/Truncate_SOS";
 
 // import View_MCP from "./view/View_MCP";
 // import Edit_MCP from "./edit/Edit_MCP";
@@ -57,7 +63,7 @@ const SOS = () => {
     { key: "remarks", label: "REMARKS", sortable: true },
     { key: "date_uploaded", label: "DATE UPLOADED", sortable: true },
     { key: "uploaded_by", label: "UPLOADED BY", sortable: true },
-    { key: "actions", label: "", sortable: false },
+    // { key: "actions", label: "", sortable: false },
   ];
 
   const [visible_columns, set_visible_columns] = useState(
@@ -76,17 +82,30 @@ const SOS = () => {
 
   const [sos_list, set_sos_list] = useState([]);
 
+  // const handle_get_sos = async () => {
+  //   const trimmed_code = input_tds_code.trim();
+
+  //   if (!trimmed_code) {
+  //     alert("Please enter a TDS Code.");
+  //     return;
+  //   }
+
+  //   try {
+  //     set_loading(true);
+  //     const response = await get_sos_by_tds(trimmed_code);
+  //     set_sos_list(response);
+  //     set_current_page(1);
+  //   } catch (error) {
+  //     console.error("Fetch error:", error);
+  //   } finally {
+  //     set_loading(false);
+  //   }
+  // };
+
   const handle_get_sos = async () => {
-    const trimmed_code = input_tds_code.trim();
-
-    if (!trimmed_code) {
-      alert("Please enter a TDS Code.");
-      return;
-    }
-
     try {
       set_loading(true);
-      const response = await get_sos_by_tds(trimmed_code);
+      const response = await get_all_sos();
       set_sos_list(response);
       set_current_page(1);
     } catch (error) {
@@ -95,6 +114,10 @@ const SOS = () => {
       set_loading(false);
     }
   };
+
+  useEffect(() => {
+    handle_get_sos();
+  }, []);
 
   const {
     search_query,
@@ -169,9 +192,9 @@ const SOS = () => {
       {page === "main" && (
         <React.Fragment>
           <div className="w-full">
+            {/* + BREADCRUMB */}
             <div className="flex flex-wrap items-center justify-between gap-3 py-5">
               <h1 className="text-xl">Cloud Management</h1>
-              {/* + Breadcrumbs */}
               <nav>
                 <ol className="flex flex-wrap items-center gap-1.5">
                   <li>
@@ -195,36 +218,25 @@ const SOS = () => {
                   </li>
                 </ol>
               </nav>
-              {/* - Breadcrumbs */}
             </div>
+            {/* - BREADCRUMB */}
+            {/* + MAIN CONTAINER */}
             <div className="w-full bg-white rounded-lg border">
-              {/* + Header */}
+              {/* + HEADER */}
               <div className="flex flex-wrap items-center justify-between gap-3 p-5">
                 <h1 className="text-lg">Share of Shelf</h1>
                 <div className="flex gap-2">
-                  {/* {active_user?.category === "DEV" && (
-                    <Button
-                      variant="success"
-                      icon={FileDigit}
-                      icon_position="left"
-                      width="w-[110px]"
-                      on_click={handle_set_incremental_id}
-                    >
-                      Set ID
-                    </Button>
-                  )}
                   {active_user?.category === "DEV" && (
                     <Button
                       variant="danger"
                       icon={Trash2}
                       icon_position="left"
                       width="w-[110px]"
-                      loading={truncate_loading}
-                      on_click={handle_truncate}
+                      on_click={() => set_display_modal("truncate_sos")}
                     >
                       Truncate
                     </Button>
-                  )} */}
+                  )}
                   <Button
                     variant="primary"
                     icon={HardDriveUpload}
@@ -235,9 +247,9 @@ const SOS = () => {
                   </Button>
                 </div>
               </div>
-              {/* - Header */}
+              {/* - HEADER */}
               {/* + Section 1 */}
-              <div className="p-5 sm:p-6 border-t">
+              {/* <div className="p-5 sm:p-6 border-t">
                 <div className="w-full flex items-center gap-2">
                   <div className="w-full">
                     <Icon_Field
@@ -260,9 +272,9 @@ const SOS = () => {
                     </Button>
                   </div>
                 </div>
-              </div>
+              </div> */}
               {/* - Section 1 */}
-              {/* + Section 2 */}
+              {/* + SECTION 2 */}
               <div className="p-5 sm:p-6 border-t">
                 <div className="w-full border rounded-lg">
                   <div className="w-full md:flex md:justify-between p-4 gap-4">
@@ -413,8 +425,8 @@ const SOS = () => {
                             return (
                               <tr
                                 key={idx}
-                                onClick={() => set_selected_id(row.id)}
-                                className={`transition-colors ${selected_id === row.id ? "bg-green-100/40 hover:bg-green-100/60" : "hover:bg-gray-50"}`}
+                                onClick={() => set_selected_id(row.id_temp)}
+                                className={`transition-colors ${selected_id === row.id_temp ? "bg-green-100/40 hover:bg-green-100/60" : "hover:bg-gray-50"}`}
                               >
                                 {active_columns.map((col, i) => (
                                   <td
@@ -446,34 +458,37 @@ const SOS = () => {
                   )}
                 </div>
               </div>
-              {/* - Section 2 */}
+              {/* - SECTION 2 */}
             </div>
+            {/* - MAIN CONTAINER */}
           </div>
         </React.Fragment>
       )}
-      {/* + Pages */}
-      {page === "upload" && <Upload_SOS set_page={set_page} />}
-      {/* - Pages */}
-      {/* + Modals */}
-      {/* <View_MCP
-        is_open={display_modal === "view_mcp"}
-        on_close={() => set_display_modal("")}
-        width="max-w-[1000px]"
-        height="max-h-[700px]"
-        show_toast={show_toast}
-        view_data={view_data}
-        set_sos_list={set_sos_list}
+      {/* + PAGES */}
+      {page === "upload" && (
+        <Upload_SOS
+          set_page={set_page}
+          on_success={() => {
+            handle_get_sos();
+          }}
+        />
+      )}
+      {/* - PAGES */}
+      {/* + MODALS */}
+      <Truncate_SOS
+        isOpen={display_modal === "truncate_sos"}
+        onClose={() => set_display_modal("")}
+        on_success={() => {
+          show_toast({
+            type: "success",
+            title: "Deletion Success",
+            message: "Execution Planner data has been cleared.",
+            icon: <CheckCircle2 size={21} className="text-green-500" />,
+          });
+          handle_get_sos();
+        }}
       />
-      <Edit_MCP
-        is_open={display_modal === "edit_mcp"}
-        on_close={() => set_display_modal("")}
-        width="max-w-[1000px]"
-        // height="max-h-[700px]"
-        edit_data={edit_data}
-        set_sos_list={set_sos_list}
-        show_toast={show_toast}
-      /> */}
-      {/* - Modals */}
+      {/* - MODALS */}
     </React.Fragment>
   );
 };

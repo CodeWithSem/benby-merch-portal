@@ -143,17 +143,16 @@ const Truncate_MCP = ({ isOpen, onClose, on_success }) => {
 
         {/* Footer */}
         <div className="p-4 bg-gray-50 border-t flex justify-end gap-3">
-          <Button variant="white" on_click={onClose} disabled={loading}>
-            Cancel
-          </Button>
           <Button
             variant="danger"
-            icon={Trash2}
-            icon_position="left"
+            width="w-[160px]"
             loading={loading}
             on_click={handle_confirm}
           >
             Confirm Delete
+          </Button>
+          <Button variant="white" on_click={onClose} disabled={loading}>
+            Cancel
           </Button>
         </div>
       </div>

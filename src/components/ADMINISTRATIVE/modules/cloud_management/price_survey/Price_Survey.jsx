@@ -12,6 +12,8 @@ import {
   Edit,
   SlidersHorizontal,
   ChevronRight,
+  CheckCircle2,
+  Trash2,
 } from "lucide-react";
 
 import { Use_App } from "context/app_context";
@@ -27,7 +29,11 @@ import Pagination from "assets/elements/Pagination";
 import Spinner from "assets/elements/Spinner";
 import Status_Badge from "assets/elements/Status_Badge";
 import Upload_Price_Surv from "./upload/Upload_Price_Surv";
-import { get_price_surv_by_tds } from "api/real_time_db/cloud_management/price_surv_api";
+import {
+  get_all_price_surveys,
+  get_price_surv_by_tds,
+} from "api/real_time_db/cloud_management/price_surv_api";
+import Truncate_Price_Surv from "./delete/Truncate_Price_Surv";
 
 // import View_MCP from "./view/View_MCP";
 // import Edit_MCP from "./edit/Edit_MCP";
@@ -60,7 +66,7 @@ const Price_Survey = () => {
     { key: "remarks", label: "REMARKS", sortable: true },
     { key: "date_uploaded", label: "DATE UPLOADED", sortable: true },
     { key: "uploaded_by", label: "UPLOADED BY", sortable: true },
-    { key: "actions", label: "", sortable: false },
+    // { key: "actions", label: "", sortable: false },
   ];
 
   const data = [
@@ -98,17 +104,30 @@ const Price_Survey = () => {
 
   const [price_surv_list, set_price_surv_list] = useState([]);
 
-  const handle_get_sos = async () => {
-    const trimmed_code = input_tds_code.trim();
+  // const handle_get_price_surv = async () => {
+  //   const trimmed_code = input_tds_code.trim();
 
-    if (!trimmed_code) {
-      alert("Please enter a TDS Code.");
-      return;
-    }
+  //   if (!trimmed_code) {
+  //     alert("Please enter a TDS Code.");
+  //     return;
+  //   }
 
+  //   try {
+  //     set_loading(true);
+  //     const response = await get_price_surv_by_tds(trimmed_code);
+  //     set_price_surv_list(response);
+  //     set_current_page(1);
+  //   } catch (error) {
+  //     console.error("Fetch error:", error);
+  //   } finally {
+  //     set_loading(false);
+  //   }
+  // };
+
+  const handle_get_price_surv = async () => {
     try {
       set_loading(true);
-      const response = await get_price_surv_by_tds(trimmed_code);
+      const response = await get_all_price_surveys();
       set_price_surv_list(response);
       set_current_page(1);
     } catch (error) {
@@ -117,6 +136,10 @@ const Price_Survey = () => {
       set_loading(false);
     }
   };
+
+  useEffect(() => {
+    handle_get_price_surv();
+  }, []);
 
   const {
     search_query,
@@ -224,29 +247,17 @@ const Price_Survey = () => {
               <div className="flex flex-wrap items-center justify-between gap-3 p-5">
                 <h1 className="text-lg">Price Survey</h1>
                 <div className="flex gap-2">
-                  {/* {active_user?.category === "DEV" && (
-                    <Button
-                      variant="success"
-                      icon={FileDigit}
-                      icon_position="left"
-                      width="w-[110px]"
-                      on_click={handle_set_incremental_id}
-                    >
-                      Set ID
-                    </Button>
-                  )}
                   {active_user?.category === "DEV" && (
                     <Button
                       variant="danger"
                       icon={Trash2}
                       icon_position="left"
                       width="w-[110px]"
-                      loading={truncate_loading}
-                      on_click={handle_truncate}
+                      on_click={() => set_display_modal("truncate_price_surv")}
                     >
                       Truncate
                     </Button>
-                  )} */}
+                  )}
                   <Button
                     variant="primary"
                     icon={HardDriveUpload}
@@ -259,7 +270,7 @@ const Price_Survey = () => {
               </div>
               {/* - Header */}
               {/* + Section 1 */}
-              <div className="p-5 sm:p-6 border-t">
+              {/* <div className="p-5 sm:p-6 border-t">
                 <div className="w-full flex items-center gap-2">
                   <div className="w-full">
                     <Icon_Field
@@ -268,21 +279,21 @@ const Price_Survey = () => {
                       icon_position="left"
                       value={input_tds_code}
                       on_change={(e) => set_input_tds_code(e.target.value)}
-                      on_key_down={(e) => e.key === "Enter" && handle_get_sos()}
+                      on_key_down={(e) => e.key === "Enter" && handle_get_price_surv()}
                     />
                   </div>
                   <div className="relative">
                     <Button
                       variant="primary"
                       width="w-[140px]"
-                      on_click={handle_get_sos}
+                      on_click={handle_get_price_surv}
                       loading={loading}
                     >
                       Load Data
                     </Button>
                   </div>
                 </div>
-              </div>
+              </div> */}
               {/* - Section 1 */}
               {/* + Section 2 */}
               <div className="p-5 sm:p-6 border-t">
@@ -309,7 +320,7 @@ const Price_Survey = () => {
                         variant="white"
                         icon={RefreshCw}
                         icon_position="left"
-                        on_click={handle_get_sos}
+                        on_click={handle_get_price_surv}
                       />
                     </div>
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-center md:w-[600px]">
@@ -474,27 +485,27 @@ const Price_Survey = () => {
         </React.Fragment>
       )}
       {/* + Pages */}
-      {page === "upload" && <Upload_Price_Surv set_page={set_page} />}
+      {page === "upload" && (
+        <Upload_Price_Surv
+          set_page={set_page}
+          on_success={() => handle_get_price_surv()}
+        />
+      )}
       {/* - Pages */}
       {/* + Modals */}
-      {/* <View_MCP
-        is_open={display_modal === "view_mcp"}
-        on_close={() => set_display_modal("")}
-        width="max-w-[1000px]"
-        height="max-h-[700px]"
-        show_toast={show_toast}
-        view_data={view_data}
-        set_price_surv_list={set_price_surv_list}
+      <Truncate_Price_Surv
+        isOpen={display_modal === "truncate_price_surv"}
+        onClose={() => set_display_modal("")}
+        on_success={() => {
+          show_toast({
+            type: "success",
+            title: "Deletion Success",
+            message: "Execution Planner data has been cleared.",
+            icon: <CheckCircle2 size={21} className="text-green-500" />,
+          });
+          handle_get_price_surv();
+        }}
       />
-      <Edit_MCP
-        is_open={display_modal === "edit_mcp"}
-        on_close={() => set_display_modal("")}
-        width="max-w-[1000px]"
-        // height="max-h-[700px]"
-        edit_data={edit_data}
-        set_price_surv_list={set_price_surv_list}
-        show_toast={show_toast}
-      /> */}
       {/* - Modals */}
     </React.Fragment>
   );

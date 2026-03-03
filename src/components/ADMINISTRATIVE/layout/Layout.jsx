@@ -18,9 +18,18 @@ import Price_Survey from "../modules/cloud_management/price_survey/Price_Survey"
 import Price_Surv_History from "../modules/data_history/price_survey_history/Price_Surv_History";
 import RTV_History from "../modules/data_history/rtv_history/RTV_History";
 import OSA_NC from "../modules/maintenance/osa_nc/OSA_NC";
+import MCL from "../modules/maintenance/mcl/MCL";
+import Store_Master from "../modules/maintenance/store_master/Store_Master";
+import TDS_Tagging from "../modules/maintenance/tds_tagging/TDS_Tagging";
+import SKU_Brand from "../modules/maintenance/sku_brand/SKU_brand";
+import TDS_Database from "../modules/maintenance/tds_database/TDS_Database";
+import Merch_Deployment from "../modules/cloud_management/merch_deployment/Merch_Deployment";
+import Execution_Planner from "../modules/cloud_management/execution_planner/Execution_Planner";
+import OSA_History from "../modules/data_history/osa_history/OSA_History";
+import MD_History from "../modules/data_history/md_history/MD_History";
 
 const Layout = () => {
-  const { set_page } = Use_App();
+  const { set_page, active_user } = Use_App();
   const { show_toast } = useToast();
   const [active_item, set_active_item] = useState(() => {
     return localStorage.getItem("active_item") || "Dashboard";
@@ -62,19 +71,32 @@ const Layout = () => {
       // case "Auth-Edit Profile":
       //   return <Edit_Profile />;
       case "Dashboard":
-        return <Dashboard />;
+        return (
+          <Dashboard
+            active_user={active_user}
+            set_active_item={set_active_item}
+          />
+        );
       case "Excel Conversion":
         return <Excel_Conversion />;
       case "User Management":
         return <User_Management />;
       case "Cloud Management-MCP":
         return <MCP />;
+      case "Cloud Management-Merch Deployment":
+        return <Merch_Deployment />;
+      case "Cloud Management-Execution Planner":
+        return <Execution_Planner />;
       case "Cloud Management-Audit Survey":
         return <Audit_Survey />;
       case "Cloud Management-Share of Shelf":
         return <SOS />;
       case "Cloud Management-Price Survey":
         return <Price_Survey />;
+      case "Data History-OSA":
+        return <OSA_History />;
+      case "Data History-Merch Deployment":
+        return <MD_History />;
       case "Data History-Execution Planner":
         return <EP_History />;
       case "Data History-Audit Survey":
@@ -85,8 +107,18 @@ const Layout = () => {
         return <Price_Surv_History />;
       case "Data History-Return to Vendor":
         return <RTV_History />;
+      case "Maintenance-MCL":
+        return <MCL />;
+      case "Maintenance-Store Master":
+        return <Store_Master />;
       case "Maintenance-OSA Not Carried":
         return <OSA_NC />;
+      case "Maintenance-TDS Tagging":
+        return <TDS_Tagging />;
+      case "Maintenance-SKU Brand":
+        return <SKU_Brand />;
+      case "Maintenance-TDS Database":
+        return <TDS_Database />;
     }
   };
 

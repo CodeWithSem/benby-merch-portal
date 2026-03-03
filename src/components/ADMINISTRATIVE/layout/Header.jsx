@@ -221,7 +221,7 @@ const Header = ({
                   </span>
                 </div>
 
-                <ul className="flex flex-col gap-1 border-b border-gray-200 pt-4 pb-3">
+                {/* <ul className="flex flex-col gap-1 border-b border-gray-200 pt-4 pb-3">
                   <li>
                     <a
                       className="group text-sm flex items-center gap-3 rounded-lg px-3 py-2 font-medium text-gray-700 hover:bg-gray-100"
@@ -246,7 +246,7 @@ const Header = ({
                       Support
                     </a>
                   </li>
-                </ul>
+                </ul> */}
 
                 <button
                   onClick={() => set_is_confirm_logout_open(true)}

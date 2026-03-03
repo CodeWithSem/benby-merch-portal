@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   Search,
   ChevronDown,
@@ -13,11 +13,13 @@ import {
   SlidersHorizontal,
   ChevronRight,
   Trash2,
+  CheckCircle2,
 } from "lucide-react";
 
 import { Use_App } from "context/app_context";
 import { useToast } from "components/ADMINISTRATIVE/layout/Toast_Provider";
 import {
+  get_all_mcp_list,
   get_mcp_list_by_tds,
   truncate_mcp,
 } from "api/real_time_db/cloud_management/mcp_api";
@@ -128,17 +130,29 @@ const MCP = () => {
 
   const [mcp_list, set_mcp_list] = useState([]);
 
+  // const handle_get_mcp_list = async () => {
+  //   const trimmed_code = input_tds_code.trim();
+
+  //   if (!trimmed_code) {
+  //     alert("Please enter a TDS Code.");
+  //     return;
+  //   }
+
+  //   try {
+  //     set_loading(true);
+  //     const response = await get_mcp_list_by_tds(trimmed_code);
+  //     set_mcp_list(response);
+  //     set_current_page(1);
+  //   } catch (error) {
+  //     console.error("Fetch error:", error);
+  //   } finally {
+  //     set_loading(false);
+  //   }
+  // };
   const handle_get_mcp_list = async () => {
-    const trimmed_code = input_tds_code.trim();
-
-    if (!trimmed_code) {
-      alert("Please enter a TDS Code.");
-      return;
-    }
-
     try {
       set_loading(true);
-      const response = await get_mcp_list_by_tds(trimmed_code);
+      const response = await get_all_mcp_list();
       set_mcp_list(response);
       set_current_page(1);
     } catch (error) {
@@ -147,6 +161,10 @@ const MCP = () => {
       set_loading(false);
     }
   };
+
+  useEffect(() => {
+    handle_get_mcp_list();
+  }, []);
 
   const {
     search_query,
@@ -313,7 +331,7 @@ const MCP = () => {
               </div>
               {/* - Header */}
               {/* + Section 1 */}
-              <div className="p-5 sm:p-6 border-t">
+              {/* <div className="p-5 sm:p-6 border-t">
                 <div className="w-full flex items-center gap-2">
                   <div className="w-full">
                     <Icon_Field
@@ -337,7 +355,7 @@ const MCP = () => {
                     </Button>
                   </div>
                 </div>
-              </div>
+              </div> */}
               {/* - Section 1 */}
               {/* + Section 2 */}
               <div className="p-5 sm:p-6 border-t">
@@ -529,7 +547,12 @@ const MCP = () => {
         </React.Fragment>
       )}
       {/* + Pages */}
-      {page === "upload_mcp" && <Upload_MCP set_page={set_page} />}
+      {page === "upload_mcp" && (
+        <Upload_MCP
+          set_page={set_page}
+          on_success={() => handle_get_mcp_list()}
+        />
+      )}
       {/* - Pages */}
       {/* + Modals */}
       <View_MCP
@@ -553,7 +576,15 @@ const MCP = () => {
       <Truncate_MCP
         isOpen={display_modal === "truncate_mcp"}
         onClose={() => set_display_modal("")}
-        on_success={(res) => console.log("Deleted count:", res.deletedCount)}
+        on_success={() => {
+          show_toast({
+            type: "success",
+            title: "Deletion Success",
+            message: "Data has been deleted from the cloud.",
+            icon: <CheckCircle2 size={21} className="text-green-500" />,
+          });
+          handle_get_mcp_list();
+        }}
       />
       {/* - Modals */}
     </React.Fragment>

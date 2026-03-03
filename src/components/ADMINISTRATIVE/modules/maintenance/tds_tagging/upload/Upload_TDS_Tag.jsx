@@ -1,0 +1,596 @@
+import React, { useMemo, useState } from "react";
+import {
+  Search,
+  ChevronDown,
+  ChevronUp,
+  RefreshCw,
+  SlidersHorizontal,
+  ChevronLeft,
+  Globe,
+  FileUp,
+  CircleX,
+  CheckCircle2,
+  ChevronRight,
+} from "lucide-react";
+import Button from "assets/elements/Button";
+import Icon_Field from "assets/elements/Icon_Field";
+import Select_Field from "assets/elements/Select_Field";
+import Pagination from "assets/elements/Pagination";
+import Checkbox_Field from "assets/elements/Checkbox_Field";
+import { client_side_filter } from "assets/scripts/functions/client_side_filter";
+import Spinner from "assets/elements/Spinner";
+import { useToast } from "components/ADMINISTRATIVE/layout/Toast_Provider";
+import { format_date_1, get_date_now } from "assets/scripts/format";
+import axios from "axios";
+import { ref, get, update } from "firebase/database";
+import { realtime_db } from "assets/scripts/firebase";
+
+const Upload_TDS_Tag = ({ set_page }) => {
+  const { show_toast } = useToast();
+  const [show_filter, set_show_filter] = useState(false);
+
+  // TDS Tagging Columns
+  const columns = [
+    { key: "index", label: "NO.", sortable: false },
+    { key: "tDSCode", label: "TDS CODE", sortable: true },
+    { key: "storecode", label: "STORE CODE", sortable: true },
+    { key: "chain", label: "CHAIN", sortable: true },
+    { key: "chainID", label: "CHAIN ID", sortable: true },
+    { key: "channel", label: "CHANNEL", sortable: true },
+    { key: "tagging", label: "TAGGING", sortable: true },
+  ];
+
+  const [visible_columns, set_visible_columns] = useState(
+    columns.filter((col) => !col.hidden).map((col) => col.key),
+  );
+
+  const active_columns = useMemo(() => {
+    return columns.filter((col) => visible_columns.includes(col.key));
+  }, [visible_columns, columns]);
+
+  const toggle_column = (key, is_checked) => {
+    set_visible_columns((prev) =>
+      is_checked ? [...prev, key] : prev.filter((k) => k !== key),
+    );
+  };
+
+  // State Management
+  const [progress, set_progress] = useState(0);
+  const [loading, set_loading] = useState(false);
+  const [tds_list, set_tds_list] = useState([]);
+  const [is_fetching, set_is_fetching] = useState(false);
+  const [fetch_controller, set_fetch_controller] = useState(null);
+
+  // Upload States
+  const [is_uploading, set_is_uploading] = useState(false);
+  const [upload_progress, set_upload_progress] = useState(0);
+  const [batch_status, set_batch_status] = useState("");
+  const [abort_controller, set_abort_controller] = useState(null);
+
+  const handle_fetch_data = async () => {
+    const controller = new AbortController();
+    set_fetch_controller(controller);
+    set_loading(true);
+    set_is_fetching(true);
+    set_progress(0);
+    set_tds_list([]);
+
+    try {
+      const response = await axios.get(
+        "https://benbyextportal.com/home/api/get/GetTDStaggingRevamp2?Storecode=0&TDSCODE=0",
+        {
+          signal: controller.signal,
+          onDownloadProgress: (progressEvent) => {
+            const total = progressEvent.total || 0;
+            if (total > 0) {
+              set_progress(Math.round((progressEvent.loaded * 100) / total));
+            } else {
+              set_progress((prev) => (prev < 90 ? prev + 5 : prev));
+            }
+          },
+        },
+      );
+
+      if (response.data) {
+        set_progress(100);
+        const formatted_data = response.data.map((item, index) => ({
+          ...item,
+          index: index + 1,
+        }));
+        set_tds_list(formatted_data);
+        show_toast({
+          type: "success",
+          title: "Data Fetched",
+          message: `${formatted_data.length} tagging records ready.`,
+          icon: <CheckCircle2 size={21} className="text-green-500" />,
+        });
+      }
+    } catch (error) {
+      if (!axios.isCancel(error)) {
+        show_toast({
+          type: "danger",
+          title: "Error",
+          message: "Could not retrieve TDS Tagging data.",
+          icon: <CircleX size={21} className="text-red-500" />,
+        });
+      }
+    } finally {
+      set_loading(false);
+      set_is_fetching(false);
+      set_fetch_controller(null);
+    }
+  };
+
+  const handle_upload = async () => {
+    const controller = new AbortController();
+    set_abort_controller(controller);
+    set_is_uploading(true);
+    set_upload_progress(0);
+    set_batch_status("Accessing Store Master...");
+
+    try {
+      const storeRef = ref(realtime_db, `/DB_TEST/TBL_STORE_MASTER/DATA`);
+      const snapshot = await get(storeRef);
+      const store_data = snapshot.exists() ? Object.values(snapshot.val()) : [];
+      const storeMasterMap = new Map(store_data.map((s) => [s.a1_cstCode, s]));
+
+      const batch_size = 500;
+      const total_records = tds_list.length;
+
+      for (let i = 0; i < total_records; i += batch_size) {
+        if (controller.signal.aborted) throw new Error("Operation cancelled");
+
+        const batch = tds_list.slice(i, i + batch_size);
+        const updates = {};
+
+        batch.forEach((item) => {
+          const chainPath = `DB_TEST/TBL_TDS_TAGGING/CHAIN_TAGGING/${item.tDSCode}/${item.chainID}`;
+          updates[chainPath] = {
+            a1_TDSCode: item.tDSCode,
+            a2_Chain: item.chain,
+            a3_ChainID: parseInt(item.chainID),
+          };
+
+          const store = storeMasterMap.get(item.storecode.toString());
+          const dataPath = `DB_TEST/TBL_TDS_TAGGING/DATA/${item.tDSCode}/${item.chainID}/${item.storecode}`;
+
+          updates[dataPath] = {
+            a1_TDSCode: item.tDSCode.toString(),
+            a2_Storecode: item.storecode.toString(),
+            a3_Dateupdated: item.dateupdated || get_date_now(),
+            a2_cstName1: store?.a2_cstName1 || "N/A",
+            a3_cstName2: store?.a3_cstName2 || "",
+            a4_Chain: item.chain,
+            a5_ChainID: parseInt(item.chainID),
+            a6_Channel: item.channel || "",
+            a7_Tagging: item.tagging || "",
+            a8_Position: item.position || "",
+          };
+        });
+
+        await update(ref(realtime_db), updates);
+        const current_prog = Math.min(
+          Math.round(((i + batch.length) / total_records) * 100),
+          100,
+        );
+        set_upload_progress(current_prog);
+        set_batch_status(
+          `Synced ${i + batch.length} of ${total_records} records`,
+        );
+      }
+
+      show_toast({
+        type: "success",
+        title: "TDS Synced",
+        message: "Tagging data successfully pushed to cloud.",
+        icon: <CheckCircle2 size={21} className="text-green-500" />,
+      });
+      handle_go_back();
+    } catch (error) {
+      if (error.message !== "Operation cancelled") {
+        show_toast({
+          type: "danger",
+          title: "Upload Failed",
+          message: error.message,
+          icon: <CircleX size={21} className="text-red-500" />,
+        });
+      }
+    } finally {
+      set_is_uploading(false);
+      set_abort_controller(null);
+    }
+  };
+
+  const handle_cancel_operation = () => {
+    if (fetch_controller) fetch_controller.abort();
+    if (abort_controller) abort_controller.abort();
+    set_is_fetching(false);
+    set_is_uploading(false);
+  };
+
+  const {
+    search_query,
+    set_search_query,
+    current_page,
+    set_current_page,
+    select_entries,
+    set_select_entries,
+    sort_by,
+    sort_order,
+    handle_sort,
+    filtered_data,
+    total_pages,
+  } = client_side_filter(tds_list, columns);
+
+  const render_cell = (col, row) => {
+    return row[col.key];
+  };
+
+  const handle_go_back = () => {
+    set_page("main");
+  };
+
+  return (
+    <React.Fragment>
+      <div className="w-full">
+        {/* + BREADCRUMB */}
+        <div className="flex flex-wrap items-center justify-between gap-3 py-5">
+          <h1 className="text-xl">Cloud Management</h1>
+          <nav>
+            <ol className="flex flex-wrap items-center gap-1.5">
+              <li>
+                <a className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-sky-500 cursor-pointer">
+                  Home
+                </a>
+              </li>
+              <li
+                className="flex items-center gap-1.5 text-sm text-gray-500 cursor-pointer"
+                onClick={handle_go_back}
+              >
+                <span>
+                  <ChevronRight size={14} />
+                </span>
+                <a className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-sky-500 cursor-pointer">
+                  Maintenance
+                </a>
+              </li>
+              <li
+                className="flex items-center gap-1.5 text-sm text-gray-500 cursor-pointer"
+                onClick={handle_go_back}
+              >
+                <span>
+                  <ChevronRight size={14} />
+                </span>
+                <a className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-sky-500 cursor-pointer">
+                  Store
+                </a>
+              </li>
+              <li className="flex items-center gap-1.5 text-sm text-gray-500">
+                <span>
+                  <ChevronRight size={14} />
+                </span>
+                <span className="text-gray-800">Upload TDS Tagging</span>
+              </li>
+            </ol>
+          </nav>
+        </div>
+
+        {/* + MAIN CONTAINER */}
+        <div className="w-full bg-white rounded-lg border">
+          {/* + HEADER */}
+          <div className="flex flex-wrap items-center justify-between gap-3 p-5">
+            <div className="flex items-center gap-3">
+              <Button
+                variant="white"
+                icon={ChevronLeft}
+                icon_position="left"
+                width="w-[20px]"
+                on_click={handle_go_back}
+              ></Button>
+              <h1 className="text-lg">Upload TDS Tagging Master</h1>
+            </div>
+            <div className="flex gap-2 text-gray-500 text-sm tracking-wider">
+              {format_date_1(get_date_now())}
+            </div>
+          </div>
+
+          {/* + SECTION 1: FETCH */}
+          <div className="p-5 sm:p-6 border-t">
+            <div className="w-full flex items-center gap-2">
+              <div className="w-full">
+                <Icon_Field
+                  icon={Globe}
+                  icon_position="left"
+                  value={
+                    "https://benbyextportal.com/home/api/get/GetTDStaggingRevamp2?Storecode=0&TDSCODE=0"
+                  }
+                  disabled
+                />
+              </div>
+              <div className="relative">
+                <Button
+                  variant="primary"
+                  width="w-[140px]"
+                  on_click={handle_fetch_data}
+                >
+                  Fetch Data
+                </Button>
+              </div>
+            </div>
+          </div>
+
+          {/* + SECTION 2: TABLE CONTROL & VIEW */}
+          <div className="p-5 sm:p-6 border-t">
+            <div className="w-full border rounded-lg">
+              <div className="w-full md:flex md:justify-between p-4 gap-4">
+                <div className="flex items-center text-sm gap-2">
+                  <div>Show</div>
+                  <div className="w-[90px]">
+                    <Select_Field
+                      value={select_entries}
+                      on_change={(e) => {
+                        set_current_page(1);
+                        set_select_entries(Number(e.target.value));
+                      }}
+                      options={[
+                        { label: "5", value: 5 },
+                        { label: "10", value: 10 },
+                        { label: "50", value: 50 },
+                      ]}
+                    />
+                  </div>
+                  <div className="mr-2">entries</div>
+                </div>
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center md:w-[600px]">
+                  <div className="w-full">
+                    <Icon_Field
+                      item_desc="search"
+                      placeholder="Search tagging records..."
+                      icon={Search}
+                      icon_position="left"
+                      value={search_query}
+                      on_change={(e) => set_search_query(e.target.value)}
+                    />
+                  </div>
+                  <div className="relative">
+                    <Button
+                      variant="white"
+                      width="w-[120px]"
+                      icon={SlidersHorizontal}
+                      icon_position="left"
+                      on_click={() => set_show_filter(!show_filter)}
+                    >
+                      Column
+                    </Button>
+
+                    {show_filter && (
+                      <React.Fragment>
+                        <div
+                          className="fixed inset-0 bg-black/20 backdrop-blur-sm z-[9998]"
+                          onClick={() => set_show_filter(false)}
+                        ></div>
+                        <div className="absolute top-full mt-2 right-0 z-[9999] bg-white border rounded-xl shadow-2xl p-4 w-[280px] animate-in fade-in zoom-in duration-200">
+                          <div className="flex justify-between items-center mb-3 pb-2 border-b">
+                            <span className="text-sm font-bold text-slate-700">
+                              Display Columns
+                            </span>
+                            <span className="text-[10px] bg-slate-100 px-2 py-0.5 rounded text-slate-500">
+                              {visible_columns.length} of {columns.length}
+                            </span>
+                          </div>
+
+                          <div className="grid grid-cols-1 gap-1 max-h-[350px] overflow-y-auto pr-2 custom-scrollbar">
+                            {columns.map((col) => (
+                              <div
+                                key={col.key}
+                                className="hover:bg-slate-50 py-1 px-2 rounded-md transition-colors"
+                              >
+                                <Checkbox_Field
+                                  label={col.label}
+                                  box_size={18}
+                                  icon_size={12}
+                                  checked={visible_columns.includes(col.key)}
+                                  on_change={(e) =>
+                                    toggle_column(col.key, e.target.checked)
+                                  }
+                                />
+                              </div>
+                            ))}
+                          </div>
+
+                          <div className="flex justify-end gap-2 mt-4 pt-3 border-t">
+                            <Button
+                              variant="primary"
+                              class_name="text-xs py-1.5 px-4 rounded-lg"
+                              on_click={() => set_show_filter(false)}
+                            >
+                              Done
+                            </Button>
+                          </div>
+                        </div>
+                      </React.Fragment>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              <div className="overflow-x-auto">
+                {loading ? (
+                  <div className="p-6 flex justify-center items-center text-gray-500 text-sm">
+                    <Spinner />
+                  </div>
+                ) : filtered_data.length === 0 ? (
+                  <div className="p-6 text-center text-gray-400 text-sm">
+                    No data found
+                  </div>
+                ) : (
+                  <table className="min-w-full whitespace-nowrap">
+                    <thead className="bg-gray-100">
+                      <tr>
+                        {active_columns.map((col, i) => (
+                          <th
+                            key={col.key}
+                            onClick={() => col.sortable && handle_sort(col.key)}
+                            className={`border px-4 py-3 text-left text-[12px] font-medium text-gray-700 ${
+                              col.sortable ? "cursor-pointer select-none" : ""
+                            } ${i === 0 ? "border-l-0" : ""} ${
+                              i === active_columns.length - 1
+                                ? "border-r-0"
+                                : ""
+                            }`}
+                          >
+                            <div className="flex gap-2 items-center justify-between w-full">
+                              <span>{col.label}</span>
+                              {col.sortable &&
+                                sort_by === col.key &&
+                                (sort_order === "asc" ? (
+                                  <ChevronUp size={14} />
+                                ) : (
+                                  <ChevronDown size={14} />
+                                ))}
+                            </div>
+                          </th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody className="bg-white">
+                      {filtered_data.map((row, idx) => (
+                        <tr
+                          key={idx}
+                          className={`transition-colors hover:bg-gray-50`}
+                        >
+                          {active_columns.map((col, i) => (
+                            <td
+                              key={i}
+                              className={`border px-4 py-4 text-[12px] text-gray-600 ${
+                                i === 0 ? "border-l-0" : ""
+                              } ${
+                                i === active_columns.length - 1
+                                  ? "border-r-0"
+                                  : ""
+                              }`}
+                            >
+                              {render_cell(col, row)}
+                            </td>
+                          ))}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                )}
+              </div>
+              {total_pages > 0 && (
+                <Pagination
+                  current_page={current_page}
+                  total_pages={total_pages}
+                  on_page_change={set_current_page}
+                  variant="compact"
+                />
+              )}
+            </div>
+          </div>
+
+          {/* + SECTION 3: ACTIONS */}
+          <div className="p-5 sm:p-6 border-t">
+            <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
+              <Button
+                variant="primary"
+                icon={FileUp}
+                icon_position="left"
+                on_click={handle_upload}
+                disabled={tds_list.length === 0 || is_fetching}
+              >
+                Upload to Cloud
+              </Button>
+              <Button variant="white" on_click={handle_go_back}>
+                Cancel
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* + FETCHING MODAL */}
+      {is_fetching && (
+        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-[10000] flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 animate-in fade-in zoom-in duration-200">
+            <div className="flex flex-col items-center text-center">
+              <div className="mb-4 p-3 bg-green-50 rounded-full">
+                <RefreshCw size={32} className="text-green-600 animate-spin" />
+              </div>
+              <h3 className="text-lg font-semibold text-slate-800">
+                Fetching Data
+              </h3>
+              <p className="text-sm text-slate-500 mb-6">
+                Please wait while we retrieve the records...
+              </p>
+              <div className="w-full bg-slate-100 rounded-full h-2.5 mb-2 overflow-hidden">
+                <div
+                  className="bg-green-600 h-full transition-all duration-300 ease-out"
+                  style={{ width: `${progress}%` }}
+                ></div>
+              </div>
+              <div className="flex justify-between w-full mb-6">
+                <span className="text-xs font-medium text-slate-400">
+                  Progress
+                </span>
+                <span className="text-xs font-bold text-green-600">
+                  {progress}%
+                </span>
+              </div>
+              <Button
+                variant="white"
+                width="w-full"
+                on_click={handle_cancel_operation}
+              >
+                Cancel
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* + UPLOADING MODAL */}
+      {is_uploading && (
+        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-[10000] flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6">
+            <div className="flex flex-col items-center text-center">
+              <div className="mb-4 p-3 bg-green-50 rounded-full">
+                <FileUp size={32} className="text-green-600 animate-bounce" />
+              </div>
+              <h3 className="text-lg font-semibold text-slate-800">
+                Pushing to Cloud
+              </h3>
+              <p className="text-sm text-slate-500 mb-6">
+                Synchronizing TDS Tagging to cloud database...
+              </p>
+              <div className="w-full bg-slate-100 rounded-full h-2.5 mb-2 overflow-hidden">
+                <div
+                  className="bg-green-600 h-full transition-all duration-300 ease-out"
+                  style={{ width: `${upload_progress}%` }}
+                ></div>
+              </div>
+              <div className="flex justify-between w-full mb-6">
+                <span className="text-xs font-medium text-slate-400">
+                  Uploading...
+                </span>
+                <span className="text-xs font-bold text-green-600">
+                  {upload_progress}%
+                </span>
+              </div>
+              <Button
+                variant="white"
+                width="w-full"
+                on_click={handle_cancel_operation}
+              >
+                Stop Upload
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+    </React.Fragment>
+  );
+};
+
+export default Upload_TDS_Tag;

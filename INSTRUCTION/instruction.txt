@@ -1,2 +1,5 @@
 Things to change before deployment:
 1. In tbl_mcp_list_api_rtdb, change the path: /DB_TEST
+
+For Deployment
+command: firebase deploy -P benby-merch-portal   

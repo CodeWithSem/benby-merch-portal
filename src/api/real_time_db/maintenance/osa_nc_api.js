@@ -29,7 +29,7 @@ export const get_all_osa_nc_list = async () => {
   }
 };
 
-// + PUSH MCP TO CLOUD
+// + PUSH TO CLOUD
 export const push_osa_nc_to_cloud = async (data, on_progress, signal) => {
   const date_now = new Date();
   const total_records = data.length;
@@ -70,7 +70,7 @@ export const push_osa_nc_to_cloud = async (data, on_progress, signal) => {
 
   return { success: true, count: total_records };
 };
-// - PUSH MCP TO CLOUD
+// - PUSH TO CLOUD
 
 // + TRUNCATE
 export const truncate_osa_nc = async (on_progress = null) => {

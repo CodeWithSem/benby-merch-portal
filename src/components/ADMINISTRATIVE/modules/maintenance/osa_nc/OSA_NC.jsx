@@ -34,12 +34,9 @@ import Upload_OSA_NC from "./upload/Upload_OSA_NC";
 import {
   get_all_osa_nc_list,
   truncate_osa_nc,
-} from "api/real_time_db/maintenance/osa_nc/osa_nc_api";
+} from "api/real_time_db/maintenance/osa_nc_api";
 import Confirm_Modal from "assets/elements/modals/Confirm_Modal";
-
-// import View_MCP from "./view/View_MCP";
-// import Edit_MCP from "./edit/Edit_MCP";
-// import Truncate_MCP from "./delete/Truncate_MCP";
+import Truncate_Modal from "assets/elements/modals/Truncate_Modal";
 
 const OSA_NC = () => {
   const { active_user } = Use_App();
@@ -152,9 +149,9 @@ const OSA_NC = () => {
       {page === "main" && (
         <React.Fragment>
           <div className="w-full">
+            {/* + BREADCRUMB */}
             <div className="flex flex-wrap items-center justify-between gap-3 py-5">
               <h1 className="text-xl">Maintenance</h1>
-              {/* + Breadcrumbs */}
               <nav>
                 <ol className="flex flex-wrap items-center gap-1.5">
                   <li>
@@ -178,10 +175,11 @@ const OSA_NC = () => {
                   </li>
                 </ol>
               </nav>
-              {/* - Breadcrumbs */}
             </div>
+            {/* - BREADCRUMB */}
+            {/* + MAIN CONTAINER */}
             <div className="w-full bg-white rounded-lg border">
-              {/* + Header */}
+              {/* + HEADER */}
               <div className="flex flex-wrap items-center justify-between gap-3 p-5">
                 <h1 className="text-lg">OSA Not Carried</h1>
                 <div className="flex gap-2">
@@ -207,8 +205,8 @@ const OSA_NC = () => {
                   </Button>
                 </div>
               </div>
-              {/* - Header */}
-              {/* + Section 2 */}
+              {/* - HEADER */}
+              {/* + SECTION 1 */}
               <div className="p-5 sm:p-6 border-t">
                 <div className="w-full border rounded-lg">
                   <div className="w-full md:flex md:justify-between p-4 gap-4">
@@ -391,55 +389,21 @@ const OSA_NC = () => {
                   )}
                 </div>
               </div>
-              {/* - Section 2 */}
+              {/* - SECTION 1 */}
             </div>
+            {/* - MAIN CONTAINER */}
           </div>
         </React.Fragment>
       )}
-      {/* + Pages */}
+      {/* + PAGES */}
       {page === "upload_mcp" && <Upload_OSA_NC set_page={set_page} />}
-      {/* - Pages */}
+      {/* - PAGES */}
 
       {/* + Truncate Progress Modal */}
-      {is_truncate_loading && (
-        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-[10000] flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6">
-            <div className="flex flex-col items-center text-center">
-              {/* Changed BG and Color to Red */}
-              <div className="mb-4 p-3 bg-red-50 rounded-full">
-                <Trash2 size={32} className="text-red-600 animate-bounce" />
-              </div>
-
-              {/* Updated Title and Description */}
-              <h3 className="text-lg font-semibold text-slate-800">
-                Deleting Cloud Data
-              </h3>
-              <p className="text-sm text-slate-500 mb-6">
-                Removing ALL records from Firebase...
-              </p>
-
-              {/* Progress Bar (Changed to Red) */}
-              <div className="w-full bg-slate-100 rounded-full h-2.5 mb-2 overflow-hidden">
-                <div
-                  className="bg-red-600 h-full transition-all duration-300 ease-out"
-                  style={{ width: `${truncate_progress}%` }}
-                ></div>
-              </div>
-
-              {/* Updated Progress Texts */}
-              <div className="flex justify-between w-full mb-6">
-                <span className="text-xs font-medium text-slate-400">
-                  Deleting...
-                </span>
-                {/* Changed Color to Red */}
-                <span className="text-xs font-bold text-red-600">
-                  {truncate_progress}%
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      <Truncate_Modal
+        is_loading={is_truncate_loading}
+        progress={truncate_progress}
+      />
       {/* - Truncate Progress Modal */}
       <Confirm_Modal
         is_open={display_modal === "truncate"}

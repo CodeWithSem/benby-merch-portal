@@ -15,6 +15,7 @@ import {
   CircleX,
   FileDown,
   Calendar,
+  ChevronRight,
 } from "lucide-react";
 
 // Elements
@@ -80,7 +81,7 @@ const EP_History = () => {
       label: "CORRECT PLANOGRAM REMARKS",
       sortable: true,
     },
-    { key: "actions", label: "", sortable: false },
+    // { key: "actions", label: "", sortable: false },
   ];
 
   const [visible_columns, set_visible_columns] = useState(
@@ -244,9 +245,9 @@ const EP_History = () => {
       {page === "main" && (
         <React.Fragment>
           <div className="w-full">
+            {/* + BREADCRUMB */}
             <div className="flex flex-wrap items-center justify-between gap-3 py-5">
               <h1 className="text-xl">Data History</h1>
-              {/* + Breadcrumbs */}
               <nav>
                 <ol className="flex flex-wrap items-center gap-1.5">
                   <li>
@@ -255,21 +256,26 @@ const EP_History = () => {
                     </a>
                   </li>
                   <li className="flex items-center gap-1.5 text-sm text-gray-500">
-                    <span>/</span>
+                    <span>
+                      <ChevronRight size={14} />
+                    </span>
                     <a className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-green-500 cursor-pointer">
                       Data History
                     </a>
                   </li>
                   <li className="flex items-center gap-1.5 text-sm text-gray-500">
-                    <span>/</span>
+                    <span>
+                      <ChevronRight size={14} />
+                    </span>
                     <span className="text-gray-800">Execution Planner</span>
                   </li>
                 </ol>
               </nav>
-              {/* - Breadcrumbs */}
             </div>
+            {/* - BREADCRUMB */}
+            {/* + MAIN CONTAINER */}
             <div className="w-full bg-white rounded-lg border">
-              {/* + Header */}
+              {/* + HEADER */}
               <div className="flex flex-wrap items-center justify-between gap-3 p-5">
                 <h1 className="text-lg">Execution Planner</h1>
                 <div className="flex gap-2">
@@ -306,8 +312,8 @@ const EP_History = () => {
                   </Button>
                 </div>
               </div>
-              {/* - Header */}
-              {/* + Section 1 */}
+              {/* - HEADER */}
+              {/* + SECTION 1 */}
               <div className="p-5 sm:p-6 border-t">
                 <div className="flex flex-col gap-3">
                   {/* Mode Switcher */}
@@ -368,8 +374,8 @@ const EP_History = () => {
                   </div>
                 </div>
               </div>
-              {/* - Section 1 */}
-              {/* + Section 2 */}
+              {/* - SECTION 1 */}
+              {/* + SECTION 2 */}
               <div className="p-5 sm:p-6 border-t">
                 <div className="w-full border rounded-lg">
                   <div className="w-full md:flex md:justify-between p-4 gap-4">
@@ -553,34 +559,12 @@ const EP_History = () => {
                   )}
                 </div>
               </div>
-              {/* - Section 2 */}
+              {/* - SECTION 2 */}
             </div>
+            {/* - MAIN CONTAINER */}
           </div>
         </React.Fragment>
       )}
-      {/* + Pages */}
-      {/* {page === "upload_mcp" && <Upload_MCP set_page={set_page} />} */}
-      {/* - Pages */}
-      {/* + Modals */}
-      {/* <View_MCP
-        is_open={display_modal === "view_mcp"}
-        on_close={() => set_display_modal("")}
-        width="max-w-[1000px]"
-        height="max-h-[700px]"
-        show_toast={show_toast}
-        view_data={view_data}
-        set_ep_history_list={set_ep_history_list}
-      />
-      <Edit_MCP
-        is_open={display_modal === "edit_mcp"}
-        on_close={() => set_display_modal("")}
-        width="max-w-[1000px]"
-        // height="max-h-[700px]"
-        edit_data={edit_data}
-        set_ep_history_list={set_ep_history_list}
-        show_toast={show_toast}
-      /> */}
-      {/* - Modals */}
     </React.Fragment>
   );
 };

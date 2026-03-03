@@ -24,7 +24,7 @@ import { format_date_1, get_date_now } from "assets/scripts/format";
 import axios from "axios";
 import { push_price_surv_to_cloud } from "api/real_time_db/cloud_management/price_surv_api";
 
-const Upload_Price_Surv = ({ set_page }) => {
+const Upload_Price_Surv = ({ set_page, on_success }) => {
   const { show_toast } = useToast();
   const [show_filter, set_show_filter] = useState(false);
   const [selected_id, set_selected_id] = useState(null);
@@ -178,7 +178,7 @@ const Upload_Price_Surv = ({ set_page }) => {
     set_upload_progress(0);
 
     try {
-      await push_price_surv_to_cloud(
+      const result = await push_price_surv_to_cloud(
         upload_price_surv_list,
         (percent) => set_upload_progress(percent),
         controller.signal,
@@ -190,6 +190,7 @@ const Upload_Price_Surv = ({ set_page }) => {
         message: "Data has been pushed to the cloud.",
         icon: <CheckCircle2 size={21} className="text-green-500" />,
       });
+      if (on_success) on_success(result);
       handle_go_back();
     } catch (error) {
       if (error.message !== "Upload Cancelled") {
