@@ -3,3 +3,7 @@ Things to change before deployment:
 
 For Deployment
 command: firebase deploy -P benby-merch-portal   
+
+How to delete path via Terminal
+1. firebase login
+2. firebase database:remove "/DB1_BENBY_MERCH_APP/TBL_STORE_TIMELOGS/DATA" --project benby-merch-app
