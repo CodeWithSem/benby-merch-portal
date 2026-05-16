@@ -48,10 +48,11 @@ const RTV_History = () => {
     { key: "store_code", label: "STORE CODE", sortable: true },
     { key: "date_prepared", label: "DATE PREPARED", sortable: true },
     { key: "return_to_vendor", label: "RTV", sortable: true },
-    { key: "defective", label: "DEFECTIVE", sortable: true },
-    { key: "incorrect_item", label: "INCORRECT", sortable: true },
-    { key: "expired", label: "EXPIRED", sortable: true },
-    { key: "other", label: "OTHER", sortable: true },
+    { key: "reason", label: "REASON", sortable: true },
+    // { key: "defective", label: "DEFECTIVE", sortable: true },
+    // { key: "incorrect_item", label: "INCORRECT", sortable: true },
+    // { key: "expired", label: "EXPIRED", sortable: true },
+    // { key: "other", label: "OTHER", sortable: true },
   ];
 
   const [visible_columns, set_visible_columns] = useState(

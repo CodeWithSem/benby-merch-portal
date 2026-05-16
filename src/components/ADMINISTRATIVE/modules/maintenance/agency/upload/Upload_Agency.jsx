@@ -22,48 +22,17 @@ import Spinner from "assets/elements/Spinner";
 import { useToast } from "components/ADMINISTRATIVE/layout/Toast_Provider";
 import { format_date_1, get_date_now } from "assets/scripts/format";
 import axios from "axios";
-import { push_price_surv_to_cloud } from "api/real_time_db/cloud_management/price_surv_api";
+import { push_agency_to_cloud } from "api/real_time_db/maintenance/agency_api";
 
-const Upload_Price_Surv = ({ set_page, on_success }) => {
+const Upload_Agency = ({ set_page, on_upload }) => {
   const { show_toast } = useToast();
   const [show_filter, set_show_filter] = useState(false);
-  const [selected_id, set_selected_id] = useState(null);
 
+  // Store Master Columns
   const columns = [
     { key: "index", label: "NO.", sortable: false },
-    { key: "iD", label: "ID", sortable: true },
-    { key: "code", label: "TDS CODE", sortable: true },
-    { key: "storecode", label: "STORE CODE", sortable: true },
-    { key: "rowNo", label: "ROW NO.", sortable: true },
-    { key: "productName", label: "SKU", sortable: true },
-    { key: "brand", label: "BRAND", sortable: true },
-    { key: "packSize", label: "PACK SIZE", sortable: true },
-    { key: "sRP", label: "SRP", sortable: true },
-    // { key: "competitorPrize", label: "COMPETITOR PRICE", sortable: true },
-    // { key: "priceDifference", label: "PRICE DIFF.", sortable: true },
-    // { key: "promoDiscount", label: "PROMO DISCOUNT", sortable: true },
-    // { key: "remarks", label: "REMARKS", sortable: true },
-    { key: "dateUpload", label: "DATE UPLOADED", sortable: true },
-    { key: "uploadedBy", label: "UPLOADED BY", sortable: true },
-  ];
-
-  const data = [
-    {
-      iD: "1",
-      code: "PMEHO01",
-      storecode: "512173",
-      rowNo: "1",
-      productName: "Shin Original 120g ",
-      brand: "NONGSHIM",
-      packSize: "Pouch",
-      sRP: "0",
-      competitorPrize: "0",
-      priceDifference: "0",
-      promoDiscount: "0",
-      remarks: "",
-      dateUpload: "2/26/2026 12:00:00 AM",
-      uploadedBy: "110828",
-    },
+    // { key: "id", label: "ID", sortable: true },
+    { key: "agency", label: "AGENCY", sortable: true },
   ];
 
   const [visible_columns, set_visible_columns] = useState(
@@ -80,13 +49,11 @@ const Upload_Price_Surv = ({ set_page, on_success }) => {
     );
   };
 
-  // Existing States
+  // State Management
   const [progress, set_progress] = useState(0);
   const [loading, set_loading] = useState(false);
-  const [upload_price_surv_list, set_upload_price_surv_list] = useState([]);
+  const [upload_agency_list, set_upload_agency_list] = useState([]);
   const [is_fetching, set_is_fetching] = useState(false);
-
-  // + NEW STATES FOR AXIOS & ABORT
   const [abort_controller, set_abort_controller] = useState(null);
 
   const handle_fetch_data = async () => {
@@ -95,15 +62,14 @@ const Upload_Price_Surv = ({ set_page, on_success }) => {
 
     set_loading(true);
     set_is_fetching(true);
-    set_progress(0); // Reset progress
-    set_upload_price_surv_list([]);
+    set_progress(0);
+    set_upload_agency_list([]);
 
     try {
       const response = await axios.get(
-        "https://benbyextportal.com/home/api/get/GetPriceSurvey?F1=0&F2=0&F3=0&F4=0",
+        "https://benbyextportal.com/home/api/get/GetMerchDeploymentForTrainingLogs?F1=0&F2=0&F3=0",
         {
           signal: controller.signal,
-          // Track progress
           onDownloadProgress: (progressEvent) => {
             const total = progressEvent.total || 0;
             const current = progressEvent.loaded;
@@ -111,7 +77,6 @@ const Upload_Price_Surv = ({ set_page, on_success }) => {
               const percentCompleted = Math.round((current * 100) / total);
               set_progress(percentCompleted);
             } else {
-              // Fallback for when Content-Length is missing
               set_progress((prev) => (prev < 90 ? prev + 10 : prev));
             }
           },
@@ -120,16 +85,26 @@ const Upload_Price_Surv = ({ set_page, on_success }) => {
 
       if (response.data) {
         set_progress(100);
-        const formatted_data = response.data.map((item, index) => ({
-          ...item,
+
+        // 1. Kuhanin lahat ng 'agency' values
+        const all_agencies = response.data.map((item) => item.agency);
+
+        // 2. Gamitin ang Set para matira lang ang Unique, then convert back to Array
+        const unique_agencies = [...new Set(all_agencies)];
+
+        // 3. i-Format para sa table (may index para sa NO. column mo)
+        const formatted_data = unique_agencies.map((agencyName, index) => ({
           index: index + 1,
+          id: index + 1,
+          agency: agencyName,
         }));
-        // console.log(formatted_data[0]);
-        set_upload_price_surv_list(formatted_data);
+
+        set_upload_agency_list(formatted_data);
+
         show_toast({
           type: "success",
-          title: "Data Fetched",
-          message: "The payload is ready to upload.",
+          title: "Agencies Filtered",
+          message: `${formatted_data.length} unique agencies found.`,
           icon: <CheckCircle2 size={21} className="text-green-500" />,
         });
       }
@@ -140,7 +115,7 @@ const Upload_Price_Surv = ({ set_page, on_success }) => {
         show_toast({
           type: "danger",
           title: "Error",
-          message: "Something went wrong. Please try again.",
+          message: "Could not retrieve Store Master data.",
           icon: <CircleX size={21} className="text-red-500" />,
         });
       }
@@ -156,16 +131,9 @@ const Upload_Price_Surv = ({ set_page, on_success }) => {
       abort_controller.abort();
       set_abort_controller(null);
       set_loading(false);
-      show_toast({
-        type: "danger",
-        title: "Request Cancelled",
-        message: "The fetching of data has been cancelled.",
-        icon: <CircleX size={21} className="text-red-500" />,
-      });
     }
   };
 
-  // 2. Inside the Upload_Price_Surv component:
   const [is_uploading, set_is_uploading] = useState(false);
   const [upload_progress, set_upload_progress] = useState(0);
   const [upload_controller, set_upload_controller] = useState(null);
@@ -178,26 +146,26 @@ const Upload_Price_Surv = ({ set_page, on_success }) => {
     set_upload_progress(0);
 
     try {
-      const result = await push_price_surv_to_cloud(
-        upload_price_surv_list,
+      await push_agency_to_cloud(
+        upload_agency_list,
         (percent) => set_upload_progress(percent),
         controller.signal,
       );
 
       show_toast({
         type: "success",
-        title: "Data Uploaded",
-        message: "Data has been pushed to the cloud.",
+        title: "Store Master Synced",
+        message: "All agency records pushed to cloud successfully.",
         icon: <CheckCircle2 size={21} className="text-green-500" />,
       });
-      if (on_success) on_success(result);
+      on_upload();
       handle_go_back();
     } catch (error) {
       if (error.message !== "Upload Cancelled") {
         show_toast({
           type: "danger",
           title: "Upload Failed",
-          message: "Something went wrong. Please try again.",
+          message: error.message || "Something went wrong.",
           icon: <CircleX size={21} className="text-red-500" />,
         });
       }
@@ -226,24 +194,22 @@ const Upload_Price_Surv = ({ set_page, on_success }) => {
     handle_sort,
     filtered_data,
     total_pages,
-  } = client_side_filter(upload_price_surv_list, columns);
+  } = client_side_filter(upload_agency_list, columns);
 
   const render_cell = (col, row) => {
-    const value = row[col.key];
-
-    return value;
+    return row[col.key];
   };
 
   const handle_go_back = () => {
     set_page("main");
   };
-  // RETURN ORIGIN
+
   return (
     <React.Fragment>
       <div className="w-full">
+        {/* + BREADCRUMB */}
         <div className="flex flex-wrap items-center justify-between gap-3 py-5">
           <h1 className="text-xl">Cloud Management</h1>
-          {/* + Breadcrumbs */}
           <nav>
             <ol className="flex flex-wrap items-center gap-1.5">
               <li>
@@ -252,25 +218,25 @@ const Upload_Price_Surv = ({ set_page, on_success }) => {
                 </a>
               </li>
               <li
-                className="flex items-center gap-1.5 text-sm text-gray-500"
+                className="flex items-center gap-1.5 text-sm text-gray-500 cursor-pointer"
                 onClick={handle_go_back}
               >
                 <span>
                   <ChevronRight size={14} />
                 </span>
                 <a className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-sky-500 cursor-pointer">
-                  Cloud Management
+                  Maintenance
                 </a>
               </li>
               <li
-                className="flex items-center gap-1.5 text-sm text-gray-500"
+                className="flex items-center gap-1.5 text-sm text-gray-500 cursor-pointer"
                 onClick={handle_go_back}
               >
                 <span>
                   <ChevronRight size={14} />
                 </span>
                 <a className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-sky-500 cursor-pointer">
-                  Price Survey
+                  Store
                 </a>
               </li>
               <li className="flex items-center gap-1.5 text-sm text-gray-500">
@@ -281,10 +247,11 @@ const Upload_Price_Surv = ({ set_page, on_success }) => {
               </li>
             </ol>
           </nav>
-          {/* - Breadcrumbs */}
         </div>
+
+        {/* + MAIN CONTAINER */}
         <div className="w-full bg-white rounded-lg border">
-          {/* + Header */}
+          {/* + HEADER */}
           <div className="flex flex-wrap items-center justify-between gap-3 p-5">
             <div className="flex items-center gap-3">
               <Button
@@ -294,14 +261,14 @@ const Upload_Price_Surv = ({ set_page, on_success }) => {
                 width="w-[20px]"
                 on_click={handle_go_back}
               ></Button>
-              <h1 className="text-lg">Upload Price Survey</h1>
+              <h1 className="text-lg">Upload Store Master</h1>
             </div>
             <div className="flex gap-2 text-gray-500 text-sm tracking-wider">
               {format_date_1(get_date_now())}
             </div>
           </div>
-          {/* - Header */}
-          {/* + Section 1 */}
+
+          {/* + SECTION 1: FETCH */}
           <div className="p-5 sm:p-6 border-t">
             <div className="w-full flex items-center gap-2">
               <div className="w-full">
@@ -309,7 +276,7 @@ const Upload_Price_Surv = ({ set_page, on_success }) => {
                   icon={Globe}
                   icon_position="left"
                   value={
-                    "https://benbyextportal.com/home/api/get/GetPriceSurvey?F1=0&F2=0&F3=0&F4=0"
+                    "https://benbyextportal.com/home/api/get/GetStoreMaster?Storecode=0"
                   }
                   disabled
                 />
@@ -325,8 +292,8 @@ const Upload_Price_Surv = ({ set_page, on_success }) => {
               </div>
             </div>
           </div>
-          {/* - Section 1 */}
-          {/* + Section 2 */}
+
+          {/* + SECTION 2: TABLE CONTROL & VIEW */}
           <div className="p-5 sm:p-6 border-t">
             <div className="w-full border rounded-lg">
               <div className="w-full md:flex md:justify-between p-4 gap-4">
@@ -393,7 +360,7 @@ const Upload_Price_Surv = ({ set_page, on_success }) => {
                                 className="hover:bg-slate-50 py-1 px-2 rounded-md transition-colors"
                               >
                                 <Checkbox_Field
-                                  label={col.label || "Action Button"}
+                                  label={col.label}
                                   box_size={18}
                                   icon_size={12}
                                   checked={visible_columns.includes(col.key)}
@@ -444,7 +411,7 @@ const Upload_Price_Surv = ({ set_page, on_success }) => {
                               i === active_columns.length - 1
                                 ? "border-r-0"
                                 : ""
-                            } ${col.width || ""}`}
+                            }`}
                           >
                             <div className="flex gap-2 items-center justify-between w-full">
                               <span>{col.label}</span>
@@ -461,28 +428,27 @@ const Upload_Price_Surv = ({ set_page, on_success }) => {
                       </tr>
                     </thead>
                     <tbody className="bg-white">
-                      {filtered_data.map((row, idx) => {
-                        return (
-                          <tr
-                            key={idx}
-                            onClick={() => set_selected_id(row.iD)}
-                            className={`transition-colors ${selected_id === row.iD ? "bg-green-100/40 hover:bg-green-100/60" : "hover:bg-gray-50"}`}
-                          >
-                            {active_columns.map((col, i) => (
-                              <td
-                                key={i}
-                                className={`border px-4 py-4 text-[12px] text-gray-600 ${i === 0 ? "border-l-0" : ""} ${
-                                  i === active_columns.length - 1
-                                    ? "border-r-0"
-                                    : ""
-                                }`}
-                              >
-                                {render_cell(col, row)}
-                              </td>
-                            ))}
-                          </tr>
-                        );
-                      })}
+                      {filtered_data.map((row, idx) => (
+                        <tr
+                          key={idx}
+                          className={`transition-colors hover:bg-gray-50`}
+                        >
+                          {active_columns.map((col, i) => (
+                            <td
+                              key={i}
+                              className={`border px-4 py-4 text-[12px] text-gray-600 ${
+                                i === 0 ? "border-l-0" : ""
+                              } ${
+                                i === active_columns.length - 1
+                                  ? "border-r-0"
+                                  : ""
+                              }`}
+                            >
+                              {render_cell(col, row)}
+                            </td>
+                          ))}
+                        </tr>
+                      ))}
                     </tbody>
                   </table>
                 )}
@@ -497,8 +463,8 @@ const Upload_Price_Surv = ({ set_page, on_success }) => {
               )}
             </div>
           </div>
-          {/* - Section 2 */}
-          {/* + Section 3 */}
+
+          {/* + SECTION 3: ACTIONS */}
           <div className="p-5 sm:p-6 border-t">
             <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
               <Button
@@ -506,7 +472,7 @@ const Upload_Price_Surv = ({ set_page, on_success }) => {
                 icon={FileUp}
                 icon_position="left"
                 on_click={handle_upload}
-                disabled={upload_price_surv_list.length === 0 || is_fetching}
+                disabled={upload_agency_list.length === 0 || is_fetching}
               >
                 Upload to Cloud
               </Button>
@@ -515,11 +481,10 @@ const Upload_Price_Surv = ({ set_page, on_success }) => {
               </Button>
             </div>
           </div>
-          {/* - Section 3 */}
         </div>
       </div>
 
-      {/* + Modals */}
+      {/* + FETCHING MODAL */}
       {is_fetching && (
         <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-[10000] flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 animate-in fade-in zoom-in duration-200">
@@ -527,22 +492,18 @@ const Upload_Price_Surv = ({ set_page, on_success }) => {
               <div className="mb-4 p-3 bg-green-50 rounded-full">
                 <RefreshCw size={32} className="text-green-600 animate-spin" />
               </div>
-
               <h3 className="text-lg font-semibold text-slate-800">
                 Fetching Data
               </h3>
               <p className="text-sm text-slate-500 mb-6">
-                Please wait while we retrieve the data...
+                Please wait while we retrieve the agency records...
               </p>
-
-              {/* Progress Bar Container */}
               <div className="w-full bg-slate-100 rounded-full h-2.5 mb-2 overflow-hidden">
                 <div
                   className="bg-green-600 h-full transition-all duration-300 ease-out"
                   style={{ width: `${progress}%` }}
                 ></div>
               </div>
-
               <div className="flex justify-between w-full mb-6">
                 <span className="text-xs font-medium text-slate-400">
                   Progress
@@ -551,7 +512,6 @@ const Upload_Price_Surv = ({ set_page, on_success }) => {
                   {progress}%
                 </span>
               </div>
-
               <Button
                 variant="white"
                 width="w-full"
@@ -563,6 +523,8 @@ const Upload_Price_Surv = ({ set_page, on_success }) => {
           </div>
         </div>
       )}
+
+      {/* + UPLOADING MODAL */}
       {is_uploading && (
         <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-[10000] flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6">
@@ -570,22 +532,18 @@ const Upload_Price_Surv = ({ set_page, on_success }) => {
               <div className="mb-4 p-3 bg-green-50 rounded-full">
                 <FileUp size={32} className="text-green-600 animate-bounce" />
               </div>
-
               <h3 className="text-lg font-semibold text-slate-800">
                 Pushing to Cloud
               </h3>
               <p className="text-sm text-slate-500 mb-6">
-                Synchronizing data with Firebase...
+                Synchronizing agency records with cloud storage...
               </p>
-
-              {/* Progress Bar */}
               <div className="w-full bg-slate-100 rounded-full h-2.5 mb-2 overflow-hidden">
                 <div
                   className="bg-green-600 h-full transition-all duration-300 ease-out"
                   style={{ width: `${upload_progress}%` }}
                 ></div>
               </div>
-
               <div className="flex justify-between w-full mb-6">
                 <span className="text-xs font-medium text-slate-400">
                   Uploading...
@@ -594,7 +552,6 @@ const Upload_Price_Surv = ({ set_page, on_success }) => {
                   {upload_progress}%
                 </span>
               </div>
-
               <Button
                 variant="white"
                 width="w-full"
@@ -606,9 +563,8 @@ const Upload_Price_Surv = ({ set_page, on_success }) => {
           </div>
         </div>
       )}
-      {/* - Modals */}
     </React.Fragment>
   );
 };
 
-export default Upload_Price_Surv;
+export default Upload_Agency;

@@ -69,6 +69,7 @@ const Sidebar = ({
         { name: "Audit Survey", sub_module_code: "CM5" },
         { name: "Share of Shelf", sub_module_code: "CM6" },
         { name: "Price Survey", sub_module_code: "CM7" },
+        { name: "Training Logs", sub_module_code: "CM9" },
         // { name: "NERM Inventory", sub_module_code: "CM8" },
         // { name: "Return to Vendor", sub_module_code: "CM8" },
       ],
@@ -103,6 +104,9 @@ const Sidebar = ({
         { name: "TDS Database", sub_module_code: "MT4" },
         { name: "TDS Tagging", sub_module_code: "MT5" },
         { name: "SKU Brand", sub_module_code: "MT6" },
+        { name: "Agency", sub_module_code: "MT7" },
+        { name: "Merchandiser", sub_module_code: "MT8" },
+        { name: "OSA NC Temp", sub_module_code: "MT9" },
         // { name: "Geo Tagging", sub_module_code: "MT7" },
       ],
     },
@@ -130,7 +134,7 @@ const Sidebar = ({
           <div
             className={`absolute left-full top-0 ml-2 bg-white rounded border py-2 z-50 w-[180px] shadow-lg ${
               key === "Maintenance"
-                ? "max-h-[305px] overflow-y-auto scrollbar-custom"
+                ? "max-h-[320px] overflow-y-auto scrollbar-custom"
                 : ""
             }`}
           >

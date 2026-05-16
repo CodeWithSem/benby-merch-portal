@@ -10,7 +10,6 @@ import {
   FileUp,
   CircleX,
   CheckCircle2,
-  ChevronRight,
 } from "lucide-react";
 import Button from "assets/elements/Button";
 import Icon_Field from "assets/elements/Icon_Field";
@@ -22,9 +21,9 @@ import Spinner from "assets/elements/Spinner";
 import { useToast } from "components/ADMINISTRATIVE/layout/Toast_Provider";
 import { format_date_1, get_date_now } from "assets/scripts/format";
 import axios from "axios";
-import { push_price_surv_to_cloud } from "api/real_time_db/cloud_management/price_surv_api";
+import { push_training_log_to_cloud } from "api/real_time_db/cloud_management/training_logs_api";
 
-const Upload_Price_Surv = ({ set_page, on_success }) => {
+const Upload_TL = ({ set_page, on_success }) => {
   const { show_toast } = useToast();
   const [show_filter, set_show_filter] = useState(false);
   const [selected_id, set_selected_id] = useState(null);
@@ -34,36 +33,11 @@ const Upload_Price_Surv = ({ set_page, on_success }) => {
     { key: "iD", label: "ID", sortable: true },
     { key: "code", label: "TDS CODE", sortable: true },
     { key: "storecode", label: "STORE CODE", sortable: true },
+    { key: "survey", label: "SURVEY", sortable: true },
+    { key: "module", label: "MODULE", sortable: true },
     { key: "rowNo", label: "ROW NO.", sortable: true },
-    { key: "productName", label: "SKU", sortable: true },
-    { key: "brand", label: "BRAND", sortable: true },
-    { key: "packSize", label: "PACK SIZE", sortable: true },
-    { key: "sRP", label: "SRP", sortable: true },
-    // { key: "competitorPrize", label: "COMPETITOR PRICE", sortable: true },
-    // { key: "priceDifference", label: "PRICE DIFF.", sortable: true },
-    // { key: "promoDiscount", label: "PROMO DISCOUNT", sortable: true },
-    // { key: "remarks", label: "REMARKS", sortable: true },
     { key: "dateUpload", label: "DATE UPLOADED", sortable: true },
     { key: "uploadedBy", label: "UPLOADED BY", sortable: true },
-  ];
-
-  const data = [
-    {
-      iD: "1",
-      code: "PMEHO01",
-      storecode: "512173",
-      rowNo: "1",
-      productName: "Shin Original 120g ",
-      brand: "NONGSHIM",
-      packSize: "Pouch",
-      sRP: "0",
-      competitorPrize: "0",
-      priceDifference: "0",
-      promoDiscount: "0",
-      remarks: "",
-      dateUpload: "2/26/2026 12:00:00 AM",
-      uploadedBy: "110828",
-    },
   ];
 
   const [visible_columns, set_visible_columns] = useState(
@@ -83,7 +57,7 @@ const Upload_Price_Surv = ({ set_page, on_success }) => {
   // Existing States
   const [progress, set_progress] = useState(0);
   const [loading, set_loading] = useState(false);
-  const [upload_price_surv_list, set_upload_price_surv_list] = useState([]);
+  const [upload_training_log_list, set_upload_training_log_list] = useState([]);
   const [is_fetching, set_is_fetching] = useState(false);
 
   // + NEW STATES FOR AXIOS & ABORT
@@ -96,11 +70,11 @@ const Upload_Price_Surv = ({ set_page, on_success }) => {
     set_loading(true);
     set_is_fetching(true);
     set_progress(0); // Reset progress
-    set_upload_price_surv_list([]);
+    set_upload_training_log_list([]);
 
     try {
       const response = await axios.get(
-        "https://benbyextportal.com/home/api/get/GetPriceSurvey?F1=0&F2=0&F3=0&F4=0",
+        "https://benbyextportal.com/home/api/get/GetTrainingLogs?F1=0&F2=0&F3=0&F4=0",
         {
           signal: controller.signal,
           // Track progress
@@ -125,7 +99,7 @@ const Upload_Price_Surv = ({ set_page, on_success }) => {
           index: index + 1,
         }));
         // console.log(formatted_data[0]);
-        set_upload_price_surv_list(formatted_data);
+        set_upload_training_log_list(formatted_data);
         show_toast({
           type: "success",
           title: "Data Fetched",
@@ -165,7 +139,7 @@ const Upload_Price_Surv = ({ set_page, on_success }) => {
     }
   };
 
-  // 2. Inside the Upload_Price_Surv component:
+  // 2. Inside the Upload_TL component:
   const [is_uploading, set_is_uploading] = useState(false);
   const [upload_progress, set_upload_progress] = useState(0);
   const [upload_controller, set_upload_controller] = useState(null);
@@ -178,8 +152,8 @@ const Upload_Price_Surv = ({ set_page, on_success }) => {
     set_upload_progress(0);
 
     try {
-      const result = await push_price_surv_to_cloud(
-        upload_price_surv_list,
+      const result = await push_training_log_to_cloud(
+        upload_training_log_list,
         (percent) => set_upload_progress(percent),
         controller.signal,
       );
@@ -226,7 +200,7 @@ const Upload_Price_Surv = ({ set_page, on_success }) => {
     handle_sort,
     filtered_data,
     total_pages,
-  } = client_side_filter(upload_price_surv_list, columns);
+  } = client_side_filter(upload_training_log_list, columns);
 
   const render_cell = (col, row) => {
     const value = row[col.key];
@@ -255,9 +229,7 @@ const Upload_Price_Surv = ({ set_page, on_success }) => {
                 className="flex items-center gap-1.5 text-sm text-gray-500"
                 onClick={handle_go_back}
               >
-                <span>
-                  <ChevronRight size={14} />
-                </span>
+                <span>/</span>
                 <a className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-sky-500 cursor-pointer">
                   Cloud Management
                 </a>
@@ -266,17 +238,13 @@ const Upload_Price_Surv = ({ set_page, on_success }) => {
                 className="flex items-center gap-1.5 text-sm text-gray-500"
                 onClick={handle_go_back}
               >
-                <span>
-                  <ChevronRight size={14} />
-                </span>
+                <span>/</span>
                 <a className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-sky-500 cursor-pointer">
-                  Price Survey
+                  Training Logs
                 </a>
               </li>
               <li className="flex items-center gap-1.5 text-sm text-gray-500">
-                <span>
-                  <ChevronRight size={14} />
-                </span>
+                <span>/</span>
                 <span className="text-gray-800">Upload</span>
               </li>
             </ol>
@@ -294,7 +262,7 @@ const Upload_Price_Surv = ({ set_page, on_success }) => {
                 width="w-[20px]"
                 on_click={handle_go_back}
               ></Button>
-              <h1 className="text-lg">Upload Price Survey</h1>
+              <h1 className="text-lg">Upload Training Logs</h1>
             </div>
             <div className="flex gap-2 text-gray-500 text-sm tracking-wider">
               {format_date_1(get_date_now())}
@@ -309,7 +277,7 @@ const Upload_Price_Surv = ({ set_page, on_success }) => {
                   icon={Globe}
                   icon_position="left"
                   value={
-                    "https://benbyextportal.com/home/api/get/GetPriceSurvey?F1=0&F2=0&F3=0&F4=0"
+                    "https://benbyextportal.com/home/api/get/GetTrainingLogs?F1=0&F2=0&F3=0&F4=0"
                   }
                   disabled
                 />
@@ -506,7 +474,7 @@ const Upload_Price_Surv = ({ set_page, on_success }) => {
                 icon={FileUp}
                 icon_position="left"
                 on_click={handle_upload}
-                disabled={upload_price_surv_list.length === 0 || is_fetching}
+                disabled={upload_training_log_list.length === 0 || is_fetching}
               >
                 Upload to Cloud
               </Button>
@@ -611,4 +579,4 @@ const Upload_Price_Surv = ({ set_page, on_success }) => {
   );
 };
 
-export default Upload_Price_Surv;
+export default Upload_TL;

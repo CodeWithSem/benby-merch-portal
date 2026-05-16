@@ -65,9 +65,9 @@ const OSA_History = () => {
     { key: "a7_Pcs", label: "PCS", sortable: true },
     { key: "a8_Cases", label: "CASES", sortable: true },
     { key: "a9_InnerBox", label: "INNER BOX", sortable: true },
-    { key: "b1_ExpiryDate", label: "EXPIRY DATE", sortable: true },
+    // { key: "b1_ExpiryDate", label: "EXPIRY DATE", sortable: true },
     { key: "b2_Remarks", label: "REMARKS", sortable: true },
-    { key: "b3_ExpiryDates", label: "EXPIRY DATES", sortable: true },
+    // { key: "b3_ExpiryDates", label: "EXPIRY DATES", sortable: true },
     // { key: "actions", label: "ACTIONS", sortable: false },
   ];
 
@@ -236,9 +236,7 @@ const OSA_History = () => {
                       on_change={(e) => {
                         const selected_date = e.target.value;
                         set_input_date(selected_date);
-                        if (selected_date) {
-                          handle_get_osa_history_list(selected_date);
-                        }
+                        handle_get_osa_history_list(selected_date);
                       }}
                     />
                   </div>
@@ -396,8 +394,7 @@ const OSA_History = () => {
                             return (
                               <tr
                                 key={idx}
-                                onClick={() => set_selected_id(row.a1_ID)}
-                                className={`transition-colors ${selected_id === row.a1_ID ? "bg-green-100/40 hover:bg-green-100/60" : "hover:bg-gray-50"}`}
+                                className={`transition-colors hover:bg-gray-50`}
                               >
                                 {active_columns.map((col, i) => (
                                   <td

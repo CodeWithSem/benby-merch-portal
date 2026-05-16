@@ -60,10 +60,11 @@ const Price_Survey = () => {
     { key: "brand", label: "BRAND", sortable: true },
     { key: "pack_size", label: "PACK SIZE", sortable: true },
     { key: "srp", label: "SRP", sortable: true },
-    { key: "competitor_price", label: "COMPETITOR PRICE", sortable: true },
-    { key: "price_diff", label: "PRICE DIFFERENCE", sortable: true },
-    { key: "promo_discount", label: "PROMO DISCOUNT", sortable: true },
-    { key: "remarks", label: "REMARKS", sortable: true },
+    { key: "total_competitor", label: "TOTAL COMPETITOR", sortable: true },
+    // { key: "competitor_price", label: "COMPETITOR PRICE", sortable: true },
+    // { key: "price_diff", label: "PRICE DIFFERENCE", sortable: true },
+    // { key: "promo_discount", label: "PROMO DISCOUNT", sortable: true },
+    // { key: "remarks", label: "REMARKS", sortable: true },
     { key: "date_uploaded", label: "DATE UPLOADED", sortable: true },
     { key: "uploaded_by", label: "UPLOADED BY", sortable: true },
     // { key: "actions", label: "", sortable: false },
@@ -157,6 +158,9 @@ const Price_Survey = () => {
 
   const render_cell = (col, row) => {
     const value = row[col.key];
+    if (col.key === "total_competitor") {
+      return row?.competitors?.length || "";
+    }
     if (col.key === "actions") {
       return (
         <div className="flex gap-2">

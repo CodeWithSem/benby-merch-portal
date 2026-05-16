@@ -51,6 +51,7 @@ const Price_Surv_History = () => {
     { key: "brand", label: "BRAND", sortable: true },
     { key: "packSize", label: "PACK SIZE", sortable: true },
     { key: "sRP", label: "SRP", sortable: true },
+    { key: "competitorProduct", label: "COMP. PRODUCT", sortable: true },
     { key: "competitorPrize", label: "COMP. PRICE", sortable: true },
     { key: "priceDifference", label: "PRICE DIFF.", sortable: true },
     { key: "promoDiscount", label: "PROMO", sortable: true },

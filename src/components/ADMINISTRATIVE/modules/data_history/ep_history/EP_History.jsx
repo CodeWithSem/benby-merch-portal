@@ -526,8 +526,7 @@ const EP_History = () => {
                             return (
                               <tr
                                 key={idx}
-                                onClick={() => set_selected_id(row.a1_ID)}
-                                className={`transition-colors ${selected_id === row.a1_ID ? "bg-green-100/40 hover:bg-green-100/60" : "hover:bg-gray-50"}`}
+                                className={`transition-colors hover:bg-gray-50`}
                               >
                                 {active_columns.map((col, i) => (
                                   <td

@@ -27,6 +27,10 @@ import Merch_Deployment from "../modules/cloud_management/merch_deployment/Merch
 import Execution_Planner from "../modules/cloud_management/execution_planner/Execution_Planner";
 import OSA_History from "../modules/data_history/osa_history/OSA_History";
 import MD_History from "../modules/data_history/md_history/MD_History";
+import Agency from "../modules/maintenance/agency/Agency";
+import Merchandiser from "../modules/maintenance/merchandiser/Merchandiser";
+import Training_Logs from "../modules/cloud_management/training_logs/Training_Logs";
+import OSA_NC_Temp from "../modules/maintenance/osa_nc/OSA_NC_Temp";
 
 const Layout = () => {
   const { set_page, active_user } = Use_App();
@@ -93,6 +97,8 @@ const Layout = () => {
         return <SOS />;
       case "Cloud Management-Price Survey":
         return <Price_Survey />;
+      case "Cloud Management-Training Logs":
+        return <Training_Logs />;
       case "Data History-OSA":
         return <OSA_History />;
       case "Data History-Merch Deployment":
@@ -113,12 +119,18 @@ const Layout = () => {
         return <Store_Master />;
       case "Maintenance-OSA Not Carried":
         return <OSA_NC />;
+      case "Maintenance-OSA NC Temp":
+        return <OSA_NC_Temp />;
       case "Maintenance-TDS Tagging":
         return <TDS_Tagging />;
       case "Maintenance-SKU Brand":
         return <SKU_Brand />;
       case "Maintenance-TDS Database":
         return <TDS_Database />;
+      case "Maintenance-Agency":
+        return <Agency />;
+      case "Maintenance-Merchandiser":
+        return <Merchandiser />;
     }
   };
 

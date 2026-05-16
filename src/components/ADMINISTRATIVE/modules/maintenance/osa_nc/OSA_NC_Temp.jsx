@@ -1,66 +1,62 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   Search,
   ChevronDown,
   ChevronUp,
   RefreshCw,
+  PlusCircle,
   User,
+  HardDriveUpload,
+  View,
+  Trash,
+  Edit,
   SlidersHorizontal,
+  ChevronRight,
+  Trash2,
   CheckCircle2,
   CircleX,
-  FileDown,
-  Calendar,
-  ChevronRight,
 } from "lucide-react";
 
-import Button from "assets/elements/Button";
-import Icon_Field from "assets/elements/Icon_Field";
-import Select_Field from "assets/elements/Select_Field";
-import Pagination from "assets/elements/Pagination";
-import Checkbox_Field from "assets/elements/Checkbox_Field";
-import { client_side_filter } from "assets/scripts/functions/client_side_filter";
-import Spinner from "assets/elements/Spinner";
-import Status_Badge from "assets/elements/Status_Badge";
 import { Use_App } from "context/app_context";
 import { useToast } from "components/ADMINISTRATIVE/layout/Toast_Provider";
-import { export_excel_service } from "assets/scripts/functions/export_excel_service";
-import {
-  get_sos_history_list_by_date,
-  get_sos_history_list_by_tds,
-} from "api/real_time_db/data_history/sos_history_api";
 
-const SOS_History = () => {
+import { client_side_filter } from "assets/scripts/functions/client_side_filter";
+
+import Button from "assets/elements/Button";
+import Button_Action from "assets/elements/Button_Action";
+import Icon_Field from "assets/elements/Icon_Field";
+import Select_Field from "assets/elements/Select_Field";
+import Checkbox_Field from "assets/elements/Checkbox_Field";
+import Pagination from "assets/elements/Pagination";
+import Spinner from "assets/elements/Spinner";
+import Status_Badge from "assets/elements/Status_Badge";
+import Upload_OSA_NC from "./upload/Upload_OSA_NC";
+import {
+  get_all_osa_nc_list,
+  truncate_osa_nc,
+} from "api/real_time_db/maintenance/osa_nc_api";
+import Confirm_Modal from "assets/elements/modals/Confirm_Modal";
+import Truncate_Modal from "assets/elements/modals/Truncate_Modal";
+import {
+  delete_all_osa_nc_by_batch,
+  get_all_osa_nc_temp_id_list,
+  get_all_osa_nc_temp_list,
+} from "api/real_time_db/maintenance/osa_nc_api_old";
+
+const OSA_NC_Temp = () => {
   const { active_user } = Use_App();
   const { show_toast } = useToast();
   const [page, set_page] = useState("main");
   const [loading, set_loading] = useState(false);
   const [display_modal, set_display_modal] = useState("");
-  const [search_mode, set_search_mode] = useState("code"); // "code" or "date"
   const [input_tds_code, set_input_tds_code] = useState("");
-  const [input_date, set_input_date] = useState(""); // For the date search
+  const [is_truncate_loading, set_is_truncate_loading] = useState(false);
   const [show_filter, set_show_filter] = useState(false);
-  const [selected_id, set_selected_id] = useState(null);
-
+  const [truncate_progress, set_truncate_progress] = useState(0);
   const columns = [
     { key: "index", label: "NO.", sortable: false },
-    { key: "iD", label: "ID", sortable: true },
-    { key: "code", label: "TDS CODE", sortable: true },
-    { key: "storecode", label: "STORE CODE", sortable: true },
-    { key: "dateVist", label: "DATE VISIT", sortable: true },
-    { key: "brand", label: "BRAND", sortable: true },
-    { key: "category", label: "CATEGORY", sortable: true },
-    { key: "channel", label: "CHANNEL", sortable: true },
-    { key: "facingCount", label: "FACING COUNT", sortable: true },
-    {
-      key: "totalCategoryCount",
-      label: "TOTAL CATEGORY COUNT",
-      sortable: true,
-    },
-    { key: "totalCompetitorCount", label: "TOTAL COMP. COUNT", sortable: true },
-    { key: "remarks", label: "REMARKS", sortable: true },
-    { key: "audit_date", label: "AUDIT DATE", sortable: true },
-    { key: "dateUpload", label: "DATE UPLOAD", sortable: true, hidden: true },
-    { key: "uploadBy", label: "UPLOADED BY", sortable: true, hidden: true },
+    { key: "a2_Storecode", label: "STORE CODE", sortable: true },
+    { key: "a1_Matcode", label: "SKU CODE", sortable: true },
   ];
 
   const [visible_columns, set_visible_columns] = useState(
@@ -77,33 +73,26 @@ const SOS_History = () => {
     );
   };
 
-  const [sos_history_list, set_sos_history_list] = useState([]);
+  const [osa_nc_list, set_osa_nc_list] = useState([]);
 
-  const handle_get_sos_history_list = async () => {
-    set_loading(true);
+  const handle_get_osa_nc_temp_list = async () => {
     try {
-      let results = [];
-      if (search_mode === "code") {
-        if (!input_tds_code) {
-          alert("Please enter a TDS code.");
-          return;
-        }
-        results = await get_sos_history_list_by_tds(input_tds_code);
-      } else {
-        if (!input_date) {
-          alert("Please enter a date.");
-          return;
-        }
-        results = await get_sos_history_list_by_date(input_date);
-      }
-      set_sos_history_list(results);
+      set_loading(true);
+      // const response = await get_all_osa_nc_temp_id_list();
+      // console.log(response);
+      const response = await get_all_osa_nc_temp_list();
+      set_osa_nc_list(response);
       set_current_page(1);
     } catch (error) {
-      console.error("Fetch failed", error);
+      console.error("Fetch error:", error);
     } finally {
       set_loading(false);
     }
   };
+
+  useEffect(() => {
+    // handle_get_osa_nc_temp_list();
+  }, []);
 
   const {
     search_query,
@@ -117,44 +106,32 @@ const SOS_History = () => {
     handle_sort,
     filtered_data,
     total_pages,
-  } = client_side_filter(sos_history_list, columns);
-
-  const handle_export_excel = () => {
-    if (!sos_history_list || sos_history_list.length === 0) {
-      alert("There is no data to export");
-      return;
-    }
-    const result = export_excel_service(sos_history_list, columns, {
-      filename_prefix: `SOS_HISTORY`,
-      sheet_name: "Share of Shelf History",
-    });
-
-    if (result.success) {
-      show_toast({
-        type: "success",
-        title: "Export Successfully",
-        message: "The data has been exported.",
-        icon: <CheckCircle2 size={21} className="text-green-500" />,
-      });
-    } else {
-      show_toast({
-        type: "danger",
-        title: "Error",
-        message: "Something went wrong. Please try again.",
-        icon: <CircleX size={21} className="text-red-500" />,
-      });
-      w;
-    }
-  };
+  } = client_side_filter(osa_nc_list, columns);
 
   const render_cell = (col, row) => {
     const value = row[col.key];
-
-    if (col.key === "answer") {
-      return <Status_Badge status={row.answer} class_name={"w-full"} />;
-    }
+    // if (col.key === "z_nerm_status") {
+    //   return <Status_Badge status={row.z_nerm_status} class_name={"w-full"} />;
+    // }
 
     return value;
+  };
+
+  const handle_truncate = async () => {
+    try {
+      set_is_truncate_loading(true);
+      await delete_all_osa_nc_by_batch();
+    } catch (error) {
+      show_toast({
+        type: "danger",
+        title: "Error",
+        message: "Something went wrong while updating.",
+        icon: <CircleX size={21} className="text-red-500" />,
+      });
+      show_toast("Failed to truncate database", "error");
+    } finally {
+      set_is_truncate_loading(false);
+    }
   };
 
   // RETURN ORIGIN
@@ -165,7 +142,7 @@ const SOS_History = () => {
           <div className="w-full">
             {/* + BREADCRUMB */}
             <div className="flex flex-wrap items-center justify-between gap-3 py-5">
-              <h1 className="text-xl">Data History</h1>
+              <h1 className="text-xl">Maintenance</h1>
               <nav>
                 <ol className="flex flex-wrap items-center gap-1.5">
                   <li>
@@ -178,14 +155,14 @@ const SOS_History = () => {
                       <ChevronRight size={14} />
                     </span>
                     <a className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-green-500 cursor-pointer">
-                      Data History
+                      Maintenance
                     </a>
                   </li>
                   <li className="flex items-center gap-1.5 text-sm text-gray-500">
                     <span>
                       <ChevronRight size={14} />
                     </span>
-                    <span className="text-gray-800">Share of Shelf</span>
+                    <span className="text-gray-800">OSA Not Carried TEMP</span>
                   </li>
                 </ol>
               </nav>
@@ -195,80 +172,42 @@ const SOS_History = () => {
             <div className="w-full bg-white rounded-lg border">
               {/* + HEADER */}
               <div className="flex flex-wrap items-center justify-between gap-3 p-5">
-                <h1 className="text-lg">Share of Shelf</h1>
+                <h1 className="text-lg">OSA Not Carried TEMP</h1>
                 <div className="flex gap-2">
+                  {/* {active_user?.category === "DEV" && (
+                    <Button
+                      variant="danger"
+                      icon={Trash2}
+                      icon_position="left"
+                      width="w-[110px]"
+                      loading={is_truncate_loading}
+                      on_click={() => set_display_modal("truncate")}
+                    >
+                      Truncate
+                    </Button>
+                  )} */}
+                  <Button
+                    variant="danger"
+                    icon={Trash2}
+                    icon_position="left"
+                    width="w-[110px]"
+                    loading={is_truncate_loading}
+                    on_click={() => handle_truncate()}
+                  >
+                    Truncate
+                  </Button>
                   <Button
                     variant="primary"
-                    icon={FileDown}
+                    icon={HardDriveUpload}
                     icon_position="left"
-                    on_click={handle_export_excel}
+                    on_click={() => set_page("upload_mcp")}
                   >
-                    Export as Excel
+                    Upload from Database
                   </Button>
                 </div>
               </div>
               {/* - HEADER */}
               {/* + SECTION 1 */}
-              <div className="p-5 sm:p-6 border-t">
-                <div className="flex flex-col gap-3">
-                  <div className="flex gap-2 mb-2">
-                    <button
-                      onClick={() => set_search_mode("code")}
-                      className={`px-3 py-1 text-xs rounded-full border outline-none 
-                        ${search_mode === "code" ? "bg-green-100 border-green-600 text-green-600" : "bg-gray-50 border-gray-200 text-gray-500"}`}
-                    >
-                      Search by TDS Code
-                    </button>
-                    <button
-                      onClick={() => set_search_mode("date")}
-                      className={`px-3 py-1 text-xs rounded-full border outline-none 
-                        ${search_mode === "date" ? "bg-green-100 border-green-600 text-green-600" : "bg-gray-50 border-gray-200 text-gray-500"}`}
-                    >
-                      Search by Date
-                    </button>
-                  </div>
-
-                  <div className="w-full flex items-center gap-2">
-                    <div className="w-full">
-                      {search_mode === "code" ? (
-                        <Icon_Field
-                          placeholder="Enter TDS Code"
-                          icon={User}
-                          icon_position="left"
-                          value={input_tds_code}
-                          on_change={(e) => set_input_tds_code(e.target.value)}
-                          on_key_down={(e) =>
-                            e.key === "Enter" && handle_get_sos_history_list()
-                          }
-                        />
-                      ) : (
-                        <Icon_Field
-                          placeholder="Enter Date"
-                          icon={Calendar}
-                          icon_position="left"
-                          value={input_date}
-                          on_change={(e) => set_input_date(e.target.value)}
-                          on_key_down={(e) =>
-                            e.key === "Enter" && handle_get_sos_history_list()
-                          }
-                        />
-                      )}
-                    </div>
-                    <div className="relative">
-                      <Button
-                        variant="primary"
-                        width="w-[140px]"
-                        loading={loading}
-                        on_click={handle_get_sos_history_list}
-                      >
-                        Load Data
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              {/* - SECTION 1 */}
-              {/* + SECTION 2 */}
               <div className="p-5 sm:p-6 border-t">
                 <div className="w-full border rounded-lg">
                   <div className="w-full md:flex md:justify-between p-4 gap-4">
@@ -293,7 +232,7 @@ const SOS_History = () => {
                         variant="white"
                         icon={RefreshCw}
                         icon_position="left"
-                        on_click={handle_get_sos_history_list}
+                        on_click={handle_get_osa_nc_temp_list}
                       />
                     </div>
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-center md:w-[600px]">
@@ -419,8 +358,7 @@ const SOS_History = () => {
                             return (
                               <tr
                                 key={idx}
-                                onClick={() => set_selected_id(row.id)}
-                                className={`transition-colors ${selected_id === row.id ? "bg-green-100/40 hover:bg-green-100/60" : "hover:bg-gray-50"}`}
+                                className={`transition-colors hover:bg-gray-50`}
                               >
                                 {active_columns.map((col, i) => (
                                   <td
@@ -452,14 +390,34 @@ const SOS_History = () => {
                   )}
                 </div>
               </div>
-              {/* - SECTION 2 */}
+              {/* - SECTION 1 */}
             </div>
             {/* - MAIN CONTAINER */}
           </div>
         </React.Fragment>
       )}
+      {/* + PAGES */}
+      {/* {page === "upload_mcp" && <Upload_OSA_NC set_page={set_page} />} */}
+      {/* - PAGES */}
+
+      {/* + Truncate Progress Modal */}
+      {/* <Truncate_Modal
+        is_loading={is_truncate_loading}
+        progress={truncate_progress}
+      /> */}
+      {/* - Truncate Progress Modal */}
+      {/* <Confirm_Modal
+        is_open={display_modal === "truncate"}
+        title="Confirm Truncate"
+        description_1="Are you sure you want to delete all OSA Not Carried data?"
+        description_2="This action will permanently delete records from the cloud database."
+        description_3="This cannot be undone. Do you wish to proceed?"
+        confirm_variant="danger" // Assuming your Button supports danger (red)
+        on_confirm={handle_truncate}
+        on_cancel={() => set_display_modal("")}
+      /> */}
     </React.Fragment>
   );
 };
 
-export default SOS_History;
+export default OSA_NC_Temp;

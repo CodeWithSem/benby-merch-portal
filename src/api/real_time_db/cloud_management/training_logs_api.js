@@ -2,43 +2,38 @@ import { ref, get, update } from "firebase/database";
 import { realtime_db } from "assets/scripts/firebase";
 import { format_date } from "assets/scripts/format";
 
-export const get_all_sos = async () => {
-  try {
-    // 1. Point the reference to the parent DATA node to get all TDS codes
-    const db_ref = ref(realtime_db, "/DB_TEST/TBL_SHARE_OF_SHELF/DATA");
-    const snapshot = await get(db_ref);
+const BASE_PATH = "/DB_TEST/TBL_TRAINING_LOG/DATA";
+const DELETE_PATH = "/DB_DELETE_PATH/TBL_TRAINING_LOG/DATA";
 
+/**
+ * GET ALL TRAINING LOGS
+ */
+export const get_all_training_logs = async () => {
+  try {
+    const db_ref = ref(realtime_db, BASE_PATH);
+    const snapshot = await get(db_ref);
     const data = snapshot.val();
     let flattened_list = [];
 
     if (data) {
-      // Loop Level 1: TDS Codes
       Object.keys(data).forEach((tds_code) => {
         const tds_node = data[tds_code];
-
         if (tds_node) {
-          // Loop Level 2: Store Codes
           Object.keys(tds_node).forEach((store_code) => {
             const store_node = tds_node[store_code];
-
             if (store_node) {
-              // Loop Level 3: Individual SOS Record IDs
               Object.keys(store_node).forEach((record_id) => {
                 const entry = store_node[record_id];
-
                 if (entry) {
                   flattened_list.push({
-                    // Unique ID for the row including TDS
                     id_temp: `${tds_code}_${store_code}_${record_id}`,
                     id: entry.id,
-                    store_code: entry.store_code,
                     tds_code: entry.tds_code,
-                    brand: entry.brand,
-                    category: entry.category,
-                    channel: entry.channel,
-                    // facing_count: entry.facing_count || "0",
-                    // remarks: entry.remarks || "",
-                    date_visit: entry.date_visit,
+                    store_code: entry.store_code,
+                    survey: entry.survey,
+                    module: entry.module,
+                    row_no: entry.row_no,
+                    answer: entry.answer,
                     date_uploaded: entry.date_uploaded,
                     uploaded_by: entry.uploaded_by,
                   });
@@ -49,53 +44,40 @@ export const get_all_sos = async () => {
         }
       });
     }
-
     return flattened_list;
   } catch (error) {
-    console.error("Error fetching all SOS records:", error);
+    console.error("Error fetching all Training Logs:", error);
     return [];
   }
 };
 
-export const get_sos_by_tds = async (tds_code) => {
+/**
+ * GET TRAINING LOGS BY TDS CODE
+ */
+export const get_training_logs_by_tds = async (tds_code) => {
   if (!tds_code) return [];
-
   try {
-    // 1. Point the reference directly to the TDS code node
-    const db_ref = ref(
-      realtime_db,
-      `/DB_TEST/TBL_SHARE_OF_SHELF/DATA/${tds_code}`,
-    );
+    const db_ref = ref(realtime_db, `${BASE_PATH}/${tds_code}`);
     const snapshot = await get(db_ref);
-
     const data = snapshot.val();
     let flattened_list = [];
 
-    // 'data' here is now the Store Code level node
     if (data) {
-      // Loop Level 1: Store Codes (previously Level 2)
       Object.keys(data).forEach((store_code) => {
         const store_node = data[store_code];
-
         if (store_node) {
-          // Loop Level 2: Individual SOS Record IDs (previously Level 3)
           Object.keys(store_node).forEach((record_id) => {
             const entry = store_node[record_id];
-
             if (entry) {
               flattened_list.push({
-                // Unique ID for the row
                 id_temp: `${tds_code}_${store_code}_${record_id}`,
-
                 id: entry.id,
-                store_code: entry.store_code,
                 tds_code: entry.tds_code,
-                brand: entry.brand,
-                category: entry.category,
-                channel: entry.channel,
-                // facing_count: entry.facing_count || "0",
-                // remarks: entry.remarks || "",
-                date_visit: entry.date_visit,
+                store_code: entry.store_code,
+                survey: entry.survey,
+                module: entry.module,
+                row_no: entry.row_no,
+                answer: entry.answer,
                 date_uploaded: entry.date_uploaded,
                 uploaded_by: entry.uploaded_by,
               });
@@ -104,15 +86,17 @@ export const get_sos_by_tds = async (tds_code) => {
         }
       });
     }
-
     return flattened_list;
   } catch (error) {
-    console.error(`Error fetching SOS list for TDS ${tds_code}:`, error);
+    console.error(`Error fetching Training Log for TDS ${tds_code}:`, error);
     return [];
   }
 };
 
-export const push_sos_to_cloud = async (data, on_progress, signal) => {
+/**
+ * PUSH TRAINING LOGS TO CLOUD
+ */
+export const push_training_log_to_cloud = async (data, on_progress, signal) => {
   if (!data || data.length === 0) return { success: false, count: 0 };
 
   try {
@@ -126,64 +110,57 @@ export const push_sos_to_cloud = async (data, on_progress, signal) => {
       const updates = {};
 
       current_batch.forEach((item) => {
-        // 1. Data Path (TDS CODE -> STORE CODE -> ID)
-        const path = `/DB_TEST/TBL_SHARE_OF_SHELF/DATA/${item.code}/${item.storecode}/${item.iD}`;
+        // Path: /DATA/tds_code/store_code/id
+        const path = `${BASE_PATH}/${item.code}/${item.storecode}/${item.iD}`;
 
         updates[path] = {
-          id: item.iD,
+          id: parseFloat(item.iD),
           tds_code: item.code,
           store_code: item.storecode,
-          date_visit: format_date(item.dateVist),
-          channel: item.channel,
-          category: item.category,
-          brand: item.brand,
-          // facing_count: item.facingCount || "0",
-          // remarks: item.remarks || "",
+          survey: item.survey,
+          module: item.module,
+          row_no: parseFloat(item.rowNo),
+          answer: item.answer || "",
           date_uploaded: format_date(item.dateUpload),
-          uploaded_by: item.uploadBy,
+          uploaded_by: item.uploadedBy,
         };
 
-        // 2. Register the TDS Code in the Delete Path (Registry)
-        updates[`/DB_DELETE_PATH/TBL_SHARE_OF_SHELF/DATA/${item.code}`] = true;
+        // Registry for Truncate/Delete purposes
+        updates[`${DELETE_PATH}/${item.code}`] = true;
       });
 
       await update(ref(realtime_db), updates);
 
       if (on_progress) {
         const processed = Math.min(i + batch_size, total_records);
-        const percent = Math.round((processed / total_records) * 100);
-        on_progress(percent);
+        on_progress(Math.round((processed / total_records) * 100));
       }
     }
 
     return { success: true, count: total_records };
   } catch (error) {
-    console.error("Error pushing SOS data:", error);
+    console.error("Error pushing Training Log data:", error);
     throw error;
   }
 };
 
 /**
- * TRUNCATE DATA: Clear specific TDS or all registered SOS records
+ * TRUNCATE TRAINING LOGS
  */
-export const truncate_sos = async (
+export const truncate_training_log = async (
   targetTdsCode = null,
   on_progress = null,
 ) => {
-  const registryPath = "/DB_DELETE_PATH/TBL_SHARE_OF_SHELF/DATA";
-  const dataPathBase = "/DB_TEST/TBL_SHARE_OF_SHELF/DATA";
   const batchSize = 500;
-
   try {
     let codesToDelete = [];
 
     if (targetTdsCode) {
       codesToDelete = [targetTdsCode];
     } else {
-      const snapshot = await get(ref(realtime_db, registryPath));
-      if (!snapshot.exists()) {
+      const snapshot = await get(ref(realtime_db, DELETE_PATH));
+      if (!snapshot.exists())
         return { success: true, message: "Nothing to delete" };
-      }
       codesToDelete = Object.keys(snapshot.val());
     }
 
@@ -194,10 +171,8 @@ export const truncate_sos = async (
       const deleteUpdates = {};
 
       batch.forEach((code) => {
-        // Clear the data node
-        deleteUpdates[`${dataPathBase}/${code}`] = null;
-        // Clear the registry entry
-        deleteUpdates[`${registryPath}/${code}`] = null;
+        deleteUpdates[`${BASE_PATH}/${code}`] = null;
+        deleteUpdates[`${DELETE_PATH}/${code}`] = null;
       });
 
       await update(ref(realtime_db), deleteUpdates);
@@ -210,7 +185,7 @@ export const truncate_sos = async (
 
     return { success: true, deletedCount: total };
   } catch (error) {
-    console.error("Error truncating SOS:", error);
+    console.error("Error truncating Training Logs:", error);
     throw error;
   }
 };

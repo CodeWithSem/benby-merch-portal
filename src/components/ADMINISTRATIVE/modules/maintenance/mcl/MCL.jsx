@@ -29,7 +29,7 @@ import Checkbox_Field from "assets/elements/Checkbox_Field";
 import Pagination from "assets/elements/Pagination";
 import Spinner from "assets/elements/Spinner";
 import Status_Badge from "assets/elements/Status_Badge";
-import Upload_OSA_NC from "./upload/Upload_MCL";
+import Upload_MCL from "./upload/Upload_MCL";
 import Confirm_Modal from "assets/elements/modals/Confirm_Modal";
 import Truncate_Modal from "assets/elements/modals/Truncate_Modal";
 import {
@@ -409,7 +409,7 @@ const MCL = () => {
         </React.Fragment>
       )}
       {/* + PAGES */}
-      {page === "upload_mcp" && <Upload_OSA_NC set_page={set_page} />}
+      {page === "upload_mcp" && <Upload_MCL set_page={set_page} />}
       {/* - PAGES */}
       {/* + MODALS */}
       <Truncate_Modal
