@@ -92,6 +92,12 @@ export const sub_module_access_list = [
     sub_module_access_desc: "Return to Vendor",
     creation_date: "MM-DD-YYYY",
   },
+  {
+    id: "DH9",
+    sub_module_access_code: "DH9",
+    sub_module_access_desc: "User Timelog",
+    creation_date: "MM-DD-YYYY",
+  },
 
   // --- MAINTENANCE (MT) ---
   {

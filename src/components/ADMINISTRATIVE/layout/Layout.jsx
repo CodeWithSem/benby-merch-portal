@@ -31,6 +31,7 @@ import Agency from "../modules/maintenance/agency/Agency";
 import Merchandiser from "../modules/maintenance/merchandiser/Merchandiser";
 import Training_Logs from "../modules/cloud_management/training_logs/Training_Logs";
 import OSA_NC_Temp from "../modules/maintenance/osa_nc/OSA_NC_Temp";
+import User_Timelog from "../modules/data_history/user_timelog/User_Timelog";
 
 const Layout = () => {
   const { set_page, active_user } = Use_App();
@@ -113,6 +114,8 @@ const Layout = () => {
         return <Price_Surv_History />;
       case "Data History-Return to Vendor":
         return <RTV_History />;
+      case "Data History-User Timelog":
+        return <User_Timelog />;
       case "Maintenance-MCL":
         return <MCL />;
       case "Maintenance-Store Master":

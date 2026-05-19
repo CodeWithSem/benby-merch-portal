@@ -89,6 +89,7 @@ const Sidebar = ({
         { name: "Price Survey", sub_module_code: "DH6" },
         { name: "Share of Shelf", sub_module_code: "DH7" },
         { name: "Return to Vendor", sub_module_code: "DH8" },
+        { name: "User Timelog", sub_module_code: "DH9" },
       ],
     },
     {

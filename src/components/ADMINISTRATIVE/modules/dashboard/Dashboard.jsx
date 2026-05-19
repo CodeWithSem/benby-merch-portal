@@ -181,7 +181,16 @@ const Dashboard = ({ active_user, set_active_item }) => {
       parent: "Data History",
       target: "Data History-Return to Vendor",
     },
-
+    {
+      title: "User Timelog",
+      desc: "User timelog historical records",
+      icon: <ClipboardList className="text-green-600" />,
+      color: "bg-green-50",
+      module_code: "DH",
+      sub_module_code: "DH9",
+      parent: "Data History",
+      target: "Data History-User Timelog",
+    },
     // --- MAINTENANCE (MT) ---
     // Icon: Settings | Parent: Maintenance | Target: Maintenance-[Name]
     {
