@@ -42,6 +42,12 @@ export const sub_module_access_list = [
     sub_module_access_desc: "Price Survey",
     creation_date: "MM-DD-YYYY",
   },
+  {
+    id: "CM9",
+    sub_module_access_code: "CM9",
+    sub_module_access_desc: "Traning Logs",
+    creation_date: "MM-DD-YYYY",
+  },
 
   // --- DATA HISTORY (DH) ---
   {
@@ -65,7 +71,7 @@ export const sub_module_access_list = [
   {
     id: "DH4",
     sub_module_access_code: "DH4",
-    sub_module_access_desc: "Trade Audit",
+    sub_module_access_desc: "Trade Rental",
     creation_date: "MM-DD-YYYY",
   },
   {
@@ -98,12 +104,32 @@ export const sub_module_access_list = [
     sub_module_access_desc: "User Timelog",
     creation_date: "MM-DD-YYYY",
   },
+  {
+    id: "DH10",
+    sub_module_access_code: "DH10",
+    sub_module_access_desc: "Training Logs",
+    creation_date: "MM-DD-YYYY",
+  },
+
+  // --- SCHEDULING (SC) ---
+  {
+    id: "SC1",
+    sub_module_access_code: "SC1",
+    sub_module_access_desc: "Daily Transfer",
+    creation_date: "MM-DD-YYYY",
+  },
 
   // --- MAINTENANCE (MT) ---
   {
     id: "MT1",
     sub_module_access_code: "MT1",
     sub_module_access_desc: "MCL",
+    creation_date: "MM-DD-YYYY",
+  },
+  {
+    id: "MT10",
+    sub_module_access_code: "MT10",
+    sub_module_access_desc: "MCL NERM",
     creation_date: "MM-DD-YYYY",
   },
   {

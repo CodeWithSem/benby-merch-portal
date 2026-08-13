@@ -226,17 +226,15 @@ const SOS = () => {
               <div className="flex flex-wrap items-center justify-between gap-3 p-5">
                 <h1 className="text-lg">Share of Shelf</h1>
                 <div className="flex gap-2">
-                  {active_user?.category === "DEV" && (
-                    <Button
-                      variant="danger"
-                      icon={Trash2}
-                      icon_position="left"
-                      width="w-[110px]"
-                      on_click={() => set_display_modal("truncate_sos")}
-                    >
-                      Truncate
-                    </Button>
-                  )}
+                  <Button
+                    variant="danger"
+                    icon={Trash2}
+                    icon_position="left"
+                    width="w-[110px]"
+                    on_click={() => set_display_modal("truncate_sos")}
+                  >
+                    Truncate
+                  </Button>
                   <Button
                     variant="primary"
                     icon={HardDriveUpload}

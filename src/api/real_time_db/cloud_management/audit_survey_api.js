@@ -31,7 +31,7 @@ export const get_all_audit_surveys = async () => {
                     id: `${tds_code}_${store_code}_${survey_id}`,
                     store_code: survey_entry.store_code,
                     tds_code: survey_entry.tds_code || tds_code,
-                    survey_id: survey_entry.id,
+                    survey_id: survey_entry.survey_id,
                     survey_category: survey_entry.survey_category,
                     survey_list: survey_entry.survey_list || [],
                     date_uploaded: survey_entry.date_uploaded,
@@ -83,7 +83,7 @@ export const get_audit_survey_by_tds = async (tds_code) => {
                 id: `${tds_code}_${store_code}_${survey_id}`,
                 store_code: survey_entry.store_code,
                 tds_code: survey_entry.tds_code,
-                survey_id: survey_entry.id,
+                survey_id: survey_entry.survey_id,
                 survey_category: survey_entry.survey_category,
                 survey_list: survey_entry.survey_list || [],
                 date_uploaded: survey_entry.date_uploaded,
@@ -114,7 +114,8 @@ export const push_audit_survey_to_cloud = async (data, on_progress, signal) => {
 
       if (!acc[key]) {
         acc[key] = {
-          id: item.suveryID,
+          id: item.iD,
+          survey_id: item.suveryID,
           tds_code: item.code,
           store_code: item.storecode,
           survey_category: item.surveyCategory,

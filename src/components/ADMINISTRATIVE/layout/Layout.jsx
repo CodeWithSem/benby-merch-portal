@@ -32,6 +32,12 @@ import Merchandiser from "../modules/maintenance/merchandiser/Merchandiser";
 import Training_Logs from "../modules/cloud_management/training_logs/Training_Logs";
 import OSA_NC_Temp from "../modules/maintenance/osa_nc/OSA_NC_Temp";
 import User_Timelog from "../modules/data_history/user_timelog/User_Timelog";
+import Trade_Rental from "../modules/cloud_management/trade_rental/Trade_Rental";
+import TR_History from "../modules/data_history/tr_history/TR_History";
+import MCL_NERM from "../modules/maintenance/mcl_nerm/MCL_NERM";
+import TL_History from "../modules/data_history/tl_history/TL_History";
+import Daily_Transfer from "../modules/scheduling/daily_transfer/Daily_Transfer";
+import NERM_History from "../modules/data_history/nerm_history/NERM_History";
 
 const Layout = () => {
   const { set_page, active_user } = Use_App();
@@ -92,6 +98,8 @@ const Layout = () => {
         return <Merch_Deployment />;
       case "Cloud Management-Execution Planner":
         return <Execution_Planner />;
+      case "Cloud Management-Trade Rental":
+        return <Trade_Rental />;
       case "Cloud Management-Audit Survey":
         return <Audit_Survey />;
       case "Cloud Management-Share of Shelf":
@@ -106,6 +114,8 @@ const Layout = () => {
         return <MD_History />;
       case "Data History-Execution Planner":
         return <EP_History />;
+      case "Data History-Trade Rental":
+        return <TR_History />;
       case "Data History-Audit Survey":
         return <AS_History />;
       case "Data History-Share of Shelf":
@@ -114,10 +124,18 @@ const Layout = () => {
         return <Price_Surv_History />;
       case "Data History-Return to Vendor":
         return <RTV_History />;
+      case "Data History-NERM Inventory":
+        return <NERM_History />;
       case "Data History-User Timelog":
         return <User_Timelog />;
+      case "Data History-Training Logs":
+        return <TL_History />;
+      case "Scheduling-Daily Transfer":
+        return <Daily_Transfer />;
       case "Maintenance-MCL":
         return <MCL />;
+      case "Maintenance-MCL NERM":
+        return <MCL_NERM />;
       case "Maintenance-Store Master":
         return <Store_Master />;
       case "Maintenance-OSA Not Carried":

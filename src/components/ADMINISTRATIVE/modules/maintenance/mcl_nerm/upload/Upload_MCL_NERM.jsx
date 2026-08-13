@@ -10,6 +10,7 @@ import {
   FileUp,
   CircleX,
   CheckCircle2,
+  ChevronRight,
 } from "lucide-react";
 import Button from "assets/elements/Button";
 import Icon_Field from "assets/elements/Icon_Field";
@@ -21,24 +22,30 @@ import Spinner from "assets/elements/Spinner";
 import { useToast } from "components/ADMINISTRATIVE/layout/Toast_Provider";
 import { format_date_1, get_date_now } from "assets/scripts/format";
 import axios from "axios";
-import { push_audit_survey_to_cloud } from "api/real_time_db/cloud_management/audit_survey_api";
+import { push_mcl_nerm_to_cloud } from "api/real_time_db/maintenance/mcl_nerm_api";
 
-const Upload_AS = ({ set_page, on_success }) => {
+const Upload_MCL_NERM = ({ set_page }) => {
   const { show_toast } = useToast();
   const [show_filter, set_show_filter] = useState(false);
-  const [selected_id, set_selected_id] = useState(null);
 
   const columns = [
     { key: "index", label: "NO.", sortable: false },
-    { key: "iD", label: "ID", sortable: true },
-    { key: "code", label: "TDS CODE", sortable: true },
-    { key: "storecode", label: "STORE CODE", sortable: true },
-    { key: "suveryID", label: "SURVEY ID", sortable: true },
-    { key: "surveyCategory", label: "CATEGORY", sortable: true },
-    { key: "rowNo", label: "ROW NO.", sortable: true },
-    { key: "surveyQuestion", label: "QUESTION", sortable: true },
-    { key: "dateUpload", label: "DATE UPLOAD", sortable: true, hidden: true },
-    { key: "uploadedBy", label: "UPLOADED BY", sortable: true, hidden: true },
+    { key: "id", label: "ID", sortable: true },
+    { key: "groupName", label: "GROUP", sortable: true },
+    { key: "brand", label: "BRAND", sortable: true },
+    { key: "subBrand", label: "SUB BRAND", sortable: true },
+    { key: "matcode", label: "SKU CODE", sortable: true },
+    { key: "sKUName", label: "SKU NAME", sortable: true },
+    { key: "dateuploaded", label: "DATE UPLOADED", sortable: true },
+    { key: "uploadedBy", label: "UPLOADED BY", sortable: true },
+    { key: "status", label: "STATUS", sortable: true },
+    { key: "arrangeBy", label: "ARANGE BY", sortable: true },
+    { key: "forAvailable", label: "FOR AVAIL", sortable: true },
+    { key: "forOutofStock", label: "FOR OOS", sortable: true },
+    { key: "category", label: "CATEGORY", sortable: true },
+    { key: "channel", label: "CHANNEL", sortable: true },
+    { key: "tagging", label: "TAGGING", sortable: true },
+    { key: "position", label: "POSITION", sortable: true },
   ];
 
   const [visible_columns, set_visible_columns] = useState(
@@ -58,7 +65,7 @@ const Upload_AS = ({ set_page, on_success }) => {
   // Existing States
   const [progress, set_progress] = useState(0);
   const [loading, set_loading] = useState(false);
-  const [upload_as_list, set_upload_as_list] = useState([]);
+  const [upload_mcl_list, set_upload_mcl_list] = useState([]);
   const [is_fetching, set_is_fetching] = useState(false);
 
   // + NEW STATES FOR AXIOS & ABORT
@@ -71,15 +78,13 @@ const Upload_AS = ({ set_page, on_success }) => {
     set_loading(true);
     set_is_fetching(true);
     set_progress(0); // Reset progress
-    set_upload_as_list([]);
+    set_upload_mcl_list([]);
 
     try {
       const response = await axios.get(
-        // "https://benbyextportal.com/home/api/get/GetSKUCarried?Storecode=0",
-        "https://benbyextportal.com/home/api/get/GetTradeAuditSurvey?F1=0&F2=0&F3=0",
+        "https://benbyextportal.com/home/api/get/GetMCLNerm?Brand=0",
         {
           signal: controller.signal,
-          // Track progress
           onDownloadProgress: (progressEvent) => {
             const total = progressEvent.total || 0;
             const current = progressEvent.loaded;
@@ -87,21 +92,19 @@ const Upload_AS = ({ set_page, on_success }) => {
               const percentCompleted = Math.round((current * 100) / total);
               set_progress(percentCompleted);
             } else {
-              // Fallback for when Content-Length is missing
               set_progress((prev) => (prev < 90 ? prev + 10 : prev));
             }
           },
         },
       );
-
       if (response.data) {
         set_progress(100);
-
         const formatted_data = response.data.map((item, index) => ({
           ...item,
           index: index + 1,
+          id: parseInt(item.id),
         }));
-        set_upload_as_list(formatted_data);
+        set_upload_mcl_list(formatted_data);
         show_toast({
           type: "success",
           title: "Data Fetched",
@@ -141,7 +144,7 @@ const Upload_AS = ({ set_page, on_success }) => {
     }
   };
 
-  // 2. Inside the Upload_AS component:
+  // 2. Inside the Upload_MCL_NERM component:
   const [is_uploading, set_is_uploading] = useState(false);
   const [upload_progress, set_upload_progress] = useState(0);
   const [upload_controller, set_upload_controller] = useState(null);
@@ -154,8 +157,8 @@ const Upload_AS = ({ set_page, on_success }) => {
     set_upload_progress(0);
 
     try {
-      const result = await push_audit_survey_to_cloud(
-        upload_as_list,
+      await push_mcl_nerm_to_cloud(
+        upload_mcl_list,
         (percent) => set_upload_progress(percent),
         controller.signal,
       );
@@ -166,7 +169,6 @@ const Upload_AS = ({ set_page, on_success }) => {
         message: "Data has been pushed to the cloud.",
         icon: <CheckCircle2 size={21} className="text-green-500" />,
       });
-      if (on_success) on_success(result);
       handle_go_back();
     } catch (error) {
       if (error.message !== "Upload Cancelled") {
@@ -202,7 +204,7 @@ const Upload_AS = ({ set_page, on_success }) => {
     handle_sort,
     filtered_data,
     total_pages,
-  } = client_side_filter(upload_as_list, columns);
+  } = client_side_filter(upload_mcl_list, columns);
 
   const render_cell = (col, row) => {
     const value = row[col.key];
@@ -217,9 +219,9 @@ const Upload_AS = ({ set_page, on_success }) => {
   return (
     <React.Fragment>
       <div className="w-full">
+        {/* + BREADCRUMB */}
         <div className="flex flex-wrap items-center justify-between gap-3 py-5">
           <h1 className="text-xl">Cloud Management</h1>
-          {/* + Breadcrumbs */}
           <nav>
             <ol className="flex flex-wrap items-center gap-1.5">
               <li>
@@ -231,30 +233,37 @@ const Upload_AS = ({ set_page, on_success }) => {
                 className="flex items-center gap-1.5 text-sm text-gray-500"
                 onClick={handle_go_back}
               >
-                <span>/</span>
+                <span>
+                  <ChevronRight size={14} />
+                </span>
                 <a className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-sky-500 cursor-pointer">
-                  Cloud Management
+                  Maintenance
                 </a>
               </li>
               <li
                 className="flex items-center gap-1.5 text-sm text-gray-500"
                 onClick={handle_go_back}
               >
-                <span>/</span>
+                <span>
+                  <ChevronRight size={14} />
+                </span>
                 <a className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-sky-500 cursor-pointer">
-                  Audit Survey
+                  MCL
                 </a>
               </li>
               <li className="flex items-center gap-1.5 text-sm text-gray-500">
-                <span>/</span>
+                <span>
+                  <ChevronRight size={14} />
+                </span>
                 <span className="text-gray-800">Upload</span>
               </li>
             </ol>
           </nav>
-          {/* - Breadcrumbs */}
         </div>
+        {/* - BREADCRUMB */}
+        {/* + MAIN CONTAINER */}
         <div className="w-full bg-white rounded-lg border">
-          {/* + Header */}
+          {/* + HEADER */}
           <div className="flex flex-wrap items-center justify-between gap-3 p-5">
             <div className="flex items-center gap-3">
               <Button
@@ -264,14 +273,14 @@ const Upload_AS = ({ set_page, on_success }) => {
                 width="w-[20px]"
                 on_click={handle_go_back}
               ></Button>
-              <h1 className="text-lg">Upload Audit Survey</h1>
+              <h1 className="text-lg">Upload MCL</h1>
             </div>
             <div className="flex gap-2 text-gray-500 text-sm tracking-wider">
               {format_date_1(get_date_now())}
             </div>
           </div>
-          {/* - Header */}
-          {/* + Section 1 */}
+          {/* - HEADER */}
+          {/* + SECTION 1 */}
           <div className="p-5 sm:p-6 border-t">
             <div className="w-full flex items-center gap-2">
               <div className="w-full">
@@ -279,7 +288,7 @@ const Upload_AS = ({ set_page, on_success }) => {
                   icon={Globe}
                   icon_position="left"
                   value={
-                    "https://benbyextportal.com/home/api/get/GetTradeAuditSurvey?F1=0&F2=0&F3=0"
+                    "https://benbyextportal.com/home/api/get/GetMCLNerm?Brand=0"
                   }
                   disabled
                 />
@@ -295,8 +304,8 @@ const Upload_AS = ({ set_page, on_success }) => {
               </div>
             </div>
           </div>
-          {/* - Section 1 */}
-          {/* + Section 2 */}
+          {/* - SECTION 1 */}
+          {/* + SECTION 2 */}
           <div className="p-5 sm:p-6 border-t">
             <div className="w-full border rounded-lg">
               <div className="w-full md:flex md:justify-between p-4 gap-4">
@@ -435,8 +444,7 @@ const Upload_AS = ({ set_page, on_success }) => {
                         return (
                           <tr
                             key={idx}
-                            onClick={() => set_selected_id(row.iD)}
-                            className={`transition-colors ${selected_id === row.iD ? "bg-green-100/40 hover:bg-green-100/60" : "hover:bg-gray-50"}`}
+                            className={`transition-colors hover:bg-gray-50`}
                           >
                             {active_columns.map((col, i) => (
                               <td
@@ -467,16 +475,16 @@ const Upload_AS = ({ set_page, on_success }) => {
               )}
             </div>
           </div>
-          {/* - Section 2 */}
-          {/* + Section 3 */}
+          {/* - SECTION 2 */}
+          {/* + SECTION 3 */}
           <div className="p-5 sm:p-6 border-t">
             <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
               <Button
                 variant="primary"
                 icon={FileUp}
                 icon_position="left"
-                on_click={handle_upload}
-                disabled={upload_as_list.length === 0 || is_fetching}
+                on_click={handle_upload} // Attached function
+                disabled={upload_mcl_list.length === 0 || is_fetching}
               >
                 Upload to Cloud
               </Button>
@@ -485,8 +493,9 @@ const Upload_AS = ({ set_page, on_success }) => {
               </Button>
             </div>
           </div>
-          {/* - Section 3 */}
+          {/* - SECTION 3 */}
         </div>
+        {/* - MAIN CONTAINER */}
       </div>
 
       {/* + Modals */}
@@ -581,4 +590,4 @@ const Upload_AS = ({ set_page, on_success }) => {
   );
 };
 
-export default Upload_AS;
+export default Upload_MCL_NERM;

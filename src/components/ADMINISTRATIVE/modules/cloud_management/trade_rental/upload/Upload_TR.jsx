@@ -21,24 +21,54 @@ import Spinner from "assets/elements/Spinner";
 import { useToast } from "components/ADMINISTRATIVE/layout/Toast_Provider";
 import { format_date_1, get_date_now } from "assets/scripts/format";
 import axios from "axios";
-import { push_audit_survey_to_cloud } from "api/real_time_db/cloud_management/audit_survey_api";
+import { push_trade_rental_to_cloud } from "api/real_time_db/cloud_management/trade_rental_api";
 
-const Upload_AS = ({ set_page, on_success }) => {
+const Upload_TR = ({ set_page, on_success }) => {
   const { show_toast } = useToast();
   const [show_filter, set_show_filter] = useState(false);
   const [selected_id, set_selected_id] = useState(null);
 
   const columns = [
     { key: "index", label: "NO.", sortable: false },
-    { key: "iD", label: "ID", sortable: true },
-    { key: "code", label: "TDS CODE", sortable: true },
+    { key: "id", label: "ID", sortable: true },
     { key: "storecode", label: "STORE CODE", sortable: true },
-    { key: "suveryID", label: "SURVEY ID", sortable: true },
-    { key: "surveyCategory", label: "CATEGORY", sortable: true },
-    { key: "rowNo", label: "ROW NO.", sortable: true },
-    { key: "surveyQuestion", label: "QUESTION", sortable: true },
-    { key: "dateUpload", label: "DATE UPLOAD", sortable: true, hidden: true },
-    { key: "uploadedBy", label: "UPLOADED BY", sortable: true, hidden: true },
+    { key: "chain", label: "CHAIN", sortable: true },
+    { key: "brand", label: "BRAND", sortable: true },
+    // { key: "pOSM", label: "POSM", sortable: true },
+    { key: "channel", label: "CHANNEL", sortable: true },
+    { key: "durationFrom", label: "DURATION FROM", sortable: true },
+    { key: "durationTo", label: "DURATION TO", sortable: true },
+    { key: "dateuploaded", label: "DATE UPLOADED", sortable: true },
+    { key: "uploadedBy", label: "UPLOADED BY", sortable: true },
+    // { key: "check1", label: "CHECK 1", sortable: true },
+    // { key: "check2", label: "CHECK 2", sortable: true },
+    // { key: "check3", label: "CHECK 3", sortable: true },
+    // { key: "check4", label: "CHECK 4", sortable: true },
+    // { key: "check5", label: "CHECK 5", sortable: true },
+    { key: "tDSName", label: "TDS NAME", sortable: true },
+    { key: "employeeID", label: "EMPLOYEE ID", sortable: true },
+    { key: "activity", label: "ACTIVITY", sortable: true },
+    { key: "manager", label: "MANAGER", sortable: true },
+    { key: "storeClass", label: "STORE CLASS", sortable: true },
+    { key: "tDSGroup", label: "TDS GROUP", sortable: true },
+    { key: "tL1", label: "TL 1", sortable: true },
+    { key: "tL2", label: "TL 2", sortable: true },
+    { key: "area", label: "AREA", sortable: true },
+    { key: "city", label: "CITY", sortable: true },
+    { key: "region", label: "REGION", sortable: true },
+    { key: "position", label: "POSITION", sortable: true },
+    // { key: "points", label: "POINTS", sortable: true },
+    // { key: "typeOfEP", label: "TYPE OF EP", sortable: true },
+    // {
+    //   key: "correctLocationUpload",
+    //   label: "CORRECT LOCATION UPLOAD",
+    //   sortable: true,
+    // },
+    { key: "typeOfActivity", label: "TYPE OF ACTIVITY", sortable: true },
+    // { key: "groupID", label: "GROUP ID", sortable: true },
+    { key: "soldStreet", label: "SOLD STREET", sortable: true },
+    // { key: "channelMerch", label: "CHANNEL MERCH", sortable: true },
+    // { key: "ePSource", label: "EP SOURCE", sortable: true },
   ];
 
   const [visible_columns, set_visible_columns] = useState(
@@ -58,7 +88,7 @@ const Upload_AS = ({ set_page, on_success }) => {
   // Existing States
   const [progress, set_progress] = useState(0);
   const [loading, set_loading] = useState(false);
-  const [upload_as_list, set_upload_as_list] = useState([]);
+  const [upload_tr_list, set_upload_tr_list] = useState([]);
   const [is_fetching, set_is_fetching] = useState(false);
 
   // + NEW STATES FOR AXIOS & ABORT
@@ -71,12 +101,11 @@ const Upload_AS = ({ set_page, on_success }) => {
     set_loading(true);
     set_is_fetching(true);
     set_progress(0); // Reset progress
-    set_upload_as_list([]);
+    set_upload_tr_list([]);
 
     try {
       const response = await axios.get(
-        // "https://benbyextportal.com/home/api/get/GetSKUCarried?Storecode=0",
-        "https://benbyextportal.com/home/api/get/GetTradeAuditSurvey?F1=0&F2=0&F3=0",
+        "https://benbyextportal.com/home/api/get/GetTradeAuditAndPhotos?Storecode=0&TDScode=0",
         {
           signal: controller.signal,
           // Track progress
@@ -96,12 +125,11 @@ const Upload_AS = ({ set_page, on_success }) => {
 
       if (response.data) {
         set_progress(100);
-
         const formatted_data = response.data.map((item, index) => ({
           ...item,
           index: index + 1,
         }));
-        set_upload_as_list(formatted_data);
+        set_upload_tr_list(formatted_data);
         show_toast({
           type: "success",
           title: "Data Fetched",
@@ -141,7 +169,7 @@ const Upload_AS = ({ set_page, on_success }) => {
     }
   };
 
-  // 2. Inside the Upload_AS component:
+  // 2. Inside the Upload_TR component:
   const [is_uploading, set_is_uploading] = useState(false);
   const [upload_progress, set_upload_progress] = useState(0);
   const [upload_controller, set_upload_controller] = useState(null);
@@ -154,8 +182,8 @@ const Upload_AS = ({ set_page, on_success }) => {
     set_upload_progress(0);
 
     try {
-      const result = await push_audit_survey_to_cloud(
-        upload_as_list,
+      const result = await push_trade_rental_to_cloud(
+        upload_tr_list,
         (percent) => set_upload_progress(percent),
         controller.signal,
       );
@@ -202,7 +230,7 @@ const Upload_AS = ({ set_page, on_success }) => {
     handle_sort,
     filtered_data,
     total_pages,
-  } = client_side_filter(upload_as_list, columns);
+  } = client_side_filter(upload_tr_list, columns);
 
   const render_cell = (col, row) => {
     const value = row[col.key];
@@ -242,7 +270,7 @@ const Upload_AS = ({ set_page, on_success }) => {
               >
                 <span>/</span>
                 <a className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-sky-500 cursor-pointer">
-                  Audit Survey
+                  Trade Rental
                 </a>
               </li>
               <li className="flex items-center gap-1.5 text-sm text-gray-500">
@@ -264,7 +292,7 @@ const Upload_AS = ({ set_page, on_success }) => {
                 width="w-[20px]"
                 on_click={handle_go_back}
               ></Button>
-              <h1 className="text-lg">Upload Audit Survey</h1>
+              <h1 className="text-lg">Upload Trade Rental</h1>
             </div>
             <div className="flex gap-2 text-gray-500 text-sm tracking-wider">
               {format_date_1(get_date_now())}
@@ -279,7 +307,7 @@ const Upload_AS = ({ set_page, on_success }) => {
                   icon={Globe}
                   icon_position="left"
                   value={
-                    "https://benbyextportal.com/home/api/get/GetTradeAuditSurvey?F1=0&F2=0&F3=0"
+                    "https://benbyextportal.com/home/api/get/GetTradeAuditAndPhotos?Storecode=0&TDScode=0"
                   }
                   disabled
                 />
@@ -476,7 +504,7 @@ const Upload_AS = ({ set_page, on_success }) => {
                 icon={FileUp}
                 icon_position="left"
                 on_click={handle_upload}
-                disabled={upload_as_list.length === 0 || is_fetching}
+                disabled={upload_tr_list.length === 0 || is_fetching}
               >
                 Upload to Cloud
               </Button>
@@ -581,4 +609,4 @@ const Upload_AS = ({ set_page, on_success }) => {
   );
 };
 
-export default Upload_AS;
+export default Upload_TR;

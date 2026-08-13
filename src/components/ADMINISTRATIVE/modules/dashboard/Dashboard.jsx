@@ -7,6 +7,7 @@ import {
   Database,
   ClipboardList,
   Settings,
+  History,
 } from "lucide-react";
 import { Use_App } from "context/app_context";
 
@@ -104,9 +105,19 @@ const Dashboard = ({ active_user, set_active_item }) => {
       icon: <Database className="text-green-600" />,
       color: "bg-green-50",
       module_code: "CM",
-      sub_module_code: "CM8",
+      sub_module_code: "CM7",
       parent: "Cloud Management",
       target: "Cloud Management-Price Survey",
+    },
+    {
+      title: "Training Logs",
+      desc: "Manage TDS training logs",
+      icon: <Database className="text-green-600" />,
+      color: "bg-green-50",
+      module_code: "CM",
+      sub_module_code: "CM9",
+      parent: "Cloud Management",
+      target: "Cloud Management-Training Logs",
     },
 
     // --- DATA HISTORY (DH) ---
@@ -142,6 +153,16 @@ const Dashboard = ({ active_user, set_active_item }) => {
       target: "Data History-Execution Planner",
     },
     {
+      title: "Trade Rental History",
+      desc: "View past audit surveys",
+      icon: <ClipboardList className="text-green-600" />,
+      color: "bg-green-50",
+      module_code: "DH",
+      sub_module_code: "DH4",
+      parent: "Data History",
+      target: "Data History-Trade Rental",
+    },
+    {
       title: "Audit Survey History",
       desc: "View past audit surveys",
       icon: <ClipboardList className="text-green-600" />,
@@ -152,7 +173,7 @@ const Dashboard = ({ active_user, set_active_item }) => {
       target: "Data History-Audit Survey",
     },
     {
-      title: "Price Sruvey History",
+      title: "Price Survey History",
       desc: "Historical price survey data",
       icon: <ClipboardList className="text-green-600" />,
       color: "bg-green-50",
@@ -182,6 +203,16 @@ const Dashboard = ({ active_user, set_active_item }) => {
       target: "Data History-Return to Vendor",
     },
     {
+      title: "NERM Inventory",
+      desc: "NERM historical records",
+      icon: <ClipboardList className="text-green-600" />,
+      color: "bg-green-50",
+      module_code: "DH",
+      sub_module_code: "DH11",
+      parent: "Data History",
+      target: "Data History-NERM Inventory",
+    },
+    {
       title: "User Timelog",
       desc: "User timelog historical records",
       icon: <ClipboardList className="text-green-600" />,
@@ -191,17 +222,49 @@ const Dashboard = ({ active_user, set_active_item }) => {
       parent: "Data History",
       target: "Data History-User Timelog",
     },
+    {
+      title: "Training Logs",
+      desc: "Training logs historical records",
+      icon: <ClipboardList className="text-green-600" />,
+      color: "bg-green-50",
+      module_code: "DH",
+      sub_module_code: "DH10",
+      parent: "Data History",
+      target: "Data History-Training Logs",
+    },
+
+    // --- SCHEDULING (SC) ---
+    {
+      title: "Daily Transfer",
+      desc: "Automated data transfer to internal database",
+      icon: <History className="text-green-600" />,
+      color: "bg-green-50",
+      module_code: "SC",
+      sub_module_code: "SC1",
+      parent: "Scheduling",
+      target: "Scheduling-Daily Transfer",
+    },
     // --- MAINTENANCE (MT) ---
     // Icon: Settings | Parent: Maintenance | Target: Maintenance-[Name]
     {
       title: "MCL",
-      desc: "Master Client List maintenance",
+      desc: "Manage list of MCL",
       icon: <Settings className="text-green-600" />,
       color: "bg-green-50",
       module_code: "MT",
       sub_module_code: "MT1",
       parent: "Maintenance",
       target: "Maintenance-MCL",
+    },
+    {
+      title: "MCL NERM",
+      desc: "Manage list of MCL NERM",
+      icon: <Settings className="text-green-600" />,
+      color: "bg-green-50",
+      module_code: "MT",
+      sub_module_code: "MT10",
+      parent: "Maintenance",
+      target: "Maintenance-MCL NERM",
     },
     {
       title: "Store Master",

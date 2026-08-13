@@ -9,6 +9,7 @@ import {
   Server,
   Settings,
   ClipboardList,
+  History,
 } from "lucide-react";
 import delphys_logo from "../../../assets/images/benby-logo.png";
 import { useToast } from "./Toast_Provider";
@@ -84,12 +85,25 @@ const Sidebar = ({
         { name: "OSA", sub_module_code: "DH1" },
         { name: "Merch Deployment", sub_module_code: "DH2" },
         { name: "Execution Planner", sub_module_code: "DH3" },
-        { name: "Trade Audit", sub_module_code: "DH4" },
+        { name: "Trade Rental", sub_module_code: "DH4" },
         { name: "Audit Survey", sub_module_code: "DH5" },
         { name: "Price Survey", sub_module_code: "DH6" },
         { name: "Share of Shelf", sub_module_code: "DH7" },
         { name: "Return to Vendor", sub_module_code: "DH8" },
+        { name: "NERM Inventory", sub_module_code: "DH11" },
         { name: "User Timelog", sub_module_code: "DH9" },
+        { name: "Training Logs", sub_module_code: "DH10" },
+      ],
+    },
+    {
+      key: "Scheduling",
+      module_code: "SC",
+      type: "dropdown",
+      name: "Scheduling",
+      icon: <History size={18} />,
+      sub_items: [
+        { name: "Daily Transfer", sub_module_code: "SC1" },
+        // { name: "Manual Transfer", sub_module_code: "SC2" },
       ],
     },
     {
@@ -100,6 +114,7 @@ const Sidebar = ({
       icon: <Settings size={18} />,
       sub_items: [
         { name: "MCL", sub_module_code: "MT1" },
+        { name: "MCL NERM", sub_module_code: "MT10" },
         { name: "Store Master", sub_module_code: "MT2" },
         { name: "OSA Not Carried", sub_module_code: "MT3" },
         { name: "TDS Database", sub_module_code: "MT4" },

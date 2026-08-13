@@ -1,99 +1,72 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import {
   Search,
   ChevronDown,
   ChevronUp,
   RefreshCw,
+  PlusCircle,
+  User,
   HardDriveUpload,
   View,
   Trash,
   Edit,
   SlidersHorizontal,
-  ChevronRight,
-  Trash2,
   CheckCircle2,
+  CircleX,
+  FileDown,
+  Calendar,
+  ChevronRight,
 } from "lucide-react";
 
-import { Use_App } from "context/app_context";
-import { useToast } from "components/ADMINISTRATIVE/layout/Toast_Provider";
-import { client_side_filter } from "assets/scripts/functions/client_side_filter";
-
+// Elements
 import Button from "assets/elements/Button";
-import Button_Action from "assets/elements/Button_Action";
 import Icon_Field from "assets/elements/Icon_Field";
 import Select_Field from "assets/elements/Select_Field";
-import Checkbox_Field from "assets/elements/Checkbox_Field";
 import Pagination from "assets/elements/Pagination";
+import Checkbox_Field from "assets/elements/Checkbox_Field";
+import { client_side_filter } from "assets/scripts/functions/client_side_filter";
 import Spinner from "assets/elements/Spinner";
+import { realtime_db } from "assets/scripts/firebase";
+import { get, ref } from "firebase/database";
+import Status_Badge from "assets/elements/Status_Badge";
 
-// Functional Imports for Execution Planner
-import Upload_EP from "./upload/Upload_EP";
-import Truncate_EP from "./delete/Truncate_EP";
-import { get_all_execution_planners } from "api/real_time_db/cloud_management/execution_planner_api";
+import Button_Action from "assets/elements/Button_Action";
+import { Use_App } from "context/app_context";
+import { useToast } from "components/ADMINISTRATIVE/layout/Toast_Provider";
+import {
+  get_nerm_history_list_by_date,
+  get_nerm_history_list_by_tds,
+} from "api/real_time_db/data_history/tbl_nerm_history_api";
+import { export_excel_service } from "assets/scripts/functions/export_excel_service";
+// import View_MCP from "./view/View_MCP";
+// import Edit_MCP from "./edit/Edit_MCP";
+// import Upload_MCP from "./upload/Upload_MCP";
 
-const Execution_Planner = () => {
+const NERM_History = () => {
   const { active_user } = Use_App();
   const { show_toast } = useToast();
   const [page, set_page] = useState("main");
   const [loading, set_loading] = useState(false);
   const [display_modal, set_display_modal] = useState("");
+  const [search_mode, set_search_mode] = useState("date"); // "code" or "date"
+  const [input_tds_code, set_input_tds_code] = useState("");
+  const [input_date, set_input_date] = useState(""); // For the date search
   const [show_filter, set_show_filter] = useState(false);
   const [selected_id, set_selected_id] = useState(null);
+  const [view_data, set_view_data] = useState({});
+  const [edit_data, set_edit_data] = useState({});
 
-  // Adjusted columns for Execution Planner functionality
   const columns = [
     { key: "index", label: "NO.", sortable: false },
-    { key: "a1_ID", label: "ID", sortable: true },
+    { key: "id", label: "TDS CODE", sortable: true },
     { key: "a2_Storecode", label: "STORE CODE", sortable: true },
-    { key: "a3_Chain", label: "CHAIN", sortable: true },
-    { key: "a4_Brand", label: "BRAND", sortable: true },
-    { key: "a5_POSM", label: "POSM", sortable: true },
-    { key: "a6_Channel", label: "CHANNEL", sortable: true },
-    { key: "a7_DurationFrom", label: "DURATION FROM", sortable: true },
-    { key: "a8_DurationTo", label: "DURATION TO", sortable: true },
-    { key: "a9_Dateuploaded", label: "DATE UPLOAD", sortable: true },
-    { key: "b1_UploadedBy", label: "UPLOADED BY", sortable: true },
-    { key: "b2_Check1", label: "CHECK 1", sortable: true },
-    { key: "b3_Check2", label: "CHECK 2", sortable: true },
-    { key: "b4_Check3", label: "CHECK 3", sortable: true },
-    { key: "b5_Check4", label: "CHECK 4", sortable: true },
-    { key: "b6_Check5", label: "CHECK 5", sortable: true },
-    { key: "b7_Remarks", label: "REMARKS", sortable: true },
-    { key: "b8_TLName", label: "TL NAME", sortable: true },
-    { key: "b9_TDSName", label: "TDS NAME", sortable: true },
-    { key: "c1_EmployeeID", label: "EMPLOYEE ID", sortable: true },
-    { key: "c2_ActualPictureLink", label: "PICTURE LINK", sortable: true },
-    { key: "c3_Activity", label: "ACTIVITY", sortable: true },
-    { key: "c4_Manager", label: "MANAGER", sortable: true },
-    { key: "c5_AddColumn", label: "ADDL COLUMN", sortable: true },
-    { key: "c6_StoreClass", label: "STORE CLASS", sortable: true },
-    { key: "c7_TDSGroup", label: "TDS GROUP", sortable: true },
-    { key: "c8_TL1", label: "TL 1", sortable: true },
-    { key: "c9_TL2", label: "TL 2", sortable: true },
-    { key: "d1_Area", label: "AREA", sortable: true },
-    { key: "d2_City", label: "CITY", sortable: true },
-    { key: "d3_Region", label: "REGION", sortable: true },
-    { key: "d4_Position", label: "POSITION", sortable: true },
-    { key: "d5_PermitLink", label: "PERMIT LINK", sortable: true },
-    { key: "d6_Points", label: "POINTS", sortable: true },
-    { key: "d7_TypeOfEP", label: "TYPE OF EP", sortable: true },
-    {
-      key: "d8_CorrectLocationUpload",
-      label: "LOCATION UPLOAD",
-      sortable: true,
-    },
-    { key: "d9_TypeOfActivity", label: "ACTIVITY TYPE", sortable: true },
-    { key: "e1_GroupID", label: "GROUP ID", sortable: true },
-    { key: "e2_SoldStreet", label: "SOLD STREET", sortable: true },
-    { key: "e3_1_ChannelMerch", label: "CHANNEL MERCH", sortable: true },
-    { key: "e3_2_EPSource", label: "EP SOURCE", sortable: true },
-    { key: "e3_3_CameraOnly", label: "CAMERA ONLY", sortable: true },
-    { key: "e4_Check1Remarks", label: "CH1 REMARKS", sortable: true },
-    { key: "e5_Check2Remarks", label: "CH2 REMARKS", sortable: true },
-    { key: "e6_Check3Remarks", label: "CH3 REMARKS", sortable: true },
-    { key: "e7_Check4Remarks", label: "CH4 REMARKS", sortable: true },
-    { key: "e8_Check5Remarks", label: "CH5 REMARKS", sortable: true },
-    // { key: "actions", label: "ACTIONS", sortable: false },
+    { key: "a1_Matcode", label: "MAT CODE", sortable: true },
+    { key: "cases", label: "CASES", sortable: true },
+    { key: "inner_box", label: "INNER BOX", sortable: true },
+    { key: "pieces", label: "PCS", sortable: true },
+    { key: "expiry_date", label: "EXPIRY DATE", sortable: true },
+    { key: "a5_Dateupdated", label: "DATE UPDATED", sortable: true },
+    // { key: "actions", label: "", sortable: false },
   ];
 
   const [visible_columns, set_visible_columns] = useState(
@@ -110,25 +83,35 @@ const Execution_Planner = () => {
     );
   };
 
-  const [ep_list, set_ep_list] = useState([]);
+  const [nerm_history_list, set_nerm_history_list] = useState([]);
 
-  // Functionality: Fetching Execution Planner data
-  const handle_get_ep_list = async () => {
+  const handle_get_nerm_history_list = async () => {
+    set_loading(true);
     try {
-      set_loading(true);
-      const response = await get_all_execution_planners();
-      set_ep_list(response);
+      let results = [];
+      if (search_mode === "code") {
+        if (!input_tds_code) {
+          alert("Please enter a TDS code.");
+          return;
+        }
+        return;
+        // results = await get_nerm_history_list_by_tds(input_tds_code);
+      } else {
+        if (!input_date) {
+          alert("Please enter a date.");
+          return;
+        }
+        results = await get_nerm_history_list_by_date(input_date);
+      }
+
+      set_nerm_history_list(results);
       set_current_page(1);
     } catch (error) {
-      console.error("Fetch error:", error);
+      console.error("Fetch failed", error);
     } finally {
       set_loading(false);
     }
   };
-
-  useEffect(() => {
-    handle_get_ep_list();
-  }, []);
 
   const {
     search_query,
@@ -142,10 +125,51 @@ const Execution_Planner = () => {
     handle_sort,
     filtered_data,
     total_pages,
-  } = client_side_filter(ep_list, columns);
+  } = client_side_filter(nerm_history_list, columns);
+
+  const handle_export_excel = () => {
+    if (!nerm_history_list || nerm_history_list.length === 0) {
+      alert("There is no data to export");
+      return;
+    }
+
+    // Bago ipasa sa service, linisin muna natin ang 'id' ng bawat row
+    const cleaned_data = nerm_history_list.map((row) => ({
+      ...row,
+      id: typeof row.id === "string" ? row.id.split("_")[0] : row.id,
+    }));
+
+    // cleaned_data na ang ipapasa natin sa halip na yung original list
+    const result = export_excel_service(cleaned_data, columns, {
+      filename_prefix: `NERM_HISTORY`,
+      sheet_name: "NERM History",
+    });
+
+    if (result.success) {
+      show_toast({
+        type: "success",
+        title: "Export Successfully",
+        message: "The data has been exported.",
+        icon: <CheckCircle2 size={21} className="text-green-500" />,
+      });
+    } else {
+      show_toast({
+        type: "danger",
+        title: "Error",
+        message: "Something went wrong. Please try again.",
+        icon: <CircleX size={21} className="text-red-500" />,
+      });
+    }
+  };
 
   const render_cell = (col, row) => {
     const value = row[col.key];
+    const tds_code = row.id;
+
+    if (col.key === "id") {
+      return <div>{tds_code.split("_")[0]}</div>;
+    }
+
     if (col.key === "actions") {
       return (
         <div className="flex gap-2">
@@ -153,14 +177,14 @@ const Execution_Planner = () => {
             <Button_Action
               icon={View}
               tooltip="View Record"
-              on_click={() => console.log("View", row)}
+              on_click={() => handle_view(row)}
             />
           </div>
           <div className="relative group flex jusity-center items-center">
             <Button_Action
               icon={Edit}
               tooltip="Edit Record"
-              on_click={() => console.log("Edit", row)}
+              on_click={() => handle_edit(row)}
             />
           </div>
           {active_user?.category === "DEV" && (
@@ -176,9 +200,28 @@ const Execution_Planner = () => {
         </div>
       );
     }
+
     return value;
   };
 
+  const handle_view = (data) => {
+    const { index, ...data_without_index } = data;
+    console.log("Clean Data (No Index):", data_without_index);
+    set_view_data(data_without_index);
+    set_display_modal("view_mcp");
+
+    // Use data_without_index for your logic
+  };
+  const handle_edit = (data) => {
+    const { index, ...data_without_index } = data;
+    console.log("Clean Data (No Index):", data_without_index);
+    set_edit_data(data_without_index);
+    set_display_modal("edit_mcp");
+
+    // Use data_without_index for your logic
+  };
+
+  // RETURN ORIGIN
   return (
     <React.Fragment>
       {page === "main" && (
@@ -186,7 +229,7 @@ const Execution_Planner = () => {
           <div className="w-full">
             {/* + BREADCRUMB */}
             <div className="flex flex-wrap items-center justify-between gap-3 py-5">
-              <h1 className="text-xl">Cloud Management</h1>
+              <h1 className="text-xl">Data History</h1>
               <nav>
                 <ol className="flex flex-wrap items-center gap-1.5">
                   <li>
@@ -199,14 +242,14 @@ const Execution_Planner = () => {
                       <ChevronRight size={14} />
                     </span>
                     <a className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-green-500 cursor-pointer">
-                      Cloud Management
+                      Data History
                     </a>
                   </li>
                   <li className="flex items-center gap-1.5 text-sm text-gray-500">
                     <span>
                       <ChevronRight size={14} />
                     </span>
-                    <span className="text-gray-800">Execution Planner</span>
+                    <span className="text-gray-800">NERM Inventory</span>
                   </li>
                 </ol>
               </nav>
@@ -216,28 +259,104 @@ const Execution_Planner = () => {
             <div className="w-full bg-white rounded-lg border">
               {/* + HEADER */}
               <div className="flex flex-wrap items-center justify-between gap-3 p-5">
-                <h1 className="text-lg">Execution Planner</h1>
+                <h1 className="text-lg">NERM Inventory</h1>
                 <div className="flex gap-2">
-                  <Button
-                    variant="danger"
-                    icon={Trash2}
-                    icon_position="left"
-                    width="w-[110px]"
-                    on_click={() => set_display_modal("truncate_ep")}
-                  >
-                    Truncate
-                  </Button>
+                  {/* {active_user?.category === "DEV" && (
+                    <Button
+                      variant="success"
+                      icon={FileDigit}
+                      icon_position="left"
+                      width="w-[110px]"
+                      on_click={handle_set_incremental_id}
+                    >
+                      Set ID
+                    </Button>
+                  )}
+                  {active_user?.category === "DEV" && (
+                    <Button
+                      variant="danger"
+                      icon={Trash2}
+                      icon_position="left"
+                      width="w-[110px]"
+                      loading={truncate_loading}
+                      on_click={handle_truncate}
+                    >
+                      Truncate
+                    </Button>
+                  )} */}
                   <Button
                     variant="primary"
-                    icon={HardDriveUpload}
+                    icon={FileDown}
                     icon_position="left"
-                    on_click={() => set_page("upload")}
+                    on_click={handle_export_excel}
                   >
-                    Upload from Database
+                    Export as Excel
                   </Button>
                 </div>
               </div>
               {/* - HEADER */}
+              {/* + SECTION 1 */}
+              <div className="p-5 sm:p-6 border-t">
+                <div className="flex flex-col gap-3">
+                  {/* Mode Switcher */}
+                  <div className="flex gap-2 mb-2">
+                    {/* <button
+                      onClick={() => set_search_mode("code")}
+                      className={`px-3 py-1 text-xs rounded-full border outline-none 
+                        ${search_mode === "code" ? "bg-green-100 border-green-600 text-green-600" : "bg-gray-50 border-gray-200 text-gray-500"}`}
+                    >
+                      Search by TDS Code
+                    </button> */}
+                    <button
+                      onClick={() => set_search_mode("date")}
+                      className={`px-3 py-1 text-xs rounded-full border outline-none 
+                        ${search_mode === "date" ? "bg-green-100 border-green-600 text-green-600" : "bg-gray-50 border-gray-200 text-gray-500"}`}
+                    >
+                      Search by Date
+                    </button>
+                  </div>
+
+                  <div className="w-full flex items-center gap-2">
+                    <div className="w-full">
+                      {search_mode === "code" ? (
+                        <Icon_Field
+                          placeholder="Enter TDS Code"
+                          icon={User}
+                          icon_position="left"
+                          value={input_tds_code}
+                          on_change={(e) => set_input_tds_code(e.target.value)}
+                          on_key_down={(e) =>
+                            e.key === "Enter" && handle_get_nerm_history_list()
+                          }
+                        />
+                      ) : (
+                        <Icon_Field
+                          type="date" // Use HTML5 date picker if Icon_Field supports 'type'
+                          placeholder="Enter Date"
+                          icon={Calendar} // Ensure you import 'Calendar' from your icon library
+                          icon_position="left"
+                          value={input_date}
+                          on_change={(e) => set_input_date(e.target.value)}
+                          on_key_down={(e) =>
+                            e.key === "Enter" && handle_get_nerm_history_list()
+                          }
+                        />
+                      )}
+                    </div>
+                    <div className="relative">
+                      <Button
+                        variant="primary"
+                        width="w-[140px]"
+                        loading={loading}
+                        on_click={handle_get_nerm_history_list}
+                      >
+                        Load Data
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              {/* - SECTION 1 */}
               {/* + SECTION 2 */}
               <div className="p-5 sm:p-6 border-t">
                 <div className="w-full border rounded-lg">
@@ -263,7 +382,7 @@ const Execution_Planner = () => {
                         variant="white"
                         icon={RefreshCw}
                         icon_position="left"
-                        on_click={handle_get_ep_list}
+                        on_click={handle_get_nerm_history_list}
                       />
                     </div>
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-center md:w-[600px]">
@@ -389,8 +508,7 @@ const Execution_Planner = () => {
                             return (
                               <tr
                                 key={idx}
-                                onClick={() => set_selected_id(row.a1_ID)}
-                                className={`transition-colors ${selected_id === row.a1_ID ? "bg-green-100/40 hover:bg-green-100/60" : "hover:bg-gray-50"}`}
+                                className={`transition-colors hover:bg-gray-50`}
                               >
                                 {active_columns.map((col, i) => (
                                   <td
@@ -428,31 +546,8 @@ const Execution_Planner = () => {
           </div>
         </React.Fragment>
       )}
-      {/* + PAGES */}
-      {page === "upload" && (
-        <Upload_EP
-          set_page={set_page}
-          on_success={() => handle_get_ep_list()}
-        />
-      )}
-      {/* - PAGES */}
-      {/* + MODALS */}
-      <Truncate_EP
-        isOpen={display_modal === "truncate_ep"}
-        onClose={() => set_display_modal("")}
-        on_success={() => {
-          show_toast({
-            type: "success",
-            title: "Deletion Success",
-            message: "Execution Planner data has been cleared.",
-            icon: <CheckCircle2 size={21} className="text-green-500" />,
-          });
-          handle_get_ep_list();
-        }}
-      />
-      {/* - MODALS */}
     </React.Fragment>
   );
 };
 
-export default Execution_Planner;
+export default NERM_History;

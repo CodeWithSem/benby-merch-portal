@@ -12,6 +12,12 @@ export const module_access_list = [
     creation_date: "MM-DD-YYYY",
   },
   {
+    id: "SC",
+    module_access_code: "SC",
+    module_access_desc: "Scheduling",
+    creation_date: "MM-DD-YYYY",
+  },
+  {
     id: "MT",
     module_access_code: "MT",
     module_access_desc: "Maintenance",

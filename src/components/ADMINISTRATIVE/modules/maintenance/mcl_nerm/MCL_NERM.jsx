@@ -4,6 +4,8 @@ import {
   ChevronDown,
   ChevronUp,
   RefreshCw,
+  PlusCircle,
+  User,
   HardDriveUpload,
   View,
   Trash,
@@ -12,88 +14,57 @@ import {
   ChevronRight,
   Trash2,
   CheckCircle2,
+  CircleX,
 } from "lucide-react";
 
 import { Use_App } from "context/app_context";
 import { useToast } from "components/ADMINISTRATIVE/layout/Toast_Provider";
+
 import { client_side_filter } from "assets/scripts/functions/client_side_filter";
 
 import Button from "assets/elements/Button";
-import Button_Action from "assets/elements/Button_Action";
 import Icon_Field from "assets/elements/Icon_Field";
 import Select_Field from "assets/elements/Select_Field";
 import Checkbox_Field from "assets/elements/Checkbox_Field";
 import Pagination from "assets/elements/Pagination";
 import Spinner from "assets/elements/Spinner";
+import Status_Badge from "assets/elements/Status_Badge";
+import Upload_MCL from "./upload/Upload_MCL_NERM";
+import Confirm_Modal from "assets/elements/modals/Confirm_Modal";
+import Truncate_Modal from "assets/elements/modals/Truncate_Modal";
+import {
+  get_all_mcl_nerm_list,
+  truncate_mcl_nerm,
+} from "api/real_time_db/maintenance/mcl_nerm_api";
 
-// Functional Imports for Execution Planner
-import Upload_EP from "./upload/Upload_EP";
-import Truncate_EP from "./delete/Truncate_EP";
-import { get_all_execution_planners } from "api/real_time_db/cloud_management/execution_planner_api";
-
-const Execution_Planner = () => {
+const MCL_NERM = () => {
   const { active_user } = Use_App();
   const { show_toast } = useToast();
   const [page, set_page] = useState("main");
   const [loading, set_loading] = useState(false);
   const [display_modal, set_display_modal] = useState("");
+  const [input_tds_code, set_input_tds_code] = useState("");
+  const [is_truncate_loading, set_is_truncate_loading] = useState(false);
   const [show_filter, set_show_filter] = useState(false);
-  const [selected_id, set_selected_id] = useState(null);
+  const [truncate_progress, set_truncate_progress] = useState(0);
 
-  // Adjusted columns for Execution Planner functionality
   const columns = [
     { key: "index", label: "NO.", sortable: false },
-    { key: "a1_ID", label: "ID", sortable: true },
-    { key: "a2_Storecode", label: "STORE CODE", sortable: true },
-    { key: "a3_Chain", label: "CHAIN", sortable: true },
-    { key: "a4_Brand", label: "BRAND", sortable: true },
-    { key: "a5_POSM", label: "POSM", sortable: true },
-    { key: "a6_Channel", label: "CHANNEL", sortable: true },
-    { key: "a7_DurationFrom", label: "DURATION FROM", sortable: true },
-    { key: "a8_DurationTo", label: "DURATION TO", sortable: true },
-    { key: "a9_Dateuploaded", label: "DATE UPLOAD", sortable: true },
-    { key: "b1_UploadedBy", label: "UPLOADED BY", sortable: true },
-    { key: "b2_Check1", label: "CHECK 1", sortable: true },
-    { key: "b3_Check2", label: "CHECK 2", sortable: true },
-    { key: "b4_Check3", label: "CHECK 3", sortable: true },
-    { key: "b5_Check4", label: "CHECK 4", sortable: true },
-    { key: "b6_Check5", label: "CHECK 5", sortable: true },
-    { key: "b7_Remarks", label: "REMARKS", sortable: true },
-    { key: "b8_TLName", label: "TL NAME", sortable: true },
-    { key: "b9_TDSName", label: "TDS NAME", sortable: true },
-    { key: "c1_EmployeeID", label: "EMPLOYEE ID", sortable: true },
-    { key: "c2_ActualPictureLink", label: "PICTURE LINK", sortable: true },
-    { key: "c3_Activity", label: "ACTIVITY", sortable: true },
-    { key: "c4_Manager", label: "MANAGER", sortable: true },
-    { key: "c5_AddColumn", label: "ADDL COLUMN", sortable: true },
-    { key: "c6_StoreClass", label: "STORE CLASS", sortable: true },
-    { key: "c7_TDSGroup", label: "TDS GROUP", sortable: true },
-    { key: "c8_TL1", label: "TL 1", sortable: true },
-    { key: "c9_TL2", label: "TL 2", sortable: true },
-    { key: "d1_Area", label: "AREA", sortable: true },
-    { key: "d2_City", label: "CITY", sortable: true },
-    { key: "d3_Region", label: "REGION", sortable: true },
-    { key: "d4_Position", label: "POSITION", sortable: true },
-    { key: "d5_PermitLink", label: "PERMIT LINK", sortable: true },
-    { key: "d6_Points", label: "POINTS", sortable: true },
-    { key: "d7_TypeOfEP", label: "TYPE OF EP", sortable: true },
-    {
-      key: "d8_CorrectLocationUpload",
-      label: "LOCATION UPLOAD",
-      sortable: true,
-    },
-    { key: "d9_TypeOfActivity", label: "ACTIVITY TYPE", sortable: true },
-    { key: "e1_GroupID", label: "GROUP ID", sortable: true },
-    { key: "e2_SoldStreet", label: "SOLD STREET", sortable: true },
-    { key: "e3_1_ChannelMerch", label: "CHANNEL MERCH", sortable: true },
-    { key: "e3_2_EPSource", label: "EP SOURCE", sortable: true },
-    { key: "e3_3_CameraOnly", label: "CAMERA ONLY", sortable: true },
-    { key: "e4_Check1Remarks", label: "CH1 REMARKS", sortable: true },
-    { key: "e5_Check2Remarks", label: "CH2 REMARKS", sortable: true },
-    { key: "e6_Check3Remarks", label: "CH3 REMARKS", sortable: true },
-    { key: "e7_Check4Remarks", label: "CH4 REMARKS", sortable: true },
-    { key: "e8_Check5Remarks", label: "CH5 REMARKS", sortable: true },
-    // { key: "actions", label: "ACTIONS", sortable: false },
+    { key: "a1_Matcode", label: "SKU CODE", sortable: true },
+    { key: "a5_SKUName", label: "SKU NAME", sortable: true },
+    { key: "a3_Brand", label: "BRAND", sortable: true },
+    { key: "b3_Category", label: "CATEGORY", sortable: true },
+    { key: "b4_Channel", label: "CHANNEL", sortable: true },
+    { key: "b5_Tagging", label: "TAGGING", sortable: true },
+    { key: "b6_Position", label: "POSITION", sortable: true },
+    { key: "a2_GroupName", label: "GROUP", sortable: true },
+    { key: "a4_SubBrand", label: "SUB-BRAND", sortable: true },
+    { key: "a6_Dateuploaded", label: "UPLOADED", sortable: true },
+    { key: "a7_UploadedBy", label: "USER", sortable: true },
+    { key: "a8_Status", label: "STATUS", sortable: true },
+    { key: "b1_ForAvailable", label: "AVAILABLE", sortable: true },
+    { key: "b2_ForOutofStock", label: "OOS", sortable: true },
+    { key: "a9_ArrangeBy", label: "ARRANGE", sortable: true },
   ];
 
   const [visible_columns, set_visible_columns] = useState(
@@ -110,14 +81,13 @@ const Execution_Planner = () => {
     );
   };
 
-  const [ep_list, set_ep_list] = useState([]);
+  const [mcl_list, set_mcl_list] = useState([]);
 
-  // Functionality: Fetching Execution Planner data
-  const handle_get_ep_list = async () => {
+  const handle_get_mcl_list = async () => {
     try {
       set_loading(true);
-      const response = await get_all_execution_planners();
-      set_ep_list(response);
+      const response = await get_all_mcl_nerm_list();
+      set_mcl_list(response);
       set_current_page(1);
     } catch (error) {
       console.error("Fetch error:", error);
@@ -127,7 +97,7 @@ const Execution_Planner = () => {
   };
 
   useEffect(() => {
-    handle_get_ep_list();
+    handle_get_mcl_list();
   }, []);
 
   const {
@@ -142,43 +112,51 @@ const Execution_Planner = () => {
     handle_sort,
     filtered_data,
     total_pages,
-  } = client_side_filter(ep_list, columns);
+  } = client_side_filter(mcl_list, columns);
 
   const render_cell = (col, row) => {
     const value = row[col.key];
-    if (col.key === "actions") {
-      return (
-        <div className="flex gap-2">
-          <div className="relative group flex jusity-center items-center">
-            <Button_Action
-              icon={View}
-              tooltip="View Record"
-              on_click={() => console.log("View", row)}
-            />
-          </div>
-          <div className="relative group flex jusity-center items-center">
-            <Button_Action
-              icon={Edit}
-              tooltip="Edit Record"
-              on_click={() => console.log("Edit", row)}
-            />
-          </div>
-          {active_user?.category === "DEV" && (
-            <div className="relative group flex jusity-center items-center">
-              <Button_Action
-                class_name="mb-[1px]"
-                icon={Trash}
-                variant="danger"
-                tooltip="Delete Record"
-              />
-            </div>
-          )}
-        </div>
-      );
-    }
+    // if (col.key === "z_nerm_status") {
+    //   return <Status_Badge status={row.z_nerm_status} class_name={"w-full"} />;
+    // }
+
     return value;
   };
 
+  const handle_truncate = async () => {
+    try {
+      set_is_truncate_loading(true);
+      set_truncate_progress(0);
+
+      const result = await truncate_mcl_nerm((progress) => {
+        set_truncate_progress(progress);
+      });
+
+      if (result.success) {
+        show_toast({
+          type: "success",
+          title: "Deletion Success",
+          message: "The record has been deleted.",
+          icon: <CheckCircle2 size={21} className="text-green-500" />,
+        });
+        set_mcl_list([]);
+        set_display_modal("");
+      }
+    } catch (error) {
+      show_toast({
+        type: "danger",
+        title: "Error",
+        message: "Something went wrong while updating.",
+        icon: <CircleX size={21} className="text-red-500" />,
+      });
+      show_toast("Failed to truncate database", "error");
+    } finally {
+      set_is_truncate_loading(false);
+      setTimeout(() => set_truncate_progress(0), 500);
+    }
+  };
+
+  // RETURN ORIGIN
   return (
     <React.Fragment>
       {page === "main" && (
@@ -186,7 +164,7 @@ const Execution_Planner = () => {
           <div className="w-full">
             {/* + BREADCRUMB */}
             <div className="flex flex-wrap items-center justify-between gap-3 py-5">
-              <h1 className="text-xl">Cloud Management</h1>
+              <h1 className="text-xl">Maintenance</h1>
               <nav>
                 <ol className="flex flex-wrap items-center gap-1.5">
                   <li>
@@ -199,14 +177,14 @@ const Execution_Planner = () => {
                       <ChevronRight size={14} />
                     </span>
                     <a className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-green-500 cursor-pointer">
-                      Cloud Management
+                      Maintenance
                     </a>
                   </li>
                   <li className="flex items-center gap-1.5 text-sm text-gray-500">
                     <span>
                       <ChevronRight size={14} />
                     </span>
-                    <span className="text-gray-800">Execution Planner</span>
+                    <span className="text-gray-800">MCL NERM</span>
                   </li>
                 </ol>
               </nav>
@@ -216,29 +194,32 @@ const Execution_Planner = () => {
             <div className="w-full bg-white rounded-lg border">
               {/* + HEADER */}
               <div className="flex flex-wrap items-center justify-between gap-3 p-5">
-                <h1 className="text-lg">Execution Planner</h1>
+                <h1 className="text-lg">MCL NERM</h1>
                 <div className="flex gap-2">
-                  <Button
-                    variant="danger"
-                    icon={Trash2}
-                    icon_position="left"
-                    width="w-[110px]"
-                    on_click={() => set_display_modal("truncate_ep")}
-                  >
-                    Truncate
-                  </Button>
+                  {active_user?.category === "DEV" && (
+                    <Button
+                      variant="danger"
+                      icon={Trash2}
+                      icon_position="left"
+                      width="w-[110px]"
+                      loading={is_truncate_loading}
+                      on_click={() => set_display_modal("truncate")}
+                    >
+                      Truncate
+                    </Button>
+                  )}
                   <Button
                     variant="primary"
                     icon={HardDriveUpload}
                     icon_position="left"
-                    on_click={() => set_page("upload")}
+                    on_click={() => set_page("upload_mcp_nerm")}
                   >
                     Upload from Database
                   </Button>
                 </div>
               </div>
               {/* - HEADER */}
-              {/* + SECTION 2 */}
+              {/* + SECTION 1 */}
               <div className="p-5 sm:p-6 border-t">
                 <div className="w-full border rounded-lg">
                   <div className="w-full md:flex md:justify-between p-4 gap-4">
@@ -263,7 +244,7 @@ const Execution_Planner = () => {
                         variant="white"
                         icon={RefreshCw}
                         icon_position="left"
-                        on_click={handle_get_ep_list}
+                        on_click={handle_get_mcl_list}
                       />
                     </div>
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-center md:w-[600px]">
@@ -389,8 +370,7 @@ const Execution_Planner = () => {
                             return (
                               <tr
                                 key={idx}
-                                onClick={() => set_selected_id(row.a1_ID)}
-                                className={`transition-colors ${selected_id === row.a1_ID ? "bg-green-100/40 hover:bg-green-100/60" : "hover:bg-gray-50"}`}
+                                className={`transition-colors hover:bg-gray-50`}
                               >
                                 {active_columns.map((col, i) => (
                                   <td
@@ -422,37 +402,33 @@ const Execution_Planner = () => {
                   )}
                 </div>
               </div>
-              {/* - SECTION 2 */}
+              {/* - SECTION 1 */}
             </div>
             {/* - MAIN CONTAINER */}
           </div>
         </React.Fragment>
       )}
       {/* + PAGES */}
-      {page === "upload" && (
-        <Upload_EP
-          set_page={set_page}
-          on_success={() => handle_get_ep_list()}
-        />
-      )}
+      {page === "upload_mcp_nerm" && <Upload_MCL set_page={set_page} />}
       {/* - PAGES */}
       {/* + MODALS */}
-      <Truncate_EP
-        isOpen={display_modal === "truncate_ep"}
-        onClose={() => set_display_modal("")}
-        on_success={() => {
-          show_toast({
-            type: "success",
-            title: "Deletion Success",
-            message: "Execution Planner data has been cleared.",
-            icon: <CheckCircle2 size={21} className="text-green-500" />,
-          });
-          handle_get_ep_list();
-        }}
+      <Truncate_Modal
+        is_loading={is_truncate_loading}
+        progress={truncate_progress}
+      />
+      <Confirm_Modal
+        is_open={display_modal === "truncate"}
+        title="Confirm Truncate"
+        description_1="Are you sure you want to delete all MCL data?"
+        description_2="This action will permanently delete records from the cloud database."
+        description_3="This cannot be undone. Do you wish to proceed?"
+        confirm_variant="danger"
+        on_confirm={handle_truncate}
+        on_cancel={() => set_display_modal("")}
       />
       {/* - MODALS */}
     </React.Fragment>
   );
 };
 
-export default Execution_Planner;
+export default MCL_NERM;

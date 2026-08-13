@@ -12,10 +12,16 @@ export const get_user_timelog_list_by_tds = async (tds_code) => {
     const snapshot = await get(epQuery);
     const data = snapshot.val();
     if (!data) return [];
-    return Object.keys(data).map((key) => ({
-      id: key,
-      ...data[key],
-    }));
+
+    return (
+      Object.keys(data)
+        .map((key) => ({
+          id: key,
+          ...data[key],
+        }))
+        // 🔹 CONDITION: Isasama lang kung may laman ang tds_code at hindi empty string
+        .filter((item) => item.tds_code && item.tds_code.trim() !== "")
+    );
   } catch (error) {
     console.error("Error in get_user_timelog_list_by_tds:", error);
     throw error;
@@ -38,10 +44,15 @@ export const get_user_timelog_list_by_date = async (target_date) => {
 
     if (!data) return [];
 
-    return Object.keys(data).map((key) => ({
-      id: key,
-      ...data[key],
-    }));
+    return (
+      Object.keys(data)
+        .map((key) => ({
+          id: key,
+          ...data[key],
+        }))
+        // 🔹 CONDITION: Tatanggalin ang record kung empty/blank ang tds_code
+        .filter((item) => item.tds_code && item.tds_code.trim() !== "")
+    );
   } catch (error) {
     console.error("Error in get_user_timelog_list_by_date:", error);
     throw error;

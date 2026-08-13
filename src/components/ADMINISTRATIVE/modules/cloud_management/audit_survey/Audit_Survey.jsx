@@ -36,9 +36,6 @@ import {
 } from "api/real_time_db/cloud_management/audit_survey_api";
 import Truncate_AS from "./delete/Truncate_AS";
 
-// import View_MCP from "./view/View_MCP";
-// import Edit_MCP from "./edit/Edit_MCP";
-
 const Audit_Survey = () => {
   const { active_user } = Use_App();
   const { show_toast } = useToast();
@@ -53,6 +50,7 @@ const Audit_Survey = () => {
 
   const columns = [
     { key: "index", label: "NO.", sortable: false },
+    { key: "id", label: "ID", sortable: true, hidden: true },
     { key: "store_code", label: "STORE CODE", sortable: true },
     { key: "tds_code", label: "TDS CODE", sortable: true },
     { key: "survey_id", label: "SURVEY ID", sortable: true },
@@ -219,17 +217,15 @@ const Audit_Survey = () => {
               <div className="flex flex-wrap items-center justify-between gap-3 p-5">
                 <h1 className="text-lg">Audit Survey</h1>
                 <div className="flex gap-2">
-                  {active_user?.category === "DEV" && (
-                    <Button
-                      variant="danger"
-                      icon={Trash2}
-                      icon_position="left"
-                      width="w-[110px]"
-                      on_click={() => set_display_modal("truncate_aud_surv")}
-                    >
-                      Truncate
-                    </Button>
-                  )}
+                  <Button
+                    variant="danger"
+                    icon={Trash2}
+                    icon_position="left"
+                    width="w-[110px]"
+                    on_click={() => set_display_modal("truncate_aud_surv")}
+                  >
+                    Truncate
+                  </Button>
                   <Button
                     variant="primary"
                     icon={HardDriveUpload}
