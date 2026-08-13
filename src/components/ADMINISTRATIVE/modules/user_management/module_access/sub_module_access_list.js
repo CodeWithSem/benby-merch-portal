@@ -110,6 +110,12 @@ export const sub_module_access_list = [
     sub_module_access_desc: "Training Logs",
     creation_date: "MM-DD-YYYY",
   },
+  {
+    id: "DH11",
+    sub_module_access_code: "DH11",
+    sub_module_access_desc: "NERM Inventory",
+    creation_date: "MM-DD-YYYY",
+  },
 
   // --- SCHEDULING (SC) ---
   {

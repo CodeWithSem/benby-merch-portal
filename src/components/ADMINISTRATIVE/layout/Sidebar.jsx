@@ -90,9 +90,9 @@ const Sidebar = ({
         { name: "Price Survey", sub_module_code: "DH6" },
         { name: "Share of Shelf", sub_module_code: "DH7" },
         { name: "Return to Vendor", sub_module_code: "DH8" },
-        { name: "NERM Inventory", sub_module_code: "DH11" },
         { name: "User Timelog", sub_module_code: "DH9" },
         { name: "Training Logs", sub_module_code: "DH10" },
+        { name: "NERM Inventory", sub_module_code: "DH11" },
       ],
     },
     {
